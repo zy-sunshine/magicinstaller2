@@ -1,0 +1,7 @@
+<package>
+<files>parted-1.8.8.bin.tar.gz</files>
+<install>
+usr/lib/libparted-1.8.so.*
+usr/sbin/parted
+</install>
+</package>

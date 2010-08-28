@@ -1,0 +1,18 @@
+bootloader      放置引导器(例如grub)的配置文件。
+bindir          放置第三放二进制包和源码包。
+rootfs          制作 mirootfs.gz 包的代码。
+scripts         过程中调用的工具脚本。
+spec            用户可操作的配置文件。
+src             magicinstaller 主程序的源码。
+tmp             过程中的临时文件。
+
+result          储存已生成的关键文件。
+mi_config.py    存储全局配置变量。
+
+SConstruct          scons命令行分析, 以及全局 env, 全局函数.
+
+SConstruct-rootfs   将 root.step1, rootfs 的 etc 目录文件, 以及 #src 中生成的 magicinstaller 主程序
+                    (#bindir/root.src.tar.gz)合并在一起, 打包成 gz cpio 格式, 生成最终的 rootfs ,
+                    放置在#result/mirootfs.gz .
+
+SConstruct-iso      生成 iso .

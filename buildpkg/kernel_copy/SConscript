@@ -1,0 +1,98 @@
+# -*- python -*-
+# Copyright (C) 2010, zy_sunshine.
+# Author:  zy_sunshine <zy.netsec@gmail.com>
+# All rights reserved.
+#
+# This program is free software; you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the Free
+# Software Foundation; either version 2, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANT; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE. See the GNU General Public LIcense for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along
+# with this program; if not, write to the Free Software Foundation, 59 Temple
+# Place - Suite 330, Boston, MA 02111-1307, USA.
+
+Import('env', 'mi_config', 'MiPkgMaker')
+import os
+
+class KernelBinMaker(MiPkgMaker):
+    '''
+    Extract kernel files (vmlinuz and kmodules) from the kernel rpm package directly.
+    '''
+    alias = 'kernel.bin'
+    name = 'linux'
+
+    build_root = os.path.join(mi_config.tmpdir, 'kernel')
+    build_prefix = build_root
+    source_prefix = '#bindir/root'
+    
+    version = mi_config.mikernelver
+    
+    source_list = []
+    source_list.append('kernel-smp-2.6.30.10-5mgc25.i686.rpm')
+
+    package_bin = 'kmodules-${version}.tar.bz2'
+    kmodules = []
+    kernel = 'boot/vmlinuz-2.6.30.10-smp'
+    
+    install_cmds = []
+    build_cmds = []
+    
+    def prepare(self):
+        MiPkgMaker.prepare(self)
+        self.init_kmodules()
+        self.init_install_cmds()
+
+    def init_kmodules(self):
+        #self.kmodules.append('lib/modules/2.6.30.10-smp/kernel/drivers/hid/hid-wacom.ko')
+        self.kmodules.append('lib/modules/2.6.30.10-smp/kernel/drivers/ide/ide_platform.ko')
+        #self.kmodules.append('lib/modules/2.6.30.10-smp/kernel/drivers/md/dm-multipath.ko')
+        #self.kmodules.append('lib/modules/2.6.30.10-smp/kernel/drivers/md/dm-round-robin.ko')
+        #self.kmodules.append('lib/modules/2.6.30.10-smp/kernel/drivers/scsi/scsi_transport_srp.ko')
+        #self.kmodules.append('lib/modules/2.6.30.10-smp/kernel/drivers/scsi/scsi_wait_scan.ko')
+        pass
+
+    def init_install_cmds(self):
+        cmds = []
+        for f in self.kmodules:
+            p = os.path.dirname(f)
+            cmd = ['mkdir -p $install_prefix/%s' % p ,
+                    'cp -dp $build_prefix/%s $install_prefix/%s' % (f, p)
+                    ]
+            cmds.extend(cmd)
+        cmd = ['/sbin/depmod -b $install_prefix -v ' + self.version, ]
+        cmds.extend(cmd)
+        self.install_cmds.extend(cmds)
+    
+    def install(self):
+        env = self.env
+        kmodules = self.path_prefix('$build_prefix', self.kmodules)
+        install_cmds = self.install_cmds
+        env.Command('$build_prefix/.installed',
+                    '$build_prefix/.prepared',
+                    install_cmds +
+                    [self.get_touch_cmd()])
+
+    def make(self):
+        self.initenv()
+        self.prepare()
+        #self.build()
+        self.install()
+        self.pack()
+
+    def pack(self):
+        env = self.env
+        # kmodules
+        MiPkgMaker.pack(self)
+        # mb-vmlinux
+        env.Alias(self.alias,
+                  env.InstallAs('$pack_prefix/mb-vmlinuz-$version',
+                                '$ROOT/%s' % self.kernel))
+
+pkg = KernelBinMaker(env)
+pkg.make()
+

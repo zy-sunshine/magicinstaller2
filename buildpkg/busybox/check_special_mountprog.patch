@@ -1,0 +1,81 @@
+Let mount applet check special mount program first (/sbin/mount.*)
+
+From: Du Jingwu <zsdjw@21cn.com>
+
+
+---
+
+ util-linux/mount.c |   53 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 files changed, 53 insertions(+), 0 deletions(-)
+
+diff --git a/util-linux/mount.c b/util-linux/mount.c
+index fe2f1d9..15728ab 100644
+--- a/util-linux/mount.c
++++ b/util-linux/mount.c
+@@ -248,6 +248,56 @@ static int fakeIt;
+ #define fakeIt 0
+ #endif
+ 
++/* Borrowed from util-linux 2.12r and hack
++ * check_special_mountprog()
++ *      If there is a special mount program for this type, exec it.
++ * returns: 0: no exec was done, 1: exec was done, status has result
++ */
++
++static int check_special_mountprog(struct mntent *mp, int vfsflags, char *filteropts,
++				   int *status)
++{
++	char mountprog[120];
++	struct stat statbuf;
++	pid_t pid;
++
++	if (mp->mnt_type && strlen(mp->mnt_type) < 100) {
++		sprintf(mountprog, "/sbin/mount.%s", mp->mnt_type);
++		if (stat(mountprog, &statbuf) == 0) {
++			pid = fork();
++			if (pid == 0) {
++				const char *mountargs[10];
++				int i = 0;
++
++				mountargs[i++] = mountprog;
++				mountargs[i++] = mp->mnt_fsname;
++				mountargs[i++] = mp->mnt_dir;
++				/* (ignore)
++				   if (nomtab)
++				   mountargs[i++] = "-n";
++				   if (verbose)
++				   mountargs[i++] = "-v";
++				*/
++				if (filteropts && *filteropts) {
++					mountargs[i++] = "-o";
++					mountargs[i++] = filteropts;
++				}
++				mountargs[i] = NULL;
++				execv(mountprog, (char **) mountargs);
++				exit(1);       /* exec failed */
++			} else if (pid != -1) {
++				waitpid(pid, status, 0);
++				*status = (WIFEXITED(*status) ? \
++					   WEXITSTATUS(*status) : -1);
++				return 1;
++			} else {
++				bb_perror_msg_and_die("fork failed");
++			}
++		}
++	}
++	return 0;
++}
++
+ // Perform actual mount of specific filesystem at specific location.
+ // NB: mp->xxx fields may be trashed on exit
+ static int mount_it_now(struct mntent *mp, int vfsflags, char *filteropts)
+@@ -256,6 +306,9 @@ static int mount_it_now(struct mntent *mp, int vfsflags, char *filteropts)
+ 
+ 	if (fakeIt) goto mtab;
+ 
++	// check special mount program first (/sbin/mount.*)
++	if (check_special_mountprog(mp, vfsflags, filteropts, &rc))
++		goto mtab;
+ 	// Mount, with fallback to read-only if necessary.
+ 
+ 	for (;;) {

@@ -1,0 +1,121 @@
+### -*- python -*-
+# Copyright (C) 2010, zy_sunshine.
+# Author:   zy_sunshine <zy.netsec@gmail.com>
+# All rights reserved.
+
+import os
+import sys
+
+Import('*')
+
+use_cp_mode = False
+Export('use_cp_mode')
+createiso_script = 'scripts/CreateISO.py'
+need_clean = 'notclean'
+#tgt_iso = mi_config.mkisofn(1)
+#need_clean = 'notclean'
+#env.Command(tgt_iso,
+#            [createiso_script,],
+#            ['$pythonbin %s $TARGET' % create_iso_script + \
+#             ' $pkgarr $pkgdirs $bootcd_dir' + \
+#             ' $distname $distver $set_no %s $bootload $miimages_cddir' % need_clean
+#             ])
+##### Construct the iso.
+## It will require some file in bootloader bindir
+class BootIsoMaker(PkgMaker.StepMaker):
+    target_list = [mi_config.mkisofn(1)]
+    steps = ['init_dir',
+             'install_miimages',
+             #'install_mlbasefiles',
+             ]
+    if use_cp_mode:
+        steps= steps + ['install_rpmdb_etctar',]
+    steps+= ['add_extra_files',
+             'install_bootload',
+             'make_iso',
+             ]
+
+    def initenv(self):
+        env = self.env
+
+    def init_dir(self):
+        cmds = ['rm -rf $bootcd_dir',
+                'mkdir -p $bootcd_dir']
+        return [], cmds
+
+    def install_miimages(self):
+        miimages_files = ['result/mirootfs.gz',
+                          'result/mivmlinuz',]
+        cmds = ['mkdir -p $miimages_dir',
+                'cp -u %s $miimages_dir' % \
+                ' '.join(miimages_files)]
+
+        return miimages_files, cmds
+
+    def install_mlbasefiles(self):
+        # specinfo.py is added for reference only.
+        cmds = ['mkdir -p $mlbase_dir',
+                'cp -u %s $mlbase_dir' % ' '.join(mlbase_files)]
+        return mlbase_files, cmds
+    
+    def install_rpmdb_etctar(self):
+        cmds = ['rm -r $bootcd_dir/$distname/packages/*',
+                'cp %s $bootcd_dir/$distname/packages/' % rpmdbtar,
+                'cp %s $bootcd_dir/$distname/packages/' % etctar,
+        ]
+        return [rpmdbtar, etctar], cmds
+
+    def add_extra_files(self):
+        if os.path.isdir('$addfiles_dir'):
+            addfiles_value = [DirValue('$addfiles_dir')]
+            cmds = ['cp -a $addfiles_dir/* $bootcd_dir']
+        else:
+            addfiles_value = []
+            cmds = []
+        return addfiles_value, cmds
+
+    def install_bootload(self):
+        if mi_config.bootload == 'grub':
+            bootload_files = ['bootload/grub/menu.lst',
+                              'bindir/splash.xpm.gz',
+                              '$devrootdir/grub/.prepared']
+            cmds = ['mkdir -p $miimages_dir/grub',
+                    'cp $devrootdir/grub/grub4dos-0.4.5b/chinese/grldr $miimages_dir/grub/',
+                    'cp $devrootdir/grub/boot/grub/fonts $miimages_dir/grub/',
+                    'cp bindir/splash.xpm.gz $miimages_dir/grub',
+                    #'cp bootload/grub/menu.lst $miimages_dir/grub/',
+                    'cp bootload/grub/menu.lst $bootcd_dir/',
+                    ]
+            return bootload_files, cmds
+        else:
+            return [], []
+
+    def make_iso(self):
+        cmds =['$pythonbin %s $TARGET' % createiso_script + \
+               ' $pkgarr $pkgdirs $bootcd_dir' + \
+               ' $distname $distver $set_no %s $bootload $miimages_cddir' % need_clean]
+        return [createiso_script], cmds
+
+bootiso = BootIsoMaker(env)
+bootiso.make()
+
+class PrepareBootload(PkgMaker.BaseMaker):
+    def extract(self):
+        if mi_config.bootload == 'grub':
+            # extract grub for dos
+            env.Command('$devrootdir/grub/.prepared',
+                        ['bindir/grub4dos-0.4.5b-2010-05-31.zip',
+                         'bindir/boot_fdr.zip'],
+                        ['rm -rf $devrootdir/grub',
+                         'mkdir -p $devrootdir/grub',
+                         self.get_extract_cmd('bindir/grub4dos-0.4.5b-2010-05-31.zip', '$devrootdir/grub'),
+                         self.get_extract_cmd('bindir/boot_fdr.zip', '$devrootdir/grub'),
+                        'ls -l $SOURCE > $TARGET'])
+prepare_bootload = PrepareBootload()
+prepare_bootload.extract()
+
+##### Prepare Kernel. Copy to $resultdir.
+env.Command('result/mivmlinuz',
+            'bindir/mi-vmlinuz-$mikernelver',
+            'cp $SOURCE $TARGET')
+

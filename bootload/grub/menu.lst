@@ -1,0 +1,22 @@
+# menu.lst of grub for MagicInstaller.
+default=0
+timeout=20
+fontfile /boot/grub/fonts
+#splashimage=/boot/grub/splash.xpm.gz
+
+title 安装 Magic Linux
+	kernel /boot/mivmlinuz root=/dev/ram0 vga=785
+	initrd /boot/mirootfs.gz
+
+title 启动 Windows 2000/XP
+	find --set-root /ntldr
+	chainloader /ntldr
+
+title 启动 Windows 9x/Me
+	find --set-root /io.sys
+	chainloader /io.sys
+
+title Linux 急救模式
+	kernel /boot/mivmlinuz root=/dev/ram0 vga=785 rescue
+	initrd /boot/mirootfs.gz
+

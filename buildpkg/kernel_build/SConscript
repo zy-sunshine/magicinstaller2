@@ -1,0 +1,54 @@
+# -*- python -*-
+# Copyright (C) 2007, Levin Du.
+# Author:  Levin Du <zsdjw@21cn.com>
+# All rights reserved.
+#
+# This program is free software; you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the Free
+# Software Foundation; either version 2, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANT; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE. See the GNU General Public LIcense for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along
+# with this program; if not, write to the Free Software Foundation, 59 Temple
+# Place - Suite 330, Boston, MA 02111-1307, USA.
+
+Import('env', 'mi_config', 'MiPkgMaker')
+
+class KernelBinMaker(MiPkgMaker):
+    alias = 'kernel.bin'
+    name = 'linux'
+    version = mi_config.mikernelver
+    source_list = ['${package}.tar.bz2']
+    package_bin = 'kmodules-${version}.tar.bz2'
+    install_cmds = ['make INSTALL_MOD_PATH=$install_prefix -C $build_prefix modules_install']
+
+    def configure(self):
+        env = self.env
+        env.Command('$build_prefix/.configured',
+                    ['${name}-${version}.config',
+                     '$build_prefix/.prepared'],
+                    ['cp $SOURCE $build_prefix/.config',
+                     'yes "" | make -C $build_prefix oldconfig',
+                     self.get_touch_cmd()])
+
+    def build(self):
+        env = self.env
+        MiPkgMaker.build(self)
+        env.SideEffect('$build_prefix/arch/i386/boot/bzImage',
+                       '$build_prefix/.built')
+
+    def pack(self):
+        env = self.env
+        # kmodules
+        MiPkgMaker.pack(self)
+        # mb-vmlinux
+        env.Alias(self.alias,
+                  env.InstallAs('$pack_prefix/mb-vmlinuz-$version',
+                                '$build_prefix/arch/i386/boot/bzImage'))
+
+pkg = KernelBinMaker(env)
+pkg.make()

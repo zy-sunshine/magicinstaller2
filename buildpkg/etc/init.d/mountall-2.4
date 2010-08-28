@@ -1,0 +1,25 @@
+#!/bin/sh
+# Copyright (C) 2003, Charles Wang.
+# Author:  Charles Wang <charles@linux.net.cn>
+# All rights reserved.
+# License: GPL
+
+echo "Mount proc filesystem:"
+mount -n -t proc proc /proc
+
+echo "Mount usb filesystem:"
+mount -t usbdevfs usbdevfs /proc/bus/usb
+
+#echo "Remount root filesystem in read-write mode:"
+#mount -n -o remount,rw /
+
+echo "Mount all filesystems:"
+mount -a
+
+echo "Make the required directories."
+mkdir -p /tmpfs/dev
+mkdir -p /tmpfs/tmp
+mkdir -p /tmpfs/var/lib/xkb
+mkdir -p /tmpfs/var/log
+mkdir -p /tmpfs/var/run
+mkdir -p /tmpfs/var/lock/rpm

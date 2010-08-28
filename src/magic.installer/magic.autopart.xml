@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<!-- Copyright (C) 2007, Levin Du <zsdjw@21cn.com> -->
+<!-- Author:  Levin Du -->
+<root>
+  <autopart>
+    <default desc="((Single partition with swap))">
+      <part>
+        <mountpoint>SWAP</mountpoint>
+        <filesystem>SWAP</filesystem>
+        <size>512M</size>
+      </part>
+      <part>
+        <mountpoint>/</mountpoint>
+        <filesystem>ext3</filesystem>
+        <size>100%</size>
+      </part>
+    </default>
+    <common desc="((Separated /, /home))">
+      <part>
+        <mountpoint>/</mountpoint>
+        <filesystem>ext3</filesystem>
+        <size>5160M</size>
+      </part>
+      <part>
+        <mountpoint>/home</mountpoint>
+        <filesystem>ext3</filesystem>
+        <size>2060M</size>
+      </part>
+    </common>
+    <custom desc="((Customed autopart profile))">
+      <part>
+        <mountpoint>SWAP</mountpoint>
+        <filesystem>SWAP</filesystem>
+        <size>512M</size>
+      </part>
+      <part>
+        <mountpoint>/</mountpoint>
+        <filesystem>ext3</filesystem>
+        <size>2060M</size>
+      </part>
+      <part>
+        <mountpoint>/usr</mountpoint>
+        <filesystem>ext3</filesystem>
+        <size>4130M</size>
+      </part>
+      <part>
+        <mountpoint>/home</mountpoint>
+        <filesystem>ext3</filesystem>
+        <size>2060M</size>
+      </part>
+    </custom>
+  </autopart>
+</root>

@@ -1,0 +1,19 @@
+
+# kernel 准备.
+kernel_build    编译 kernel 并将编译好的 kernel 拷贝到 #bindir/mi-vmlinuz-$kernelver ;
+                将编译好的内核模块打包至 #bindir/kmodules-$kernelver.tar.bz2 .
+kernel_copy     从 #bindir/root/ 中提取内核相关二进制包, 拷贝其中的内核至 #bindir/mi-vmlinuz-$kernelver ;
+                将包中的内核模块打包至 #bindir/kmodules-$kernelver.tar.bz2 .
+* kernel_build kernel_copy 二者使用其一即可.
+
+# root.step1 准备.
+busybox         编译 rootfs 中需要的 busybox 打包至 #bindir/root/busybox-$busybox_version.tar.bz2 .
+parted          编译特定 parted 为 magicinstaller 主程序提供支持, 打包至 #bindir/root/parted-$ver.bin.tar.gz .
+root.step1      从某一发行版的二进制包中提取文件, 与 busybox parted 共同构建 MI 运行的 rootfs .
+
+# rootfs 的 etc 目录文件.
+etc             rootfs 中需要的 etc 目录文件.
+
+# 脚本控制
+SConscript          控制 rootfs 的各个模块的准备过程.
+

@@ -1,0 +1,19 @@
+#!/bin/sh
+# Copyright (C) 2003, Charles Wang.
+# Author:  Charles Wang <charles@linux.net.cn>
+# All rights reserved.
+# License: GPL
+
+export PATH=/usr/bin:/bin:/usr/sbin:/sbin
+
+. /etc/sysconfig/i18n
+export GDK_USE_XFT=0
+
+# Run the init script one by one.
+/etc/init.d/mountall
+/etc/init.d/modules
+#/etc/init.d/apply-dbgopts
+/etc/init.d/syslogd
+/etc/init.d/network
+#/etc/init.d/tftpd
+#/etc/init.d/create-devenv

@@ -1,0 +1,16 @@
+<packages>
+<package>
+<post_action>
+mkdir -p $ROOT/proc
+mkdir -p $ROOT/sys
+mkdir -p $ROOT/root
+mkdir -p $ROOT/etc
+mkdir -p $ROOT/tmpfs
+#mkdir -p $ROOT/mnt/MagicBooter
+ln -s /proc/mounts $ROOT/etc/mtab
+chmod 777 $ROOT/tmpfs
+ln -s /tmpfs/tmp $ROOT/tmp
+ln -s /tmpfs/var $ROOT/var
+</post_action>
+</package>
+</packages>

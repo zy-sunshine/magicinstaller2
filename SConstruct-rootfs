@@ -1,0 +1,128 @@
+# -*- python -*-
+import os
+import sys
+import string
+Import('*')
+
+##### Construct the tar.gz which needed by rootfs.
+## include: 
+#           #bindir/root.step1.tar.gz
+#           #bindir/root.etc.tar.gz
+#           #bindir/kmodules-x.xx.xx.tar.bz2
+#           #bindir/mi-vmlinuz-x.xx.xx  (needed by iso)
+SConscript('buildpkg/SConscript')
+
+##### miinitrd
+## #result/mirootfs.gz <- 
+#               #bindir/root.step1.tar.gz
+#               #bindir/root.src.tar.gz
+#               #bindir/root.etc.tar.gz
+#               #bindir/kmodules-x.xx.xx.tar-bz2
+class MirootfsMaker(PkgMaker.StepMaker):
+    target_list = ['result/mirootfs.gz']
+    ROOT = 'tmp/mi.rootfs'
+    steps = [
+             #'init_dir',
+             'extract_bins',
+#             'install_configfiles',
+#             'install_tranlatefiles',
+            ]
+#    if use_cp_mode:
+#        steps = steps + ['install_cpinstmode_UIxml',]
+    steps+= [
+             #'install_post',
+             'mkcramfs',
+             ]
+
+    def init_dir(self):
+        # Check if $ROOT is your mount dir.
+        if self.ROOT.startswith('/') or len(self.ROOT) == '':
+            os.write(2, '%s can not start with / or blank.' % self.ROOT)
+            sys.exit(-1)
+        f = file('/proc/mounts')
+        l = f.readline()
+        ltodir = len('$ROOT')
+        dangeous_mount = None
+        while l:
+            pieces = string.split(l, ' ')
+            if pieces[1][:ltodir] == '$ROOT':
+                os.write(2, 'DANGEOUS MOUNT: [%s]\n' % str(pieces[:2]))
+                dangeous_mount = 'true'
+            l = f.readline()
+        if dangeous_mount:
+            os.write(2, 'Please umount the previous mounts firstly!\n')
+            sys.exit(-1)
+
+        cmds = ['sudo rm -rf $ROOT',
+                'mkdir -p $ROOT']
+        return [], cmds
+
+    def extract_bins(self):
+        toextract = ['bindir/root.step1.tar.gz',
+                     'bindir/root.src.tar.gz',
+                     'bindir/root.etc.tar.gz',
+                     #'bindir/root.src.etc.tar.gz',
+                     'bindir/kmodules-${mikernelver}.tar.bz2']
+
+        #if mi_config.useudev:
+        #    toextract.append('bindir/udev-${udev_version}.tar.bz2')
+        mkstep2_script = 'scripts/mkstep2.py'
+        cmds = ['sudo $pythonbin %s $udev_arg %s' % \
+                (mkstep2_script,
+                 ' '.join(toextract))]
+        return toextract + [mkstep2_script], cmds
+
+## FIXME : should place it in to magicinstaller(src) etc #dir(root.src.etc.tar.gz)
+#    def install_configfiles(self):
+#        configfiles = [('#src/magic.installer/mipublic.py',
+#                        '$ROOT/$pythondir/site-packages/'),
+#
+#                       ('#src/magic.installer/magic.autopart.xml',
+#                        '$ROOT/usr/share/MagicInstaller/')]
+#        slist = []
+#        cmds = []
+#        for src, dest in configfiles:
+#            slist.append(src)
+#            cmds.extend(['mkdir -p %s' % dest,
+#                         'cp -a %s %s' % (src, dest)])
+#        return slist, cmds
+
+#    def install_tranlatefiles(self):
+#        slist = []
+#        cmds = []
+#        for lang in mi_config.all_linguas:
+#            inst_file = 'src/magic.installer/po/%s.mo' % lang
+#            dest_file = '$ROOT/usr/share/locale/%s/LC_MESSAGES/${textdomain}.mo' % lang
+#            slist.append(inst_file)
+#            cmds.extend(['mkdir -p %s' % os.path.dirname(dest_file),
+#                         'cp -a %s %s' % (inst_file, dest_file)])
+#        return slist, cmds
+
+#    def install_cpinstmode_UIxml(self):
+#        slist = []
+#        cmds = []
+#        inst_file = 'src/magic.installer/UIxml/takeactions.xml.cpinstmode'
+#        dest_file = '$ROOT$root_datadir/UIxml/takeactions.xml'
+#        slist.append(inst_file)
+#        cmds.extend(['mkdir -p %s' % os.path.dirname(dest_file),
+#                         'cp -a %s %s' % (inst_file, dest_file)])
+#        return slist, cmds
+
+#    def install_post(self):
+#        env = self.env
+#        post_script = '$specdir/post_install.sh'
+#        if os.path.exists(env.subst(post_script)):
+#            cmds = ['cp %s $ROOT/root' % post_script,
+#                    'chmod 700 $ROOT/root/post_install.sh']
+#            return [post_script], cmds
+#        else:
+#            return [], []
+
+    def mkcramfs(self):
+        cmds = ['mkdir -p result',
+                'cd $ROOT && find . | cpio -v -o -H newc | gzip -9 > $TARGET.abspath']
+        return [], cmds
+
+mirootfs = MirootfsMaker(env)
+mirootfs.make()
+

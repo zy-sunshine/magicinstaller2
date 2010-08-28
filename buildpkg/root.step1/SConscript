@@ -1,0 +1,190 @@
+# -*- python -*-
+# Copyright (C) 2007, Levin Du.
+# Author:  Levin Du <zsdjw@21cn.com>
+# All rights reserved.
+#
+# This program is free software; you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the Free
+# Software Foundation; either version 2, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANT; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE. See the GNU General Public LIcense for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along
+# with this program; if not, write to the Free Software Foundation, 59 Temple
+# Place - Suite 330, Boston, MA 02111-1307, USA.
+
+import os
+import stat
+from SCons.Action import ActionFactory
+from xml.dom.minidom import parse
+
+Import('env', 'mi_config', 'MiPkgMaker', 'PkgMaker')
+
+def line_split(lines):
+    result = []
+    for line in lines.split('\n'):
+        line = line.strip()
+        if line and line[0] != '#':
+            result.append(line)
+    return result
+
+def get_node_value(node, name):
+    value = ''
+    for subnode in node.childNodes:
+        if subnode.nodeType == subnode.ELEMENT_NODE \
+           and subnode.tagName == name:
+            value = ''.join([t.data for t in subnode.childNodes \
+                             if t.nodeType == t.TEXT_NODE])
+    return line_split(value)
+
+class RootBuildTheme(PkgMaker.BaseMaker):
+    def __init__(self, mod, env):
+        self.source_list = source_list = []
+        self.build_cmds = cmds = []
+
+        source_list.append(mod + '.xml')
+        themesdoc = parse(source_list[-1])
+        cmds.extend(['mkdir -p $ROOT/etc/gtk-2.0/pics',
+                     'mkdir -p $ROOT/usr/share/themes',
+                     'cp ${pwd}/%s $ROOT/etc/gtk-2.0/' % source_list[-1]])
+
+        for themenode in themesdoc.getElementsByTagName('theme'):
+            dir = themenode.getAttribute('dir')
+            tar = themenode.getAttribute('tar')
+            if dir and tar:
+                source_list.append('$source_prefix/themes/' + tar)
+                cmds.extend(self.get_extract_cmd([source_list[-1]], '$ROOT/usr/share/themes'))
+            pic = themenode.getAttribute('pic')
+            if pic:
+                source_list.append('$source_prefix/themes/' + pic)
+                cmds.extend(['cp %s $ROOT/etc/gtk-2.0/pics/' % source_list[-1]])
+        cmds.extend(['find $ROOT/usr/share/themes -name "*~" | xargs rm -f'])
+
+class RootBuildNode(PkgMaker.BaseMaker):
+    def __init__(self, mod, env):
+        self.source_list = source_list = []
+        self.build_cmds = cmds = []
+
+        source_list.append(mod + '.xml')
+        try:
+            rootdoc = parse(source_list[-1])
+        except:
+            print 'Parser mod %s.xml failed!' % mod
+            raise
+
+        # init
+        cmds.extend(['rm -rf $BUILD',
+                     'mkdir -p $BUILD'])
+        inst_list = []
+        pre_list = []
+        post_list = []
+
+        for pkgnode in rootdoc.getElementsByTagName('package'):
+            pkgfiles = get_node_value(pkgnode, 'files')
+            if pkgfiles:
+                pkgfiles = self.path_prefix('$source_prefix', pkgfiles)
+                source_list.extend(pkgfiles)
+                # extract
+                cmds.extend(self.get_extract_cmd(pkgfiles, '$build_prefix'))
+            inst_list.extend(get_node_value(pkgnode, 'install'))
+            pre_list.extend(get_node_value(pkgnode, 'pre_action'))
+            post_list.extend(get_node_value(pkgnode, 'post_action'))
+
+        # pre_action
+        cmds.extend(pre_list)
+        # install
+        for f in inst_list:
+            if f[0] == '+':             # mkdir only
+                f = f[1:]
+                cmds.extend(['mkdir -p $ROOT/%s' % f])
+
+            elif f[0] == '@':           # recursive
+                f = f[1:]
+                cmds.extend(['mkdir -p $ROOT/%s' % os.path.dirname(f),
+                             'cp -a $BUILD/%s $ROOT/%s/' % (f, os.path.dirname(f))])
+            else:
+                cmds.extend(['mkdir -p $ROOT/%s' % os.path.dirname(f),
+                             'cp -dp $BUILD/%s $ROOT/%s/' % (f, os.path.dirname(f))])
+        # post_action
+        cmds.extend(post_list)
+
+class RootPkgMaker(MiPkgMaker):
+    source_prefix = '#bindir/root'
+
+    build_root =  mi_config.tmpdir
+    build_prefix = '$build_root/${package}.tmp'
+    install_prefix = '$build_root/${package}'
+    pack_prefix = '#bindir'
+
+    build_cmds = []
+    mods = []
+    global_post_cmds = []
+
+    def initenv(self):
+        MiPkgMaker.initenv(self)
+        env = self.env
+        env['ROOT'] = self.get_abspath(env['install_prefix'])
+        env['BUILD'] = self.get_abspath(env['build_prefix'])
+
+        self.parse_def_mods()
+
+    def parse_def_mods(self):
+        raise NotImplementedError()
+
+    def build(self):
+        env = self.env
+        for mod in self.mods:
+            self.build_cmds.extend(mod.build_cmds)
+            self.source_list.extend(mod.source_list)
+        env.Alias(self.alias,
+                  env.Command('$pack_prefix/$package_bin',
+                              self.source_list,
+                              ['rm -rf $ROOT',
+                               'mkdir -p $ROOT'] +
+                              self.build_cmds +
+                              self.global_post_cmds +
+                              self.fetch_pack_cmds() +
+                              ['rm -rf $BUILD']))
+
+    def make(self):
+        self.initenv()
+        self.build()
+
+class RootStep1Maker(RootPkgMaker):
+    alias = 'root.step1'
+    package = 'root.step1'
+    package_bin = '${package}.tar.gz'
+
+    global_post_cmds = [PkgMaker.SearchExecAction('$ROOT',
+                                                  ['usr/lib/xorg/modules', 'lib/modules'],
+                                                  'strip %s')]
+
+    def parse_def_mods(self):
+        mods = self.mods
+        for mod_src in ['filesystem',
+                        'glibc',
+                        'syslib',
+                        'busybox',
+                        'python',
+                        'xorg',
+                        'gtk2',
+                        'parted',
+                        'rhpl',
+                        'rpm',
+#                        'debug',
+                        'mkfs',
+                        'kudzu',
+                        'tftp-server',
+                        'grub',
+                        'trace',
+                        'post_scripts',
+                        ]:
+            mods.append(RootBuildNode(mod_src, self.env))
+        # theme is special
+        mods.append(RootBuildTheme('themes', self.env))
+
+pkg = RootStep1Maker(env)
+pkg.make()

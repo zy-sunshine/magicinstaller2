@@ -1,0 +1,22 @@
+#!/bin/sh
+# Copyright (C) 2003, Charles Wang.
+# Author:  Charles Wang <charles@linux.net.cn>
+# All rights reserved.
+# License: GPL
+
+export PATH=/usr/bin:/bin:/usr/sbin:/sbin
+
+. /etc/sysconfig/i18n
+export GDK_USE_XFT=0
+# to override some python modules
+export PYTHONPATH=/usr/lib/python2.6/site-packages
+export PANGO_RC_FILE=/etc/pango/pangorc
+
+if grep "rescue" /proc/cmdline >/dev/null 2>&1 ; then
+    echo "You have entered rescue mode."
+    /bin/sh
+else
+    /usr/bin/python /usr/bin/magic.toplevel
+fi
+
+reboot
