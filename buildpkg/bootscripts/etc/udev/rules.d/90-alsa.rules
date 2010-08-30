@@ -1,0 +1,2 @@
+SUBSYSTEM=="sound", KERNEL=="controlC*"	RUN+="/sbin/salsa"
+SUBSYSTEM=="sound", KERNEL=="pcm*"	RUN+="/sbin/salsa"		

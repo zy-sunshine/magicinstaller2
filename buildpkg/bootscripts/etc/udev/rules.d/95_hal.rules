@@ -1,0 +1,1 @@
+RUN+='socket:/org/freedesktop/hal/udev_event'

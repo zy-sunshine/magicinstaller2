@@ -1,0 +1,28 @@
+#/bin/sh
+
+# read kernel command line
+. /etc/sysconfig/rc
+. ${rc_functions_mi}
+
+import-cmdline
+
+if [ -n "$DEVELOP" ] ; then
+	ip_mihost="192.168.56.111"
+	ip_devhost="192.168.56.1"
+    # configure network
+	ln -s /lib/modules/2.6.28.10/kernel/drivers /
+    /sbin/modprobe e1000
+    /sbin/ifconfig eth0 $ip_mihost netmask 255.255.255.0
+    echo "$ip_mihost mihost" >> /etc/hosts
+    echo "$ip_devhost devhost" >> /etc/hosts
+    
+    # load scsi mod
+    #/sbin/modprobe BusLogic
+
+    # start telnet server
+    /usr/sbin/telnetd -l /bin/sh
+
+    # nfs mount the remote working directory
+    /bin/mkdir -p /tmp/update
+    /bin/mount -t nfs -o nolock "$ip_devhost":/opt/miexport /tmp/update
+fi
