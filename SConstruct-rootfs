@@ -78,7 +78,7 @@ class MirootfsMaker(PkgMaker.StepMaker):
         return toextract + [mkstep2_script], cmds
 
     def run_post_scripts(self):
-        cmds = [getSudoSh("buildpkg/post_scripts/commands.sh $ROOT"),
+        cmds = [getSudoSh("sh buildpkg/post_scripts/commands.sh $ROOT"),
                 getSudoSh("install -m 777 buildpkg/post_scripts/commands_chroot.sh $ROOT"),
                 getSudoSh('chroot $ROOT /commands_chroot.sh'),
                 getSudoSh('rm $ROOT/commands_chroot.sh'),
