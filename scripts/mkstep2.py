@@ -66,22 +66,3 @@ for cmd in cmds:
 cmd = 'find %s -name .sconsign | xargs rm -f' % todir
 os.system(cmd)
 
-# Create required symlinks.
-if useudev:
-    # Use initramfs, the /etc is preserved.
-    pass
-else:
-    os.system("ln -sf /mnt/MagicBooter/etc/i18n %s/etc/sysconfig/i18n" % todir)
-
-# Create base system blocks and chars dev file.
-cmd = 'python scripts/mkrootsys.py %s' % todir
-print cmd
-os.system(cmd)
-
-# Run /sbin/ldconfig.
-cmd = '/usr/sbin/chroot %s /sbin/ldconfig' % todir
-print cmd
-os.system(cmd)
-
-# Remove the /sbin/ldconfig.
-#os.remove(todir + '/sbin/ldconfig')

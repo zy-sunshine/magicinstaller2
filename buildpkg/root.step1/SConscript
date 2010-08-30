@@ -176,6 +176,7 @@ class RootStep1Maker(RootPkgMaker):
                         'rpm',
 #                        'debug',
                         'mkfs',
+                        'udev',
                         'kudzu',
                         'tftp-server',
                         'grub',

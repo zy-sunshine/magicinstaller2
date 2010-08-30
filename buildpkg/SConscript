@@ -18,14 +18,15 @@
 
 
 if 'root.step1' in COMMAND_LINE_TARGETS:
-    SConscript('busybox/SConscript')
-    SConscript('parted/SConscript')
     SConscript('root.step1/SConscript')
+elif 'busybox.bin' in COMMAND_LINE_TARGETS:
+    SConscript('busybox/SConscript')
+elif 'parted.bin' in COMMAND_LINE_TARGETS:
+    SConscript('parted/SConscript')
 elif 'kernel_copy' in COMMAND_LINE_TARGETS:
     SConscript('kernel_copy/SConscript')
 elif 'kernel_build' in COMMAND_LINE_TARGETS:
     SConscript('kernel_build/SConscript')
 else:
-    SConscript('etc/SConscript')
-#    SConscript('SConscript-rootfs')
+    SConscript('bootscripts/SConscript')
 

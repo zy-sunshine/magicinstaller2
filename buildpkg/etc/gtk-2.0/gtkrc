@@ -1,5 +1,0 @@
-style "gtk-default" {
-	font_name = "Sans 12"
-}
-class "GtkWidget" style "gtk-default"
-gtk-theme-name = "Milk-2.0"

@@ -1,3 +1,0 @@
-export LANG=C
-export LANGUAGE=C
-export SUPPORTED="en_US.UTF-8:en_US:en"

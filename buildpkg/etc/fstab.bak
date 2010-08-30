@@ -1,8 +1,0 @@
-none		/proc		proc	defaults	0 0
-none		/sys		sysfs	defaults	0 0
-none		/proc/bus/usb	usbfs	defaults	0 0
-none		/dev/pts	devpts	mode=620	0 0
-none            /dev/shm	tmpfs	defaults	0 0
-
-#/dev/ram1	/		ext2	defaults	0 0
-/dev/shm	/tmpfs		tmpfs	defaults	0 0

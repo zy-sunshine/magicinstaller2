@@ -38,3 +38,4 @@ class PartedBinMaker(MiPkgMaker):
 
 pkg = PartedBinMaker(env)
 pkg.make()
+

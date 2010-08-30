@@ -16,6 +16,13 @@ langset = 'en:zh_CN'
 
 udev_arg = '--use-udev'
 
+usesudoprom = False
+sudoprom = ''
+if usesudoprom:
+    sudoprom = ' && sudo -k'
+    # If use sudo promopt, clean sudo timpstamp first.
+    os.system('echo "clean sudo timestamp..." %s' % sudoprom)
+
 pkgarr = 'none'
 pkgdirs = 'none'
 bootcd_dir = 'tmp/bootcd'
@@ -34,7 +41,6 @@ resultdir = os.path.abspath('result')
 
 devrootdir = os.path.join(tmpdir, 'devroot')   # building sources dir
 bootcd_dir = os.path.join(tmpdir, 'bootcd')
-#bootdir = 'boot'
 miimages_cddir = 'boot'
 miimages_dir = os.path.join(bootcd_dir, miimages_cddir)
 
@@ -45,7 +51,7 @@ def mkisofn(iso_no):
     return 'result/%s-%s-%s.iso' % (distname, distver, iso_no)
 bootiso_fn = os.path.basename(mkisofn(1))
 
-#{{ rootfs environment
+#{{ build rootfs environment
 tmp_rootfs = os.path.join(tmpdir, 'rootfs')     # Construct the rootfs temp dir.
 busybox_version = '1.6.1'
 #}}

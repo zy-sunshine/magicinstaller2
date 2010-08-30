@@ -17,3 +17,8 @@ etc             rootfs 中需要的 etc 目录文件.
 # 脚本控制
 SConscript          控制 rootfs 的各个模块的准备过程.
 
+# 制作 rootfs 的 post 脚本
+post_scripts
+    commands.sh             在宿主系统中执行的命令. $1 参数为目标系统目录.
+    commands_chroot.sh      chroot 进入目标系统中执行的命令.
+

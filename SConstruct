@@ -49,6 +49,40 @@ for k in mi_config.__dict__:
         env[k] = mi_config.__dict__[k]
 
 ### Scon Utils
+def depInstallExcludeSvn(env, alias, destdir, srcdirs):
+    def getAllExcludeSvnFile(dir):
+        svndirs = []
+        allfiles = []
+        excludesvnfiles = []
+        topdown = True
+        for root, dirs, files in os.walk(dir, topdown):
+            for d in dirs:
+                if d == '.svn':
+                    svndirs.append(os.path.join(root, d))
+            for f in files:
+                allfiles.append(os.path.join(root, f))
+        for f in allfiles:
+            issvn = False
+            for svndir in svndirs:
+                if f.startswith(svndir):
+                    issvn = True
+                    break
+            if not issvn:
+                excludesvnfiles.append(f)
+        return excludesvnfiles
+
+    for srcd in srcdirs:
+        files = []
+        if not os.path.isdir(srcd):
+            # Omit the file, Only deal with directory.
+            continue
+        else:
+            files = getAllExcludeSvnFile(srcd)
+        for f in files:
+            related_dir = os.path.dirname(f)
+            env.Alias(target=alias, 
+                    source=env.Install(os.path.join(destdir,related_dir), f))
+
 def depInstall(env, alias, destdir, files):
     env.Alias(target=alias, source=env.Install(destdir, files))
 
@@ -63,10 +97,15 @@ def depPyModule(env, alias, dir, sofile, cfiles):
     env.Alias(alias, sopath)
     #env.Depends(alias, sopath)
 
+class MiPkgMaker(PkgMaker.BinPkgMaker):
+    source_prefix = '#bindir/src'
+    build_root = mi_config.devrootdir
+    pack_prefix = '#bindir'
+
 Export('env')
 Export('mi_config')
-Export('depInstall', 'depInstallAs', 'depPyModule')
-Export('PkgMaker')
+Export('depInstall', 'depInstallAs', 'depPyModule', 'depInstallExcludeSvn')
+Export('PkgMaker', 'MiPkgMaker')
 
 ##### Construct the magicinstaller main application, tar into :
 #       #bindir/root.src.tar.gz         (source file)

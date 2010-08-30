@@ -7,16 +7,16 @@ Import('*')
 ##### Construct the tar.gz which needed by rootfs.
 ## include: 
 #           #bindir/root.step1.tar.gz
-#           #bindir/root.etc.tar.gz
+#           #bindir/root.bootscripts.tar.gz
 #           #bindir/kmodules-x.xx.xx.tar.bz2
 #           #bindir/mi-vmlinuz-x.xx.xx  (needed by iso)
 SConscript('buildpkg/SConscript')
 
-##### miinitrd
+##### mirootfs.gz
 ## #result/mirootfs.gz <- 
 #               #bindir/root.step1.tar.gz
 #               #bindir/root.src.tar.gz
-#               #bindir/root.etc.tar.gz
+#               #bindir/root.bootscripts.tar.gz
 #               #bindir/kmodules-x.xx.xx.tar-bz2
 class MirootfsMaker(PkgMaker.StepMaker):
     target_list = ['result/mirootfs.gz']
@@ -31,6 +31,7 @@ class MirootfsMaker(PkgMaker.StepMaker):
 #        steps = steps + ['install_cpinstmode_UIxml',]
     steps+= [
              #'install_post',
+             'run_post_scripts',
              'mkcramfs',
              ]
 
@@ -53,24 +54,36 @@ class MirootfsMaker(PkgMaker.StepMaker):
             os.write(2, 'Please umount the previous mounts firstly!\n')
             sys.exit(-1)
 
-        cmds = ['sudo rm -rf $ROOT',
+        cmds = ['sudo rm -rf $ROOT $sudoprom',
                 'mkdir -p $ROOT']
         return [], cmds
 
     def extract_bins(self):
         toextract = ['bindir/root.step1.tar.gz',
                      'bindir/root.src.tar.gz',
-                     'bindir/root.etc.tar.gz',
-                     #'bindir/root.src.etc.tar.gz',
+                     'bindir/root.bootscripts.tar.gz',
                      'bindir/kmodules-${mikernelver}.tar.bz2']
 
         #if mi_config.useudev:
         #    toextract.append('bindir/udev-${udev_version}.tar.bz2')
         mkstep2_script = 'scripts/mkstep2.py'
-        cmds = ['sudo $pythonbin %s $udev_arg %s' % \
+        # Use sudo, because we use root to create the root.step1.tar.gz .
+        # If we use other user to extract the root.step1.tar.gz, the files
+        # permision will change.(We create the root.step1.tar.gz and other
+        # rootfs tar packages use root user, only correspond with the
+        # files' permision, so be careful with your system.:P )
+        cmds = ['sudo $pythonbin %s $udev_arg %s $sudoprom' % \
                 (mkstep2_script,
                  ' '.join(toextract))]
         return toextract + [mkstep2_script], cmds
+
+    def run_post_scripts(self):
+        cmds = ['sudo sh -c "buildpkg/post_scripts/commands.sh $ROOT" $sudoprom',
+                'sudo sh -c "install -m 777 buildpkg/post_scripts/commands_chroot.sh $ROOT" $sudoprom',
+                'sudo chroot $ROOT /commands_chroot.sh $sudoprom',
+                'rm $ROOT/commands_chroot.sh',
+            ]
+        return [], cmds
 
 ## FIXME : should place it in to magicinstaller(src) etc #dir(root.src.etc.tar.gz)
 #    def install_configfiles(self):
@@ -120,7 +133,7 @@ class MirootfsMaker(PkgMaker.StepMaker):
 
     def mkcramfs(self):
         cmds = ['mkdir -p result',
-                'cd $ROOT && find . | cpio -v -o -H newc | gzip -9 > $TARGET.abspath']
+                'cd $ROOT && sudo sh -c "find . | cpio -o -H newc | gzip -9 > $TARGET.abspath" $sudoprom']
         return [], cmds
 
 mirootfs = MirootfsMaker(env)
