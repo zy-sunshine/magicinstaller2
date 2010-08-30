@@ -1,6 +1,7 @@
 #!/bin/sh
 
 # ARGS:     $1 : The target rootfs directory.
+# Remove the backslash at the end of ROOT.
 ROOT=$(echo "$1" |sed 's/\/*$//')
 
 # We have the root directory already, 
@@ -27,12 +28,12 @@ mkdir -pv $ROOT/var/{opt,cache,lib/{misc,locate},local}
 ln -sv ../proc/mounts $ROOT/etc/mtab
 mkdir -pv $ROOT/var/lib/xkb
 mkdir -pv $ROOT/var/lock/rpm
-ln -sv sbin/busybox $ROOT/init
+ln -sv bin/busybox $ROOT/init
 
 # Remove .sconsign
-find $ROOT -name .sconsign | xargs rm -f
+find $ROOT -name .sconsign | xargs rm -frv
 # Remove .svn
-find $ROOT -name .svn | xargs rm -f
+find $ROOT -name .svn | xargs rm -frv
 
 # Make static device file.
 mknod -m 600 $ROOT/dev/console c 5 1
@@ -42,4 +43,19 @@ mknod -m 666 $ROOT/dev/tty c 5 0
 for v in 0 1 2 3 4 5 6;do
     mknod -m 620 $ROOT/dev/tty$v c 4 $v
 done
+
+# For static device nodes to /dev
+static_dev=$ROOT/lib/udev/devices
+mkdir -pv $static_dev
+ln -sv /proc/kcore $static_dev/core
+ln -sv /proc/self/fd $static_dev/fd
+ln -sv /proc/self/fd/2 $static_dev/stderr
+ln -sv /proc/self/fd/0 $static_dev/stdin
+ln -sv /proc/self/fd/1 $static_dev/stdout
+install -dv -m 755 $static_dev/shm
+mknod -m 600 $static_dev/mixer c 14 0
+#
+mknod -m 600 $static_dev/console c 5 1
+mknod -m 666 $static_dev/null c 1 3
+mknod -m 666 $static_dev/zero c 1 5
 

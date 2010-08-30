@@ -102,10 +102,14 @@ class MiPkgMaker(PkgMaker.BinPkgMaker):
     build_root = mi_config.devrootdir
     pack_prefix = '#bindir'
 
+def getSudoSh(cmd):
+    return 'sudo sh -c "%s" $sudoprom' % cmd
+
 Export('env')
 Export('mi_config')
 Export('depInstall', 'depInstallAs', 'depPyModule', 'depInstallExcludeSvn')
 Export('PkgMaker', 'MiPkgMaker')
+Export('getSudoSh')
 
 ##### Construct the magicinstaller main application, tar into :
 #       #bindir/root.src.tar.gz         (source file)

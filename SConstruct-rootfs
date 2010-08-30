@@ -72,16 +72,16 @@ class MirootfsMaker(PkgMaker.StepMaker):
         # permision will change.(We create the root.step1.tar.gz and other
         # rootfs tar packages use root user, only correspond with the
         # files' permision, so be careful with your system.:P )
-        cmds = ['sudo $pythonbin %s $udev_arg %s $sudoprom' % \
+        cmds = [getSudoSh( 'sudo $pythonbin %s $udev_arg %s $sudoprom' % \
                 (mkstep2_script,
-                 ' '.join(toextract))]
+                 ' '.join(toextract)) )]
         return toextract + [mkstep2_script], cmds
 
     def run_post_scripts(self):
-        cmds = ['sudo sh -c "buildpkg/post_scripts/commands.sh $ROOT" $sudoprom',
-                'sudo sh -c "install -m 777 buildpkg/post_scripts/commands_chroot.sh $ROOT" $sudoprom',
-                'sudo chroot $ROOT /commands_chroot.sh $sudoprom',
-                'rm $ROOT/commands_chroot.sh',
+        cmds = [getSudoSh("buildpkg/post_scripts/commands.sh $ROOT"),
+                getSudoSh("install -m 777 buildpkg/post_scripts/commands_chroot.sh $ROOT"),
+                getSudoSh('chroot $ROOT /commands_chroot.sh'),
+                getSudoSh('rm $ROOT/commands_chroot.sh'),
             ]
         return [], cmds
 
@@ -133,7 +133,7 @@ class MirootfsMaker(PkgMaker.StepMaker):
 
     def mkcramfs(self):
         cmds = ['mkdir -p result',
-                'cd $ROOT && sudo sh -c "find . | cpio -o -H newc | gzip -9 > $TARGET.abspath" $sudoprom']
+                'cd $ROOT && %s' % getSudoSh("find . | cpio -o -H newc | gzip -9 > $TARGET.abspath")]
         return [], cmds
 
 mirootfs = MirootfsMaker(env)

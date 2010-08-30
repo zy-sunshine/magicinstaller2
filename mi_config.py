@@ -6,7 +6,7 @@
 import os
 import sys
 
-mikernelver = '2.6.28.10'
+mikernelver = '2.6.35.4'
 
 #{{ User custom default value
 langset = 'en:zh_CN'

@@ -19,7 +19,7 @@
 Import('env', 'mi_config', 'MiPkgMaker')
 
 class KernelBinMaker(MiPkgMaker):
-    alias = 'kernel.bin'
+    alias = 'kernel.build'
     name = 'linux'
     version = mi_config.mikernelver
     source_list = ['${package}.tar.bz2']

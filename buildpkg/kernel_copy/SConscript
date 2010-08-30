@@ -23,7 +23,7 @@ class KernelBinMaker(MiPkgMaker):
     '''
     Extract kernel files (vmlinuz and kmodules) from the kernel rpm package directly.
     '''
-    alias = 'kernel.bin'
+    alias = 'kernel.copy'
     name = 'linux'
 
     build_root = os.path.join(mi_config.tmpdir, 'kernel')

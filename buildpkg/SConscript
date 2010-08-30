@@ -23,9 +23,9 @@ elif 'busybox.bin' in COMMAND_LINE_TARGETS:
     SConscript('busybox/SConscript')
 elif 'parted.bin' in COMMAND_LINE_TARGETS:
     SConscript('parted/SConscript')
-elif 'kernel_copy' in COMMAND_LINE_TARGETS:
+elif 'kernel.copy' in COMMAND_LINE_TARGETS:
     SConscript('kernel_copy/SConscript')
-elif 'kernel_build' in COMMAND_LINE_TARGETS:
+elif 'kernel.build' in COMMAND_LINE_TARGETS:
     SConscript('kernel_build/SConscript')
 else:
     SConscript('bootscripts/SConscript')
