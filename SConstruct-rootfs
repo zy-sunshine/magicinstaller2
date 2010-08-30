@@ -85,52 +85,6 @@ class MirootfsMaker(PkgMaker.StepMaker):
             ]
         return [], cmds
 
-## FIXME : should place it in to magicinstaller(src) etc #dir(root.src.etc.tar.gz)
-#    def install_configfiles(self):
-#        configfiles = [('#src/magic.installer/mipublic.py',
-#                        '$ROOT/$pythondir/site-packages/'),
-#
-#                       ('#src/magic.installer/magic.autopart.xml',
-#                        '$ROOT/usr/share/MagicInstaller/')]
-#        slist = []
-#        cmds = []
-#        for src, dest in configfiles:
-#            slist.append(src)
-#            cmds.extend(['mkdir -p %s' % dest,
-#                         'cp -a %s %s' % (src, dest)])
-#        return slist, cmds
-
-#    def install_tranlatefiles(self):
-#        slist = []
-#        cmds = []
-#        for lang in mi_config.all_linguas:
-#            inst_file = 'src/magic.installer/po/%s.mo' % lang
-#            dest_file = '$ROOT/usr/share/locale/%s/LC_MESSAGES/${textdomain}.mo' % lang
-#            slist.append(inst_file)
-#            cmds.extend(['mkdir -p %s' % os.path.dirname(dest_file),
-#                         'cp -a %s %s' % (inst_file, dest_file)])
-#        return slist, cmds
-
-#    def install_cpinstmode_UIxml(self):
-#        slist = []
-#        cmds = []
-#        inst_file = 'src/magic.installer/UIxml/takeactions.xml.cpinstmode'
-#        dest_file = '$ROOT$root_datadir/UIxml/takeactions.xml'
-#        slist.append(inst_file)
-#        cmds.extend(['mkdir -p %s' % os.path.dirname(dest_file),
-#                         'cp -a %s %s' % (inst_file, dest_file)])
-#        return slist, cmds
-
-#    def install_post(self):
-#        env = self.env
-#        post_script = '$specdir/post_install.sh'
-#        if os.path.exists(env.subst(post_script)):
-#            cmds = ['cp %s $ROOT/root' % post_script,
-#                    'chmod 700 $ROOT/root/post_install.sh']
-#            return [post_script], cmds
-#        else:
-#            return [], []
-
     def mkcramfs(self):
         cmds = ['mkdir -p result',
                 'cd $ROOT && %s' % getSudoSh("find . | cpio -o -H newc | gzip -9 > $TARGET.abspath")]

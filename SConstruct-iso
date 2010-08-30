@@ -8,29 +8,33 @@ import sys
 
 Import('*')
 
-use_cp_mode = False
-Export('use_cp_mode')
+### Global variable
+packages_md5sum = 'result/packages.md5sum'
+mlbase_files = ['result/pkgarr.py',
+                mi_config.sifile,
+                packages_md5sum]
+pkgdirs = ' '.join(mi_config.pkgdirs.split(':'))
+pkginfor_script = 'scripts/%s%sPkgInfor.py' % \
+                  (string.upper(mi_config.pkgtype[0]), mi_config.pkgtype[1:])
 createiso_script = 'scripts/CreateISO.py'
-need_clean = 'notclean'
-#tgt_iso = mi_config.mkisofn(1)
-#need_clean = 'notclean'
-#env.Command(tgt_iso,
-#            [createiso_script,],
-#            ['$pythonbin %s $TARGET' % create_iso_script + \
-#             ' $pkgarr $pkgdirs $bootcd_dir' + \
-#             ' $distname $distver $set_no %s $bootload $miimages_cddir' % need_clean
-#             ])
+use_cp_mode = mi_config.use_copy_install_mode
+
+# packages_value - the full file info of all software packages.
+packages_value = DirValue(mi_config.pkgdirs.split(':'))
+
+### Default Build Target
+# The default scons object is allisos, i.e. all iso files.
+Default(env.Alias('allisos', map(mi_config.mkisofn, range(1, mi_config.max_cd_no + 1))))
+
 ##### Construct the iso.
 ## It will require some file in bootloader bindir
 class BootIsoMaker(PkgMaker.StepMaker):
     target_list = [mi_config.mkisofn(1)]
     steps = ['init_dir',
              'install_miimages',
-             #'install_mlbasefiles',
-             ]
-    if use_cp_mode:
-        steps= steps + ['install_rpmdb_etctar',]
-    steps+= ['add_extra_files',
+             'install_mlbasefiles',
+             'install_rpmdb_etctar',
+             'add_extra_files',
              'install_bootload',
              'make_iso',
              ]
@@ -49,7 +53,6 @@ class BootIsoMaker(PkgMaker.StepMaker):
         cmds = ['mkdir -p $miimages_dir',
                 'cp -u %s $miimages_dir' % \
                 ' '.join(miimages_files)]
-
         return miimages_files, cmds
 
     def install_mlbasefiles(self):
@@ -59,11 +62,15 @@ class BootIsoMaker(PkgMaker.StepMaker):
         return mlbase_files, cmds
     
     def install_rpmdb_etctar(self):
-        cmds = ['rm -r $bootcd_dir/$distname/packages/*',
-                'cp %s $bootcd_dir/$distname/packages/' % rpmdbtar,
-                'cp %s $bootcd_dir/$distname/packages/' % etctar,
-        ]
-        return [rpmdbtar, etctar], cmds
+        inst_file = []
+        cmds = []
+        if use_cp_mode:
+            cmds = ['rm -r $bootcd_dir/$distname/packages/*',
+                    'cp %s $bootcd_dir/$distname/packages/' % rpmdbtar,
+                    'cp %s $bootcd_dir/$distname/packages/' % etctar,
+            ]
+            inst_file = [rpmdbtar, etctar]
+        return inst_file, cmds
 
     def add_extra_files(self):
         if os.path.isdir('$addfiles_dir'):
@@ -93,7 +100,7 @@ class BootIsoMaker(PkgMaker.StepMaker):
     def make_iso(self):
         cmds =['$pythonbin %s $TARGET' % createiso_script + \
                ' $pkgarr $pkgdirs $bootcd_dir' + \
-               ' $distname $distver $set_no %s $bootload $miimages_cddir' % need_clean]
+               ' $distname $distver 1 $cleanpkgdir $bootload $miimages_cddir']
         return [createiso_script], cmds
 
 bootiso = BootIsoMaker(env)
@@ -114,8 +121,59 @@ class PrepareBootload(PkgMaker.BaseMaker):
 prepare_bootload = PrepareBootload()
 prepare_bootload.extract()
 
-##### Prepare Kernel. Copy to $resultdir.
+##### Prepare Kernel. Copy to #result/ .
 env.Command('result/mivmlinuz',
             'bindir/mi-vmlinuz-$mikernelver',
             'cp $SOURCE $TARGET')
 
+### Other ISOs
+#iso2 - iso<max_cd_no> <- createiso_script, mlbase_files
+for iso_cnt in range(2, mi_config.max_cd_no + 1):
+    iso_dir = 'tmp/cd-%d' % iso_cnt
+    env.Command(mi_config.mkisofn(iso_cnt),
+                [createiso_script] + mlbase_files,
+                ['rm -rf $iso_dir',
+
+                 '$pythonbin %s $TARGET' % createiso_script + \
+                 ' result/pkgarr.py $pkgdirs $iso_dir' + \
+                 ' $distname $distver $iso_cnt %s' % cleanpkgdir
+                 ],
+                iso_dir = iso_dir,
+                iso_cnt = iso_cnt)
+
+### Package arrangement
+# result/pkgarr.py <- scripts/PkgArrange.py, scripts/pkgpublic.py, tmp/pkginfor.py, mi_config.sifile
+env.Command(['result/pkgarr.py'],
+            ['scripts/PkgArrange.py',
+             'scripts/pkgpublic.py',
+             'tmp/pkginfor.py',
+             env.Value((mi_config.volume_limit_list,
+                        mi_config.placement_list,
+                        mi_config.toplevel_groups,
+                        mi_config.add_deps,
+                        mi_config.remove_deps)),
+             ],
+            ['$pythonbin scripts/PkgArrange.py -o $TARGET -l tmp/pkgarr.log'])
+
+if use_cp_mode:
+    env.Command([os.path.join(mi_config.rpmdb_dir, '.prepared')],
+            ['result/pkgarr.py', 'scripts/GenRpmdb.py'],
+            ['sudo $pythonbin scripts/GenRpmdb.py  -t $rpmdb_dir/tgtsys_root -s $pkgdirs -p result/pkgarr.py -l $tmpdir/GenRpmdb.out.log -e $tmpdir/GenRpmdb.err.log',
+             '/bin/date > $TARGET'])
+    env.Command([rpmdbtar],
+            [os.path.join(mi_config.rpmdb_dir,'.prepared')],
+            ['tar -cjf $TARGET -C $rpmdb_dir/tgtsys_root .'])
+
+    env.Command([etctar],
+            ['$etctar_dir','$etctar_script'],
+            ['chmod +x $etctar_script','tar -cjf $TARGET -C $etctar_dir .'])
+
+# packages_md5sum <- packages_value
+env.Command(packages_md5sum, packages_value,
+            'find %s -name \"*.rpm\" -exec md5sum {} \; > $TARGET' % pkgdirs)
+
+# This script must use the native python because it require rpm.
+env.Command('tmp/pkginfor.py',
+            [pkginfor_script, packages_value],
+            ['python %s -o $TARGET -l tmp/%s.log %s' % \
+             (pkginfor_script, mi_config.pkgtype, pkgdirs)])
