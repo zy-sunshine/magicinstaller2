@@ -24,13 +24,6 @@ class MirootfsMaker(PkgMaker.StepMaker):
     steps = [
              #'init_dir',
              'extract_bins',
-#             'install_configfiles',
-#             'install_tranlatefiles',
-            ]
-#    if use_cp_mode:
-#        steps = steps + ['install_cpinstmode_UIxml',]
-    steps+= [
-             #'install_post',
              'run_post_scripts',
              'mkcramfs',
              ]
@@ -78,6 +71,7 @@ class MirootfsMaker(PkgMaker.StepMaker):
         return toextract + [mkstep2_script], cmds
 
     def run_post_scripts(self):
+        # Add some directory, nodes, links and check privilege.
         cmds = [getSudoSh("sh buildpkg/post_scripts/commands.sh $ROOT"),
                 getSudoSh("install -m 777 buildpkg/post_scripts/commands_chroot.sh $ROOT"),
                 getSudoSh('chroot $ROOT /commands_chroot.sh'),

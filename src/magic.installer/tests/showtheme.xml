@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<!-- Copyright (C) 2003, Charles Wang <charles@linux.net.cn> -->
+<!-- Author:  Charles Wang -->
+<table rows="3" columns="2" rowspacings="2" colspacings="2">
+  <checkbutton label="check" left="0" right="1" top="0" bottom="1"/>
+  <radiobutton label="radio" left="1" right="2" top="0" bottom="1"/>
+  <button label="button" left="0" right="1" top="1" bottom="2"/>
+  <spinbutton left="1" right="2" top="1" bottom="2"/>
+  <hscrollbar left="0" right="2" top="2" bottom="3"/>
+</table>

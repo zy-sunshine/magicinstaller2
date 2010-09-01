@@ -1,0 +1,11 @@
+关于 IDE 接口的 CDRW：
+由于常见的 IDE 接口的 CDRW 是由 ide-scsi.o 模块驱动的，因此为加载以此类
+模块驱动的 IDE 接口的光驱，必须使用设备文件 /dev/sr0、/dev/sr1 ......，而
+不是：/dev/hdc ......。判断的标准就是 /proc/ide/hdc/driver 的内容是否含有
+ide-scsi 字符串。
+
+但在 m4.pkgselect.py，并没有据此做出判断。其原因是 MagicInstaller 没有必要
+支持光盘刻录，因此启动内核的时候不必加载 ide-scsi.o 模块，这样所有 IDE 光驱
+都是由普通驱动程序驱动的。也就是应该用 /dev/hdc 来加载。
+
+如果有必要，可以增加这方面的支持。

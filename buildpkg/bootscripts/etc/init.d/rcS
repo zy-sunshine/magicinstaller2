@@ -4,21 +4,54 @@
 # All rights reserved.
 # License: GPL
 
-export PATH=/usr/bin:/bin:/usr/sbin:/sbin
+. /etc/sysconfig/rc
+. ${rc_functions}
 
-. /etc/sysconfig/i18n.zh_CN
-export GDK_USE_XFT=0
+# This sets a few default terminal options.
+# suit for busybox too.
+stty sane
 
-# Run the init script one by one.
+# These 3 signals will not cause our script to exit.
+trap "" INT QUIT TSTP
+
+# We only have one runlevel.
+# So we not need check the runlevel and prevlevel here.
+# If we have multi-level, we should stop all services started by
+# previous runlevel, and killed in this runlevel.
+# Then start all functions in this runlevel.
+
+# There we only run the specified scripts.
+
+##### Run the init script one by one.
 # Please don't change the order arbitrarily.
-/etc/init.d/mountall start
-/etc/init.d/udev start
-/etc/init.d/modules
-/etc/init.d/syslogd
-/etc/init.d/network
+${rc_base}/init.d/mountkernfs start
+${rc_base}/init.d/consolelog start
+${rc_base}/init.d/modules start
+${rc_base}/init.d/udev start
+${rc_base}/init.d/mountotherfs start
+${rc_base}/init.d/swap start
+${rc_base}/init.d/setclock start
+# We have this boot script, but in MI we don't use it.
+#${rc_base}/init.d/checkfs start
+${rc_base}/init.d/mountfs start
+${rc_base}/init.d/udev_retry start
+#${rc_base}/init.d/cleanfs start
+${rc_base}/init.d/console start
+${rc_base}/init.d/localnet start
+${rc_base}/init.d/sysctl start
+${rc_base}/init.d/sysklogd start
 
-# For magicinstaller.
-#/etc/init.d/tftpd
-# For magicinstaller debug.
-#/etc/init.d/create-devenv
-#/etc/init.d/apply-dbgopts
+# We don't use internet network in MI, only a tftpd and telnet for debug.
+#${rc_base}/init.d/network start
+
+# This script use killall5 command, it is in the SysVinit, MI not include it.
+# So we don't use this script, and not necessary.
+#${rc_base}/init.d/sendsignals stop
+
+##### Attempt to run magicinstaller services below.
+
+$mi_start_services
+
+##### We will start magicinstaller in inittab, not there.
+#$mi_start_script
+

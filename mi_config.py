@@ -124,7 +124,7 @@ pythondir = 'usr/lib/python2.6'
 #}}}
 
 #{{ build rootfs environment
-busybox_version = '1.6.1'                       # busybox in rootfs
+busybox_version = '1.17.2'                       # busybox in rootfs
 
 root_bindir = '/usr/bin'
 root_libdir = '/$pythondir/site-packages'
@@ -155,4 +155,7 @@ lang_map = { 'ja_JP': ('eucJP', 'eucJP'),
              'ko_KR' : ('eucKR', 'eucKR'),
              'zh_CN': ('gb2312', 'GB2312'),
              'zh_TW': ('big5', 'BIG5') }
+# For magicinstaller debug
+ip_mihost = '192.168.56.111'
+ip_devhost = '192.168.56.1'
 #}}

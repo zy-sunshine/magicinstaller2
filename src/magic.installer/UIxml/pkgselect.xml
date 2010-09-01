@@ -1,0 +1,66 @@
+<?xml version="1.0"?>
+<!-- Copyright (C) 2003 Charles Wang <charles@linux.net.cn> -->
+<!-- Author:  Charles Wang -->
+<pkgselect>
+  <steps>
+    <hbox margin="4">
+      <vbox name="toplevel" spacing="4" expand="true" fill="true">
+        <hbox spacing="4" fill="true">
+          <label text="((Source position:))"/>
+          <label name="srcpos_show"/>
+	</hbox>
+	<frame expand="true" fill="true">
+          <vbox spacing="4" margin="4" >
+            <list name="grouplist" value="grouplist"
+	          choose_value="package.choosedgroup" choose_id="1"
+	          selection_mode="multiple" expand="true" fill="true">
+              <column label="((Name))"/>
+              <column label="" visible="false"/>
+            </list>
+          </vbox>
+	</frame>
+	<hbox spacing="4" fill="true">
+	  <button label="((_Change the source position))"
+                  clicked="change_srcpos" pack="end"/>
+	</hbox>
+	<checkbutton name="" label="((Choose _individual packages))"
+	             value="package.individual" fill="true" show="false"/>
+      </vbox>
+      <hbox name="pkgchoose" spacing="4" show="false" expand="true" fill="true">
+	<list name="pkglist" value="pkglist" selection_mode="single" expand="true" fill="true">
+	  <column label="((Status))"/>
+	  <column label="((Type))"/>
+	  <column label="((Name/Group Name))"/>
+        </list>
+	<vbox spacing="4">
+	  <button label="((Install _All))" fill="true" clicked="select_all"/>
+	  <button label="((Install _Nothing))" fill="true" clicked="select_nothing"/>
+	  <button label="((_Details))" fill="true" clicked="select_details"/>
+	</vbox>
+      </hbox>
+    </hbox>
+  </steps>
+  <srcpos.dialog>
+    <list name="srcposlist" value="srcposlist" selection_mode="single" expand="true" fill="true">
+      <column label="" visible="false"/>
+      <column label="((Device))"/>
+      <column label="((Filesystem))"/>
+      <column label="((Directory))"/>
+      <column label="((ISO Filename))"/>
+    </list>
+  </srcpos.dialog>
+  <choose.dialog>
+    <hbox spacings="4">
+      <list name="pkglist" value="pkglist" selection_mode="single" expand="true" fill="true">
+        <column label="((Status))"/>
+	<column label="((Type))"/>
+	<column label="((Name/Group Name))"/>
+      </list>
+      <vbox spacing="4">
+        <button label="((Install _All))" fill="true" clicked="all"/>
+        <button label="((Install _Nothing))" fill="true" clicked="nothing"/>
+	<button label="((_Details))" fill="true" clicked="details"/>
+      </vbox>
+    </hbox>
+  </choose.dialog>
+</pkgselect>

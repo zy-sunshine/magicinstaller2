@@ -3,7 +3,7 @@
 <package>
 <files>udev-146-1mgc25.i686.rpm</files>
 <install>
-# These etc config file will be added in the bootscripts, so remove it.
+# These etc config file will be added in the bootscripts, so remove it here.
 #+etc/dev.d
 #etc/modprobe.d/floppy-pnp.conf
 #etc/rc.d/init.d/udev-post
@@ -38,7 +38,9 @@ lib/udev/modem-modeswitch
 lib/udev/path_id
 lib/udev/pci-db
 lib/udev/rule_generator.functions
-@lib/udev/rules.d
+
+# We will add this rules in bootscripts, special for MI.
+#@lib/udev/rules.d
 lib/udev/scsi_id
 lib/udev/udev-acl
 lib/udev/usb-db

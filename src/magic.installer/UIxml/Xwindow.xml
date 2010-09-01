@@ -1,0 +1,211 @@
+<?xml version="1.0"?>
+<!-- Copyright (C) 2003 Charles Wang <charles@linux.net.cn> -->
+<!-- Author:  Charles Wang -->
+<Xwindow>
+  <steps>
+    <hbox margin="4">
+      <vbox name="monitor" expand="true" fill="true">
+        <hbox fill="true">
+	  <frame label="((Monitor Parameters))" margin="4" fill="true" expand="true">
+	    <table columns="2" rows="3" margin="4" colspacings="4" rowspacings="4">
+	      <label text="((_Monitor Name :))" xalign="0" mnemonic="mon_name_entry"/>
+	      <entry name="mon_name_entry" value="Xwindow.monitor.name"/>
+	      <label text="((_HorizSync :))" xalign="0" mnemonic="mon_horiz_sync_entry"/>
+	      <entry name="mon_horiz_sync_entry" value="Xwindow.monitor.horiz_sync"/>
+	      <label text="((_VertRefresh :))" xalign="0" mnemonic="mon_vert_refresh_entry"/>
+	      <entry name="mon_vert_refresh_entry" value="Xwindow.monitor.vert_refresh"/>
+	    </table>
+	  </frame>
+	  <vbox margin="8">
+	    <button label="_Reprobe Monitor" clicked="reprobe_monitor" yalign="1" pack="end"/>
+	  </vbox>
+	</hbox>
+        <frame label="((Monitor Vender List))" margin="4" expand="true" fill="true">
+	  <vbox margin="4" spacing="6">
+	    <label text="((You can choose your monitor vender and then choose your monitor.))" fill="true"/>
+	    <list name="monitor_vender_list" value="lists.vender_list"
+	          selection_mode="single" readonly="true"
+		  expand="true" fill="true">
+	      <column label="((Monitor Vender))"/>
+	    </list>
+	    <hbox fill="true">
+	      <label expand="true"/>
+	      <button label="((_Choose))" clicked="popup_monitor_dialog"/>
+	      <label expand="true"/>
+	    </hbox>
+	  </vbox>
+	</frame>
+      </vbox>
+      <vbox name="videocard" show="false" expand="true" fill="true">
+        <hbox fill="true">
+	  <frame label="((Videocard Parameters))" margin="4" fill="true" expand="true">
+	    <table columns="2" rows="3" margin="4" colspacings="4" rowspacings="4">
+	      <label text="((_Videocard Name :))" xalign="0" mnemonic="vc_name_entry"/>
+	      <entry name="vc_name_entry" xalign="0" value="Xwindow.videocard.name"/>
+	      <label text="((_Driver :))" xalign="0" mnemonic="vc_driver_entry"/>
+	      <entry name="vc_driver_entry" xalign="0" value="Xwindow.videocard.driver"/>
+	      <label text="((_VideoRam :))" xalign="0" mnemonic="vc_videoram_om"/>
+	      <optionmenu name="vc_videoram_om" value="Xwindow.videocard.videoram">
+	        <value valstr="0">none</value>
+	        <value valstr="256">256K</value>
+		<value valstr="512">512K</value>
+		<value valstr="1024">1M</value>
+		<value valstr="2048">2M</value>
+		<value valstr="4096">4M</value>
+		<value valstr="8192">8M</value>
+		<value valstr="16384">16M</value>
+		<value valstr="32768">32M</value>
+		<value valstr="65536">64M</value>
+		<value valstr="131072">128M</value>
+		<value valstr="262144">256M</value>
+		<value valstr="524288">512M</value>
+		<value valstr="1048576">1G</value>
+	      </optionmenu>
+	    </table>
+	  </frame>
+	  <vbox margin="8">
+	    <button label="((_Reprobe Videocard))" clicked="reprobe_videocard" pack="end"/>
+	  </vbox>
+	</hbox>
+        <frame label="((Video Card List))" margin="4" expand="true" fill="true">
+	  <vbox margin="4" spacing="6">
+	    <label text="((You can choose your video card here directly.))" fill="true"/>
+	    <list name="videocard_list" value="lists.card_list"
+	          selection_mode="single" readonly="true"
+		  expand="true" fill="true">
+	      <column label="((Videocard))"/>
+	      <column visible="false"/>
+	    </list>
+	    <hbox fill="true">
+	      <label expand="true"/>
+	      <button label="((_Choose))" clicked="load_videocard"/>
+	      <label expand="true"/>
+	    </hbox>
+	  </vbox>
+	</frame>
+      </vbox>
+      <vbox name="mouse" show="false" expand="true" fill="true">
+        <hbox fill="true">
+	  <frame label="((Mouse Parameters))" margin="4" fill="true" expand="true">
+	    <table columns="2" rows="3" margin="4" colspacings="4" rowspacings="4">
+	      <label text="((_Mouse Name :))" xalign="0" mnemonic="mouse_name_entry"/>
+	      <entry name="mouse_name_entry" xalign="0" value="Xwindow.mouse.name"/>
+	      <label text="((_Protocol :))" xalign="0" mnemonic="mouse_protocol_entry"/>
+	      <entry name="mouse_protocol_entry" xalign="0" value="Xwindow.mouse.protocol"/>
+	      <label text="((_Device :))" xalign="0" mnemonic="mouse_device_entry"/>
+	      <entry name="mouse_device_entry" xalign="0" value="Xwindow.mouse.device"/>
+	      <checkbutton label="((_Emulate 3 Buttons))" value="Xwindow.mouse.xemu3" span="2"/>
+	    </table>
+	  </frame>
+	  <vbox margin="8">
+	    <button label="((_Reprobe Mouse))" clicked="reprobe_mouse" pack="end"/>
+	  </vbox>
+	</hbox>
+        <frame label="((Mouse List))" margin="4" expand="true" fill="true">
+	  <vbox margin="4" spacing="6">
+	    <label text="((If auto probe is incorrect, choose your mouse here directly. If you have a wheel mouse, please choose one tagged with 'wheel mouse' according to the interface.))" fill="true" line_wrap="true"/>
+	    <list name="mouse_list" value="lists.mouse_list"
+	          selection_mode="single" readonly="true"
+		  expand="true" fill="true">
+	      <column label="((Mouse))"/> <!-- name -->
+	      <column visible="false"/>   <!-- protocol -->
+	      <column visible="false"/>   <!-- device -->
+	      <column visible="false"/>	  <!-- xemu3 -->
+	    </list>
+	    <hbox fill="true">
+	      <label expand="true"/>
+	      <button label="((_Choose))" clicked="load_mouse"/>
+	      <label expand="true"/>
+	    </hbox>
+	  </vbox>
+	</frame>
+      </vbox>
+      <vbox name="misc" show="false" expand="true" fill="true">
+        <frame label="((Modes))" margin="4" fill="true">
+	  <table margin="4" columns="5" rows="4">
+	    <label text="((256 Colors))"/>
+	    <checkbutton name="640x8" label="640x480" value="Xwindow.modes.m640x8"/>
+	    <checkbutton name="800x8" label="800x600" value="Xwindow.modes.m800x8"/>
+	    <checkbutton name="1024x8" label="1024x768" value="Xwindow.modes.m1024x8"/>
+	    <checkbutton name="1280x8" label="1280x1024" value="Xwindow.modes.m1280x8"/>
+	    <label text="((32K Colors))"/>
+	    <checkbutton name="640x15" label="640x480" value="Xwindow.modes.m640x15"/>
+	    <checkbutton name="800x15" label="800x600" value="Xwindow.modes.m800x15"/>
+	    <checkbutton name="1024x15" label="1024x768" value="Xwindow.modes.m1024x15"/>
+	    <checkbutton name="1280x15" label="1280x1024" value="Xwindow.modes.m1280x15"/>
+	    <label text="((64K Colors))"/>
+	    <checkbutton name="640x16" label="640x480" value="Xwindow.modes.m640x16"/>
+	    <checkbutton name="800x16" label="800x600" value="Xwindow.modes.m800x16"/>
+	    <checkbutton name="1024x16" label="1024x768" value="Xwindow.modes.m1024x16"/>
+	    <checkbutton name="1280x16" label="1280x1024" value="Xwindow.modes.m1280x16"/>
+	    <label text="((16M Colors))"/>
+	    <checkbutton name="640x24" label="640x480" value="Xwindow.modes.m640x24"/>
+	    <checkbutton name="800x24" label="800x600" value="Xwindow.modes.m800x24"/>
+	    <checkbutton name="1024x24" label="1024x768" value="Xwindow.modes.m1024x24"/>
+	    <checkbutton name="1280x24" label="1280x1024" value="Xwindow.modes.m1280x24"/>
+	  </table>
+        </frame>
+        <frame label="((LCD Widescreen))" margin="4" fill="true">
+	  <table margin="4" columns="4" rows="2">
+	    <label text="((Resolution:))"/>
+	    <optionmenu name="widemode_res_om" value="Xwindow.modes.widemode_res" changed="widemode_res_changed">
+	      <value valstr="x">((none))</value>
+	      <value valstr="1024x640">1024x640</value>
+	      <value valstr="1024x720">1024x720</value>
+	      <value valstr="1280x768">1280x768</value>
+	      <value valstr="1280x800">1280x800</value>
+	      <value valstr="1280x960">1280x960</value>
+	      <value valstr="1440x864">1440x864</value>
+	      <value valstr="1440x900">1440x900</value>
+	      <value valstr="1440x960">1440x960</value>
+	      <value valstr="1440x1050">1440x1050</value>
+	      <value valstr="1680x1050">1680x1050</value>
+	      <value valstr="1920x1080">1920x1080</value>
+	      <value valstr="1920x1200">1920x1200</value>
+	    </optionmenu>
+	    <label text="((Custom:))" xalign="1"/>
+	    <hbox margin="4" spacing="6">
+	      <entry name="widemode_x_entry" xalign="0" value="Xwindow.modes.widemode_x" width="6"/>
+	      <label text="x"/>
+	      <entry name="widemode_y_entry" xalign="0" value="Xwindow.modes.widemode_y" width="6"/>
+              <label expand="true" fill="true"/>
+	    </hbox>
+	    <label text="((Color Depth:))" xalign="1"/>
+	    <optionmenu name="widemode_depth_om" value="Xwindow.modes.widemode_depth">
+	      <value valstr="8">((256 Colors))</value>
+	      <value valstr="15">((32K Colors))</value>
+	      <value valstr="16">((64K Colors))</value>
+	      <value valstr="24">((16M Colors))</value>
+	    </optionmenu>
+	    <label text="((Refresh Rate:))" xalign="1"/>
+	    <hbox margin="4" spacing="6">
+	      <entry name="widemode_refresh_entry" xalign="0" value="Xwindow.modes.widemode_refresh"  width="6"/>
+              <label text="kHz" xalign="0"/>
+	    </hbox>
+	  </table>
+        </frame>
+        <label expand="true" fill="true"/>
+	<frame label="((Init Mode))" margin="4" fill="true">
+	  <hbox margin="4" homogenous="true">
+	    <radiobutton label="((_Text))" value="Xwindow.init" valuedata="text" expand="true"/>
+	    <radiobutton label="((_Graphics))" value="Xwindow.init" valuedata="gra" expand="true"/>
+	  </hbox>
+	</frame>
+        <label expand="true" fill="true"/>
+	<hbox margin="4" fill="true">
+	  <label expand="true"/>
+	  <button label="((Test Xwindow _Settings))" clicked="test_x_settings"/>
+	  <label expand="true"/>
+	</hbox>
+      </vbox>
+    </hbox>
+  </steps>
+  <monitor.dialog>
+    <list name="monitor_list" value="monlist"
+          selection_mode="single" expand="true" fill="true">
+      <column label="((Name))"/>
+      <column label="((Horiz Sync))"/>
+      <column label="((Vert Refresh))"/>
+    </list>
+  </monitor.dialog>
+</Xwindow>

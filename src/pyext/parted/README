@@ -1,0 +1,16 @@
+There is a python wrapper for parted which provided by RedHat9.
+I import it because it is not present in the office release of
+parted and I want extend it somewhat.
+
+The revision 1.1 is the original text. To get the patch for my
+modification, please use:
+cvs diff -u -r 1.1 *.[hc] > mymodification.patch.
+
+The setup.py is composed by myself to replace its original
+Makefile.am.
+
+zy_sunshine:
+因为原版本的parted在内存释放上有问题，因此更新到parted1.8.8版本
+,在不大面积改动的前提下只能升级到该版本, 现在最高版本为3.4
+因为3.4与parted-2.2相关联，因此现在还不能升级(magiclinux2.5(parted1.8.8))
+可以在这里获得各个发行版https://fedorahosted.org/releases/p/y/pyparted/

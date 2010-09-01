@@ -1,0 +1,52 @@
+# -*- python -*-
+# Copyright (C) 2003, Charles Wang.
+# Author:  Charles Wang <charles@linux.net.cn>
+# All rights reserved.
+#
+# This program is free software; you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the Free
+# Software Foundation; either version 2, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANT; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE. See the GNU General Public LIcense for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along
+# with this program; if not, write to the Free Software Foundation, 59 Temple
+# Place - Suite 330, Boston, MA 02111-1307, USA.
+
+import glob
+import os.path
+Import ('*')
+
+env = env.Clone()
+
+env['_xtest_textdomain'] = 'testxdlg'
+env['_xtest_srcdir'] = os.getcwd()
+env['_xtest_devdir'] = '$devrootdir/testxdlg'
+env['_xtest_rootdir'] = '$_xtest_devdir/tmp/testxdlg'
+
+for lang in mi_config.all_linguas:
+    env['_lang'] = lang
+    if not mi_config.lang_map.has_key(lang):
+        env.Command('$_xtest_devdir/${_lang}.mo',
+                    '${_lang}.po',
+                    'msgfmt -c -o $TARGET $SOURCE')
+    else:
+        env.Command('$_xtest_devdir/${_lang}.mo',
+                    '${_lang}.utf8.po',
+                    'msgfmt -c -o $TARGET $SOURCE')
+        env.Command('${_lang}.utf8.po',
+                    '${_lang}.tmp.po',
+                    'sed s/charset=$_langcharset/charset=UTF-8/ $SOURCE > $TARGET',
+                    _langcharset = mi_config.lang_map[lang][0])
+        env.Command('${_lang}.tmp.po',
+                    '${_lang}.po',
+                    'iconv -f $_langcharset -t UTF8 -o $TARGET $SOURCE',
+                    _langcharset = mi_config.lang_map[lang][1])
+
+    env.Alias('newpo', '${_lang}.new.po')
+    env.Command('${_lang}.new.po',
+                ['${_lang}.po', '../${_xtest_textdomain}.pot'],
+                'msgmerge $SOURCES > $TARGET')

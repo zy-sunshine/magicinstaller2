@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<!-- Copyright (C) 2003, Charles Wang -->
+<!-- Author: Charles Wang <charles@linux.net.cn> -->
+<dosetup>
+  <vbox margin="4" spacing="4">
+    <label expand="true"/>
+    <label line_wrap="true" fill="true"
+text="((Make the setup take effect...))"/>
+    <label expand="true"/>
+    <label expand="true"/>
+  </vbox>
+</dosetup>

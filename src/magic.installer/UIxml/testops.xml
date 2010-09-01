@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<!-- Copyright (C) 2003 Charles Wang <charles@linux.net.cn> -->
+<!-- Author:  Charles Wang -->
+<vbox>
+   <label text="Test Long Operation"/>
+   <button name="sleepbtn" label="StartSleep" clicked="startsleep"/>
+</vbox>

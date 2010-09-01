@@ -1,0 +1,156 @@
+非静态连接
+
+应该加入的程序
+* 开头的是必要的程序
+
+/bin
+cat
+chmod
+*cp             @
+cpio
+date
+dd
+df
+dmesg
+*echo           @
+*egrep          @
+false
+fgrep
+*grep           @
+gunzip
+gzip
+*hostname       @
+*ip             @
+*kill           @
+*ln             @
+*login          @
+ls
+mkdir
+mknod
+more
+*mount          @
+*mountpoint     @
+mv
+netstat
+*nice           @
+*pidof          @
+ping
+printenv
+ps
+pwd
+rm
+rmdir
+*sed            @
+setarch
+*sh
+*sleep
+stat
+stty
+sync
+tar
+*touch
+true
+*umount         @
+*uname
+*vi
+zcat
+
+/sbin
+arp
+blkid
+depmod
+fbsplash        # 如果想要使用这个功能的话
+*fdisk
+*getty          @
+*halt           @
+hdparm
+*hwclock        @
+*ifconfig       @
+*init
+insmod
+*klogd          @
+loadkmap
+lsmod
+mkfs.*          # 根据需要
+*modprobe       @
+pivot_root
+*poweroff
+*reboot         @
+rmmod
+*route          @
+scsi_id
+*swapoff        @
+*swapon         @
+switch_root
+*sysctl         @
+*syslogd        @
+
+/usr/bin
+*awk            @
+*basename
+bunzip2
+bzcat
+bzip2
+*clear
+cut
+diff
+*dirname
+env
+*find           @
+ftpget
+ftpput
+head
+*id             @
+*install
+*kbd_mode       @
+*killall        @
+less
+lspci
+lsusb
+*md5sum
+nc          # good tool.
+nohup
+nslookup
+*openvt         @
+passwd
+patch
+pgrep
+*pkill
+realpath
+sort
+*split
+tail
+*tee
+*telnet
+test
+*tftp
+*time
+timeout
+top
+traceroute
+*tty
+*udpsvd         @
+*unzip
+*wc
+*wget
+*which
+who
+whoami
+*xargs
+*yes
+
+/usr/sbin
+chpasswd
+*chroot
+*tfpd           @
+setfont
+*telnetd        @
+udhcpd
+
+以上标记 * 号的有些是 bootscript 中必要的, 有的是MI中需要的, 还有常用的.
+几个在 bootscript 中需要的命令必须打开长选项, 即命令可以使用多个参数来执行命令,
+在其后标记 @
+
+补充:
+*inetd          @  # 用于启动 tftpd
+

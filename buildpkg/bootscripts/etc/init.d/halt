@@ -6,7 +6,8 @@
 
 case "${1}" in
     stop)
-        halt
+        # busybox have a poweroff to get the system down.
+        poweroff -d 1
         ;;
     *)
         echo "Usage: {stop}"

@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<!-- Copyright (C) 2003, Charles Wang -->
+<!-- Author: Charles Wang <charles@linux.net.cn> -->
+<finish>
+  <vbox margin="4" spacing="4">
+    <label expand="true"/>
+    <label line_wrap="true" fill="true"
+text="((Congratulation! Your system has been installed and setup successfully. Click 'Finish' to reboot system and enjoy it. Be note that if you are install it from CDROM you should remove the ejected CDROM so your system can boot from your harddisk.))"/>
+    <label expand="true"/>
+    <label expand="true"/>
+  </vbox>
+</finish>

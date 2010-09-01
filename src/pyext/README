@@ -1,0 +1,7 @@
+The module 'extioctl', 'lowlevel' are developed for the self-implemented
+partition code. But I decide to use GNU Parted now, so they are removed.
+These code are preserved for future requirement. If the others required
+them, they will be added again.
+The module 'isys' is imported from anaconda because some operations are
+not supported by python directly. I do some change on it to fit the
+requirement of MagicInstaller.

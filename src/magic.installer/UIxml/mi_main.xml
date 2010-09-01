@@ -1,0 +1,66 @@
+<?xml version="1.0"?>
+<!-- Copyright (C) 2003, Charles Wang <charles@linux.net.cn> -->
+<!-- Author: Charles Wang -->
+<main><whole>
+<vbox>
+  <image file="images/banner.png"/>
+  <hbox margin="4" spacing="4">
+    <vbox>
+      <frame label="((Steps))">
+        <table name="steptables" columns="2" margin="4" colspacings="4" rowspacings="4"/>
+        <label expand="true"/>
+      </frame>
+	</vbox>
+    <mim_notebook name="mi_main" expand="true" fill="true"/>
+  </hbox>
+
+  <hbox margin="4" spacing="4">
+    <label name="mi_step_label" show="false"/>
+    <progressbar name="mi_step" pack="start" expand="true" fill="true" show="false"/>
+  </hbox>
+  <hbox name="mi_action" margin="4" spacing="8">
+    <button tips="((Theme Choice))" clicked="btntheme_clicked" pack="start">
+      <image file="images/gnome-ccthemes-24.png" fill="true"/>
+    </button>
+    <button name="btnhelp" clicked="btnhelp_clicked" pack="start">
+      <hbox>
+        <image file="images/stock_help_24.png"/>
+        <label text="((_Help))" use_underline="true" expand="true" fill="true"/>
+      </hbox>
+    </button> 
+    <label text="" pack="start" expand="true" fill="true"/>
+    <button name="btnfinish" clicked="btnfinish_clicked" pack="end">
+      <hbox>
+        <image file="images/stock_exit_24.png"/>
+        <label text="((_Finish))" use_underline="true" expand="true" fill="true"/>
+      </hbox>
+    </button>
+    <button name="btnnext" clicked="btnnext_clicked" pack="end">
+      <hbox>
+        <image file="images/stock_right_arrow_24.png"/>
+        <label text="((_Next))" use_underline="true" expand="true" fill="true"/>
+      </hbox>
+    </button>
+    <button name="btnback" clicked="btnback_clicked" pack="end">
+      <hbox>
+        <image file="images/stock_left_arrow_24.png"/>
+        <label text="((_Back))" use_underline="true" expand="true" fill="true"/>
+      </hbox>
+    </button>
+    <button name="btncancel" clicked="btncancel_clicked" pack="end">
+      <hbox>
+        <image file="images/stock_cancel_20.png"/>
+        <label text="((_Cancel the Installation))" use_underline="true" expand="true" fill="true"/>
+      </hbox>
+    </button>
+  </hbox>
+</vbox>
+</whole><themedlg>
+  <vbox>
+    <label line_wrap="true" fill="true"
+           text="((Click the button to choose the theme that you like.))"/>
+    <hbox name="themes" expand="true" fill="true">
+      <image file="images/gnome-ccthemes.png" fill="true"/>
+    </hbox>
+  </vbox>
+</themedlg></main>

@@ -1,0 +1,169 @@
+<?xml version="1.0"?>
+<!-- Copyright (C) 2003 Charles Wang <charles@linux.net.cn> -->
+<!-- Author:  Charles Wang -->
+<parted>
+  <step>
+    <vbox name="realwork" show="false" margin="4" spacing="4">
+      <frame type="none" expand="true" fill="true">
+        <miparted_notebook/>
+      </frame>
+      <frame name="autopart_frame" label="((Auto-partition))">
+	<hbox margin="4" spacing="4" homogenous="true" show="true">
+          <label expand="true" fill="true"/>
+	  <autopart_optionmenu name="autopart_om" value="parted.profile"/>
+	  <button name="autopart_button" label="((_Apply))" clicked="auto1_clicked"
+		  tips="((Apply the selected auto-partition profile))"
+		  expand="true"/>
+          <label expand="true" fill="true"/>
+	</hbox>
+      </frame>
+    </vbox>
+  </step>
+  <diskpage>
+    <vbox margin="4" spacing="4">
+      <hbox margin="4" spacing="4" homogenous="true" fill="true">
+        <label text="((Capacity:))"/>
+        <label name="capacity"/>
+        <label expand="true"/>
+        <label text="((Disklabel:))"/>
+        <label name="disklabel"/>
+        <label expand="true"/>
+        <label text="((Model:))"/>
+        <label name="model"/>
+      </hbox>
+      <list name="partitions" value="partitions" changed="part_sel_changed" expand="true" fill="true">
+        <column label="num" visible="false"/>
+        <column label="((Device))"/>
+        <column label="((Format))" type="pixmap"/>
+        <column label="((Flags))"/>
+        <column label="((Type))"/>
+        <column label="((Capacity))"/>
+        <column label="((Filesystem))"/>
+        <column label="((Mount point))"/>
+        <column label="((Label))"/>
+        <column label="((Start))"/>
+        <column label="((End))"/>
+	<column label="" visible="false"/> <!-- Format or not value -->
+        <column label="" visible="false"/> <!-- Avaiable flags -->
+        <column label="" visible="false"/> <!-- Original filesystem -->
+      </list>
+      <hbox margin="4" spacing="4" homogenous="true" fill="true">
+        <button name="create" label="((_Create))" clicked="create_clicked" sensitive="false"
+                tips="((Create a new partition at the selected freespace))"
+                expand="true" fill="true"/>
+        <button name="edit" label="((_Edit))" clicked="edit_clicked" sensitive="false"
+                tips="((Edit the selected partition))"
+                expand="true" fill="true"/>
+        <button name="remove" label="((_Remove))" clicked="remove_clicked" sensitive="false"
+                tips="((Remove the selected partition))"
+                expand="true" fill="true"/>
+        <button name="restore" label="((Re_store))" clicked="restore_clicked" sensitive="false"
+	        tips="((Reload the original partition table))"
+                expand="true" fill="true"/>
+        <button name="newlabel" label="((New _Disk Label))" clicked="newlabel_clicked" sensitive="false"
+	        tips="((Create a new empty disk label))"
+                expand="true" fill="true"/>
+      </hbox>
+    </vbox>
+  </diskpage>
+  <newpart-dlg>
+    <table columns="3" rows="12" margin="4" colspacings="4" rowspacings="4">
+      <label text="((Device))" xalign="0"/>
+      <label name="device_label" xalign="1" span="2"/>
+      <label text="((Partition _Type))" xalign="0" mnemonic="parttype_om"/>
+      <optionmenu name="parttype_om" span="2" value="parttype" changed="parttype_changed">
+        <value name="ptom_primary" valstr="primary">((Primary))</value>
+        <value name="ptom_extended" valstr="extended">((Extended))</value>
+        <value name="ptom_logical" valstr="logical">((Logical))</value>
+      </optionmenu>
+      <checkbutton name="format" group="noextend" label="((Fo_rmat it or not))"
+                   toggled="format_changed"
+                   value="format_or_not" span="3"/>
+      <label group="noextend" text="((_File System))" xalign="0" mnemonic="filesystem_om"/>
+      <optionmenu name="filesystem_om" hook="FILESYSTEM_HOOK1"
+	          value="filesystem" changed="fstype_changed"
+		  enable="format" span="2"/>
+      <label group="noextend" name="mountpoint_label" xalign="0" text="((Mount point))"/>
+      <combo group="noextend" name="mountpoint_combo" value="mountpoint" span="2">
+        <value>/</value>
+        <value>/boot</value>
+        <value>/home</value>
+        <value>/tmp</value>
+        <value>/usr</value>
+        <value>/var</value>
+      </combo>
+      <hbox group="noextend" name="swapbox" homogenous="true" span="3" show="false">
+        <radiobutton label="((_Use))" value="swap" valuedata="USE" expand="true"/>
+	<radiobutton label="((_Don't use))" value="swap" valuedata="" expand="true"/>
+      </hbox>
+      <label text="((Partition Position))" xalign="0"/>
+      <radiobutton label="((From _begin))" value="ppos" valuedata="ppbegin"
+                   toggled="label_change"/>
+      <radiobutton label="((From _end))" value="ppos" valuedata="ppend"
+                   toggled="label_change"/>
+      <label text="((_Size:))" mnemonic="size_entry" xalign="0"/>
+      <entry name="size_entry" value="size" span="2"/>
+      <label text="((Sectors))" skip="1"/>
+      <label text="((Megabytes))"/>
+      <label text="((Start))"/>
+      <label name="start_sec"/>
+      <label name="start_mega"/>
+      <label text="((End))"/>
+      <label name="end_sec"/>
+      <label name="end_mega"/>
+      <label text="((Size))"/>
+      <label name="size_sec"/>
+      <label name="size_mega"/>
+      <label text="((Partition Size))"/>
+      <hscale hook="size_hscale" name="size_hscale" span="2"
+              lower="1" pagesize="0.0" pageinc="0.0" digits="0"
+	      value-changed="label_change"/>
+      <label name="label_label" text="((Label))" mnemonic="label_entry"/>
+      <entry name="label_entry" value="label" span="2"/>
+    </table>
+  </newpart-dlg>
+  <editpart-dlg>
+    <table columns="3" rows="5" margin="4" colspacings="4" rowspacings="4">
+      <checkbutton name="format" group="noextend" label="((Fo_rmat it or not))"
+                   toggled="format_changed"
+                   value="format_or_not" span="3"/>
+      <label group="noextend" text="((_File System))" xalign="0" mnemonic="filesystem_om"/>
+      <optionmenu group="noextend" name="filesystem_om" hook="FILESYSTEM_HOOK2"
+                  value="filesystem" changed="fstype_changed"
+		  enable="format" span="2"/>
+      <label group="noextend" name="mountpoint_label" text="((Mount point))" xalign="0"/>
+      <combo group="noextend" name="mountpoint_combo" value="mountpoint"
+             span="2">
+        <value>/</value>
+        <value>/boot</value>
+        <value>/home</value>
+        <value>/tmp</value>
+        <value>/usr</value>
+        <value>/var</value>
+      </combo>
+      <hbox group="noextend" name="swapbox" homogenous="true" span="3" show="false">
+        <radiobutton label="((_Use))" value="swap" valuedata="USE" expand="true"/>
+        <radiobutton label="((_Don't use))" value="swap" valuedata="" expand="true"/>
+      </hbox>
+      <frame label="((Flags))" type="etched_out" span="3">
+        <table columns="3" rows="2" homogenous="true" colspacings="4" rowspacing="4">
+          <checkbutton name="flag_B" label="(((_1).Boot))" value="flag_B"/>
+          <checkbutton name="flag_R" label="(((_2).Root))" value="flag_R"/>
+          <checkbutton name="flag_S" label="(((_3).Swap))" value="flag_S"/>
+          <checkbutton name="flag_H" label="(((_4).Hidden))" value="flag_H"/>
+          <checkbutton name="flag_A" label="(((_5).RAID))" value="flag_A"/>
+          <checkbutton name="flag_V" label="(((_6).LVM))" value="flag_V"/>
+          <checkbutton name="flag_L" label="(((_7).LBA))" value="flag_L"/>
+        </table>
+      </frame>
+      <label name="label_label" text="((_Label))" xalign="0" mnemonic="label_entry"/>
+      <entry name="label_entry" value="label" span="2"/>
+    </table>
+  </editpart-dlg>
+  <newdisklabel-dlg>
+    <hbox margin="4" spacing="4">
+      <text filename="((helptext/newdisklabel.help.en.txt))" expand="true" fill="true"/>
+      <vbox hook="DISKTYPEBOX" fill="true"/>
+    </hbox>
+  </newdisklabel-dlg>
+</parted>

@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<vbox spacing="8">
+ <progressbar text="This is a progressbar" expand="true" fill="true"/>
+ <hbox spacing="8">
+  <vbox>
+    <label text="yes"/>
+    <entry visible="false"/>
+    <combo value="tcombo" editable="false">
+      <value>/</value>
+      <value>/boot</value>
+      <value>/home</value>
+    </combo>
+    <spinbutton value="tspin"/>
+  </vbox>
+  <vbox>
+    <optionmenu value="toptmenu">
+      <value valstr="f">False</value>
+      <value valstr="t">True</value>
+      <value valstr="o">OK</value>
+      <value valstr="c">Cancel</value>
+    </optionmenu>
+    <button clicked="test_clicked" tips="click to open">
+      <vbox>
+        <image file="../magic145x64.png"/>
+        <label text="MAGIC"/>
+      </vbox>
+    </button>
+  </vbox>
+ </hbox>
+  <hscale value="hscale" digits="2" valuepos="left"
+          lower="0" upper="200" stepinc="0.5" pagesize="0.0" pageinc="0.0"/>
+  <hseparator/>
+  <frame label="FRAME">
+    <table rows="3" columns="3" margin="5" expand="fill">
+      <radiobutton label="fullscreen" left="0" right="1" top="0" bottom="1" value="screen.type" valuedata="fullscreen" toggled="test_toggled"/>
+      <radiobutton name="percentage_radio" label="percentage" left="0" right="1" top="1" bottom="2" value="screen.type" valuedata="percentage" toggled="test_toggled"/>
+      <spinbutton enable="percentage_radio" lower="0" upper="100" value="screen.percentage_value" left="1" right="2" top="1" bottom="2"/>
+      <radiobutton name="fixed_radio" label="fixed" left="0" right="1" top="2" bottom="3" value="screen.type" valuedata="fixed" toggled="test_toggled"/>
+      <entry enable="fixed_radio" left="1" right="2" top="2" bottom="3" value="screen.fixed_width"/>
+      <entry enable="fixed_radio" left="2" right="3" top="2" bottom="3" value="screen.fixed_height"/>
+    </table>
+  </frame>
+ <text filename="../../../COPYING" hpolicy="always" expand="true" fill="true"/>
+</vbox>

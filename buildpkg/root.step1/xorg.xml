@@ -11,6 +11,10 @@ usr/lib/libfreetype.so.*
 <files>fontconfig-2.6.0-5mgc25.i686.rpm</files>
 <install>
 usr/bin/fc-cache
+# This font file is important(as I test), If lose this file, X strat will have a problem.
+# We will add it here, not in bootscripts.
+# but I find font.conf is not in this package, so add it in bootscripts.
+#etc/fonts/font.conf
 etc/fonts/fonts.dtd
 usr/lib/libfontconfig.so.*
 </install>

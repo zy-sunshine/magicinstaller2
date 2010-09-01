@@ -3,7 +3,10 @@ default=0
 timeout=20
 fontfile /boot/grub/fonts
 #splashimage=/boot/grub/splash.xpm.gz
-
+# yellow
+foreground dfcf00
+# black
+background 000000
 title °²×° Magic Linux
 	kernel /boot/mivmlinuz root=/dev/ram0 vga=785
 	initrd /boot/mirootfs.gz

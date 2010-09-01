@@ -1,0 +1,61 @@
+# -*- python -*-
+# Copyright (C) 2003, Charles Wang.
+# Author:  Charles Wang <charles@linux.net.cn>
+# All rights reserved.
+#
+# This program is free software; you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the Free
+# Software Foundation; either version 2, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANT; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE. See the GNU General Public LIcense for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along
+# with this program; if not, write to the Free Software Foundation, 59 Temple
+# Place - Suite 330, Boston, MA 02111-1307, USA.
+
+import glob
+import os
+import os.path
+import string
+
+Import ('*')
+
+depInstall(env, 'root_src', '$destdir$root_operationdir', glob.glob('*.py'))
+
+# building testxdlg
+depInstall(env, 'root_src', '$destdir$root_operationdir', '#tmp/testxdlg.tar.gz')
+
+env = env.Clone()
+env.ParseConfig('pkg-config gtk+-2.0 --cflags')
+env.ParseConfig('pkg-config gtk+-2.0 --libs')
+
+env['_xtest_textdomain'] = 'testxdlg'
+env['_xtest_srcdir'] = os.getcwd()
+env['_xtest_devdir'] = '$devrootdir/testxdlg'
+env['_xtest_rootdir'] = '$_xtest_devdir/tmp/testxdlg'
+
+env.Command('#tmp/testxdlg.tar.gz',
+            ['$_xtest_devdir/testxdlg', '$_xtest_srcdir/txbackground.png'] +
+            ['$_xtest_devdir/%s.mo' % lang for lang in mi_config.all_linguas],
+
+            # Create directory for each language.
+            ['rm -rf $_xtest_rootdir'] +
+            ['mkdir -p $_xtest_rootdir/%s/LC_MESSAGES' % lang for lang in mi_config.all_linguas] +
+            # Install mo.
+            ['cp -a $_xtest_devdir/%s.mo $_xtest_rootdir/%s/LC_MESSAGES/${_xtest_textdomain}.mo' % (lang, lang) \
+             for lang in mi_config.all_linguas] +
+            ['cp -af $_xtest_devdir/testxdlg $_xtest_srcdir/txbackground.png $_xtest_rootdir',
+             'tar cz -C $_xtest_devdir tmp > $TARGET'])
+
+env.BuildDir('$_xtest_devdir', '$_xtest_srcdir')
+env.Program('$_xtest_devdir/testxdlg',
+            '$_xtest_devdir/testxdlg.c')
+
+env.Command('${_xtest_textdomain}.pot',
+            'testxdlg.c',
+            'xgettext --default-domain=$_xtest_textdomain --directory=. --keyword=_ --keyword=N_ --copyright-holder=\'$copyright_holder\' -o $TARGET $SOURCES')
+
+SConscript('po/SConscript')

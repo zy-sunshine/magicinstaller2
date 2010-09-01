@@ -5,7 +5,7 @@
 <install>
 sbin/mkfs.ext3
 sbin/mkfs.ext4
-etc/mke2fs.conf
+#etc/mke2fs.conf
 </install>
 </package>
 

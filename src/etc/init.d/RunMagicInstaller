@@ -1,0 +1,51 @@
+#!/bin/sh
+# Copyright (C) 2003, Charles Wang.
+# Author:  Charles Wang <charles@linux.net.cn>
+# All rights reserved.
+# License: GPL
+
+. /etc/sysconfig/rc
+. ${rc_functions}
+
+# Notice: we should add all the environment for magicinstaller.
+#         and these env should add in /etc/profile or other 
+#         bash init script too.
+export PATH=/usr/bin:/bin:/usr/sbin:/sbin
+
+export LANG="zh_CN.GB18030"
+export GDK_USE_XFT=0
+
+# to override some python modules
+export PYTHONPATH=/usr/lib/python2.6/site-packages
+export PANGO_RC_FILE=/etc/pango/pangorc
+
+mi_toplevel='/usr/bin/magic.toplevel'
+
+if [ -e /tmp/MIsrv.failed ]; then
+    # Because run services for magicinstaller failed, the magicinstaller can't
+    # work, so we just drop a login shell.
+    /sbin/getty 38400 tty1
+else
+
+    if grep "rescue" /proc/cmdline >/dev/null 2>&1 ; then
+        boot_mesg -n "You have entered rescue mode." ${INFO}
+        boot_mesg "" ${NORMAL}
+        /sbin/getty 38400 tty1
+    
+    else
+        boot_mesg -n "Starting magicinstaller..." ${INFO}
+        boot_mesg "" ${NORMAL}
+        if [ -f $mi_toplevel ]; then
+            /usr/bin/python $mi_toplevel
+        else
+            boot_mesg -n "Missing $mi_toplevel" ${FAILURE}
+            boot_mesg -n "Cannot start magicinstaller."
+            boot_mesg -n "We will drop a shell for login."
+            boot_mesg "" ${NORMAL}
+            /sbin/getty 38400 tty1
+        fi
+    fi
+fi
+
+${rc_base}/init.d/reboot stop
+

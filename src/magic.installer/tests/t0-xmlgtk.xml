@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<vbox spacing="4">
+  <hbox spacing="4">
+    <button name="btn1" label="First" expand="true" fill="true"/>
+    <button name="btn2" label="Second" expand="true" fill="true"/>
+  </hbox>
+  <label name="btndesc"/>
+  <hseparator/>
+  <hbox spacing="4">
+    <button label="First" desclabel="BTNDESC" desctext="HAHA"
+            expand="true" fill="true"/>
+    <button label="Second" desclabel="BTNDESC" desctext="XIXI"
+            expand="true" fill="true"/>
+  </hbox>
+  <label name="BTNDESC" xalign="0.1"/>
+</vbox>

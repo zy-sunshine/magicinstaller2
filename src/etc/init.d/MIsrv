@@ -1,0 +1,26 @@
+#!/bin/sh
+
+# /etc/init.d/MIsrv
+
+. /etc/sysconfig/rc
+. ${rc_functions}
+
+# Start some services for magicinstaller.
+boot_mesg -n "Start tftpd service for magicinstaller..." ${INFO}
+boot_mesg -n "" ${NORMAL}
+/etc/init.d/tftpd
+evaluate_retval
+if [ ${?} != 0 ]; then
+    > /tmp/MIsrv.failed
+    echo_warning
+    boot_mesg -n "Start the tftpd service for magicinstaller" ${WARNING}
+    boot_mesg -n " failed. Please Check the service.\nWe will"
+    boot_mesg -n " drop a shell to login."
+    boot_mesg "" ${NORMAL}
+fi
+
+# For magicinstaller debug (hotfix).
+/etc/init.d/create-devenv
+# For magicinstaller step debug.
+/etc/init.d/apply-dbgopts
+

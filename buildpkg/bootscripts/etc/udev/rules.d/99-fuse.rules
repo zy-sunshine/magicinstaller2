@@ -1,1 +1,0 @@
-KERNEL=="fuse", NAME="%k", MODE="0660",OWNER="root",GROUP="fuse"

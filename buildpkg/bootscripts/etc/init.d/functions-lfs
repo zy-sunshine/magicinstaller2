@@ -464,7 +464,7 @@ pidofproc()
 		done
 
 	else
-		pidlist=`pidof -o $$ -o $PPID -x "$1"`
+		pidlist=`pidof -o $$ -o $PPID "$1"`
 		if [ "${silent}" != "1" ]; then
 			echo "${pidlist}"
 		fi

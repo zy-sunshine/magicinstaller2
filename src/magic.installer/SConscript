@@ -1,0 +1,205 @@
+# -*- python -*-
+# Copyright (C) 2003, Charles Wang.
+# Author:  Charles Wang <charles@linux.net.cn>
+# All rights reserved.
+#
+# This program is free software; you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the Free
+# Software Foundation; either version 2, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANT; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE. See the GNU General Public LIcense for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along
+# with this program; if not, write to the Free Software Foundation, 59 Temple
+# Place - Suite 330, Boston, MA 02111-1307, USA.
+
+import glob
+import os.path
+import string
+
+Import('*')
+
+env = env.Clone()
+
+TOPSRCDIR = os.path.abspath('.')
+POTFILES = ['magic.installer.py', 'magicstep.py', 'magicpopup.py', 'xmlgtk.py'] \
+           + glob.glob('modules/*.py') + glob.glob('operations/*.py') + \
+           glob.glob('games/*.py')
+POTXMLS = ['magic.installer.xml', 'magic.autopart.xml'] + glob.glob('UIxml/*.xml') + \
+          glob.glob('games/*.xml')
+
+env.Command('mipublic.py', 'm4.mipublic.py',
+            'm4 -DFULL_WIDTH=$full_width -DFULL_HEIGHT=$full_height' + \
+               ' -Dkernelver=$mikernelver -Disofn_fmt="$isofn_fmt"' + \
+               ' -Ddistname="$distname" -Ddistver="$distver" -Ddistkernelver="$distkernelver"' + \
+               ' -Dbootcdfn="$bootiso_fn" -Ddolog="$dolog" -Duseudev="$useudev"' + \
+               ' -Dhotfixdir="$hotfixdir"' + \
+               ' -DTEXTDOMAIN="$textdomain" -DBINDIR="$root_bindir" -DDATADIR="$root_datadir"' + \
+               ' -DLIBDIR="$root_libdir" -DMODULEDIR="$root_moduledir" -DOPERATIONDIR="$root_operationdir" '
+               ' < $SOURCES > $TARGET')
+
+def xmlesc(s):
+    s = string.replace(s, "&", "&amp;")
+    s = string.replace(s, "<", "&lt;")
+    s = string.replace(s, ">", "&gt;")
+    return  s
+
+def gen_magic_autopart_xml(target, source, env):
+    f = file(str(target[0]), 'w')
+    # auto partition profile
+    f.write("""<?xml version="1.0"?>
+<!-- Copyright (C) 2007, Levin Du <zsdjw@21cn.com> -->
+<!-- Author:  Levin Du -->
+<root>
+  <autopart>
+""")
+    for (i, profile) in enumerate(mi_config.autopart_profile):
+        partlist = mi_config.autopart_profile[profile]
+        f.write("    <%s desc=\"((%s))\">\n" % (profile, xmlesc(partlist[0])))
+        for part in partlist[1:]:
+            f.write("      <part>\n")
+            f.write("""        <mountpoint>%s</mountpoint>
+        <filesystem>%s</filesystem>
+        <size>%s</size>
+""" % (xmlesc(part[0]), xmlesc(part[1]), xmlesc(part[2])))
+            f.write("      </part>\n")
+        f.write("    </%s>\n" % profile)
+    f.write("  </autopart>\n")
+    f.write("</root>\n")
+    f.close()
+
+env.Command('magic.autopart.xml', [env.Value(mi_config.autopart_profile)],
+            gen_magic_autopart_xml)
+
+Export('TOPSRCDIR', 'POTFILES', 'POTXMLS') # FIXME
+SConscript('po/SConscript')
+
+if mi_config.develmode:
+    #m4bld = Builder(action = 'm4 -DTEXTDOMAIN=$textdomain -Dbindir=$root_bindir -Ddatadir=$root_datadir -Dlibdir=$root_libdir -Dmoduledir=$root_moduledir -Doperationdir=$root_operationdir $SOURCES > $TARGET')
+    #env['BUILDERS']['M4Builder'] = m4bld
+    #env.M4Builder('magic.installer.py', 'm4.magic.installer.py')
+    #env.M4Builder('magic.actions.server.py', 'm4.magic.actions.server.py')
+
+    bin_programs = ['magic.toplevel',        # MagicInstaller Toplevel Controller.
+                    'magic.installer',       # MagicInstaller GUI.
+                    'magic.actions.server',  # MagicInstaller Actions Sevrer.
+                    'magic.actions.quit']    # Just a test script. It force the Actions Server quit.
+
+    for bp in bin_programs:
+        env['_bp'] = bp
+        depInstallAs(env, 'root_src', '$destdir$root_bindir/${_bp}', '${_bp}.py')
+        AddPostAction('$destdir$root_bindir/${_bp}',
+                      'chmod +x $destdir$root_bindir/${_bp}')
+    del env['_bp']
+
+    pydatas = ['magic.installer.xml', 'magic.values.xml']
+    depInstall(env, 'root_src', '$destdir$root_datadir', pydatas)
+
+    def gen_magic_values_m4defs(target, source, env):
+        import rhpxl.monitor
+        import rhpxl.mouse
+        import rhpxl.videocard
+
+        f = file(str(target[0]), 'w')
+        f.write("changequote(/--, --/)dnl\n")
+        f.write("define(vender_list, /--\n")
+
+        m = rhpxl.monitor.MonitorInfo()
+        mdb = m.monitorsDB()
+        mvlist = mdb.keys()
+        mvlist.sort()
+        for mv in mvlist:
+            f.write("\t<row c0=\"%s\"/>\n" % xmlesc(mv))
+
+        f.write("--/)dnl\n")
+        f.write("define(mouse_list, /--\n")
+
+        m = rhpxl.mouse.Mouse(skipProbe = 1)
+        mava = m.available()
+        malist = mava.keys()
+        malist.sort()
+        for mk in malist:
+            # (gpmproto, xproto, iproto, device, emulate3, shortname)
+            (gpm, x11, iproto, dev, em, shortname) = mava[mk]
+            #(gpm, x11, dev, em, shortname) = mava[mk]
+            if dev == None:  dev = 'none'
+            if em:  xemu3 = 'true'
+            else:   xemu3 = 'false'
+            f.write("\t<row c0=\"%s\" c1=\"%s\" c2=\"%s\" c3=\"%s\"/>\n" % \
+                    (xmlesc(mk), xmlesc(x11), xmlesc(dev), xemu3))
+
+        f.write("--/)dnl\n")
+        f.write("define(card_list, /--\n")
+
+    ## Old rhpl
+    #     rhpl.videocard.VideoCardInfo()
+    #     vclist = rhpl.videocard.Video_cardslist
+    #     vckeylist = vclist.keys()
+    #     vckeylist.sort()
+    #     for vc in vckeylist:
+    #         if vclist[vc].has_key('DRIVER'): # only handle video card with driver
+    #             vcname = vclist[vc]['NAME']
+    #             vcdriver = vclist[vc]['DRIVER']
+    #             f.write("\t<row c0=\"%s\" c1=\"%s\"/>\n" % \
+    #                     (xmlesc(vcname), xmlesc(vcdriver)))
+    ## New rhpxl, but readDrivers() is removed
+    #     rhpxl.videocard.readDrivers()
+    #     vclist = rhpxl.videocard.drivers
+    #     vckeylist = vclist.keys()
+    #     vckeylist.sort()
+    #     for vc in vckeylist:
+    #         vcname = vclist[vc].getDescription()
+    #         vcdriver = vc
+    #         f.write("\t<row c0=\"%s\" c1=\"%s\"/>\n" % \
+    #                 (xmlesc(vcname), xmlesc(vcdriver)))
+        def get_videodrivers():
+            res = {}
+            lines = open('/usr/share/hwdata/videodrivers').readlines()
+            for line in lines:
+                drv, desc = line.split(None, 1)
+                res[drv] = desc.strip()
+            return res
+        vclist = get_videodrivers()
+        vckeylist = vclist.keys()
+        vckeylist.sort()
+        for vc in vckeylist:
+            vcname = vclist[vc]
+            vcdriver = vc
+            f.write("\t<row c0=\"%s\" c1=\"%s\"/>\n" % \
+                    (xmlesc(vcname), xmlesc(vcdriver)))
+
+        f.write("--/)dnl\n")
+
+        f.close()
+
+    env.Command('magic.values.m4defs', '', gen_magic_values_m4defs)
+
+    env.Command('magic.values.xml', ['magic.values.m4defs',
+                                     'm4.magic.values.xml'],
+                'm4 $SOURCES > $TARGET')
+    # Fill distname in m4.magic.values.xml at run time.
+    #            'm4 -Ddistname="%s" -Ddistver="%s" $SOURCES > $TARGET' % \
+    #            (mi_config.distname, mi_config.distver))
+    #env.Depends('magic.values.xml', [env.Value(mi_config.distname),
+    #                                 env.Value(mi_config.distver)])
+
+
+    pymodules = ['mipublic.py', 'xmlgtk.py',
+                 'magicstep.py', 'magicpopup.py',
+                 'miutil.py',
+                 'short_operations.py', 'long_operations.py',
+                 'xmlrpclib.py']
+    depInstall(env, 'root_src', '$destdir$root_libdir', pymodules)
+
+    #for pym in pymodules:
+    #    env.PYCBuilder(pym, pym[:-1])
+
+    SConscript('UIxml/SConscript')
+    SConscript('helptext/SConscript')
+    SConscript('images/SConscript')
+    SConscript('modules/SConscript')
+    SConscript('operations/SConscript')
+    SConscript('games/SConscript')

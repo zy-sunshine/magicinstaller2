@@ -1,0 +1,17 @@
+#!/bin/sh
+# Copyright (C) 2003, Charles Wang.
+# Author:  Charles Wang <charles@linux.net.cn>
+# All rights reserved.
+# License: GPL
+
+/bin/mkdir -p /tmpfs/tftpboot
+# Use in.tftpd might cause security problem. Hostile program can
+# upload files until all of the memory is consumed.
+
+# We use tftpd in busybox instead of in.tftpd, so remove it.
+#/usr/sbin/in.tftpd -l -c -u root -s /tmpfs/tftpboot
+
+# A deamon for tftpd in busybox. It will read /etc/inetd.conf and excute the
+# tftpd command as a deamon service.
+inetd
+

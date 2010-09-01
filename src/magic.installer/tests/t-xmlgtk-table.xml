@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<vbox margin="4">
+  <label text="TEST-LEFT" xalign="0" fill="true"/>
+  <label text="TEST-RIGHT" xalign="1" fill="true"/>
+  <label text="TEST-CENTER" xalign="0.5" fill="true"/>
+  <hseparator/>
+  <table margin="5" rows="3" columns="3" homogeneous="true" fill="true" expand="true">
+    <label text=".LEFT.TOP." xalign="0" yalign="0"/>
+    <label text=".CENTER.TOP." xalign="0.5" yalign="0"/>
+    <label text=".RIGHT.TOP." xalign="1" yalign="0"/>
+
+    <label text=".CENTER.CENTER." xalign="0.5" yalign="0.5"/>
+    <label text=".RIGHT.CENTER." xalign="1" yalign="0.5"/>
+    <label text=".LEFT.CENTER." xalign="0" yalign="0.5"/>
+
+    <label text=".RIGHT.BOTTOM." xalign="1" yalign="1"/>
+    <label text=".LEFT.BOTTOM." xalign="0" yalign="1"/>
+    <label text=".CENTER.BOTTOM." xalign="0.5" yalign="1"/>
+  </table>
+</vbox>

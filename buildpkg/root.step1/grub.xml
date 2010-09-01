@@ -7,20 +7,4 @@ usr/sbin/grub
 </install>
 </package>
 
-<package>
-<files>ncurses-libs-5.7-2.20090207mgc25.i686.rpm</files>
-<install>
-lib/libncurses.so.*
-lib/libtinfo.so.*
-</install>
-</package>
-
-<package>
-<files>ncurses-base-5.7-2.20090207mgc25.i686.rpm</files>
-<install>
-usr/share/terminfo/l/linux
-lib/terminfo/l/linux
-</install>
-</package>
-
 </packages>

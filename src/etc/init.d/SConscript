@@ -1,0 +1,54 @@
+# -*- python -*-
+
+Import('*')
+# Notice: these init.d/* should add in /etc/init.d/rcS, make these scripts run
+#           at the start stage of MI.
+
+# Install apply-dbgopts for magicinstaller step debug.
+depInstall(env, 'root.src.etc',
+           '$destdir/etc/init.d',
+           ['apply-dbgopts'])
+
+dbgopts_cmds = ['echo "#/bin/sh" > $TARGET',
+                'echo "/bin/mkdir -p /tmpfs/debug" >> $TARGET']
+for opt in mi_config.debugopts:
+    dbgopts_cmds.append('echo "cat /dev/null > /tmpfs/debug/%s" >> $TARGET' % opt)
+dbgopts_cmds.append('chmod +x $TARGET')
+
+env.Command('apply-dbgopts', [], dbgopts_cmds)
+
+# Install create-devenv, it will create /tmp/update in MI and mount it to host
+# nfs filesystem for hotfix.
+depInstall(env, 'root.src.etc',
+            '$destdir/etc/init.d',
+            ['create-devenv'])
+
+env.Command('create-devenv', 'm4.create-devenv',
+            ['m4 -DMIHOSTIP=$ip_mihost -DDEVHOSTIP=$ip_devhost $SOURCE > $TARGET',
+             'chmod +x $TARGET'])
+
+# Install inetd.conf for tftpd.
+depInstall(env, 'root.src.etc',
+            '$destdir/etc/init.d',
+            ['MIsrv'])
+
+# Install inetd.conf for tftpd.
+depInstall(env, 'root.src.etc',
+            '$destdir/etc',
+            ['inetd.conf'])
+
+# Install tftpd for magicinstaller.
+depInstall(env, 'root.src.etc',
+            '$destdir/etc/init.d',
+            ['tftpd'])
+
+# Install RunMagicInstaller to init.d, it is the start script for
+# magicinstaller, if it is exist rootfs's rc script will call it.
+depInstall(env, 'root.src.etc',
+            '$destdir/etc/init.d',
+            ['RunMagicInstaller'])
+
+depInstall(env, 'root.src.etc',
+            '$destdir/root',
+            ['RunMagicInstaller'])
+

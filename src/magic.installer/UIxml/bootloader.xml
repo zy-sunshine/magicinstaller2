@@ -1,0 +1,72 @@
+<?xml version="1.0"?>
+<!-- Copyright (C) 2003 Charles Wang <charles@linux.net.cn> -->
+<!-- Author:  Charles Wang -->
+<bootloader>
+    <steps>
+        <hbox margin="4">
+            <vbox name="choose" spacing="16" expand="true">
+                <label expand="true"/>
+                <label line_wrap="true" fill="true" text="((Please choose the bootloader that you like.))"/>
+                <hbox expand="true" fill="true">
+                    <label expand="true"/>
+                    <vbox fill="true" spacing="4">
+                        <radiobutton label="((_Grub(Recommended)))" value="bootloader.bltype" valuedata="grub"/>
+                        <radiobutton show="false" label="((_Lilo))" value="bootloader.bltype" valuedata="lilo"/>
+                        <radiobutton name="bltype_none_radiobutton" label="((_Do not use boot loader))" value="bootloader.bltype" valuedata="none"/>
+                    </vbox>
+                    <label expand="true"/>
+                </hbox>
+                <label expand="true"/>
+            </vbox>
+            <vbox name="bootlist" spacing="4" expand="true" fill="true" show="false">
+                <frame label="((Install Position))" expand="true" fill="true">
+                    <table columns="2" rows="3" colspaings="2" rowspacings="2">
+                        <radiobutton name="mbr" label="((_Master Boot Record(MBR)))" value="bootloader.instpos" valuedata="mbr"/>
+                        <entry name="mbr_entry" value="bootloader.mbr_device" expand="true" fill="true"/>
+                        <radiobutton name="bootpartition" label="((The partition which contain /_boot))" value="bootloader.instpos" valuedata="boot"/>
+                        <entry name="bootpartition_entry" value="bootloader.boot_device" expand="true" fill="true"/>
+                        <radiobutton name="winpartition" label="((The Win_dows partition))" value="bootloader.instpos" valuedata="win"/>
+                        <entry name="winpartition_entry" value="bootloader.win_device" expand="true" fill="true"/>
+                    </table>
+                </frame>
+                <frame label="((Bootloader Option))" expand="true" fill="true">
+                    <table columns="2" rows="4" colspacings="2" rowspacings="2" expand="true" fill="true">
+                        <label text="((Menu t_imeout(second):))" mnemonic="bt-timeout" xalign="0"/>
+                        <spinbutton name="bt-timeout" value="bootloader.timeout" 
+                                lower="1" upper="120" stepinc="1" pagesize="0" pageinc="0"/>
+                        <checkbutton label="((_Force enable LBA32))" value="bootloader.lba"/>
+                        <label/>
+                        <checkbutton show="false" name="useblpassword" label="((Use bootloader pass_word:))" value="bootloader.usepassword"/>
+                        <entry show="false" value="bootloader.password" visible="false" enable="useblpassword" expand="true" fill="true"/>
+                        <label text="((Other bootloader _options:))" mnemonic="bt-options"/>
+                        <entry name="bt-options" value="bootloader.options" expand="true" fill="true"/>
+                    </table>
+                </frame>
+                <label text="((Please modify the bootloader entry here.))" xalign="0"/>
+                <hbox spacing="4" expand="true" fill="true">
+                    <list name="bootlist" value="bootloader.entrylist"
+                            selection_mode="single" expand="true" fill="true">
+                        <column label="((Default))" type="pixmap"/>
+                        <column label="((Label))"/>
+                        <column label="((Root Device))"/>
+                        <column label="" visible="false"/>
+                    </list>
+                    <vbox spacing="4" fill="true">
+                        <button label="((_Restore entry))" fill="true" clicked="restore_entry"/>
+                        <button label="((_Edit entry))" fill="true" clicked="edit_entry"/>
+                        <button label="((Remo_ve entry))" fill="true" clicked="remove_entry"/>
+                    </vbox>
+                </hbox>
+            </vbox>
+        </hbox>
+    </steps>
+    <bootentry.dialog>
+        <table columns="2" rows="3" colspacings="4" rowspacings="4">
+            <checkbutton label="((_Default Boot Entry))" value="default" span="2"/>
+            <label text="((_Label:))" mnemonic="labelentry"/>
+            <entry name="labelentry" value="label"/>
+            <label text="((Root device:))"/>
+            <label name="root_device"/>
+        </table>
+    </bootentry.dialog>
+</bootloader>

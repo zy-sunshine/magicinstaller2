@@ -1,0 +1,3 @@
+虽然启动管理器可以安装到主引导记录、任何一个主分区或逻辑分区上，MagicInstaller 只提供两个可选择的安装点，一个是主引导记录 (MBR)，另一个是含有 /boot 的分区。这样做是因为一个 /boot 分区通常只含有一个 grub.conf。
+
+如果 /boot 分区已经含有 grub.conf，则 MagicInstaller 会将其自动备份为 grub.conf.bk。如果 grub.conf.bk 已存在，则备份为 grub.conf.bk1，并依此类推。

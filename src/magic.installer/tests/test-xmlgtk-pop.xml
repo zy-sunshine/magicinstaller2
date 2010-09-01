@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<vbox>
+  <list name="TestList" changed="show_changed" value="list" selection_mode="single" expand="true" fill="true">
+    <column label="?" type="pixmap"/>
+    <column label="((First))" resizable="true"/>
+    <column label="((Second))"/>
+  </list>
+  <hbox>
+    <button label="Add" clicked="add_clicked"/>
+    <button label="AddBefore" clicked="add_before_clicked"/>
+    <button label="AddAfter" clicked="add_after_clicked"/>
+    <button label="Replace" clicked="replace_clicked"/>
+    <button label="Remove" clicked="remove_clicked"/>
+  </hbox>
+</vbox>

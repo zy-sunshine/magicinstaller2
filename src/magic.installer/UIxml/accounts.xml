@@ -1,0 +1,87 @@
+<?xml version="1.0"?>
+<!-- Copyright (C) 2003 Charles Wang <charles@linux.net.cn> -->
+<!-- Author:  Charles Wang -->
+<accounts><step>
+  <hbox margin="4">
+    <vbox name="root" expand="true" fill="true">
+      <label expand="true"/>
+      <frame label="((Hostname))" margin="4" expand="true" fill="true">
+        <hbox margin="8" spacing="8">
+	  <label text="((_Hostname :))" mnemonic="hostname"/>
+	  <entry name="hostname" value="network.hostname"
+	         expand="true" fill="true"/>
+	</hbox>
+      </frame>
+      <label expand="true"/>
+      <frame label="((The password of root))" margin="4" expand="true" fill="true">
+        <table columns="2" rows="3" colspacings="4" rowspacings="4" margin="4" expand="true" fill="true">
+          <label line_wrap="true" mnemonic="rootpwd" span="2"
+text="((IMPORTANT: The password of root account is the key of your system, choose it carefully please and don't forget it. Please do not use the password shorter than 3 characters for security.))"/>
+          <label text="((_Root password :))"  mnemonic="rootpwd"
+                 xalign="0" xoptions="none"/>
+          <entry name="rootpwd" visible="false"
+                 value="accounts.root.password"/>
+	  <label text="((Root password _confirm :))" mnemonic="rootpwdconfirm"
+	         xalign="0" xoptions="none"/>
+	  <entry name="rootpwdconfirm" visible="false"
+                 value="accounts.root.passwordconfirm"/>
+        </table>
+      </frame>
+      <label expand="true"/>
+    </vbox>
+    <vbox name="others" show="false" expand="true" fill="true" spacing="8">
+      <label line_wrap="true" text="((If you want to add more user, please click 'Add user'.))"/>
+      <hbox spacing="4">
+        <label expand="true"/>
+        <button label="((_Add user))" fill="true" clicked="add_user"/>
+        <label expand="true"/>
+        <button label="((_Edit user))" fill="true" clicked="edit_user"/>
+        <label expand="true"/>
+        <button label="((_Remove user))" fill="true" clicked="remove_user"/>
+        <label expand="true"/>
+      </hbox>
+      <list name="userlist" value="accounts.userlist" selection_mode="single" expand="true" fill="true">
+        <column label="((Username))"/>
+        <column label="password" visible="false"/>
+        <column label="((Shell))"/>
+        <column label="((Home directory))"/>
+	<column label="realuid" visible="false"/>
+        <column label="((UID))" type="i18n.4"/>
+      </list>
+    </vbox>
+  </hbox>
+</step><account.dialog>
+  <table columns="2" rows="7" colspacings="8" rowspacings="8">
+    <label text="((_Username :))" mnemonic="username_entry"
+           left="0" right="1" top="0" bottom="1"/>
+    <entry name="username_entry" value="username"
+           left="1" right="2" top="0" bottom="1"/>
+    <label text="((_Password :))" mnemonic="password_entry"
+           left="0" right="1" top="1" bottom="2"/>
+    <entry name="password_entry" visible="false" value="password"
+           left="1" right="2" top="1" bottom="2"/>
+    <label text="((_Confirm Password :))" mnemonic="confirm_password_entry"
+           left="0" right="1" top="2" bottom="3"/>
+    <entry name="confirm_password_entry" visible="false" value="confirm_password"
+           left="1" right="2" top="2" bottom="3"/>
+    <label text="((_Shell :))" mnemonic="shell_optmenu"
+           left="0" right="1" top="3" bottom="4"/>
+    <optionmenu name="shell_optmenu" value="shell" left="1" right="2" top="3" bottom="4">
+      <value>/bin/bash</value>
+      <value>/bin/sh</value>
+      <value>/bin/csh</value>
+      <value>/bin/ash</value>
+      <value>/bin/tcsh</value>
+      <value>/sbin/nologin</value>
+    </optionmenu>
+    <hseparator left="0" right="2" top="4" bottom="5"/>
+    <checkbutton name="homedir" label="((Custom _home directory))" value="homedir"
+           left="0" right="1" top="5" bottom="6"/>
+    <entry value="customhomedir" enable="homedir"
+           left="1" right="2" top="5" bottom="6"/>
+    <checkbutton name="uid" label="((Custom U_ID))" value="uid"
+           left="0" right="1" top="6" bottom="7"/>
+    <spinbutton value="customuid" lower="1" upper="65535" stepinc="1" enable="uid"
+           left="1" right="2" top="6" bottom="7"/>
+  </table>
+</account.dialog></accounts>

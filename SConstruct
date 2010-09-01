@@ -7,31 +7,27 @@ import sys
 import os
 import types
 
-if '$specdir' != '':
-    sys.path.insert(0, '$specdir')
+### Command line and Config
+#get specdir
+specdir = ARGUMENTS.get('specdir', 'spec')
+if specdir != '':
+    sys.path.insert(0, specdir)
 sys.path.insert(0, 'scripts')
 
-env = Environment()
 import mi_config
-import PkgMaker
-##### Common Function and Class.
-def DirValue(dir_or_list, env=env):
-    def file_stat(arg, dirname, namelist):
-        namelist.sort()
-        for name in namelist:
-            fullname = os.path.join(dirname, name)
-            lst = os.lstat(fullname)
-            arg.append((fullname, lst.st_size, lst.st_mtime))
-            #arg.append((fullname, lst.st_mode, lst.st_dev,
-            #            lst.st_uid, lst.st_gid, lst.st_size, lst.st_mtime))
-    if type(dir_or_list) is types.ListType:
-        dir_list = dir_or_list
-    else:
-        dir_list = [dir_or_list]
-    dir_value = []
-    for dir in dir_list:
-        os.path.walk(dir, file_stat, dir_value)
-    return env.Value(dir_value)
+mi_config.specdir = specdir
+mi_config.sifile = os.path.join(specdir, 'specinfo.py')
+
+#check rpmtype
+if mi_config.pkgtype != 'rpm':
+    print "Only rpm is supported in pkgtype."
+    sys.exit(1)
+
+#get pkgdirs
+for pd in mi_config.pkgdirs.split(':'):
+    if not os.path.isdir(pd):
+        print "%s is not a directory" % pd
+        sys.exit(1)
 
 #get debug option
 debugopts = ARGUMENTS.get('debug', None)
@@ -97,6 +93,36 @@ def depPyModule(env, alias, dir, sofile, cfiles):
     env.Alias(alias, sopath)
     #env.Depends(alias, sopath)
 
+# python compiler
+def pycompiler(source, target, env):
+    import py_compile
+    for src in source:
+        py_compile.compile(str(src))
+pycbuilder = Builder(action=pycompiler)
+env['BUILDERS']['PYCBuilder'] = pycbuilder
+
+##### Common Function and Class.
+def DirValue(dir_or_list, env=env):
+    def file_stat(arg, dirname, namelist):
+        namelist.sort()
+        for name in namelist:
+            fullname = os.path.join(dirname, name)
+            lst = os.lstat(fullname)
+            arg.append((fullname, lst.st_size, lst.st_mtime))
+            #arg.append((fullname, lst.st_mode, lst.st_dev,
+            #            lst.st_uid, lst.st_gid, lst.st_size, lst.st_mtime))
+    if type(dir_or_list) is types.ListType:
+        dir_list = dir_or_list
+    else:
+        dir_list = [dir_or_list]
+    dir_value = []
+    for dir in dir_list:
+        os.path.walk(dir, file_stat, dir_value)
+    return env.Value(dir_value)
+
+### Scon Maker
+import PkgMaker
+
 class MiPkgMaker(PkgMaker.BinPkgMaker):
     source_prefix = '#bindir/src'
     build_root = mi_config.devrootdir
@@ -108,6 +134,7 @@ def getSudoSh(cmd):
 Export('env')
 Export('mi_config')
 Export('depInstall', 'depInstallAs', 'depPyModule', 'depInstallExcludeSvn')
+Export('DirValue')
 Export('PkgMaker', 'MiPkgMaker')
 Export('getSudoSh')
 
@@ -115,7 +142,7 @@ Export('getSudoSh')
 #       #bindir/root.src.tar.gz         (source file)
 #       #bindir/root.src.etc.tar.gz     (config file)
 #       needed by rootfs .
-#SConscript('SConstruct-mi')
+SConscript('SConstruct-mi')
 
 ##### Construct the mirootfs, tar into :
 #       #bindir/mirootfs.gz

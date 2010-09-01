@@ -4,5 +4,7 @@ rc_base=/etc
 rc_functions=${rc_base}/init.d/functions-lfs
 network_devices=/etc/sysconifg/network-devices
 
-# For magicinstaller's old functions
+# For magicinstaller.
 rc_functions_mi=${rc_base}/init.d/functions-mi
+mi_start_services=${rc_base}/init.d/MIsrv
+mi_start_script=${rc_base}/init.d/RunMagicInstaller

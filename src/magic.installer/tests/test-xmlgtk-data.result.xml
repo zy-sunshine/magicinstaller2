@@ -1,0 +1,18 @@
+<?xml version="1.0" ?>
+<dataroot>
+  <tcombo>haha</tcombo>
+  <tspin>25.0</tspin>
+  <toptmenu>t</toptmenu>
+  <hscale>50.0</hscale>
+  <screen>
+    <type>fullscreen</type>
+    <percentage_value>90.0</percentage_value>
+    <fixed_width>640</fixed_width>
+    <fixed_height>480</fixed_height>
+  </screen>
+  <list>
+    <row c0="yes.png" c1="HaHa" c2="haha0"/>
+    <row c0="yes.png" c1="XiXi" c2="xixi0"/>
+    <row c0="yes.png" c1="just" c2="ok"/>
+  </list>
+</dataroot>

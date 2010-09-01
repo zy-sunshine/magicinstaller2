@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<!-- Copyright (C) 2003 Charles Wang <charles@linux.net.cn> -->
+<!-- Author:  Charles Wang -->
+<hbox margin="4">
+  <vbox name="welcome" show="false" expand="true" fill="true">
+    <label line_wrap="true" expand="true" fill="true"
+text="((Welcome to the MagicLinux. It is a composition of Chinese Linux lovers. Enjoy it!))"/>
+  </vbox>
+  <vbox name="license" show="false" expand="true" fill="true" spacing="4">
+    <label line_wrap="true" fill="true"
+text="((Most of the softwares that distributed in MagicLinux are licensed by free software license. These licenses include: GPL, LGPL, MPL, BSD License, and so on. This program, MagicInstaller, is licensed by General Public License. If you are not agree General Public License, sure you can't use this MagicInstaller to install MagicLinux. Read it carefully please.))"/>
+    <text filename="helptext/license.en.txt" expand="true" fill="true"/>
+    <text filename="helptext/license.gb.utf8.txt" expand="true" fill="true"/>
+    <hbox name="license_query" spacing="4">
+      <label expand="true"/>
+      <radiobutton label="((I _Agree))" value="welcome.license" valuedata="agree"
+                   toggled="agree"/>
+      <radiobutton label="((I _DISAGREE))" value="welcome.license" valuedata="disagree"
+                   toggled="disagree"/>
+    </hbox>
+    <label name="license_agreed" text="((You have agree the license))" show="false"/>
+  </vbox>
+  <vbox name="nowarranty" show="false" expand="true" fill="true" spacing="4">
+    <label line_wrap="true" fill="true"
+text="((It is very important to noticed that there is NO WARRANTY. I take it out for emphasis even it is contained in General Public License already. Read the following text carefully please.))"/>
+    <text filename="helptext/nowarranty.en.txt" expand="true" fill="true"/>
+    <text filename="helptext/nowarranty.gb.utf8.txt" expand="true" fill="true"/>
+    <hbox name="nowarranty_query" spacing="4">
+      <label expand="true"/>
+      <radiobutton label="((I _Agree))" value="welcome.nowarranty" valuedata="agree"
+                   toggled="agree"/>
+      <radiobutton label="((I _DISAGREE))" value="welcome.nowarranty" valuedata="disagree"
+                   toggled="disagree"/>
+    </hbox>
+    <label name="nowarranty_agreed" text="((You have agree the nowarranty))" show="false"/>
+  </vbox>
+</hbox>

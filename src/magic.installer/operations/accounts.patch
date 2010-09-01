@@ -1,0 +1,23 @@
+--- ../MagicInstaller/src/magic.installer/operations/accounts.py	2004-04-08 15:39:23.000000000 +0100
++++ accounts.py	2004-08-20 04:19:58.000000000 +0100
+@@ -23,8 +23,11 @@
+ elif operation_type == 'long':
+     def setup_accounts(mia, operid, rootpasswd, acclist):
+         # Error detect is not implemented yet.
+-	os.system('/usr/sbin/chroot %s /usr/sbin/pwconv' % tgtsys_root)
+-	os.system('echo %s | /usr/sbin/chroot %s /usr/bin/passwd --stdin root' % (rootpasswd, tgtsys_root))
++        os.system('/bin/sed 1d /tmpfs/tgtsys/etc/passwd > /tmpfs/tgtsys/etc/passwd.bk')
++        os.system('/bin/mv -f /tmpfs/tgtsys/etc/passwd.bk /tmpfs/tgtsys/etc/passwd')
++        os.system('/usr/sbin/chroot /tmpfs/tgtsys  /usr/sbin/useradd -g root -s /bin/bash -d /root -u 0 root')	
++        os.system('echo %s | /usr/sbin/chroot %s /usr/bin/passwd --stdin root' % \
++                     (rootpasswd, tgtsys_root))
+         for (username, password, shell, homedir, realuid) in acclist:
+             cmd = '/usr/sbin/chroot %s /usr/sbin/useradd -s %s -d %s %s %s' % \
+                   (tgtsys_root, shell, homedir, '%s', username)
+@@ -35,6 +38,4 @@
+             os.system(cmd)
+             os.system('echo %s | /usr/sbin/chroot %s /usr/bin/passwd --stdin %s' % \
+                       (password, tgtsys_root, username))
+-            # Dirty work.
+-#            os.system('cp -f %s/tmp/fstab.* %s/etc/fstab' % (tgtsys_root, tgtsys_root))
+         return 0

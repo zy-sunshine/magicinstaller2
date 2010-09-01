@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<vbox margin="4" spacing="4">
+  <hbox spacing="8" expand="true" fill="true">
+    <frame type="etched_out" expand="true" fill="true">
+      <table name="board" margin="4" columns="9" rows="4"/>
+    </frame>
+    <vbox fill="true">
+      <frame label="((TOP Score))">
+        <hbox margin="4">
+          <label name="topscore" xalign="1" expand="true" fill="true"/>
+	</hbox>
+      </frame>
+      <frame label="((Current Score))">
+        <hbox margin="4">
+	  <label name="score" xalign="1" expand="true" fill="true"/>
+	</hbox>
+      </frame>
+      <frame label="((The Next Three))" expand="true" fill="true">
+        <vbox margin="4">
+	  <label expand="true"/>
+	  <hbox fill="true">
+	    <label expand="true"/>
+	    <frame type="in">
+	      <image name="next0" file="blank.png"/>
+	    </frame>
+	    <frame type="in">
+	      <image name="next1" file="blank.png"/>
+	    </frame>
+	    <frame type="in">
+	      <image name="next2" file="blank.png"/>
+	    </frame>
+	    <label expand="true"/>
+	  </hbox>
+	  <label expand="true"/>
+	</vbox>
+      </frame>
+    </vbox>
+  </hbox>
+  <hbox spacing="4" homogenous="true" fill="true">
+    <button label="((_Restart))" clicked="restart_clicked" expand="true"/>
+    <button label="((_Help))" clicked="help_clicked" expand="true"/>
+    <button label="((_Quit))" clicked="quit_clicked" expand="true"/>
+  </hbox>
+</vbox>

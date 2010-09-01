@@ -24,8 +24,8 @@ mkdir -pv $ROOT/var/{lock,log,mail,run,spool}
 mkdir -pv $ROOT/var/{opt,cache,lib/{misc,locate},local}
 
 ## Important directory and files.
-# Create a simple mtab file.
-ln -sv ../proc/mounts $ROOT/etc/mtab
+# Create a mtab file.
+touch $ROOT/etc/mtab
 mkdir -pv $ROOT/var/lib/xkb
 mkdir -pv $ROOT/var/lock/rpm
 ln -sv bin/busybox $ROOT/init
@@ -53,9 +53,16 @@ ln -sv /proc/self/fd/2 $static_dev/stderr
 ln -sv /proc/self/fd/0 $static_dev/stdin
 ln -sv /proc/self/fd/1 $static_dev/stdout
 install -dv -m 755 $static_dev/shm
+install -dv -m 755 $static_dev/pts
 mknod -m 600 $static_dev/mixer c 14 0
 #
 mknod -m 600 $static_dev/console c 5 1
 mknod -m 666 $static_dev/null c 1 3
 mknod -m 666 $static_dev/zero c 1 5
 
+# check all the file to root privilege.
+chown -Rv root $ROOT/*
+chgrp -Rv root $ROOT/*
+
+# If will create a directory or file, do it like this better.
+#install --directory --mode=0755 --owner=root --group=root /etc/profile.d

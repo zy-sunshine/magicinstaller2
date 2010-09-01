@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<!-- Copyright (C) 2003, Charles Wang -->
+<!-- Author: Charles Wang <charles@linux.net.cn> -->
+<startsetup>
+  <vbox margin="4" expand="true" fill="true" spacing="4">
+    <label expand="true"/>
+    <label line_wrap="true" fill="true" xalign="0"
+            text="((OK, your system has been installed successfully. Click 'Next' to start the system configuration steps.))"/>
+    <label expand="true"/>
+    <vbox fill="true" spacing="4" expand="true">
+        <label line_wrap="true" fill="true" xalign="0"
+            text="((If you want to manually set the Xwindow, please select the Expert Mode, it will generate a xorg.conf configuration file for your system.))"/>
+        <label line_wrap="true" fill="true" xalign="0"
+            text="((If you do not know Xwindow parameter settings, please skip Xwindow settings (recommended).))"/>
+    </vbox>
+    <vbox fill="true" spacing="4">
+        <radiobutton label="((_Skip Xwindow Setup(Recommended)))" value="startsetup.skipXsetting" valuedata="1"/>
+        <radiobutton label="((_Do not skip Xwindow Setup(Expert Mode)))" value="startsetup.skipXsetting" valuedata="0"/>
+    </vbox>
+    <label expand="true"/>
+  </vbox>
+</startsetup>

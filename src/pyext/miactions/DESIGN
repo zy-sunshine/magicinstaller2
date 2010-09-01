@@ -1,0 +1,77 @@
+这里首先给出 miactions 的设计。在安装过程中，必然出现一些长操作。
+可能的长操作有：格式化硬盘、下载 rpm、安装 rpm、硬件探测，等等。
+而界面部分不能够因此被锁定，还要同时显示长操作进度。因此，界面
+和长操作 daemon 必须是分立的进程。
+
+同时，最好还要能够允许界面和长操作处于不同的机器上。这可以通过
+xmlrpc 来实现。
+
+具体说来，MagicInstaller 的进程结构设计如下：
+1、MagicInstaller 的图形界面。可以运行在被安装机器上，也可以
+运行在另外一台电脑上。它负责发送操作运行请求、操作进度探查请求，
+并接收相应的返回结果；
+2、xmlrpc 守护进程：运行在被安装的机器上，用于接收操作运行请求、
+操作进度探查请求，并返回相应的结果。它在某个固定端口等待 xmlrpc
+ request，并在短时间内返回结果；
+3、长操作执行进程：长操作执行进程，是 xmlrpc 守护进程的子进程，
+运行在被安装的机器上。
+
+1 和 2 之间通过标准的 xmlrpc 机制进行通讯。
+2 和 3 使用共享内存进行通讯。当 2 接收到 1 的请求时，若请求为
+操作请求，则将操作请求存入请求队列。然后查看操作进程的状态。如果
+正在进行其它操作，立即返回。如果正处于空闲状态，则发送信号 SIGUSR1
+以便唤醒操作进程。若请求为状态查询请求，则直接取得操作进程状态并
+返回之。3 无操作时进入 sleep 状态。一旦从 sleep 中醒来，就检查是否
+有操作要作，若任务队列非空，则从任务队列中取得任务开始操作。在长操作
+过程中，往往提供回调函数。回调函数只要向共享内存中写入当前状态即可。
+
+具体实现方法：
+对于 MagicInstaller，直接使用 xmlrpclib 即可发送 xmlrpc 请求，
+以获得需要的结果。
+
+对于 2 和 3。需用 C 为 Python 写一个模块，该模块定义一个 Python
+类 LongOpDaemon。此类 LongOpDaemon 一旦实例化(即创建此类的对象)，
+就立刻 fork 出子进程。此时主进程就是 2，子进程就是 3。
+
+下面给出调用代码示例：
+
+longop = LongOpDaemon(共享内存的大小)
+childpid = longop.getchildpid()
+
+if childpid > 0:
+    # 这儿是父进程
+    def request_func(...)
+	if 请求是操作请求：
+	    推入请求队列。
+	    if 操作进程正在睡眠:
+		os.kill(childpid, signal.SIGUSR1)
+	    return 'request_sent'
+	elif 请求是查询请求：
+	    根据某些共享内存中的变量组成 result_object
+	    return result_object
+
+    server = SimpleXMLRPCServer('127.0.0.1', 32574)
+    server.register_function()
+    ......
+    server.serve_forever()
+elif childpid == 0:
+    # 这儿是子进程
+    while 1:
+	time.sleep(60)
+	# 检查任务队列，如果有任务立即开始执行。
+else:
+    # 进程 fork 失败。
+
+LongOpDaemon 必须给出共享内存的访问方法。
+
+LongOpDaemon 的构造函数，接受一个 map 对象。例如：
+{ 'state':'int', 'curprocess':'int', 'maxprocess':'int', 'name':'str20' }
+并提供 longop.setvar('state', 9)
+longop.getvar('state')
+以方便对共享内存的访问。
+支持的基本类型有整数，固定长度的字符串。
+组合类型有数组。访问数组通过 longop.setarrvar('state', index, 9)
+longop.getarrvar('state', index)
+来实现。
+元素类型还可以以“.”分隔，加后缀。后缀出现 p，表示父进程可写。后缀出现
+c，标识子进程可写。不出现后缀则表示父子进程都可写。

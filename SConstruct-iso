@@ -5,6 +5,7 @@
 
 import os
 import sys
+import string
 
 Import('*')
 
@@ -17,7 +18,13 @@ pkgdirs = ' '.join(mi_config.pkgdirs.split(':'))
 pkginfor_script = 'scripts/%s%sPkgInfor.py' % \
                   (string.upper(mi_config.pkgtype[0]), mi_config.pkgtype[1:])
 createiso_script = 'scripts/CreateISO.py'
+
 use_cp_mode = mi_config.use_copy_install_mode
+cleanpkgdir = 'clean'
+if use_cp_mode:
+    # If use copy install mode, we will clean package dir first and install some
+    # file, so we won't make the Createiso.py clean the package directory.
+    cleanpkgdir = 'notclean'
 
 # packages_value - the full file info of all software packages.
 packages_value = DirValue(mi_config.pkgdirs.split(':'))
@@ -84,12 +91,12 @@ class BootIsoMaker(PkgMaker.StepMaker):
     def install_bootload(self):
         if mi_config.bootload == 'grub':
             bootload_files = ['bootload/grub/menu.lst',
-                              'bindir/splash.xpm.gz',
+                              #'bindir/splash.xpm.gz',
                               '$devrootdir/grub/.prepared']
             cmds = ['mkdir -p $miimages_dir/grub',
                     'cp $devrootdir/grub/grub4dos-0.4.5b/chinese/grldr $miimages_dir/grub/',
                     'cp $devrootdir/grub/boot/grub/fonts $miimages_dir/grub/',
-                    'cp bindir/splash.xpm.gz $miimages_dir/grub',
+                    #'cp bindir/splash.xpm.gz $miimages_dir/grub',
                     #'cp bootload/grub/menu.lst $miimages_dir/grub/',
                     'cp bootload/grub/menu.lst $bootcd_dir/',
                     ]
@@ -100,7 +107,7 @@ class BootIsoMaker(PkgMaker.StepMaker):
     def make_iso(self):
         cmds =['$pythonbin %s $TARGET' % createiso_script + \
                ' $pkgarr $pkgdirs $bootcd_dir' + \
-               ' $distname $distver 1 $cleanpkgdir $bootload $miimages_cddir']
+               ' $distname $distver 1 %s $bootload $miimages_cddir' % cleanpkgdir]
         return [createiso_script], cmds
 
 bootiso = BootIsoMaker(env)
@@ -177,3 +184,4 @@ env.Command('tmp/pkginfor.py',
             [pkginfor_script, packages_value],
             ['python %s -o $TARGET -l tmp/%s.log %s' % \
              (pkginfor_script, mi_config.pkgtype, pkgdirs)])
+

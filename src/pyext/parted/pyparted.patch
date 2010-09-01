@@ -1,0 +1,45 @@
+--- partedmodule.c.duorig	2006-06-08 16:42:33.000000000 +0800
++++ partedmodule.c	2006-06-08 16:43:14.000000000 +0800
+@@ -131,6 +131,31 @@
+         return Py_None;
+ }
+ 
++PyObject *
++py_ped_device_probe_all(PyObject * self, PyObject *args)
++{
++        ped_device_probe_all();
++        Py_INCREF(Py_None);
++        return Py_None;
++}
++
++PyObject *
++py_ped_device_get_all(PyObject * self, PyObject *args)
++{
++        PedDevice   *dev;
++        PyObject    *result;
++        PyPedDevice *devobj;
++
++        result = PyList_New(0);
++        for (dev = ped_device_get_next(NULL);
++             dev != NULL; dev = ped_device_get_next(dev)) {
++                devobj = (PyPedDevice *) PyObject_NEW(PyObject, &PyPedDeviceType);
++                devobj->dev = dev;
++                PyList_Append(result, (PyObject *)devobj);
++        }
++        return  Py_BuildValue("O", result);
++}
++
+ /* XXX remove me after deprecation period */
+ PyObject *
+ PedDevice_get (PyObject * self, PyObject * args);
+@@ -270,6 +295,10 @@
+ }
+ 
+ static struct PyMethodDef PyPedModuleMethods[] = {
++        { "device_probe_all",
++          (PyCFunction) py_ped_device_probe_all, METH_NOARGS, NULL },
++        { "device_get_all",
++          (PyCFunction) py_ped_device_get_all, METH_NOARGS, NULL },
+     	{ "device_get",
+           (PyCFunction) py_ped_device_get, METH_VARARGS, NULL },
+ 	{ "exception_set_handler",

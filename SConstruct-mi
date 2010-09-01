@@ -1,0 +1,105 @@
+# -*- python -*-
+
+Import('*')
+import os
+import glob
+
+use_cp_mode = mi_config.use_copy_install_mode
+
+##### Construct the root.src.tar.gz
+##       and something to fix(like copy install mode files fix)
+class miSrcMaker(PkgMaker.StepMaker):
+    target_list = ['bindir/root.src.tar.gz']
+    ROOT = '$tmpdir/root.src'
+    steps = ['install_src_step1',
+             'install_src_etc',
+             'install_configfiles',
+             'install_tranlatefiles',
+             'install_post',
+             'install_fix',
+             'mkmisrc',
+            ]
+
+    def install_src_step1(self):
+        inst_file = ['bindir/root.src.step1.tar.gz']
+        cmds = [self.get_extract_cmd('bindir/root.src.step1.tar.gz', self.ROOT)]
+        return inst_file, cmds
+
+    def install_src_etc(self):
+        cmds = []
+        return [env.Alias('root.src.etc')], cmds
+
+    def install_configfiles(self):
+        configfiles = [('src/magic.installer/mipublic.py',
+                        '$ROOT/$pythondir/site-packages/'),
+
+                       ('src/magic.installer/magic.autopart.xml',
+                        '$ROOT/usr/share/MagicInstaller/')]
+        slist = []
+        cmds = []
+        for src, dest in configfiles:
+            slist.append(src)
+            cmds.extend(['mkdir -p %s' % dest,
+                         'cp -a %s %s' % (src, dest)])
+        return slist, cmds
+
+    def install_tranlatefiles(self):
+        slist = []
+        cmds = []
+        for lang in mi_config.all_linguas:
+            inst_file = 'src/magic.installer/po/%s.mo' % lang
+            dest_file = '$ROOT/usr/share/locale/%s/LC_MESSAGES/${textdomain}.mo' % lang
+            slist.append(inst_file)
+            cmds.extend(['mkdir -p %s' % os.path.dirname(dest_file),
+                         'cp -a %s %s' % (inst_file, dest_file)])
+        return slist, cmds
+
+    def install_post(self):
+        env = self.env
+        post_script = '$specdir/post_install.sh'
+        if os.path.exists(env.subst(post_script)):
+            cmds = ['mkdir -pv $ROOT/root && cp %s $ROOT/root' % post_script,
+                    'chmod 700 $ROOT/root/post_install.sh']
+            return [post_script], cmds
+        else:
+            return [], []
+
+    def install_fix(self):
+        slist = []
+        cmds = []
+        if use_cp_mode:
+            inst_file = 'src/magic.installer/UIxml/takeactions.xml.cpinstmode'
+            dest_file = '$ROOT$root_datadir/UIxml/takeactions.xml'
+            slist.append(inst_file)
+            cmds.extend['mkdir -p %s' % os.path.dirname(dest_file),
+                        'cp -a %s %s' % (inst_file, dest_file)]
+        return slist, cmds
+
+    def mkmisrc(self):
+        cmds = ['tar c -C $destdir . | gzip -9 > $TARGET']
+        return [], cmds
+
+misrc = miSrcMaker(env)
+misrc.make()
+
+if mi_config.develmode:
+    # There will compile the src/pyext (python modules for magicinstaller)
+    # and pack src/magic.installer into root.src.step1.tar.gz
+    # Do it at develmode ,because we won't compile the python modules 
+    # every time (especially at dist mode).
+    env.Command('bindir/root.src.step1.tar.gz', env.Alias('root_src'),
+                ['tar c -C $destdir . | gzip -9 > $TARGET'])
+
+### Hotfix file
+# Handle with hotfix file
+hotfix_path = mi_config.hotfixfiles_dir
+if glob.glob(hotfix_path + '/*'):
+    Default(env.Command('%s.hotfix' % mi_config.mkisofn(1),
+                        DirValue(hotfix_path),
+                        ['(cd $SOURCE && find . -print | cpio -o -H newc | gzip -9) > $TARGET']))
+else:
+    Delete('%s.hotfix' % mi_config.mkisofn(1))
+
+### SConscript
+SConscript('src/SConscript')
+

@@ -89,8 +89,6 @@ LD_LIBRARY_PATH=/usr/lib sudo /usr/sbin/chroot $ROOT gtk-query-immodules-2.0-32 
 sudo /usr/sbin/chroot $ROOT /usr/bin/gdk-pixbuf-query-loaders-32 &gt; $ROOT/etc/gtk-2.0/gdk-pixbuf.loaders
 rm -f $ROOT/etc/passwd
 rm -f $ROOT/etc/group
-#rm -f $ROOT/usr/bin/gtk-query-immodules-2.0-32
-#rm -f $ROOT/usr/bin/gdk-pixbuf-query-loaders-32
 </post_action>
 </package>
 
@@ -182,7 +180,7 @@ usr/lib/libffi.so.*
 <package>
 <files>gtk2-engines-2.17.3-1mgc25.i686.rpm</files>
 <install>
-/etc/gtk-2.0/gtkrc
+#/etc/gtk-2.0/gtkrc
 #/usr/lib/gtk-2.0/2.10.0/engines/libpixmap.so
 /usr/lib/gtk-2.0/2.10.0/engines/libclearlooks.so
 #/usr/lib/gtk-2.0/2.10.0/engines/libcrux-engine.so

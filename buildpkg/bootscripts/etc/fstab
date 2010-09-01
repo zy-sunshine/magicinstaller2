@@ -4,3 +4,14 @@
 proc		    /proc		proc	defaults	0       0
 sysfs		    /sys		sysfs	defaults	0       0
 
+# For telnet and other program. 
+# If have a group, we should add "gid=4" (tty) in options.
+devpts          /dev/pts    devpts  mode=620    0       0
+
+# The /dev/shm mount point for tmpfs is included to allow enabling POSIX-shared
+# memory. The kernel must have the required support built into it for this to
+# work. Please note that very little software currently uses POSIX-shared memory. 
+# Therefore, consider the /dev/shm mount point optional.
+
+tmpfs           /dev/shm    tmpfs   defaults    0       0
+

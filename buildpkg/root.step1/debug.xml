@@ -63,7 +63,7 @@
 <files>MAKEDEV-3.24-2mgc25.i686.rpm</files>
 <install>
 /dev/MAKEDEV
-@/etc/makedev.d
+#@/etc/makedev.d
 #/etc/makedev.d/00macros
 #/etc/makedev.d/01alsa
 #/etc/makedev.d/01cdrom

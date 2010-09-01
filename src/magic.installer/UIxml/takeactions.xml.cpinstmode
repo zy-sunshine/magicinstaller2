@@ -1,0 +1,175 @@
+<?xml version="1.0"?>
+<!-- Copyright (C) 2003, Charles Wang -->
+<!-- Author: Charles Wang <charles@linux.net.cn> -->
+<takeactions>
+  <step><hbox margin="4">
+    <vbox name="notes" spacing="4" expand="true" fill="true">
+      <frame label="((Release Notes))" expand="true" fill="true">
+        <hbox margin="4">
+	  <text filename="((helptext/release.en.txt))" expand="true" fill="true"/>
+        </hbox>
+      </frame>
+      <frame label="((Authors))" expand="true" fill="true">
+        <hbox margin="4">
+	  <text filename="((helptext/authors.en.txt))" expand="true" fill="true"/>
+	</hbox>
+      </frame>
+    </vbox>
+    <vbox name="ensure" show="false" spacing="4" expand="true" fill="true">
+      <label text="" expand="true"/>
+      <label line_wrap="true" fill="true"
+text="((NOTE: All required information have been collected. Click 'Next' to take the real action (partition, format, packages installation and other setup) and there is no chance to revert... Are you sure?))"/>
+      <vbox fill="true" spacing="4" expand="true">
+        <label line_wrap="true" fill="true" xalign="0"
+            text="((Please select the install mode.))"/>
+        <label line_wrap="true" fill="true" xalign="0"
+            text="((If you do not know which should be selected, please select Copy Install Mode (Recommended).))"/>
+      </vbox>
+      <vbox fill="true" spacing="4">
+        <radiobutton label="((_Copy Install Mode (Recommended)))" value="takeactions.installmode" valuedata="copyinstallmode"/>
+        <radiobutton label="((_Rpm  Install Mode))" value="takeactions.installmode" valuedata="rpminstallmode"/>
+      </vbox>
+      <label text="" expand="true"/>
+      <label text="" expand="true"/>
+    </vbox>
+  </hbox></step>
+  <actions.dialog>
+    <vbox>
+      <image file="images/banner.png" fill="true"/>
+      <frame type="out" expand="true" fill="true"><frame type="in"><frame type="out">
+        <hbox margin="4" spacing="4">
+	  <vbox>
+            <frame label="((Steps))">
+              <table name="stepsshow" columns="2" margin="4" colspacings="4" rowspacings="4"/>
+            </frame>
+	    <label expand="true"/>
+	    <frame margin="4">
+	      <hbox margin="4">
+	        <button tips="((Theme Choice))" clicked="btntheme_clicked" pack="start">
+		  <image file="images/gnome-ccthemes-24.png" fill="true"/>
+		</button>
+		<button tips="((xglines))" clicked="popup_xglines" pack="end">
+		  <image file="games/xglines.png" fill="true"/>
+		</button>
+	      </hbox>
+	    </frame>
+	  </vbox>
+	  <vbox margin="4" spacing="4" expand="true" fill="true">
+	    <frame name="frame_parted" label="((Partition/Format Progress))"
+	           fill="true" sensitive="false">
+	      <table margin="4" columns="2" rows="2" colspacings="4" rowspacings="4">
+	        <label text="((Operation:))" xalign="0" xoptions="none"/>
+		<label name="pfname" xalign="0" expand="true"/>
+		<label text="((Progress:))" xalign="0" xoptions="none"/>
+		<progressbar name="pfprog"/>
+	      </table>
+	    </frame>
+	    <label text="" expand="true"/>
+            <frame name="frame_packages" label="((Installation Progress))"
+	           fill="true" sensitive="false">
+              <vbox margin="4" spacing="4">
+	        <hbox spacing="4" fill="true">
+	          <label text="((Package:))" fill="true"/>
+	          <label name="pkgname" text="" xalign="0" expand="true" fill="true"/>
+	        </hbox>
+	        <table columns="2" rows="2" colspacings="4" rowspacings="4" fill="true">
+	          <label text="((Total Progress:))" xalign="0" xoptions="none"/>
+	          <progressbar name="topprog"/>
+		  <label text="((Package Progress:))" xalign="0" xoptions="none"/>
+                  <progressbar name="pkgprog"/>
+	        </table>
+		<hbox spacing="4" homogeneous="true">
+		  <frame label="((Package Number))" label_align="0.5"
+		         expand="true" fill="true">
+		    <table columns="2" rows="3"
+		           margin="4" colspacings="4" rowspacings="4">
+		      <label text="((Total:))" xalign="0"/>
+		      <label name="totalpkg" xalign="1"/>
+		      <label text="((Done:))" xalign="0"/>
+		      <label name="donepkg" xalign="1"/>
+		      <label text="((Remain:))" xalign="0"/>
+		      <label name="remainpkg" xalign="1"/>
+		    </table>
+		  </frame>
+		  <frame label="((Package Size))" label_align="0.5"
+		         expand="true" fill="true">
+		    <table columns="2" rows="3"
+		           margin="4" colspacings="4" rowspacings="4">
+		      <label text="((Total:))" xalign="0"/>
+		      <label name="totalsize" xalign="1"/>
+		      <label text="((Done:))" xalign="0"/>
+		      <label name="donesize" xalign="1"/>
+		      <label text="((Remain:))" xalign="0"/>
+		      <label name="remainsize" xalign="1"/>
+		    </table>
+		  </frame>
+		  <frame label="((Time))" label_align="0.5"
+		         expand="true" fill="true">
+		    <table columns="2" rows="4"
+		           margin="4" colspacings="4" rowspacings="4">
+		      <label text="((Total(est):))" xalign="0"/>
+		      <label name="totaltime" xalign="1"/>
+		      <label text="((Elapsed:))" xalign="0"/>
+		      <label name="elapsed" xalign="1"/>
+		      <label text="((Remain(est):))" xalign="0"/>
+		      <label name="remaintime" xalign="1"/>
+		    </table>
+		  </frame>
+		</hbox>
+	      </vbox>
+	    </frame>
+	    <label text="" expand="true"/>
+	    <frame name="frame_other" fill="true" sensitive="false">
+              <vbox margin="4" spacing="4">
+	        <label name="otname" fill="true"/>
+	        <progressbar name="otprog" fill="true"/>
+	      </vbox>
+	    </frame>
+	  </vbox>
+	</hbox>
+      </frame></frame></frame>
+    </vbox>
+  </actions.dialog>
+  <disc.dialog>
+    <vbox spacing="4">
+      <hbox expand="true" fill="true" spacing="4">
+        <image file="images/stock_dialog_warning_48.png"/>
+	<label name="msg" line_wrap="true"/>
+      </hbox>
+      <hseparator/>
+      <hbox fill="true" spacing="4" homogeneous="true">
+        <button label="((_Retry))" clicked="retry_clicked"
+	        desclabel="tiplabel"
+		desctext="((Rescan the packages.))"/>
+	<button label="((_Abort))" clicked="abort_clicked"
+	        desclabel="tiplabel"
+		desctext="((Abort the installation of the following packages and continues to the next step of installtion.))"/>
+	<button label="((Re_boot))" clicked="reboot_clicked"
+	        desclabel="tiplabel"
+		desctext="((Abort the installation, umount the filesystems and reboot the system right now.))"/>
+      </hbox>
+      <label name="tiplabel" fill="true" xalign="0"/>
+    </vbox>
+  </disc.dialog>
+  <rpmerr.dialog>
+    <vbox spacing="4">
+      <hbox expand="true" fill="true" spacing="4">
+        <image file="images/stock_dialog_warning_48.png"/>
+	<label name="msg" line_wrap="true"/>
+      </hbox>
+      <hseparator/>
+      <hbox fill="true" spacing="4" homogeneous="true">
+        <button label="((_Retry))" clicked="retry_clicked"
+	        desclabel="tiplabel"
+		desctext="((Retry installing this package.))"/>
+	<button label="((_Skip))" clicked="skip_clicked"
+	        desclabel="tiplabel"
+		desctext="((Skip installing this package.))"/>
+	<button label="((Re_boot))" clicked="reboot_clicked"
+	        desclabel="tiplabel"
+		desctext="((Abort the installation, umount the filesystems and reboot the system right now.))"/>
+      </hbox>
+      <label name="tiplabel" fill="true" xalign="0"/>
+    </vbox>
+  </rpmerr.dialog>
+</takeactions>

@@ -5,12 +5,12 @@
 # Notice: This file is specific to busybox init.
 
 ::sysinit:/etc/init.d/rcS
-tty1::once:/bin/sh
-tty2::askfirst:/bin/sh
-tty3::askfirst:/bin/sh
-tty4::askfirst:/bin/sh
-tty5::askfirst:/bin/sh
-tty6::askfirst:/bin/sh
+tty1::once:/etc/init.d/RunMagicInstaller
+tty2::respawn:/sbin/getty 38400 tty2
+tty3::respawn:/sbin/getty 38400 tty3
+tty4::respawn:/sbin/getty 38400 tty4
+tty5::respawn:/sbin/getty 38400 tty5
+tty6::respawn:/sbin/getty 38400 tty6
 ::restart:/sbin/init
 ::ctrlaltdel:/sbin/reboot
 ::shutdown:/etc/init.d/rcK

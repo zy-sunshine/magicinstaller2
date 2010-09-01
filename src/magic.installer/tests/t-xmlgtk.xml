@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<vbox spacing="4">
+  <list name="testlist" selection_mode="multiple"
+        value="testlist" choose_value="tl_choose" choose_id="0"
+        expand="true" fill="true">
+    <column label="First"/>
+    <column label="Second"/>
+  </list>
+  <hbox spacing="4">
+    <button label="Fetch values" clicked="fetch_values_clicked"
+            expand="true" fill="true"/>
+    <button label="Show selection" clicked="show_selection"
+            expand="true" fill="true"/>
+  </hbox>
+</vbox>

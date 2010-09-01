@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<!-- Copyright (C) 2003 Charles Wang <charles@linux.net.cn> -->
+<!-- Author:  Charles Wang -->
+<scsi>
+  <vbox margin="4" spacing="4">
+    <list name="scsilist" value="scsi.modulelist"
+          selection_mode="single" expand="true" fill="true">
+      <column label="((Loaded))" type="pixmap"/>
+      <column label="((Module))"/>
+      <column label="((Name))" visible="false"/>
+    </list>
+    <hbox spacing="4" fill="true">
+      <button label="((_Load the selected driver))" clicked="do_modprobe" pack="end"/>
+    </hbox>
+  </vbox>
+</scsi>
