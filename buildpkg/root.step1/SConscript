@@ -179,7 +179,6 @@ class RootStep1Maker(RootPkgMaker):
                         'mkfs',
                         'udev',
                         'kudzu',
-                        'tftp-server',
                         'grub',
                         'trace',
                         'post_scripts',
