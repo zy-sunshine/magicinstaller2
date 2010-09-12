@@ -1,5 +1,5 @@
 #!/bin/sh
-
+# $rc_base/init.d/localnet
 . /etc/sysconfig/rc
 . ${rc_functions}
 . /etc/sysconfig/network
