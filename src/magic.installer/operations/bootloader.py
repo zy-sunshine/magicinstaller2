@@ -20,7 +20,8 @@ import os.path
 import string
 import time
 
-import kudzu
+#import kudzu
+import getdev
 
 import isys
 
@@ -255,9 +256,10 @@ elif operation_type == 'long':
                 dolog('TURN ON: nobootloader\n')
                 return 0
             # Get the command arguments for grub.
-            floppy = kudzu.probe(kudzu.CLASS_FLOPPY,
-                                 kudzu.BUS_IDE | kudzu.BUS_SCSI | kudzu.BUS_MISC,
-                                 kudzu.PROBE_ALL)
+            #floppy = kudzu.probe(kudzu.CLASS_FLOPPY,
+            #                     kudzu.BUS_IDE | kudzu.BUS_SCSI | kudzu.BUS_MISC,
+            #                     kudzu.PROBE_ALL)
+            floppy = getdev.probe(getdev.CLASS_FLOPPY)
             grubopt = '--batch'
             if floppy == []:
                 grubopt = grubopt + ' --no-floppy'

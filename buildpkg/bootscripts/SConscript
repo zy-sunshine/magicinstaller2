@@ -22,7 +22,9 @@ Import('*')
 root_bs = os.path.join(mi_config.tmpdir, 'root.bootscripts')
 
 depInstallExcludeSvn(env, 'root.bs', root_bs,
-                    srcdirs=['etc', 'lib', 'root'])
+                    srcdirs=['etc', 
+                             'lib',
+                             'root'])
 
 ##### Construct the #bindir/root.bootscripts.tar.gz
 env.Command('#bindir/root.bootscripts.tar.gz', env.Alias('root.bs'),

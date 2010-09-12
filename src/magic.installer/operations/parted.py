@@ -19,7 +19,8 @@
 from gettext import gettext as _
 import iconv
 import sys
-import kudzu
+#import kudzu
+import getdev
 import parted
 
 import isys
@@ -60,9 +61,10 @@ elif operation_type == 'long':
 
         def get_device_list():
             result = []
-            hd_list = kudzu.probe(kudzu.CLASS_HD,
-                                  kudzu.BUS_IDE | kudzu.BUS_SCSI | kudzu.BUS_MISC,
-                                  kudzu.PROBE_ALL)
+            #hd_list = kudzu.probe(kudzu.CLASS_HD,
+            #                      kudzu.BUS_IDE | kudzu.BUS_SCSI | kudzu.BUS_MISC,
+            #                      kudzu.PROBE_ALL)
+            hd_list = getdev.probe(getdev.CLASS_HD)
             for hd in hd_list:
                 try:
                     dev = parted.PedDevice.get(os.path.join('/dev/', hd.device))
@@ -333,17 +335,20 @@ elif operation_type == 'long':
         mountmap['/sys']     = ('none', 'sysfs', 'defaults', 0, 0)
         mountmap['/dev/shm'] = ('none', 'tmpfs', 'defaults', 0, 0)
         #
-        fdlist = kudzu.probe(kudzu.CLASS_FLOPPY,
-                             kudzu.BUS_IDE | kudzu.BUS_SCSI | kudzu.BUS_MISC,
-                             kudzu.PROBE_ALL)
-        cdlist = kudzu.probe(kudzu.CLASS_CDROM,
-                             kudzu.BUS_IDE | kudzu.BUS_SCSI | kudzu.BUS_MISC,
-                             kudzu.PROBE_ALL)
+        #fdlist = kudzu.probe(kudzu.CLASS_FLOPPY,
+        #                     kudzu.BUS_IDE | kudzu.BUS_SCSI | kudzu.BUS_MISC,
+        #                     kudzu.PROBE_ALL)
+        fdlist = getdev.probe(getdev.CLASS_FLOPPY)
+        #cdlist = kudzu.probe(kudzu.CLASS_CDROM,
+        #                     kudzu.BUS_IDE | kudzu.BUS_SCSI | kudzu.BUS_MISC,
+        #                     kudzu.PROBE_ALL)
+        cdlist = getdev.probe(getdev.CLASS_CDROM)
         for fd in fdlist:
             mntdir = string.replace(fd.device, 'fd', '/media/floppy')
             if mntdir == '/media/floppy0':  mntdir = '/media/floppy'
             mountmap[mntdir] = (os.path.join('/dev', fd.device),
-                                'auto', 'iocharset=cp936,noauto,user,kudzu,rw,exec,sync', 0, 0)
+                                #'auto', 'iocharset=cp936,noauto,user,kudzu,rw,exec,sync', 0, 0)
+                                'auto', 'iocharset=cp936,noauto,user,rw,exec,sync', 0, 0)
             os.system('mkdir -p %s' % os.path.join(tgtsys_root, mntdir[1:]))
         #if cdlist != []:
         if 0: # remove cdrom entries
@@ -355,7 +360,8 @@ elif operation_type == 'long':
                 else:
                     mntdir = '/mnt/cdrom%d' % cnt
                 mountmap[mntdir] = (os.path.join('/dev', cddevlist[cnt]),
-                                    'iso9660,udf', 'iocharset=cp936,noauto,user,kudzu,ro,exec', 0, 0)
+                                    #'iso9660,udf', 'iocharset=cp936,noauto,user,kudzu,ro,exec', 0, 0)
+                                    'iso9660,udf', 'iocharset=cp936,noauto,user,ro,exec', 0, 0)
                 devdir = os.path.join(tgtsys_root, 'dev')
                 os.system('mkdir -p %s' % devdir)
                 os.system('ln -s %s %s' % \

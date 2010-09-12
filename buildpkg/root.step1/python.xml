@@ -74,6 +74,16 @@ $pythondir/lib-dynload/syslog.so
 $pythondir/lib-dynload/timemodule.so
 $pythondir/lib-dynload/zlibmodule.so
 $pythondir/lib-dynload/fcntlmodule.so
+$pythondir/lib-dynload/itertoolsmodule.so
+$pythondir/lib-dynload/_ctypes.so
+@$pythondir/ctypes
+# For pdb
+$pythondir/pdb.pyc
+$pythondir/cmd.pyc
+$pythondir/bdb.pyc
+$pythondir/repr.pyc
+$pythondir/pprint.pyc
+
 $pythondir/locale.pyc
 $pythondir/mimetools.pyc
 $pythondir/os.pyc

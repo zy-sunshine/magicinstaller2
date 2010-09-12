@@ -18,7 +18,8 @@
 
 import os.path
 
-import kudzu
+#import kudzu
+import getdev
 
 if operation_type == 'short':
     def config_network_short(hostname):

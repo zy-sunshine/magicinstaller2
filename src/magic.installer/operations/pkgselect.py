@@ -22,7 +22,9 @@ import sys
 import syslog
 import time
 
-import kudzu
+#import kudzu
+import getdev
+
 import rpm
 
 import isys
@@ -80,9 +82,10 @@ elif operation_type == 'long':
         cli.connect('127.0.0.1')
         result = []
         all_drives = hdpartlist
-        cdlist = kudzu.probe(kudzu.CLASS_CDROM,
-                             kudzu.BUS_IDE | kudzu.BUS_SCSI | kudzu.BUS_MISC,
-                             kudzu.PROBE_ALL)
+        #cdlist = kudzu.probe(kudzu.CLASS_CDROM,
+        #                     kudzu.BUS_IDE | kudzu.BUS_SCSI | kudzu.BUS_MISC,
+        #                     kudzu.PROBE_ALL)
+        cdlist = getdev.probe(getdev.CLASS_CDROM)
         map(lambda cd: all_drives.append((os.path.join('/dev', cd.device),
                                           'iso9660',
                                           os.path.join('/dev', cd.device))),

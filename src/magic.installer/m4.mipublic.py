@@ -69,14 +69,14 @@ fstype_map = {
 EXPERT_MODE = 0
 RESCUE_MODE = 0
 TEXT_MODE = 0
-try:
-    if useudev:
-        execfile('/etc/mbsave.py')
-    else:
-        import os
-        execfile(os.path.join(MBRoot, 'mbsave.py'))
-except Exception, errmsg:
-    print str(errmsg)
+#try:
+#    if useudev:
+#        execfile('/etc/mbsave.py')
+#    else:
+#        import os
+#        execfile(os.path.join(MBRoot, 'mbsave.py'))
+#except Exception, errmsg:
+#    print str(errmsg)
 
 from miutil import *
 --/
