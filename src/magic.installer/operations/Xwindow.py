@@ -321,3 +321,14 @@ Section "Screen"
             result = _('Failed: Please recheck X settings.')
         os.system('/bin/rm -rf %s' % os.path.join(tgtsys_root, 'tmp/testxdlg'))
         return  result
+
+    def backup_xconfig(mia, operid, dummy):
+        os.system('sync')
+        xorg_files = ['xorg.conf', 'XF86Config']
+        tgt_etc_x = os.path.join(tgtsys_root, 'etc/X11')
+        for xorg_file in xorg_files:
+            if os.path.exists(os.path.join(tgt_etc_x, xorg_file)):
+                os.system('mv %s %s' % \
+                          (os.path.join(tgt_etc_x, xorg_file),
+                           os.path.join(tgt_etc_x, xorg_file+'.bak')))
+

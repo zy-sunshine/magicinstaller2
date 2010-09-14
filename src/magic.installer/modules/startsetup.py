@@ -26,9 +26,13 @@ class mistep_startsetup (magicstep.magicstep):
     def btnnext_clicked(self, widget, data):
         # We add a skip step name to current class, 
         # and it will remove the step in magic.installer class
+        global skipxsetting
         self.fetch_values(self.rootobj.values,
                 valuename_list = ['startsetup.skipXsetting'])
-        skipXsetting = self.get_data(self.values, 'startsetup.skipXsetting')
-        if skipXsetting == '1':
+        skipx = self.get_data(self.values, 'startsetup.skipXsetting')
+        if skipx == '1':
             self.skip_stepnames.append('mistep_Xwindow')
+            skipxsetting = 1
+        else:
+            skipxsetting = 0
         return  1

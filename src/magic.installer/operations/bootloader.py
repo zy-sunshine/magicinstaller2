@@ -260,7 +260,11 @@ elif operation_type == 'long':
             #                     kudzu.BUS_IDE | kudzu.BUS_SCSI | kudzu.BUS_MISC,
             #                     kudzu.PROBE_ALL)
             floppy = getdev.probe(getdev.CLASS_FLOPPY)
-            grubopt = '--batch'
+
+            # Because --batch will cause a bus error, we don not use this
+            # option.
+            #grubopt = '--batch'
+            grubopt = ''
             if floppy == []:
                 grubopt = grubopt + ' --no-floppy'
 

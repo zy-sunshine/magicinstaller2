@@ -229,6 +229,7 @@ swap_device = None
 
 mount_all_list = []
 
+skipxsetting = 0
 
 path_tftproot = '/tmpfs/tftpboot'
 

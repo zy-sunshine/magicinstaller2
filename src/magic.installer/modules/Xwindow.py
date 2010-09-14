@@ -38,6 +38,17 @@ class mistep_Xwindow (magicstep.magicstepgroup):
         self.rootobj.tm.add_action(_('Probe Mouse'),
                                    self.probe_mouse_ok, None,
                                    'probe_mouse', 0)
+    def check_leave_monitor(self):
+        self.fetch_values(self.rootobj.values)
+        return 1
+
+    def check_leave_videocard(self):
+        self.fetch_values(self.rootobj.values)
+        return 1
+
+    def check_leave_mouse(self):
+        self.fetch_values(self.rootobj.values)
+        return 1
 
     def leave(self):
         if not magicstep.magicstepgroup.leave(self):  return 0
