@@ -101,8 +101,8 @@ class mistep_takeactions(magicstep.magicstepgroup):
         magicstep.magicstepgroup.__init__(self, rootobj, 'takeactions.xml',
                                           ['notes', 'ensure'], 'step')
         self.actlist = [(N_('Partition/Format'), self.act_start_parted, self.act_end_parted),
-#                        (N_('Install Package'), self.act_start_instpkg, self.act_end_instpkg),
-#                        (N_('Make initrd'), self.act_start_mkinitrd, None),
+                        (N_('Install Package'), self.act_start_instpkg, self.act_end_instpkg),
+                        (N_('Make initrd'), self.act_start_mkinitrd, None),
                         (N_('Install Bootloader'), self.act_start_bootloader, None)]
         #(N_('Setup Keyboard'), self.act_start_keyboard, None)]
         self.actpos = 0
