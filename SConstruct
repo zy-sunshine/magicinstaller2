@@ -129,7 +129,10 @@ class MiPkgMaker(PkgMaker.BinPkgMaker):
     pack_prefix = '#bindir'
 
 def getSudoSh(cmd):
-    return 'sudo sh -c "%s" $sudoprom' % cmd
+    if os.getuid() != 0:
+        return 'sudo sh -c "%s" $sudoprom' % cmd
+    else:
+        return cmd
 
 Export('env')
 Export('mi_config')
