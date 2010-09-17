@@ -132,6 +132,7 @@ class mistep_pkgselect (magicstep.magicstepgroup):
                                    magicpopup.magicpopup.MB_OK)
             return 0
         if len(pkgarr_probe_result) > 1:
+            print pkgarr_probe_result
             popup = 'true'
             if self.pa_choose:
                 for result in pkgarr_probe_result:

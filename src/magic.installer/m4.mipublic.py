@@ -16,7 +16,7 @@
 # with this program; if not, write to the Free Software Foundation, 59 Temple
 # Place - Suite 330, Boston, MA 02111-1307, USA.
 changequote(/--, --/)/--
-
+import os
 kernelver      = '--/kernelver/--'  # The kernel used by installer.
 distname       = '--/distname/--'
 distver        = '--/distver/--'
@@ -31,6 +31,9 @@ hotfixdir      = '--/hotfixdir/--'
 
 BINDIR         = '--/BINDIR/--'
 DATADIR        = '--/DATADIR/--'
+CURDIR         = os.path.abspath(os.path.curdir)
+if not os.path.exists(DATADIR):
+    DATADIR = CURDIR
 LIBDIR         = '--/LIBDIR/--'
 MODULEDIR      = '--/MODULEDIR/--'
 OPERATIONDIR   = '--/OPERATIONDIR/--'
@@ -60,7 +63,7 @@ fstype_map = {
     'jfs':        ('jfs',      '/sbin/mkfs.jfs -q',        16,   -1, 'b'),
     'linux-swap': ('',         'internal',                 -1,   -1, ''),
     #'ntfs':       ('ntfs',      '',                          -1,    -1,  ''),
-    'ntfs':       ('ntfs',   '/sbin/mkfs.ntfs -Q',         1,    -1,  ''),
+    'ntfs':       ('ntfs-3g',   '/sbin/mkfs.ntfs -Q',         1,    -1,  ''),
     'reiserfs':   ('reiserfs', '/sbin/mkreiserfs -f -f',   33,   -1, 'b'),
     'xfs':        ('xfs',      '/sbin/mkfs.xfs -q -f',      5,   -1, 'b')
     }

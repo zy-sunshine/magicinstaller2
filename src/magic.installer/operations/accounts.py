@@ -48,13 +48,12 @@ elif operation_type == 'long':
             password = password.replace("'", """'"'"'""") # escape ' to '"'"'
             os.system("echo '%s' | /usr/sbin/chroot %s /usr/bin/passwd --stdin %s" % \
                       (password, tgtsys_root, username))
-        os.system('/usr/bin/clear')
         return 0
 
     def run_post_install(mia, operid, dummy):
         script = '/root/post_install.sh'
         if os.access(script, os.X_OK):
-            dolog('Run %s' % script)
+            dolog('Run %s\n' % script)
             sys_root_dir = os.path.join(tgtsys_root, 'root')
             if not os.path.isdir(sys_root_dir):
                 os.makedirs(sys_root_dir)

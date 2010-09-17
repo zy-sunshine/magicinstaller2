@@ -306,11 +306,19 @@ elif operation_type == 'long':
                 except parted.error, errmsg:
                     return  str(errmsg)
                 time.sleep(1)
-                cmd = '%s %s%d' % (fstype_map[fstype][1], devpath, part.num)
-                r = os.system(cmd)
-                if r != 0:
-                    errmsg = _('Run "%s" failed.')
-                    return  errmsg % cmd
+                #cmd = '%s %s%d' % (fstype_map[fstype][1], devpath, part.num)
+                #r = os.system(cmd)
+                cmd_format = fstype_map[fstype][1]
+                cmd_f_list = cmd_format.split()
+                cmd = cmd_f_list[0]
+                argv = cmd_f_list[1:]
+                argv.append('%s%d' % (devpath, part.num))
+                cmdres = run_bash(cmd, argv)
+                dolog('%s %s\n' % (cmd, ' '.join(argv)))
+                dolog(' '.join(cmdres['out'])+'\n')
+                if cmdres['ret'] != 0:
+                    errmsg = _('Run "%s %s" failed: %s\n')
+                    return  errmsg % (cmd, ' '.join(argv), str(cmdres['err']))
                 else:
                     return  0
         return _('Not any partition found on position: ') + str(part_start)
@@ -409,21 +417,13 @@ elif operation_type == 'long':
                         except SystemError, em:
                             errmsg = _('swapon(%s) failed: %s')
                             errmsg = errmsg % (devfn, str(em))
-                            return  str(em)
+                            return  errmsg
                 else:
                     realpath = os.path.join(tgtsys_root, mntpoint[1:])
-                    if not os.path.isdir(realpath):
-                        try:
-                            os.makedirs(os.path.join(tgtsys_root, mntpoint[1:]))
-                        except OSError, em:
-                            errmsg = _('Can not make directory %s: %s')
-                            errmsg = errmsg % (realpath, str(em))
-                            return  errmsg
-                    try:
-                        isys.mount(fstype_map[fstype][0], devfn, realpath, 0, 0)
-                    except SystemError, em:
+                    ret, mntdir = mount_dev(fstype_map[fstype][0], devfn, realpath)
+                    if not ret:
                         errmsg = _('Mount %s on %s as %s failed: %s')
-                        errmsg = errmsg % (devfn, realpath, fstype, str(em))
+                        errmsg = errmsg % (devfn, realpath, fstype, mntdir)
                         return  errmsg
                 cnt = cnt + 1
                 mia.set_step(operid, cnt, len(mount_all_list))
@@ -432,13 +432,15 @@ elif operation_type == 'long':
         if not os.path.isdir(procpath):
             os.makedirs(procpath)
         if not os.path.exists(os.path.join(procpath, 'cmdline')):
-            isys.mount('proc', 'proc', procpath, 0, 0)
+            #isys.mount('proc', 'proc', procpath)
+            ret, msg = mount_dev('proc', 'proc', mntdir=procpath)
         # Mount /sys
         syspath = os.path.join(tgtsys_root, 'sys')
         if not os.path.isdir(syspath):
             os.makedirs(syspath)
         if not os.path.exists(os.path.join(syspath, 'block')):
-            isys.mount('sysfs', 'sys', syspath, 0, 0)
+            #isys.mount('sysfs', 'sys', syspath)
+            ret, msg = mount_dev('sysfs', 'sys', mntdir=syspath)
             
         if firstcall:
             _gen_fstab(mount_all_list)
@@ -454,16 +456,14 @@ elif operation_type == 'long':
     def umount_all_tgtpart(mia, operid, mount_all_list, lastcall):
         # Umount proc.
         procdir = os.path.join(tgtsys_root, 'proc')
-        try:
-            isys.umount(procdir)
-        except Exception, errmsg:
-            dolog('Umount %s failed: %s\n' % (procdir, str(errmsg)))
+        ret,msg = umount_dev(procdir, rmdir=False)
+        if not ret:
+            dolog('Umount %s failed: %s\n' % (procdir, str(msg)))
         # Umount sys.
         sysdir = os.path.join(tgtsys_root, 'sys')
-        try:
-            isys.umount(sysdir)
-        except Exception, errmsg:
-            dolog('Umount %s failed: %s\n' % (sysdir, str(errmsg)))
+        ret, msg = umount_dev(sysdir, rmdir=False)
+        if not ret:
+            dolog('Umount %s failed: %s\n' % (sysdir, str(msg)))
 
         if os.path.exists('/tmpfs/debug/nomnttgt'):
             dolog('TURN ON: nomnttgt\n')
@@ -492,11 +492,10 @@ elif operation_type == 'long':
                         return  errmsg
             else:
                 realpath = os.path.join(tgtsys_root, mntpoint[1:])
-                try:
-                    isys.umount(realpath)
-                except SystemError, em:
+                ret, msg = umount_dev(realpath, rmdir=False)
+                if not ret:
                     errmsg = _('UMount %s failed: %s')
-                    errmsg = errmsg % (realpath, str(em))
+                    errmsg = errmsg % (realpath, str(msg))
                     return  errmsg
             cnt = cnt + 1
             mia.set_step(operid, cnt, len(mount_all_list))

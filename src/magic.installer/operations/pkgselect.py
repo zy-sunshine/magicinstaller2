@@ -67,7 +67,9 @@ elif operation_type == 'long':
                         os.path.basename(localfn))
             cli.put(localfn, remotefn)
             # Leave the mntpoint to 0 now because the mntpoint can't be get easily.
-            return (remotefn, new_device, 0, fstype, dir, isofn)
+            mntpoint = 0
+            return (remotefn, new_device, mntpoint, fstype, dir, isofn)
+            # The format like ('allpa/hdc.1.pkgarr.py', '/dev/hdc', 0, 'iso9660', 'MagicLinux/base', '')
 
         global cd_papath
         global hd_papathes
@@ -95,26 +97,16 @@ elif operation_type == 'long':
                 continue
             if fstype_map[fstype][0] == '':
                 continue
-            mntdir = os.path.join('/tmpfs/mnt', os.path.basename(device))
-            syslog.syslog(syslog.LOG_INFO,
-                          "Probe: Device = %s Mount = %s Fstype = %s" % \
-                          (device, mntdir, fstype))
-            if not os.path.isdir(mntdir):
-                os.makedirs(mntdir)
-            else:
-                # attempt to umount the device always. 
-                try:
-                    isys.umount(mntdir)
-                except SystemError, errmsg:
-                    pass
-                
-            try:
-                isys.mount(fstype_map[fstype][0], device, mntdir, 1, 0)
-            except SystemError, errmsg:
+
+            ret, mntdir = mount_dev(fstype_map[fstype][0], device)
+            if not ret:
                 syslog.syslog(syslog.LOG_ERR,
                               "Mount %s on %s as %s failed: %s" % \
-                              (device, mntdir, fstype_map[fstype][0], str(errmsg)))
+                              (device, mntdir, fstype_map[fstype][0], str(mntdir)))
             else:
+                syslog.syslog(syslog.LOG_INFO,
+                          "Probe: Device = %s Mount = %s Fstype = %s" % \
+                          (device, mntdir, fstype))
                 if fstype == 'iso9660':
                     search_dirs = [cd_papath]
                 else:
@@ -132,37 +124,35 @@ elif operation_type == 'long':
                         isopath = os.path.join(mntdir, dir, isofn)
                         if not os.path.exists(isopath):
                             continue
-                        try:
-                            isys.lomount(os.path.join('/dev', isoloop),
-                                         isopath, loopmntdir, 'iso9660', 'readonly')
-                        except SystemError, errmsg:
+                        ret, errmsg = mount_dev('iso9660', isopath, loopmntdir, flags='loop')
+                        if not ret:
                             syslog.syslog(syslog.LOG_ERR,
-                                          "LoMount %s(%s) on %s as %s failed: %s" % \
-                                          (os.path.join('/dev', isoloop),
-                                           isopath, loopmntdir,
+                                          "LoMount %s on %s as %s failed: %s" % \
+                                          (isopath, loopmntdir,
                                            'iso9660', str(errmsg)))
                         else:
                             localfn = os.path.join(loopmntdir, cd_papath, pafile)
                             r = probe_position(localfn, pi_add + pos_id, cli,
                                                device, new_device, fstype, dir, isofn)
-                            try:
-                                isys.loumount(os.path.join('/dev', isoloop),
-                                              loopmntdir)
-                            except SystemError, errmsg:
+                            ret, errmsg = umount_dev(loopmntdir)
+                            if not ret:
                                 syslog.syslog(syslog.LOG_ERR,
-                                              "LoUMount(%s, %s) failed: %s" % \
-                                              (os.path.join('/dev', isoloop),
+                                              "LoUMount %s from %s failed: %s" % \
+                                              (isopath,
                                                loopmntdir,
                                                str(errmsg)))
-                                return str(errmsg)
+                                #return str(errmsg)
                             if r:
                                 result.append(r)
-                try:
-                    isys.umount(mntdir)
-                except SystemError, errmsg:
-                    syslog.syslog(syslog.LOG_ERR,
-                                  "UMount(%s) failed: %s" % (mntdir, str(errmsg)))
-                    return  str(errmsg)
+                        ret, errmsg = umount_dev(loopmntdir)
+                        if not ret:
+                            syslog.syslog(syslog.LOG_ERR,
+                                    "UMount(%s) failed: %s" % (loopmntdir, str(errmsg)))
+                            #return  str(errmsg)
+            ret, errmsg = umount_dev(mntdir)
+            if not ret:
+                syslog.syslog(syslog.LOG_ERR,
+                        "UMount(%s) failed: %s" % (loopmntdir, str(errmsg)))
         del(cli)
         return result
 
@@ -175,18 +165,13 @@ elif operation_type == 'long':
         dolog('probe_all_disc(%s, %s, %s, %s, %s)\n' % \
               (device, str(mntpoint), dir, fstype, disc_first_pkgs))
         loopmntdir = os.path.join('/tmpfs/mnt', isoloop)
-        if not os.path.isdir(loopmntdir):
-            os.makedirs(loopmntdir)
         if mntpoint != 0:
             # The packages are placed in the mounted partitions.
             mntdir = os.path.join(tgtsys_root, mntpoint)
         else:
             mntdir = os.path.join('/tmpfs/mnt', os.path.basename(device))
-            if not os.path.isdir(mntdir):
-                os.makedirs(mntdir)
-            try:
-                isys.mount(fstype_map[fstype][0], device, mntdir, 1, 0)
-            except SystemError, errmsg:
+            ret, errmsg = mount_dev(fstype_map[fstype][0], device, mntdir)
+            if not ret:
                 syslog.syslog(syslog.LOG_ERR,
                               "Mount %s on %s as %s failed: %s" % \
                               (device, mntdir, fstype_map[fstype][0], str(errmsg)))
@@ -209,36 +194,30 @@ elif operation_type == 'long':
                 discfn = isofn_fmt % (distname, distver, disc_no + 1)
                 discpath = os.path.join(mntdir, dir, discfn)
                 if os.path.isfile(discpath):
-                    try:
-                        isys.lomount(os.path.join('/dev', isoloop),
-                                     discpath, loopmntdir, 'iso9660', 'readonly')
-                    except SystemError, errmsg:
+                    ret, errmsg = mount_dev('iso9660', discpath, mntdir=loopmntdir, flags='loop')
+                    if not ret:
                         syslog.syslog(syslog.LOG_ERR,
-                                      "LoMount %s(%s) on %s as %s failed: %s" % \
-                                      (os.path.join('/dev', isoloop),
-                                       discpath, loopmntdir,
+                                      "LoMount %s on %s as %s failed: %s" % \
+                                      (discpath, loopmntdir,
                                        'iso9660', str(errmsg)))
                     else:
                         probepkg = os.path.join(loopmntdir, '%s/packages' % distname, disc_first_pkgs[disc_no])
                         if os.path.isfile(probepkg):
                             dolog('Have found the first_pkg %s in iso %s\n' % (probepkg, discpath))
                             proberes = (discpath, probepkg)
-                        try:
-                            isys.loumount(os.path.join('/dev', isoloop),
-                                          loopmntdir)
-                        except SystemError, errmsg:
+                        ret, errmsg = umount_dev(loopmntdir)
+                        if not ret:
                             syslog.syslog(syslog.LOG_ERR,
-                                          "LoUMount(%s, %s) failed: %s" % \
-                                          (os.path.join('/dev', isoloop),
+                                          "LoUMount %s from %s failed: %s" % \
+                                          (discpath,
                                            loopmntdir,
                                            str(errmsg)))
                             return  (str(errmsg), [])
             result.append(proberes)
         dolog('probe_all_disc return result is : %s\n' % str(result))
         if mntpoint == 0:
-            try:
-                isys.umount(mntdir)
-            except SystemError, errmsg:
+            ret, errmsg = umount_dev(mntdir)
+            if not ret:
                 syslog.syslog(syslog.LOG_ERR,
                               "UMount(%s) failed: %s" % (mntdir, str(errmsg)))
                 if result != []:
@@ -282,11 +261,8 @@ elif operation_type == 'long':
             mntdir = os.path.join(tgtsys_root, mntpoint)
         else:
             mntdir = os.path.join('/tmpfs/mnt', os.path.basename(dev))
-            if not os.path.isdir(mntdir):
-                os.makedirs(mntdir)
-            try:
-                isys.mount(fstype_map[fstype][0], dev, mntdir, 1, 0)
-            except SystemError, errmsg:
+            ret, errmsg = mount_dev(fstype_map[fstype][0], dev, mntdir)
+            if not ret:
                 return  str(errmsg)
         return  0
 
@@ -302,24 +278,18 @@ elif operation_type == 'long':
             # It is CDROM installation.
             # assert(mntpoint == 0) because CDROM can't be mount as part
             #    of target system.
-            if not os.path.isdir(mntdir):
-                os.makedirs(mntdir)
-            try:
-                isys.mount(fstype_map[fstype][0], dev, mntdir, 1, 0)
-            except SystemError, errmsg:
+            ret, errmsg = mount_dev(fstype_map[fstype][0], dev, mntdir)
+            if not ret:
                 return  str(errmsg)
         elif iso_fn:
             # iso file is placed in mntdir.
             isopath = os.path.join(mntdir, dir, iso_fn)
             loopmntdir = os.path.join('/tmpfs/mnt/', isoloop)
-            try:
-                isys.lomount(os.path.join('/dev', isoloop),
-                             isopath, loopmntdir, 'iso9660', 'readonly')
-            except SystemError, errmsg:
+            ret, errmsg = mount_dev('iso9660', isopath, mntdir=loopmntdir, flags='loop')
+            if not ret:
                 syslog.syslog(syslog.LOG_ERR,
-                              "LoMount %s(%s) on %s as %s failed: %s" % \
-                              (os.path.join('/dev', isoloop),
-                               isopath, loopmntdir,
+                              "LoMount %s on %s as %s failed: %s" % \
+                              (isopath, loopmntdir,
                                'iso9660', str(errmsg)))
                 return  str(errmsg)
         return  0
@@ -335,23 +305,6 @@ elif operation_type == 'long':
             os.close(cur_rpm_fd)
         elif what == rpm.RPMCALLBACK_INST_PROGRESS:
             mia.set_step(operid, bytes, total)
-
-    def run_bash(cmd, argv, root='/'):
-        import subprocess
-        def chroot():
-            os.chroot(root)
-
-        cmd_res = {}
-        res = subprocess.Popen([cmd] + argv, 
-                                stdout = subprocess.PIPE, 
-                                stderr = subprocess.PIPE, 
-                                preexec_fn = chroot, cwd = root,
-                                close_fds = True)
-        res.wait()
-        cmd_res['out']=res.stdout.readlines()
-        cmd_res['err']=res.stderr.readlines()
-        cmd_res['ret']=res.returncode
-        return cmd_res
         
     def package_install(mia, operid, pkgname, firstpkg):
         global tgtsys_root
@@ -493,9 +446,8 @@ elif operation_type == 'long':
             # It is CDROM installation.
             # assert(mntpoint == 0) because CDROM can't be mount as part
             #    of target system.
-            try:
-                isys.umount(mntdir)
-            except SystemError, errmsg:
+            ret, errmsg = umount_dev(mntdir)
+            if not ret:
                 syslog.syslog(syslog.LOG_ERR, 'UMount(%s) failed: %s' % \
                               (mntdir, str(errmsg)))
                 return str(errmsg)
@@ -511,11 +463,10 @@ elif operation_type == 'long':
         elif iso_fn:
             # iso file is placed in mntdir.
             loopmntdir = os.path.join('/tmpfs/mnt/', isoloop)
-            try:
-                isys.loumount(os.path.join('/dev', isoloop), loopmntdir)
-            except SystemError, errmsg:
-                syslog.syslog(syslog.LOG_ERR, 'LoUMount(%s, %s) failed: %s' % \
-                              (os.path.join('/tmpfs/mnt', isoloop),
+            ret, errmsg = umount_dev(loopmntdir)
+            if not ret:
+                syslog.syslog(syslog.LOG_ERR, 'LoUMount %s from %s failed: %s' % \
+                              (iso_fn,
                                loopmntdir,
                                str(errmsg)))
                 return str(errmsg)
@@ -601,9 +552,8 @@ elif operation_type == 'long':
             mntdir = os.path.join(tgtsys_root, mntpoint)
         else:
             mntdir = os.path.join('/tmpfs/mnt', os.path.basename(dev))
-            try:
-                isys.umount(mntdir)
-            except SystemError, errmsg:
+            ret, errmsg = umount_dev(mntdir)
+            if not ret:
                 syslog.syslog(syslog.LOG_ERR, 'UMount(%s) failed: %s' % \
                               (mntdir, str(errmsg)))
                 return str(errmsg)

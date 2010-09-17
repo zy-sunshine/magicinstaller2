@@ -29,7 +29,7 @@ env.Command('setup.py',
             ['m4 -Ddevrootdir=$devrootdir $SOURCE > $TARGET',
                 'mkdir -p $devrootdir',
                 'cd $devrootdir; tar xzf $parted_path'],
-            parted_path = '$bindir/root/parted-1.8.8.bin.tar.gz')
+            parted_path = '$bindir/root_ext/parted-1.8.8.bin.tar.gz')
 
 depPyModule(env, 'root_src', os.getcwd(),
             'parted.so', glob.glob('*.[hc]'))

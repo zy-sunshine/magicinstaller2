@@ -18,10 +18,11 @@
 
 import os
 import stat
+import sys
 from SCons.Action import ActionFactory
 from xml.dom.minidom import parse
 
-Import('env', 'mi_config', 'MiPkgMaker', 'PkgMaker')
+Import('env', 'mi_config', 'MiPkgMaker', 'PkgMaker', 'getSudoSh')
 
 def line_split(lines):
     result = []
@@ -65,6 +66,7 @@ class RootBuildTheme(PkgMaker.BaseMaker):
 
 class RootBuildNode(PkgMaker.BaseMaker):
     def __init__(self, mod, env):
+        self.env = env
         self.source_list = source_list = []
         self.build_cmds = cmds = []
 
@@ -83,9 +85,18 @@ class RootBuildNode(PkgMaker.BaseMaker):
         post_list = []
 
         for pkgnode in rootdoc.getElementsByTagName('package'):
-            pkgfiles = get_node_value(pkgnode, 'files')
-            if pkgfiles:
-                pkgfiles = self.path_prefix('$source_prefix', pkgfiles)
+            pkgfiles_orig = get_node_value(pkgnode, 'files')
+            if pkgfiles_orig:
+                pkgfiles = []
+                #pkgfiles = self.path_prefix('$source_list_pkg', pkgfiles_orig)
+                for pkgfile in pkgfiles_orig:
+                    pkg_path = self.search_file(pkgfile, ['$source_prefix_pkg', '$source_prefix'])
+                    if pkg_path:
+                        pkgfiles.append(pkg_path)
+                    else:
+                        print "Can not find the package %s" % pkgfile
+                        sys.exit(1)
+
                 source_list.extend(pkgfiles)
                 # extract
                 cmds.extend(self.get_extract_cmd(pkgfiles, '$build_prefix'))
@@ -111,8 +122,15 @@ class RootBuildNode(PkgMaker.BaseMaker):
         # post_action
         cmds.extend(post_list)
 
+    def search_file(self, filename, pathes):
+        for p in pathes:
+            f = os.path.join(p, filename)
+            if os.access(self.env.subst(f), os.R_OK):
+                return f
+
 class RootPkgMaker(MiPkgMaker):
-    source_prefix = '#bindir/root'
+    source_prefix = '#bindir/root_ext'
+    source_prefix_pkg = '#bindir/root_pkg'
 
     build_root =  mi_config.tmpdir
     build_prefix = '$build_root/${package}.tmp'
@@ -128,6 +146,7 @@ class RootPkgMaker(MiPkgMaker):
         env = self.env
         env['ROOT'] = self.get_abspath(env['install_prefix'])
         env['BUILD'] = self.get_abspath(env['build_prefix'])
+        env['source_prefix_pkg'] = self.get_abspath(self.source_prefix_pkg)
 
         self.parse_def_mods()
 
@@ -142,11 +161,13 @@ class RootPkgMaker(MiPkgMaker):
         env.Alias(self.alias,
                   env.Command('$pack_prefix/$package_bin',
                               self.source_list,
-                              ['rm -rf $ROOT',
+                              [getSudoSh('rm -rf $ROOT'),
                                'mkdir -p $ROOT'] +
                               self.build_cmds +
                               self.global_post_cmds +
-                              self.fetch_pack_cmds() +
+                              [getSudoSh('chown -R root $ROOT')] +
+                              [getSudoSh('chgrp -R root $ROOT')] +
+                              [getSudoSh(self.fetch_pack_cmds()[0])] +
                               ['rm -rf $BUILD']))
 
     def make(self):

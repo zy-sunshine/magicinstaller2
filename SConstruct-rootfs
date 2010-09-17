@@ -47,7 +47,7 @@ class MirootfsMaker(PkgMaker.StepMaker):
             os.write(2, 'Please umount the previous mounts firstly!\n')
             sys.exit(-1)
 
-        cmds = ['sudo rm -rf $ROOT $sudoprom',
+        cmds = [getSudoSh('rm -rf $ROOT'),
                 'mkdir -p $ROOT']
         return [], cmds
 
@@ -65,7 +65,7 @@ class MirootfsMaker(PkgMaker.StepMaker):
         # permision will change.(We create the root.step1.tar.gz and other
         # rootfs tar packages use root user, only correspond with the
         # files' permision, so be careful with your system.:P )
-        cmds = [getSudoSh( 'sudo $pythonbin %s $udev_arg %s $sudoprom' % \
+        cmds = [getSudoSh( 'sudo $pythonbin %s $udev_arg %s' % \
                 (mkstep2_script,
                  ' '.join(toextract)) )]
         return toextract + [mkstep2_script], cmds

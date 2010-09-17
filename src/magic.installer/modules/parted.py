@@ -1026,7 +1026,7 @@ class mistep_parted (magicstep.magicstep):
         if win_probe_result:
             def win_part_cmp(e1, e2):
                 # priority sort
-                d = {'winnt': 1, 'win98': 2, 'win': 3}
+                d = {'vista/7': 1, 'winnt': 2, 'win98': 3, 'win': 4 }
                 r = d[e1[1]] - d[e2[1]]
                 if r != 0:
                     return r

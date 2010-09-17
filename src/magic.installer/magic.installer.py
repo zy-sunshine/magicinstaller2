@@ -44,7 +44,7 @@ import xmlgtk
 import magicstep
 import magicpopup
 from xmlgtk import N_
-
+USE_TEXTDOMAIN = True
 openlog('/var/log/client.log')
 
 # Setup constants and working directory.
@@ -53,9 +53,15 @@ os.chdir(DATADIR)
 sys.path.append(os.path.join(DATADIR, 'games'))
 from xglines import xglines
 
-if 1:#not os.path.exists(hotfixdir):
-    gettext.bindtextdomain(TEXTDOMAIN, '/usr/share/locale')
-    gettext.textdomain(TEXTDOMAIN)
+if USE_TEXTDOMAIN:
+    sys_locale = '/usr/share/locale'
+    all_dirs, all_files = treedir(sys_locale, False)
+    if TEXTDOMAIN+'.mo' in all_files:
+        gettext.bindtextdomain(TEXTDOMAIN, sys_locale)
+        gettext.textdomain(TEXTDOMAIN)
+    else:
+        gettext.bindtextdomain(TEXTDOMAIN, 'libs')
+        gettext.textdomain(TEXTDOMAIN)
 
 # Create the task manager: It only manage the long operation.
 class taskman :
@@ -406,8 +412,7 @@ class mi_main (xmlgtk.xmlgtk):
 
     def btnback_clicked(self, widget, data):
         if self.stepobj_list[self.curstep].btnback_clicked(widget, data):
-            pass
-#            self.name_map['mi_main'].set_current_page(self.curstep - 1)
+            self.name_map['mi_main'].set_current_page(self.curstep - 1)
 
     def btnnext_clicked(self, widget, data):
         if self.stepobj_list[self.curstep].btnnext_clicked(widget, data):

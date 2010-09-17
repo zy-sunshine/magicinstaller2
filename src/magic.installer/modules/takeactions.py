@@ -409,7 +409,7 @@ class mistep_takeactions(magicstep.magicstepgroup):
         self.add_action(_('Researching packages...'),
                         self.reprobe_all_disc_0, None,
                         'instpkg_post', dev, mntpoint, dir, fstype)
-
+        
     def reprobe_all_disc_0(self, operid, data):
         global choosed_patuple
         (pafile, dev, mntpoint, fstype, dir, isofn) = choosed_patuple
@@ -424,7 +424,7 @@ class mistep_takeactions(magicstep.magicstepgroup):
         (pafile, dev, mntpoint, fstype, dir, isofn) = choosed_patuple
         self.add_action(_('Researching packages...'),
                         self.act_instpkg_disc_start, self.cur_disc_no,
-                        'instpkg_prep', dev, mntpoint, dir, fstype)
+                        'instpkg_prep', dev, mntpoint, dir, fstype, self.installmode)
 
     def abort_clicked(self, widget, data):
         global choosed_patuple

@@ -34,22 +34,20 @@
 
 static PyObject * doMount(PyObject * s, PyObject * args);
 static PyObject * doUMount(PyObject * s, PyObject * args);
-static PyObject * doLoMount(PyObject *s, PyObject * args);
-static PyObject * doLoUMount(PyObject *s, PyObject * args);
 static PyObject * doSwapon(PyObject * s, PyObject * args);
 static PyObject * doSwapoff(PyObject * s, PyObject * args);
 static PyObject * doEjectCdrom(PyObject * s, PyObject * args);
 static PyObject * doSync(PyObject * s, PyObject * args);
+static PyObject * checkLoopdevUnused(PyObject * s, PyObject * args);
 
 static PyMethodDef isysModuleMethods[] = {
     { "mount", (PyCFunction) doMount, METH_VARARGS, NULL },
     { "umount", (PyCFunction) doUMount, METH_VARARGS, NULL },
-    { "lomount", (PyCFunction) doLoMount, METH_VARARGS, NULL },
-    { "loumount", (PyCFunction) doLoUMount, METH_VARARGS, NULL },
     { "swapon", (PyCFunction) doSwapon, METH_VARARGS, NULL },
     { "swapoff", (PyCFunction) doSwapoff, METH_VARARGS, NULL },
     { "ejectcdrom", (PyCFunction) doEjectCdrom, METH_VARARGS, NULL },
     { "sync", (PyCFunction) doSync, METH_VARARGS, NULL },
+    { "loopstatus", (PyCFunction) checkLoopdevUnused, METH_VARARGS, NULL},
     { NULL, NULL, 0, NULL }
 };
 
@@ -58,19 +56,29 @@ void initisys(void) {
 }
 
 static PyObject * doMount(PyObject * s, PyObject * args) {
-    char * fs, * device, * mntpoint;
+    char *err = NULL, * fs, * device, * mntpoint, *flags = NULL;
     int rc;
-    int readOnly;
-    int bindMount;
 
-    if (!PyArg_ParseTuple(args, "sssii", &fs, &device, &mntpoint,
-                          &readOnly, &bindMount)) return NULL;
+    if (!PyArg_ParseTuple(args, "sss|z", &fs, &device, &mntpoint,
+			  &flags)) return NULL;
 
-    rc = doPwMount(device, mntpoint, fs, readOnly, 0, NULL, NULL, bindMount);
+    rc = doPwMount(device, mntpoint, fs, flags, &err);
     if (rc == IMOUNT_ERR_ERRNO)
-        PyErr_SetFromErrno(PyExc_SystemError);
-    else if (rc)
-        PyErr_SetString(PyExc_SystemError, "mount failed");
+	PyErr_SetFromErrno(PyExc_SystemError);
+    else if (rc) {
+        PyObject *tuple = PyTuple_New(2);
+
+        PyTuple_SetItem(tuple, 0, PyInt_FromLong(rc));
+
+        if (err == NULL) {
+            Py_INCREF(Py_None);
+            PyTuple_SetItem(tuple, 1, Py_None);
+        } else {
+            PyTuple_SetItem(tuple, 1, PyString_FromString(err));
+        }
+
+        PyErr_SetObject(PyExc_SystemError, tuple);
+    }
 
     if (rc) return NULL;
 
@@ -79,61 +87,35 @@ static PyObject * doMount(PyObject * s, PyObject * args) {
 }
 
 static PyObject * doUMount(PyObject * s, PyObject * args) {
-    char * fs;
-
-    if (!PyArg_ParseTuple(args, "s", &fs)) return NULL;
-
-    if (umount(fs)) {
-        PyErr_SetFromErrno(PyExc_SystemError);
+    char *err = NULL, *mntpoint = NULL;
+    int rc;
+    
+    if (!PyArg_ParseTuple(args, "s", &mntpoint)){
         return NULL;
     }
 
-    Py_INCREF(Py_None);
-    return Py_None;
-}
+    rc = doPwUmount(mntpoint, &err);
+    if (rc == IMOUNT_ERR_ERRNO){
+        PyErr_SetFromErrno(PyExc_SystemError);
+    } else if (rc) {
+        PyObject *tuple = PyTuple_New(2);
 
-static int check_loopdev_unused(const char *device);
-static int set_loop(const char *device, const char *file, int mode);
-static int del_loop(const char *device);
-static PyObject * doLoMount(PyObject *s, PyObject * args) {
-    int           mode;
-    unsigned long flags;
-    char  *device, *file, *mntdir, *fstype, *readonly;
+        PyTuple_SetItem(tuple, 0, PyInt_FromLong(rc));
 
-    if (!PyArg_ParseTuple(args, "sssss", &device, &file, &mntdir, &fstype, &readonly))  return NULL;
+        if (err == NULL) {
+            Py_INCREF(Py_None);
+            PyTuple_SetItem(tuple, 1, Py_None);
+        } else {
+            PyTuple_SetItem(tuple, 1, PyString_FromString(err));
+        }
 
-    if (!strcmp(readonly, "readonly")) {
-	mode = O_RDONLY;
-	flags = MS_RDONLY;
-    } else {
-	mode = O_RDWR;
-	flags = 0;
+        PyErr_SetObject(PyExc_SystemError, tuple);
     }
 
-    if (check_loopdev_unused(device))  return NULL;
-    if (set_loop(device, file, mode))  return NULL;
-
-    if (mount(device, mntdir, fstype, flags, NULL) == 0) {
-	Py_INCREF(Py_None);
-	return Py_None;
+    if (rc){
+        return NULL;
     }
-    PyErr_SetFromErrno(PyExc_SystemError);
-    del_loop(device);
-    return  NULL;
-}
 
-static PyObject * doLoUMount(PyObject *s, PyObject * args) {
-    char  *device, *mntdir;
-    if (!PyArg_ParseTuple(args, "ss", &device, &mntdir))  return NULL;
-
-    if (umount(mntdir)) {
-	PyErr_SetFromErrno(PyExc_SystemError);
-	return NULL;
-    }
-    if (del_loop(device)) {
-	PyErr_SetFromErrno(PyExc_SystemError);
-	return NULL;
-    }
     Py_INCREF(Py_None);
     return Py_None;
 }
@@ -185,42 +167,70 @@ static PyObject * doSync(PyObject * s, PyObject * args) {
 
     if (!PyArg_ParseTuple(args, "", &fd)) return NULL;
     sync();
-
+    
     Py_INCREF(Py_None);
     return Py_None;
 }
 
-static int check_loopdev_unused(const char *device) {
+static int check_loopdev_unused(const char *device, char **errmsg);
+
+static PyObject * checkLoopdevUnused(PyObject * s, PyObject * args){
+    char *looppath = NULL;
+    char *err = NULL;
+    int rc;
+    
+    if (!PyArg_ParseTuple(args, "s", &looppath)) return NULL;
+
+    rc = check_loopdev_unused(looppath, &err);
+    
+    PyObject *tuple = PyTuple_New(2);
+    PyTuple_SetItem(tuple, 0, PyInt_FromLong(rc));
+    if (err == NULL) {
+        PyTuple_SetItem(tuple, 1, Py_None);
+    } else {
+        PyTuple_SetItem(tuple, 1, PyString_FromString(err));
+    }
+
+    //Py_INCREF(Py_None);
+    //return Py_None;
+    //Py_INCREF(tuple);
+    return tuple;
+    //return Py_BuildValue("i", !rc);
+
+}
+
+static int check_loopdev_unused(const char *device, char **errmsg) {
     int              fd;
     struct stat      statbuf;
     struct loop_info loopinfo;
-    char             errmsg[256];
 
     if (stat(device, &statbuf)) {
-        PyErr_SetFromErrno(PyExc_SystemError);
+        //PyErr_SetFromErrno(PyExc_SystemError);
         return 1;
     }
     if (!S_ISBLK(statbuf.st_mode)) {
-	snprintf(errmsg, sizeof(errmsg), "%s is not a block device file.\n", device);
-	PyErr_SetString(PyExc_SystemError, errmsg);
+    *errmsg = calloc(4096, sizeof(char));
+	snprintf(*errmsg, 4096, "%s is not a block device file.\n", device);
+	//PyErr_SetString(PyExc_SystemError, *errmsg);
         return 1;
     }
     fd = open(device, O_RDONLY);
     if (fd < 0) {
-	PyErr_SetFromErrno(PyExc_SystemError);
+	//PyErr_SetFromErrno(PyExc_SystemError);
         return 1;
     }
     if (ioctl(fd, LOOP_GET_STATUS, &loopinfo) == 0) {
 	close(fd);
-	snprintf(errmsg, sizeof(errmsg), "%s is used already.\n", device);
-	PyErr_SetString(PyExc_SystemError, errmsg);
+    *errmsg = calloc(4096, sizeof(char));
+	snprintf(*errmsg, 4096, "%s is used already.\n", device);
+	//PyErr_SetString(PyExc_SystemError, *errmsg);
         return 1;
     }
     if (errno == ENXIO) {
         close(fd);
         return 0;
     }
-    PyErr_SetFromErrno(PyExc_SystemError);
+    //PyErr_SetFromErrno(PyExc_SystemError);
     close(fd);
     return 1;
 }
