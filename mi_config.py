@@ -143,7 +143,8 @@ if use_sudo_prom:
 #}}
 
 #{{ build magicinstaller src environment (src/*)
-destdir = os.path.join(tmpdir, 'root.src')      # with magicinstaller root src files
+destdir = os.path.join(tmpdir, 'root.src.step1')      # with magicinstaller root src files
+pyextdir = os.path.join(tmpdir, 'root.src.pyext')   # python module for MI.
 
 # i18n translation
 textdomain = 'magic.installer'

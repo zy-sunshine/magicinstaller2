@@ -21,4 +21,4 @@ import os
 
 Import('*')
 
-depPyModule(env, 'root_src', os.getcwd(), 'isys.so', glob.glob('*.[hc]'))
+depPyModule(env, 'root.pyext', os.getcwd(), 'isys.so', glob.glob('*.[hc]'))

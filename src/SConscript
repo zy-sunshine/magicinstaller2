@@ -28,3 +28,4 @@ SConscript('etc/SConscript')
 if mi_config.develmode:
     # Only compile the python modules at develmode.
     SConscript('pyext/SConscript')
+

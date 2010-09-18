@@ -31,5 +31,5 @@ env.Command('setup.py',
                 'cd $devrootdir; tar xzf $parted_path'],
             parted_path = '$bindir/root_ext/parted-1.8.8.bin.tar.gz')
 
-depPyModule(env, 'root_src', os.getcwd(),
+depPyModule(env, 'root.pyext', os.getcwd(),
             'parted.so', glob.glob('*.[hc]'))

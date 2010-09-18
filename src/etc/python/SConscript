@@ -20,5 +20,5 @@ import os.path
 
 Import('*')
 
-depInstall(env, 'root.src.etc', '$destdir/$pythondir', ['sitecustomize.pyc'])
-env.PYCBuilder('sitecustomize.pyc', 'sitecustomize.py')
+depInstall(env, 'root.src.etc', '$destdir/$pythondir', ['sitecustomize.py'])
+#env.PYCBuilder('sitecustomize.pyc', 'sitecustomize.py')

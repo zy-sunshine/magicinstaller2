@@ -89,7 +89,7 @@ def depPyModule(env, alias, dir, sofile, cfiles):
     sopath = os.path.join(mi_config.destdir, mi_config.pythondir, 'site-packages', sofile)
     env.Command(sopath, ['setup.py'] + cfiles,
                 ['cd %s; %s setup.py install --prefix=%s/usr' % \
-                 (dir, mi_config.pythonbin, mi_config.destdir)])
+                 (dir, mi_config.pythonbin, mi_config.pyextdir)])
     env.Alias(alias, sopath)
     #env.Depends(alias, sopath)
 

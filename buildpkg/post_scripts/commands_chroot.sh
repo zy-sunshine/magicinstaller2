@@ -10,4 +10,4 @@ done
 chgrp -v utmp /var/run/utmp /var/log/lastlog 
 chmod -v 664 /var/run/utmp /var/log/lastlog
 
-ldconfig
+/sbin/ldconfig
