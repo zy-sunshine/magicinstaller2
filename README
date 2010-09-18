@@ -1,6 +1,6 @@
 bootloader      放置引导器(例如grub)的配置文件。
-bindir          放置第三放二进制包和源码包。
-rootfs          制作 mirootfs.gz 包的代码。
+bindir          放置第三方二进制包和源码包。
+buildpkg        制作 mirootfs.gz 包的代码。
 scripts         过程中调用的工具脚本。
 spec            用户可操作的配置文件。
 src             magicinstaller 主程序的源码。
@@ -16,3 +16,7 @@ SConstruct-rootfs   将 root.step1, rootfs 的 etc 目录文件, 以及 #src 中生成的 ma
                     放置在#result/mirootfs.gz .
 
 SConstruct-iso      生成 iso .
+
+SConstruct-mi       打包MI主程序 .
+
+配置和使用说明请查看 CONFIG 文件.

@@ -1,0 +1,23 @@
+配置方法:
+    1. 关闭开发模式 
+       "touch .distmode" 我们创建这个隐藏文件, 以关闭开发模式.
+
+    2. 下载 MagicLinux-2.5-1.iso 并将其挂载到某个目录, 例如 /mnt/magic_iso/
+       wget http://apt.magiclinux.org/iso/MagicLinux-2.5/MagicLinux-2.5-1.iso
+       mount -o loop MagicLinux-2.5-1.iso /mnt/magic_iso/
+        
+       做连接 bindir/root_pkg 使其指向 iso 中的 packages 目录.
+       ln -sv /mnt/magic_iso/MagicLinux/packages/ bindir/root_pkg
+
+    3. 配置 spec 目录.
+       按照模板 spec/specinfo.py 更改配置.
+       添加连接 spec/packages 使其指向您需要发行的 rpm 包目录.
+       可以添加 spec/add_files 目录, 其中的文件(根目录)会置于 iso 中.(可选)
+       
+    4. 执行命令制作 iso .
+       scons root.step1     # 从 bindir/root_pkg 中的 rpm 包中提取文件构建 MI 的rootfs.
+       scons                # 构建 iso.
+
+       之后重复制作 iso 可以不执行 scons root.step1 ,只需执行 scons ,
+       但要保证 bindir/root.step1.tar.gz 存在(即 scons root.step1 命令生成的文件).
+
