@@ -147,7 +147,7 @@ class mistep_bootloader (magicstep.magicstepgroup):
         if self.restore_dos and win_device:
             try:
                 devinfo = get_devinfo(win_device)
-                if devinfo.fstype in ('ntfs', 'vfat') \
+                if devinfo.fstype in ('ntfs-3g', 'ntfs', 'vfat') \
                        and devinfo.not_touched == 'true':
                     has_dos = 'true'
             except KeyError:

@@ -384,10 +384,10 @@ elif operation_type == 'long':
                 continue
             ret, mntdir = mount_dev(fstype_map[fstype][0], device)
             if ret:
-                if os.path.exists(os.path.join(mntdir, 'ntldr')):
-                    result.append((new_device, 'winnt'))
-                elif os.path.exists(os.path.join(mntdir, 'bootmgr')):
+                if os.path.exists(os.path.join(mntdir, 'bootmgr')):
                     result.append((new_device, 'vista/7'))
+                elif os.path.exists(os.path.join(mntdir, 'ntldr')):
+                    result.append((new_device, 'winnt'))
                 elif os.path.exists(os.path.join(mntdir, 'io.sys')):
                     result.append((new_device, 'win98'))
                 else:
