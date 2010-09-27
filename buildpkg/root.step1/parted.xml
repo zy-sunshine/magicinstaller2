@@ -32,20 +32,4 @@ $pythondir/site-packages/parted/*.pyc
 </install>
 </package>
 
-<package>
-#<files>gparted-0.4.3-2mgc25.i686.rpm</files>
-#<install>
-#/usr/sbin/gparted
-#/usr/sbin/gpartedbin
-#/usr/share/icons/hicolor/16x16/apps/gparted.png
-#/usr/share/icons/hicolor/22x22/apps/gparted.png
-#/usr/share/icons/hicolor/24x24/apps/gparted.png
-#/usr/share/icons/hicolor/32x32/apps/gparted.png
-#/usr/share/icons/hicolor/48x48/apps/gparted.png
-#/usr/share/icons/hicolor/icon-theme.cache
-#/usr/share/icons/hicolor/scalable/apps/gparted.svg
-#/usr/share/locale/zh_CN/LC_MESSAGES/gparted.mo
-#</install>
-</package>
-
 </packages>
