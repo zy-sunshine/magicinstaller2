@@ -8,8 +8,12 @@ foreground dfcf00
 # black
 background 000000
 title 安装 Magic Linux
-	kernel /boot/mivmlinuz root=/dev/ram0 vga=785
+	kernel /boot/mivmlinuz root=/dev/ram0 vga=788
 	initrd /boot/mirootfs.gz
+
+title 启动 Vista/Win7
+    find --set-root /bootmgr
+    chainloader /bootmgr
 
 title 启动 Windows 2000/XP
 	find --set-root /ntldr
@@ -20,6 +24,10 @@ title 启动 Windows 9x/Me
 	chainloader /io.sys
 
 title Linux 急救模式
-	kernel /boot/mivmlinuz root=/dev/ram0 vga=785 rescue
+	kernel /boot/mivmlinuz root=/dev/ram0 vga=788 rescue
+	initrd /boot/mirootfs.gz
+
+title Linux 开发模式
+	kernel /boot/mivmlinuz root=/dev/ram0 vga=788 rescue DEVELOP=1
 	initrd /boot/mirootfs.gz
 

@@ -4,7 +4,7 @@
 <main><whole>
 <vbox>
   <image file="images/banner.png"/>
-  <hbox margin="4" spacing="4">
+  <hbox margin="4" spacing="4" expand="true" fill="true">
     <vbox>
       <frame label="((Steps))">
         <table name="steptables" columns="2" margin="4" colspacings="4" rowspacings="4"/>

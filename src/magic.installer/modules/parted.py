@@ -777,8 +777,12 @@ class mistep_parted (magicstep.magicstep):
             all_fs_type = self.rootobj.tm.actserver.all_file_system_type()
             fst_index = 0
             for fst in all_fs_type:
-                if fstype_map[fst][1] == '':
+                if not fstype_map.has_key(fst):
                     continue
+                
+                if fstype_map[fst][1] == '':
+                        continue
+
                 if fst == 'linux-swap':
                     fstype_swap_index = fst_index;
                 newnode = self.uixmldoc.createElement('value')
@@ -1085,7 +1089,6 @@ class mistep_parted (magicstep.magicstep):
                                    magicpopup.magicpopup.MB_OK)
             return
 
-        dolog('Here\n')
         class AutoPart:
             def __init__(self, mountpoint, filesystem, size):
                 self.mountpoint = mountpoint

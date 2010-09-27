@@ -8,20 +8,20 @@
         <miparted_notebook/>
       </frame>
       <frame name="autopart_frame" label="((Auto-partition))">
-	<hbox margin="4" spacing="4" homogenous="true" show="true">
-          <label expand="true" fill="true"/>
-	  <autopart_optionmenu name="autopart_om" value="parted.profile"/>
-	  <button name="autopart_button" label="((_Apply))" clicked="auto1_clicked"
-		  tips="((Apply the selected auto-partition profile))"
-		  expand="true"/>
-          <label expand="true" fill="true"/>
-	</hbox>
+        <hbox margin="4" spacing="4" homogenous="true" show="true" expand="false" fill="false">
+            <label expand="true" fill="true"/>
+        <autopart_optionmenu name="autopart_om" value="parted.profile"/>
+        <button name="autopart_button" label="((_Apply))" clicked="auto1_clicked"
+            tips="((Apply the selected auto-partition profile))"
+            expand="true"/>
+            <label expand="true" fill="true"/>
+        </hbox>
       </frame>
     </vbox>
   </step>
   <diskpage>
-    <vbox margin="4" spacing="4">
-      <hbox margin="4" spacing="4" homogenous="true" fill="true">
+    <vbox margin="4" spacing="4" expand="true" fill="true">
+      <hbox margin="4" spacing="4" homogenous="true" expand="false" fill="false">
         <label text="((Capacity:))"/>
         <label name="capacity"/>
         <label expand="true"/>
@@ -43,11 +43,11 @@
         <column label="((Label))"/>
         <column label="((Start))"/>
         <column label="((End))"/>
-	<column label="" visible="false"/> <!-- Format or not value -->
+        <column label="" visible="false"/> <!-- Format or not value -->
         <column label="" visible="false"/> <!-- Avaiable flags -->
         <column label="" visible="false"/> <!-- Original filesystem -->
       </list>
-      <hbox margin="4" spacing="4" homogenous="true" fill="true">
+      <hbox margin="4" spacing="4" homogenous="true" expand="false" fill="false">
         <button name="create" label="((_Create))" clicked="create_clicked" sensitive="false"
                 tips="((Create a new partition at the selected freespace))"
                 expand="true" fill="true"/>

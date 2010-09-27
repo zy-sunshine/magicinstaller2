@@ -266,7 +266,12 @@ class mistep_takeactions(magicstep.magicstepgroup):
         result = self.rootobj.tm.results[operid]
         if result:
             # Error occurred. Stop it?
+            # Yes, we should stop it, and we should stop at mount failed place too.
             dolog('format_result ERROR: %s\n' % str(result))
+            magicpopup.magicmsgbox(None, _('Format Partition Error: %s' % result),
+                       magicpopup.magicmsgbox.MB_ERROR,
+                       magicpopup.magicpopup.MB_OK)
+            self.rootobj.btnnext_do()
         self.act_parted_format_start(data + 1)
 
     def act_end_parted(self):

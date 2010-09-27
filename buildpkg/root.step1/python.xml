@@ -1,10 +1,9 @@
 <packages>
 
-
 <package>
 <files>python-libs-2.6.2-1mgc25.i686.rpm</files>
 <install>
-/usr/lib/libpython2.6.so.*
+usr/lib/libpython2.6.so.*
 </install>
 </package>
 

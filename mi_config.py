@@ -90,7 +90,7 @@ else:
 
 # {{{ Run setting
 # boot screen mode
-gui_mode = 785 #788
+gui_mode = 788 #785
 
 if gui_mode == 785:
     full_width  = 640

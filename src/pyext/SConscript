@@ -19,5 +19,6 @@
 SConscript('iconv/SConscript')
 SConscript('isys/SConscript')
 SConscript('miactions/SConscript')
-SConscript('parted/SConscript')
+# Remove parted pylib, because we will use pyparted instead of it.
+#SConscript('parted/SConscript')
 SConscript('tftpc/SConscript')

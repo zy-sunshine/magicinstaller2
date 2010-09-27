@@ -1,4 +1,5 @@
 #!/usr/bin/python
+#-*- encoding:GB18030 -*-
 # Copyright (C) 2003, Charles Wang.
 # Author:  Charles Wang <charles@linux.net.cn>
 # All rights reserved.
@@ -44,7 +45,7 @@ import xmlgtk
 import magicstep
 import magicpopup
 from xmlgtk import N_
-USE_TEXTDOMAIN = True
+USE_TEXTDOMAIN = False
 openlog('/var/log/client.log')
 
 # Setup constants and working directory.
@@ -280,9 +281,11 @@ class mi_main (xmlgtk.xmlgtk):
         self.curstep = -1
         self.stepobj_list = []			# The classname of each Func File	
         self.stepobj_group_list = []
+        
         self.namestep_map = {}         # The classname to step number map
         self.available_steps = []            # available classname (step)
         self.steptitle_list = []        # every step's title
+        
         self.values = parse(search_file('magic.values.xml', [hotfixdir, '.']))
         # Set the host name and boot label to distname.
         self.set_data(self.values, 'network.hostname', distname)
@@ -311,8 +314,7 @@ class mi_main (xmlgtk.xmlgtk):
         self.stepsarr = []
         for step in self.stepobj_list:
             self.steptitle_list.append(step.get_label())
-#        width = 3
-#        height = (len(self.actlist) + width - 1) / width
+
         table = self.name_map['steptables']
         for i in range(len(self.stepobj_list)):
             image = gtk.Image()
@@ -380,9 +382,11 @@ class mi_main (xmlgtk.xmlgtk):
                 self.name_map[btn].show()
             else:
                 self.name_map[btn].hide()
+        self.stepobj_list[dststep].widget.show()
+        self.stepobj_list[self.curstep].widget.hide()
         self.curstep = dststep
         self.name_map['mi_main'].set_current_page(dststep)
-#        self.stepobj_list[dststep].widget.show()
+        self.stepobj_list[dststep].widget.show()
 
     def enter_step(self, step):
         stepobj = self.stepobj_list[step]
@@ -451,12 +455,12 @@ class mi_main (xmlgtk.xmlgtk):
                     self.stepobj_list[skip_num].widget.hide()          # Hide this step
                     
 
-        if self.stepobj_group_list[self.curstep] != \
-               self.stepobj_group_list[self.curstep + 1]:
-            for step in range(self.curstep, -1, -1):
-#                if self.stepobj_group_list[step] != \
-#                       self.stepobj_group_list[self.curstep + 1]:
-                self.stepobj_list[step].widget.hide()
+        #if self.stepobj_group_list[self.curstep] != \
+        #       self.stepobj_group_list[self.curstep + 1]:
+        #    for step in range(self.curstep, -1, -1):
+        #        if self.stepobj_group_list[step] != \
+        #               self.stepobj_group_list[self.curstep + 1]:
+        #        self.stepobj_list[step].widget.hide()
 
         next_step = self.get_next_available_step(self.curstep)
         self.switch_to_page(next_step)
@@ -471,12 +475,16 @@ class mi_main (xmlgtk.xmlgtk):
         
     def switch_to_page(self, pageno):
         if self.curstep != pageno:
-            if pageno < self.curstep  \
-                    or ( self.leave_step(self.curstep) and self.enter_step(pageno) ): # only check next
-                self.stepsarr[self.curstep].set_from_file('images/applet-okay.png')
+            if pageno < self.curstep:           # 如果向后变更 step，则表明，当前页面未完成。
+                self.stepsarr[self.curstep].set_from_file('images/applet-blank.png')
                 self.stepsarr[pageno].set_from_file('images/applet-busy.png')
-                self.stepobj_list[pageno].widget.show()
                 self.switch2step(pageno)
+            elif pageno > self.curstep:         # 如果向前变更 step，则表明，当前页面已经完成。
+                # 我们只处理下一步的leave和enter
+                if self.leave_step(self.curstep) and self.enter_step(pageno): # only check next
+                    self.stepsarr[self.curstep].set_from_file('images/applet-okay.png')
+                    self.stepsarr[pageno].set_from_file('images/applet-busy.png')
+                    self.switch2step(pageno)
             else:
                 # Call set_current_page is useless here, so use timeout
                 # to switch back.
@@ -544,6 +552,7 @@ mi_win.connect('destroy', gtk.main_quit)
 
 # Lock the position and size of the toplevel window.
 mi_win.set_position(gtk.WIN_POS_CENTER)
+#mi_win.set_default_size(800, 600)
 mi_win.set_size_request(full_width, full_height)
 mi_win.set_resizable(False)
 

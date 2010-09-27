@@ -265,7 +265,7 @@ def mount_dev(fstype, devfn, mntdir=None,flags=None):
                 argv = ['-t', fstype, '-o', flags, devfn, mntdir]
             else:
                 argv = ['-t', fstype, devfn, mntdir]
-        dolog("Run mount command: %s %s" % (cmd, ' '.join(argv)))
+        dolog("Run mount command: %s %s\n" % (cmd, ' '.join(argv)))
         cmdres = run_bash(cmd, argv)
         if cmdres['ret']:
             errmsg = "mount_dev: mount failed: %s\n" % str([cmdres['out'], cmdres['err']])
@@ -314,10 +314,10 @@ def umount_dev(mntdir, rmdir=True):
 
         cmd = '/bin/umount'
         argv = [mntdir]
-        dolog("Run umount command: %s %s" % (cmd, ' '.join(argv)))
+        dolog("Run umount command: %s %s\n" % (cmd, ' '.join(argv)))
         cmdres = run_bash(cmd, argv)
         if cmdres['ret']:
-            errmsg = "umount_dev: mount failed: %s\n" % str([cmdres['out'], cmdres['err']])
+            errmsg = "umount_dev: umount failed: %s\n" % str([cmdres['out'], cmdres['err']])
             return False, errmsg
     if 0:
         # attempt to remove the mnt dir. For next mount.

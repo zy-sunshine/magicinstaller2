@@ -31,9 +31,14 @@ if os.path.exists(tmpfs_mnt_dir):
         remove_empty_dir(os.path.join(tmpfs_mnt_dir, d))
 
 # umount target system dir.
-if os.path.exists('/tmpfs/tgtsys'):
-    umount_dev('/tmpfs/tgtsys')
-    remove_empty_dir('/tmpfs/tgtsys')
+tgtsys_dir = '/tmpfs/tgtsys'
+if os.path.exists(tgtsys_dir):
+    if os.path.exists( os.path.join(tgtsys_dir, 'proc', 'cmdline') ):
+        umount_dev(os.path.join(tgtsys_dir, 'proc'))
+    if os.path.exists( os.path.join(tgtsys_dir, 'sys', 'block') ):
+        umount_dev(os.path.join(tgtsys_dir, 'sys'))
+    umount_dev(tgtsys_dir)
+    remove_empty_dir(tgtsys_dir)
 
 # Search magic.toplevel file and Run it.
 magicToplevelFile = ''

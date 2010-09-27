@@ -1,4 +1,5 @@
 #!/usr/bin/python
+#-*- encoding:GB18030 -*-
 # Copyright (C) 2003, Charles Wang.
 # Author:  Charles Wang <charles@linux.net.cn>
 # All rights reserved.
@@ -22,7 +23,7 @@ import sys
 #import kudzu
 import getdev
 import parted
-
+import _ped
 import isys
 
 # Because the short operation and long operation are run in different process,
@@ -34,21 +35,27 @@ if operation_type == 'short':
 
     def all_file_system_type():
         fstype_list = []
-        fstype = parted.file_system_type_get_next()
-        while fstype:
-            if fstype_map.has_key(fstype.name):
-                fstype_list.append(fstype.name)
-            fstype = parted.file_system_type_get_next(fstype)
+        #fstype = parted.file_system_type_get_next()
+        #while fstype:
+        #    if fstype_map.has_key(fstype.name):
+        #        fstype_list.append(fstype.name)
+        #    fstype = parted.file_system_type_get_next(fstype)
+        fstype_map = parted.fileSystemType
+        fstype_list = fstype_map.keys()
+        if 'linux-swap' not in fstype_list:
+            fstype_list.append('linux-swap')
         return  fstype_list
 
     def all_disk_type():
         dtype_list = []
-        dtype = parted.disk_type_get_next()
-        while dtype:
-            dtype_list.append(dtype.name)
-            dtype = parted.disk_type_get_next(dtype)
+        #dtype = parted.disk_type_get_next()
+        #while dtype:
+        #    dtype_list.append(dtype.name)
+        #    dtype = parted.disk_type_get_next(dtype)
+        dtype_map = parted.diskType
+        dtype_list = dtype_map.keys()
         return  dtype_list
-
+        
 elif operation_type == 'long':
     # Status globals
 
@@ -56,23 +63,36 @@ elif operation_type == 'long':
     all_harddisks = {}
 
     # Status-Related operations.
-
+    
+    def revision_fstype(fstype):
+        ''' 修正MI和libparted之间的文件系统版本, 现主要是 linux-swap 版本问题 '''
+        if fstype == 'linux-swap':
+            fstype = 'linux-swap(v0)'
+        return fstype
+        
     def device_probe_all(mia, operid, dummy):
 
         def get_device_list():
-            result = []
+            #result = []
+            # Use kudzu to probe devices.
             #hd_list = kudzu.probe(kudzu.CLASS_HD,
             #                      kudzu.BUS_IDE | kudzu.BUS_SCSI | kudzu.BUS_MISC,
             #                      kudzu.PROBE_ALL)
-            hd_list = getdev.probe(getdev.CLASS_HD)
-            for hd in hd_list:
-                try:
-                    dev = parted.PedDevice.get(os.path.join('/dev/', hd.device))
-                except:
-                    pass
-                else:
-                    result.append(dev)
-            return result
+            # Use udev to probe devices
+            #hd_list = getdev.probe(getdev.CLASS_HD)
+            #for hd in hd_list:
+            #    try:
+            #        dev = parted.PedDevice.get(os.path.join('/dev/', hd.device))
+            #    except:
+            #        pass
+            #    else:
+            #        result.append(dev)
+            #return result
+            
+            # Use libparted to probe devices.
+            hd_list = filter(lambda d: d.type != parted.DEVICE_DM, parted.getAllDevices())
+            
+            return hd_list
 
         global all_harddisks
         mia.set_step(operid, 0, -1)
@@ -83,11 +103,14 @@ elif operation_type == 'long':
             for dev in devlist:
                 newdisklabel = None
                 try:
-                    disk = parted.PedDisk.new(dev)
-                except parted.error:
+                    disk = parted.Disk(dev)
+                except _ped.DiskLabelException:
                     # For the disk without any disk label, create it.
-                    newdisklabel = 'y'
-                    disk = dev.disk_new_fresh(parted.disk_type_get('msdos'))
+                    # disk label 是磁盘分区表格式
+                    dltype = parted.diskType['msdos']
+                    disk = parted.freshDisk(device=dev, ty=dltype)
+                    #newdisklabel = 'y'
+                    #disk = dev.disk_new_fresh(parted.disk_type_get('msdos'))
                 # Model might contain GB2312, it must be convert to Unicode.
                 model = iconv.iconv('gb2312', 'utf8', dev.model).encode('utf8')
                 result.append((dev.path, dev.length, model))
@@ -99,82 +122,140 @@ elif operation_type == 'long':
             flags = []
             avaflags = []
             label = 'N/A'
-            if part.is_active() != 0:
-                for f in range(parted.PARTITION_FIRST_FLAG,
-                               parted.PARTITION_LAST_FLAG + 1):
-                    if part.is_flag_available(f):
+            if part.active:
+                for f in parted.partitionFlag.keys():
+                    if part.isFlagAvailable(f):
                         avaflags.append(f)
-                        if part.get_flag(f):
+                        if part.getFlag(f):
                             flags.append(f)
-                if part.disk.type.check_feature(parted.DISK_TYPE_PARTITION_NAME):
-                    label = part.get_name()
-            if part.fs_type:
-                fs_type_name = part.fs_type.name
+                if disk.supportsFeature(parted.DISK_TYPE_PARTITION_NAME):
+                    label = part.name
+
+            if part.fileSystem:    
+                fs_type_name = part.fileSystem.type
             else:
                 fs_type_name = 'N/A'
-            return (part.num, flags, part.type, part.geom.length,
-                    fs_type_name, label, part.geom.start, part.geom.end, avaflags)
+            #if part.is_active() != 0:
+            #    for f in range(parted.PARTITION_FIRST_FLAG,
+            #                   parted.PARTITION_LAST_FLAG + 1):
+            #        if part.is_flag_available(f):
+            #            avaflags.append(f)
+            #            if part.get_flag(f):
+            #                flags.append(f)
+            #    if part.disk.type.check_feature(parted.DISK_TYPE_PARTITION_NAME):
+            #        label = part.get_name()
+            #if part.fs_type:
+            #    fs_type_name = part.fs_type.name
+            #else:
+            #    fs_type_name = 'N/A'
+            
+            return (part.number, flags, part.type, part.geometry.length,
+                    fs_type_name, label, part.geometry.start, part.geometry.end, avaflags)
 
         result = []
         if all_harddisks.has_key(devpath):
             disk = all_harddisks[devpath][1]
             if disk:
-                part = disk.next_partition()
+                part = disk.getFirstPartition()
                 while part:
                     if part.type & parted.PARTITION_METADATA == 0:
                         result.append(part2result(part))
-                    part = disk.next_partition(part)
+                    part = part.nextPartition()
+                # Another way to get all partitions, but not include freespace patitions.
+                #for part in disk.partitions:
+                #    result.append(part2result(part))
+                    
+                #part = disk.next_partition()
+                #while part:
+                #    if part.type & parted.PARTITION_METADATA == 0:
+                #        result.append(part2result(part))
+                #    part = disk.next_partition(part)
         return  result
 
     def get_disk_type(mia, operid, devpath):
         if all_harddisks.has_key(devpath):
             disk = all_harddisks[devpath][1]
             if disk:
-                if disk.type.check_feature(parted.DISK_TYPE_PARTITION_NAME):
+                if disk.supportsFeature(parted.DISK_TYPE_PARTITION_NAME):
                     support_partition_name = 'true'
                 else:
                     support_partition_name = 'false'
-                return (disk.type.name, support_partition_name)
+                return (disk.type, support_partition_name)
+            #if disk:
+            #    if disk.type.check_feature(parted.DISK_TYPE_PARTITION_NAME):
+            #        support_partition_name = 'true'
+            #    else:
+            #        support_partition_name = 'false'
+            #    return (disk.type.name, support_partition_name)
         return  ('N/A', 'false')
 
     def _get_left_bound(sector, disk):
-        under_sector = disk.get_partition_by_sector(sector)
+        #under_sector = disk.get_partition_by_sector(sector)
+        under_sector = disk.getPartitionBySector(sector)
         if not under_sector:
             return  sector
         if under_sector.type & parted.PARTITION_FREESPACE:
-            return  under_sector.geom.start
+            return  under_sector.geometry.start
         else:
             return  sector
 
     def _get_right_bound(sector, disk):
-        under_sector = disk.get_partition_by_sector(sector)
+        # disk.getPartitionBySector.__doc__
+        # Returns the Partition that contains the sector.  If the sector
+        #   lies within a logical partition, then the logical partition is
+        #   returned (not the extended partition).
+        #under_sector = disk.get_partition_by_sector(sector)
+        under_sector = disk.getPartitionBySector(sector)
         if not under_sector:
             return  sector
         if under_sector.type & parted.PARTITION_FREESPACE:
-            return  under_sector.geom.end
+            return  under_sector.geometry.end
         else:
             return  sector
 
-    def _grow_over_small_freespace(geom, disk):
-        if geom.length < parted_MIN_FREESPACE * 5:
-            return  geom
-        start = _get_left_bound(geom.start, disk)
-        if start >= geom.end:
+    #def _grow_over_small_freespace(geometry, disk):
+    #    if geometry.length < parted_MIN_FREESPACE * 5:
+    #        return  geometry
+    #    start = _get_left_bound(geometry.start, disk)
+    #    if start >= geometry.end:
+    #        return  None
+    #    if geometry.start - start < parted_MIN_FREESPACE:
+    #        geometry.set_start(start)
+    #    end = _get_right_bound(geometry.end, disk)
+    #    if end <= geometry.start:
+    #        return  None
+    #    if end - geometry.end < parted_MIN_FREESPACE:
+    #        geometry.set_end(end)
+    #    return  geometry
+        
+    def _grow_over_small_freespace(start_in, end_in, disk):
+        length_in = end_in - start_in + 1
+        start_out = start_in
+        end_out = end_in
+        length_out = length_in
+        
+        if length_in < parted_MIN_FREESPACE * 5:
+            return  (start_out, end_out, length_out)
+        start = _get_left_bound(start_in, disk)
+        if start >= end_in:
             return  None
-        if geom.start - start < parted_MIN_FREESPACE:
-            geom.set_start(start)
-        end = _get_right_bound(geom.end, disk)
-        if end <= geom.start:
+        if start_in - start < parted_MIN_FREESPACE:
+            start_out = start
+        end = _get_right_bound(end_in, disk)
+        if end <= start_in:
             return  None
-        if end - geom.end < parted_MIN_FREESPACE:
-            geom.set_end(end)
-        return  geom
+        if end - end_in < parted_MIN_FREESPACE:
+            end_out = end
+        length_out = end_out - start_out + 1
+        return (start_out, end_out, length_out)
 
     def add_partition(mia, operid, devpath, parttype, fstype, start, end):
+        fstype = revision_fstype(fstype)
         if all_harddisks.has_key(devpath):
             (dev, disk, dirty_or_not) = all_harddisks[devpath]
             if disk:
-                constraint = dev.constraint_any()
+                #constraint = dev.constraint_any()
+                constraint = parted.Constraint(device=dev)#exactGeom=newgeom)
                 if parttype == 'primary':
                     parttype = 0
                 elif parttype == 'extended':
@@ -182,23 +263,38 @@ elif operation_type == 'long':
                 elif parttype == 'logical':
                     parttype = parted.PARTITION_LOGICAL
                 if fstype != 'N/A':
-                    fstype = parted.file_system_type_get(fstype)
+                    #fstype = parted.file_system_type_get(fstype)
+                    fstype = parted.fileSystemType[fstype]
                 else:
                     fstype = None
                 try:
-                    newpart = disk.partition_new(parttype, fstype, start, end)
-                    newgeom = _grow_over_small_freespace(newpart.geom, disk)
+                    #newpart = disk.partition_new(parttype, fstype, start, end)
+                    newgeom_bound = _grow_over_small_freespace(start, end, disk)
+                    if not newgeom_bound:
+                        return (-1, "Can't get the geometry of new partition (start=%s end=%s)." % (start, end))
+                    newgeom = parted.Geometry(device=dev, start=newgeom_bound[0], end=newgeom_bound[1])
+                    # 我们可以用_ped的geometry来构建parted的Geometry
+                    #newgeom = parted.Geometry(PedGeometry=newpart.geometry.getPedGeometry())
                     if newgeom:
-                        newpart.geom.set_start(newgeom.start)
-                        newpart.geom.set_end(newgeom.end)
-                        disk.add_partition(newpart, constraint)
+                        newpart = parted.Partition(disk=disk, type=parttype, geometry=newgeom)
+                        disk.addPartition(partition=newpart, constraint=constraint)
                         if fstype:
-                            newpart.set_system(fstype)
-                except  parted.error:
-                    exc_info = sys.exc_info()
-                    return (-1, str(exc_info[1]))
+                            newpart.getPedPartition().set_system(fstype)
+                    #newgeom = _grow_over_small_freespace(newpart.geometry, disk)
+                    #if newgeom:
+                    #    newpart.geom.set_start(newgeom.start)
+                    #    newpart.geom.set_end(newgeom.end)
+                    #    disk.add_partition(newpart, constraint)
+                    #    if fstype:
+                    #        newpart.set_system(fstype)
+                    
+                #except  parted.error:
+                #    exc_info = sys.exc_info()
+                #    return (-1, str(exc_info[1]))
+                except _ped.PartitionException, errmsg:
+                    return(-1, str(errmsg))
                 all_harddisks[devpath] = (dev, disk, 'y')
-                return (newpart.geom.start, '')
+                return (newpart.geometry.start, '')
         return (-1, _("Can't find the specified disk."))
 
     def set_flags_and_label(mia, operid, devpath, part_start,
@@ -206,17 +302,29 @@ elif operation_type == 'long':
         if all_harddisks.has_key(devpath):
             disk = all_harddisks[devpath][1]
             if disk:
-                part = disk.next_partition()
+                part = disk.getFirstPartition()
                 while part:
-                    if part.geom.start == part_start:
+                    if part.geometry.start == part_start:
                         for tf in true_flags:
-                            part.set_flag(tf, 1)
+                            part.setFlag(tf)
                         for ff in false_flags:
-                            part.set_flag(ff, 0)
+                            part.unsetFlag(ff)
                         if set_label == 'true':
-                            part.set_name(label)
+                            part.getPedPartition().set_name(label)
                         break
-                    part = disk.next_partition(part)
+                    part = part.nextPartition()
+
+                #part = disk.next_partition()
+                #while part:
+                #    if part.geom.start == part_start:
+                #        for tf in true_flags:
+                #            part.set_flag(tf, 1)
+                #        for ff in false_flags:
+                #            part.set_flag(ff, 0)
+                #        if set_label == 'true':
+                #            part.set_name(label)
+                #        break
+                #    part = disk.next_partition(part)
                 all_harddisks[devpath] = (all_harddisks[devpath][0], disk, 'y')
         return  0
 
@@ -224,30 +332,46 @@ elif operation_type == 'long':
         if all_harddisks.has_key(devpath):
             disk  = all_harddisks[devpath][1]
             if disk:
-                part = disk.next_partition()
+                part = disk.getFirstPartition()
                 while part:
-                    if part.geom.start == part_start:
-                        disk.delete_partition(part)
+                    if part.geometry.start == part_start:
+                        #disk.delete_partitons(part)
+                        disk.removePartition(part)
                         break
-                    part = disk.next_partition(part)
+                    part = part.nextPartition()
                 all_harddisks[devpath] = (all_harddisks[devpath][0], disk, 'y')
+            #if disk:
+            #    part = disk.next_partition()
+            #    while part:
+            #        if part.geom.start == part_start:
+            #            disk.delete_partition(part)
+            #            break
+            #        part = disk.next_partition(part)
+            #    all_harddisks[devpath] = (all_harddisks[devpath][0], disk, 'y')
         return get_all_partitions(mia, operid, devpath)
 
     def reload_partition_table(mia, operid, devpath):
         if all_harddisks.has_key(devpath):
             dev = all_harddisks[devpath][0]
             try:
-                all_harddisks[devpath] = (dev, parted.PedDisk.new(dev), None)
-            except parted.error:
-                dltype = parted.disk_type_get('msdos')
-                all_harddisks[devpath] = (dev, dev.disk_new_fresh(dltype), 'y')
+                all_harddisks[devpath] = (dev, parted.Disk(dev), None)
+            except _ped.DiskLabelException:
+                dltype = parted.diskType['msdos']
+                all_harddisks[devpath] = (dev, parted.freshDisk(device=dev, ty=dltype), 'y')
+            #try:
+            #    all_harddisks[devpath] = (dev, parted.PedDisk.new(dev), None)
+            #except parted.error:
+            #    dltype = parted.disk_type_get('msdos')
+            #    all_harddisks[devpath] = (dev, dev.disk_new_fresh(dltype), 'y')
         return 0
 
     def disk_new_fresh(mia, operid, devpath, dltype):
-        dltype = parted.disk_type_get(dltype)
+        #dltype = parted.disk_type_get(dltype)
+        dltype = parted.diskType[dltype]
         if dltype and all_harddisks.has_key(devpath):
             dev = all_harddisks[devpath][0]
-            all_harddisks[devpath] = (dev, dev.disk_new_fresh(dltype), 'y')
+            #all_harddisks[devpath] = (dev, dev.disk_new_fresh(dltype), 'y')
+            all_harddisks[devpath] = (dev, parted.freshDisk(device=dev, ty=dltype), 'y')
         return 0
 
     def get_all_dirty_disk(mia, operid, dummy):
@@ -266,7 +390,8 @@ elif operation_type == 'long':
                 try:
                     disk.commit()
                     all_harddisks[devpath] = (all_harddisks[devpath][0], disk, None)
-                except parted.error, errmsg:
+                #except parted.error, errmsg:
+                except parted.DiskException as errmsg:
                     return  str(errmsg)
         return  0
 
@@ -283,27 +408,26 @@ elif operation_type == 'long':
         disk = all_harddisks[devpath][1]
         if not disk:
             return _('Not any partition table found on: ') + devpath
-        part = disk.next_partition()
+        #part = disk.next_partition()
+        part = disk.getFirstPartition()
         while part:
-            if part.geom.start != part_start:
-                part = disk.next_partition(part)
+            if part.geometry.start != part_start:
+                #part = disk.next_partition(part)
+                part = part.nextPartition()
                 continue
             if fstype_map[fstype][1] == 'internal':
-                parted_fstype = parted.file_system_type_get(fstype)
                 try:
-                    fs = part.geom.file_system_create(parted_fstype)
-                    del(fs)
-                    part.set_system(parted_fstype)
+                    part.fileSystem.create()
                     disk.commit()
                     return  0
-                except parted.error, errmsg:
+                except NotImplementedError, errmsg:
+                    return  str(errmsg)
+                except parted.DiskException as errmsg:
                     return  str(errmsg)
             else:
-                parted_fstype = parted.file_system_type_get(fstype)
                 try:
-                    part.set_system(parted_fstype)
                     disk.commit()
-                except parted.error, errmsg:
+                except parted.DiskException as errmsg:
                     return  str(errmsg)
                 time.sleep(1)
                 #cmd = '%s %s%d' % (fstype_map[fstype][1], devpath, part.num)
@@ -312,7 +436,7 @@ elif operation_type == 'long':
                 cmd_f_list = cmd_format.split()
                 cmd = cmd_f_list[0]
                 argv = cmd_f_list[1:]
-                argv.append('%s%d' % (devpath, part.num))
+                argv.append('%s%d' % (devpath, part.number))
                 cmdres = run_bash(cmd, argv)
                 dolog('%s %s\n' % (cmd, ' '.join(argv)))
                 dolog(' '.join(cmdres['out'])+'\n')
