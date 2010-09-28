@@ -18,6 +18,43 @@
        scons root.step1     # 从 bindir/root_pkg 中的 rpm 包中提取文件构建 MI 的rootfs.
        scons                # 构建 iso.
 
-       之后重复制作 iso 可以不执行 scons root.step1 ,只需执行 scons ,
-       但要保证 bindir/root.step1.tar.gz 存在(即 scons root.step1 命令生成的文件).
+       之后重复制作 iso 可以不执行 scons root.step1 ,只需执行 scons 
+       , 但 svn update 或者其他更新后, 需要执行一次 scons root.step1 命令以更新 rootfs
+       要保证 bindir/root.step1.tar.gz 存在(即 scons root.step1 命令生成的文件).
+
+    rpm 安装模式:
+        1. 将所有 rpm 包放在 spec/packages 目录下
+        2. 然后修改 spec/specinfo.py 中的 pkgtype 为 "tar" .
+        3. scons root.step1 && scons 就可以生成相应的 iso .
+        注: rpm 包的安装顺序可以手动调节, 修改 spec/specinfo.py 中的
+            basepkg_list, remove_deps, add_deps 参数即可.
+        原理说明:
+            传统的 rpm 安装模式, 根据依赖列表逐个安装, 执行 rpm 中的pre_script
+            and post_script, 同时生成 rpm 数据库. 注意,
+            如果你的 pre_script 执行失败那这个包安装就不成功了.
+            post_script 如果安装失败可以在系统安装后期修正 spec/post_install.sh (rpm 包已经成功安装进入系统了)
+        附加: 还隐藏了一个安装模式(rpm copy install mode) ;) , 有兴趣的可以试试, 开启步骤如下：
+            添加 spec/rpmdb 目录(用于生成 rpm 数据库的地方, 添加
+            spec/etc_install 目录 (用于保存系统安装的后期配置脚本))
+            将后期安装处理脚本放置于 spec/etc_install/etc_install.sh
+            (这个脚本需要用户来写了, 主要功能是安装一些配置文件,
+            对新系统进行配置),
+            etc_install.sh 需要调用的文件可以放在 同目录下 spec/etc_install
+            最后执行 scons root.step1 && scons
+            原理说明: 
+                安装过程由安装 rpm 变为解压 rpm 包,
+                解压完成后则释放 rpm 数据库(scons 时生成的), 最后执行 etc_install.sh 脚本.
+            
+
+    tar 安装模式:
+        1. 将所有要解压的 tar 包放在 spec/tarpackages 目录下(一定不要有多余文件, tar 包最好为 tar.bz2 或 tar.gz 标准模式)，
+           tar包中的文件目录结构是以根目录为底层目录的, tar 打包参考命令:
+                tar -czvf tarpkg.tar.gz -C /home/user/pkgfiledir .
+                tar -cjvf tarpkg.tar.bz2 -C /home/user/pkgfiledir .
+        2. 然后修改 spec/specinfo.py 中的 pkgtype 为 "tar" .
+        3. scons root.step1 && scons 就可以生成相应的 iso .
+        注:  tar 包的安装顺序可以指定, 修改 spec/specinfo.py 中的 basepkg_list 列表即可.
+        原理说明:
+            您可以将您的系统打包成 tar 包, 这样在安装的时候就会解压这些 tar 包到目的系统, 然后 MI 会继续配置新系统.
+
 
