@@ -29,6 +29,7 @@ import rpm
 
 import isys
 import tftpc
+import tarfile
 
 if operation_type == 'short':
     pass
@@ -213,7 +214,8 @@ elif operation_type == 'long':
                                            loopmntdir,
                                            str(errmsg)))
                             return  (str(errmsg), [])
-            result.append(proberes)
+            if proberes:
+                result.append(proberes)
         dolog('probe_all_disc return result is : %s\n' % str(result))
         if mntpoint == 0:
             ret, errmsg = umount_dev(mntdir)
@@ -231,7 +233,10 @@ elif operation_type == 'long':
         # Set the package install mode.
         global installmode
         installmode = instmode
-        dolog('InstallMode: %s\n' % installmode)
+        if PKGTYPE == 'rpm':
+            dolog('InstallMode: Rpm Packages %s\n' % installmode)
+        elif PKGTYPE == 'tar':
+            dolog('InstallMode: Tar Packages\n')
         
         dolog('instpkg_prep(%s, %s, %s, %s)\n' % (dev, mntpoint, dir, fstype))
         #--- This code is according to rpm.spec in rpm-4.2-0.69.src.rpm. ---
@@ -305,7 +310,15 @@ elif operation_type == 'long':
             os.close(cur_rpm_fd)
         elif what == rpm.RPMCALLBACK_INST_PROGRESS:
             mia.set_step(operid, bytes, total)
-        
+            
+    class CBFileObj(file):
+        def __init__(self, filepath, data):
+            self.mia, self.operid, self.total_size = data
+            file.__init__(self, filepath)
+        def read(self, size):
+            self.mia.set_step(self.operid, self.tell(), self.total_size)
+            return file.read(self, size)
+
     def package_install(mia, operid, pkgname, firstpkg):
         global tgtsys_root
         use_ts = False
@@ -394,21 +407,49 @@ elif operation_type == 'long':
                 dolog('FAILED on %s: %s\n' % (pkgname, str(errmsg)))
                 return str(errmsg)
                 
+        def do_tar_extract_install():
+            tar_size = os.path.getsize(pkgpath)
+            try:
+                tarobj = tarfile.open(fileobj=CBFileObj(pkgpath, (mia, operid, tar_size)))
+            except:
+                errstr = 'Faild on create tarfile object on file "%s" size"%d"\n' % (pkgpath, tar_size)
+                dolog(errstr)
+                return errstr
+            try:
+                tarobj.extractall(path=tgtsys_root)
+            except:
+                if tarobj:
+                    tarobj.close()
+                errstr = 'Faild on extract file "%s" size"%d" to directory "%s"\n' % (pkgpath, tar_size, tgtsys_root)
+                dolog(errstr)
+                return errstr
+            try:
+                tarobj.close()
+            except:
+                pass
+            
         # Decide using which mode to install.
-        if installmode == 'rpminstallmode':
-            if use_ts:
-                # Use rpm-python module to install rpm pkg, but at this version it is very slowly.
-                do_ts_install()
-            else:
-                # Because I can not use rpm-python module to install quickly.
-                # So use the bash mode to install the pkg, it is very fast.
-                # If you can use rpm-python module install pkg quickly, you can remove it.
-                do_bash_rpm_install()
-        elif installmode == 'copyinstallmode':
-            # Use rpm2cpio name-ver-release.rpm | cpio -diu to uncompress the rpm files to target system.
-            # Then we will do some configuration in instpkg_post.
-            do_copy_install()
-        return 0
+        ret = 'Nothing'
+        if PKGTYPE == 'rpm':     # In the mipublic.py
+            if installmode == 'rpminstallmode':
+                if use_ts:
+                    # Use rpm-python module to install rpm pkg, but at this version it is very slowly.
+                    ret = do_ts_install()
+                else:
+                    # Because I can not use rpm-python module to install quickly.
+                    # So use the bash mode to install the pkg, it is very fast.
+                    # If you can use rpm-python module install pkg quickly, you can remove it.
+                    ret = do_bash_rpm_install()
+            elif installmode == 'copyinstallmode':
+                # Use rpm2cpio name-ver-release.rpm | cpio -diu to uncompress the rpm files to target system.
+                # Then we will do some configuration in instpkg_post.
+                ret = do_copy_install()
+        elif PKGTYPE == 'tar':
+            ret = do_tar_extract_install()
+        if ret:
+            return ret
+        else:
+            return 0
 
     def instpkg_disc_post(mia, operid, dev, mntpoint, dir, fstype, iso_fn, first_pkg):
         # determine the rpmdb.tar.bz2 and etc.tar.bz2. If exist copy it to tmp_config_dir in target system.

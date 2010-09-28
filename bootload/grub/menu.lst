@@ -11,23 +11,40 @@ title 安装 Magic Linux
 	kernel /boot/mivmlinuz root=/dev/ram0 vga=788
 	initrd /boot/mirootfs.gz
 
+title 寻找第一个 Linux
+    find --set-root --ignore-floppies --ignore-cd /boot/grub/menu.lst
+    map () (hd0)
+    map (hd0) ()
+    map --rehook
+    find --set-root --ignore-floppies --ignore-cd /boot/grub/menu.lst
+    configfile /boot/grub/menu.lst
+
 title 启动 Vista/Win7
-    find --set-root /bootmgr
+    find --set-root --ignore-floppies --ignore-cd /bootmgr
+    map () (hd0)
+    map (hd0) ()
+    find --set-root --ignore-floppies --ignore-cd /bootmgr
     chainloader /bootmgr
 
 title 启动 Windows 2000/XP
-	find --set-root /ntldr
+	find --set-root --ignore-floppies --ignore-cd /ntldr
+    map () (hd0)
+    map (hd0) ()
+	find --set-root --ignore-floppies --ignore-cd /ntldr
 	chainloader /ntldr
 
 title 启动 Windows 9x/Me
-	find --set-root /io.sys
+	find --set-root --ignore-floppies --ignore-cd /io.sys
+    map () (hd0)
+    map (hd0) ()
+	find --set-root --ignore-floppies --ignore-cd /io.sys
 	chainloader /io.sys
 
 title Linux 急救模式
 	kernel /boot/mivmlinuz root=/dev/ram0 vga=788 rescue
 	initrd /boot/mirootfs.gz
 
-title Linux 开发模式
-	kernel /boot/mivmlinuz root=/dev/ram0 vga=788 rescue DEVELOP=1
-	initrd /boot/mirootfs.gz
+#title Linux 开发模式
+#	kernel /boot/mivmlinuz root=/dev/ram0 vga=788 rescue DEVELOP=1
+#	initrd /boot/mirootfs.gz
 

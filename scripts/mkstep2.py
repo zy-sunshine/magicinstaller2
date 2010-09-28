@@ -53,9 +53,11 @@ for f in sys.argv:
     if f[:2] == '--':
         continue
     if f[-3:] == '.gz':
-        cmds.append('zcat %s | tar x -C %s' % (f, todir))
+        #cmds.append('zcat %s | tar x -C %s' % (f, todir))
+        cmds.append('tar xf %s -C %s' % (f, todir))
     elif f[-4:] == '.bz2':
-        cmds.append('bzcat %s | tar x -C %s' % (f, todir))
+        #cmds.append('bzcat %s | tar x -C %s' % (f, todir))
+        cmds.append('tar xf %s -C %s' % (f, todir))
 
 for cmd in cmds:
     print cmd

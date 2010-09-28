@@ -1,6 +1,13 @@
 <packages>
 
 <package>
+<files>readline-5.2-14mgc25.i686.rpm</files>
+<install>
+lib/libreadline.so.*
+</install>
+</package>
+
+<package>
 <files>ncurses-libs-5.7-2.20090207mgc25.i686.rpm</files>
 <install>
 lib/libncurses.so.*

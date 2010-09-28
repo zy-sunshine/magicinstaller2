@@ -38,6 +38,7 @@ env.Command('mipublic.py', 'm4.mipublic.py',
                ' -Dbootcdfn="$bootiso_fn" -Ddolog="$dolog" -Duseudev="$useudev"' + \
                ' -Dhotfixdir="$hotfixdir"' + \
                ' -DTEXTDOMAIN="$textdomain" -DBINDIR="$root_bindir" -DDATADIR="$root_datadir"' + \
+               ' -DPKGTYPE="$pkgtype"'+ \
                ' -DLIBDIR="$root_libdir" -DMODULEDIR="$root_moduledir" -DOPERATIONDIR="$root_operationdir" '
                ' < $SOURCES > $TARGET')
 

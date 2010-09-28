@@ -53,6 +53,8 @@ $pythondir/dummy_threading.pyc
 $pythondir/threading.pyc
 $pythondir/dummy_thread.pyc
 $pythondir/traceback.pyc
+$pythondir/tarfile.pyc
+$pythondir/shutil.pyc
 $pythondir/lib-dynload/binascii.so
 $pythondir/lib-dynload/_randommodule.so
 $pythondir/lib-dynload/_codecs_cn.so

@@ -18,7 +18,7 @@ distkernelver='2.6.30.10-smp'
 # pkgtype is used to specify the package management scheme used by the
 # installed distribution. Now only 'rpm' is supported.
 #
-pkgtype='rpm'
+pkgtype='tar'
 
 # pkgdirs is used to specify the directories which contain the packages
 # which should be installed by MagicInstaller as a part of the installed

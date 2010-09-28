@@ -19,8 +19,8 @@ mi_config.specdir = specdir
 mi_config.sifile = os.path.join(specdir, 'specinfo.py')
 
 #check rpmtype
-if mi_config.pkgtype != 'rpm':
-    print "Only rpm is supported in pkgtype."
+if mi_config.pkgtype not in ['rpm', 'tar']:
+    print "Only rpm and tar are supported in pkgtype."
     sys.exit(1)
 
 #get pkgdirs

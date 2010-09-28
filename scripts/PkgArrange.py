@@ -159,7 +159,7 @@ def get_pkg_weight_number(packages_infor, depnum):
 #---------- 
 # notice: we calculate each package's weight number according to 
 #           the number of being depended by other packages.
-#         But we have not use this element to ajust the order of packages.
+#         But we have not use this element to adjust the order of packages.
 #-----------
 if use_weight_number:
     packages_weight_number = get_pkg_weight_number(packages_infor, pkgpublic.deps)
@@ -230,7 +230,8 @@ def get_pkg_name(pkg):
         pkgname = pkg[ : pkg.rindex('-') ]
         pkgname = pkg[ : pkgname.rindex('-') ]
     except ValueError, e:
-        print 'Can not get the name of '+ pkg +' Error: '+e
+        print 'Can not get the name of %s Error: %s' % (pkg, str(e))
+        return pkg
     return pkgname
 
 def sort_by_basepkg(sort_list, base_list):

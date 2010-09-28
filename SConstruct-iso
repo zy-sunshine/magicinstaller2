@@ -152,14 +152,15 @@ for iso_cnt in range(2, mi_config.max_cd_no + 1):
 # result/pkgarr.py <- scripts/PkgArrange.py, scripts/pkgpublic.py, tmp/pkginfor.py, mi_config.sifile
 env.Command(['result/pkgarr.py'],
             ['scripts/PkgArrange.py',
-             'scripts/pkgpublic.py',
-             'tmp/pkginfor.py',
-             env.Value((mi_config.volume_limit_list,
+            'scripts/pkgpublic.py',
+            'tmp/pkginfor.py',
+            env.Value((mi_config.volume_limit_list,
                         mi_config.placement_list,
                         mi_config.toplevel_groups,
                         mi_config.add_deps,
+                        mi_config.basepkg_list,
                         mi_config.remove_deps)),
-             ],
+            ],
             ['$pythonbin scripts/PkgArrange.py -o $TARGET -l tmp/pkgarr.log'])
 
 if use_cp_mode:
@@ -183,5 +184,5 @@ env.Command(packages_md5sum, packages_value,
 env.Command('tmp/pkginfor.py',
             [pkginfor_script, packages_value],
             ['python %s -o $TARGET -l tmp/%s.log %s' % \
-             (pkginfor_script, mi_config.pkgtype, pkgdirs)])
+            (pkginfor_script, mi_config.pkgtype, pkgdirs)])
 

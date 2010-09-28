@@ -416,7 +416,9 @@ elif operation_type == 'long':
                 part = part.nextPartition()
                 continue
             if fstype_map[fstype][1] == 'internal':
+                parted_fstype = parted.fileSystemType[revision_fstype(fstype)]
                 try:
+                    part.getPedPartition().set_system(parted_fstype)
                     part.fileSystem.create()
                     disk.commit()
                     return  0
@@ -425,13 +427,41 @@ elif operation_type == 'long':
                 except parted.DiskException as errmsg:
                     return  str(errmsg)
             else:
+                parted_fstype = parted.fileSystemType[revision_fstype(fstype)]
                 try:
+                    part.getPedPartition().set_system(parted_fstype)
                     disk.commit()
+                except NotImplementedError, errmsg:
+                    return  str(errmsg)
                 except parted.DiskException as errmsg:
                     return  str(errmsg)
-                time.sleep(1)
-                #cmd = '%s %s%d' % (fstype_map[fstype][1], devpath, part.num)
-                #r = os.system(cmd)
+                    
+                # Wait for device block appear.
+                fblk = False
+                trycnt = 0
+                # 我们在此处尝试检查设备文件是否存在
+                for t in range(5):
+                    devn = '%s%d' % (devpath, part.number)
+                    # os.path.exists 不能实时检测文件存在与否
+                    #if os.path.exists(devn):
+                    if os.system('ls %s' % devn) == 0:
+                        fblk = True
+                        break
+                    else:
+                        trycnt += 1
+                        time.sleep(1)
+                        
+                if not fblk:
+                    return _('Not exists device block on %s: \ntry time: %d\n') % (devpath, trycnt)
+                    
+                #cmd = '%s %s%d' % (fstype_map[fstype][1], devpath, part.number)
+                #ret = os.system(cmd)
+                #if ret != 0:
+                #    errmsg = _('Run "%s" failed: %s\n')
+                #    return  errmsg % (cmd, str(ret))
+                #else:
+                #    return  0
+                # Run command to format partition
                 cmd_format = fstype_map[fstype][1]
                 cmd_f_list = cmd_format.split()
                 cmd = cmd_f_list[0]
@@ -441,8 +471,8 @@ elif operation_type == 'long':
                 dolog('%s %s\n' % (cmd, ' '.join(argv)))
                 dolog(' '.join(cmdres['out'])+'\n')
                 if cmdres['ret'] != 0:
-                    errmsg = _('Run "%s %s" failed: %s\n')
-                    return  errmsg % (cmd, ' '.join(argv), str(cmdres['err']))
+                    errmsg = _('Run "%s %s" failed: %s\ntry time: %d\n')
+                    return  errmsg % ( cmd, ' '.join(argv), str(cmdres['err']), trycnt )
                 else:
                     return  0
         return _('Not any partition found on position: ') + str(part_start)

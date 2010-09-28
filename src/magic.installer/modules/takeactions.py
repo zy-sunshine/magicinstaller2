@@ -100,10 +100,11 @@ class mistep_takeactions(magicstep.magicstepgroup):
         self.rootobj = rootobj
         magicstep.magicstepgroup.__init__(self, rootobj, 'takeactions.xml',
                                           ['notes', 'ensure'], 'step')
-        self.actlist = [(N_('Partition/Format'), self.act_start_parted, self.act_end_parted),
-                        (N_('Install Package'), self.act_start_instpkg, self.act_end_instpkg),
-                        (N_('Make initrd'), self.act_start_mkinitrd, None),
-                        (N_('Install Bootloader'), self.act_start_bootloader, None)]
+        self.actlist = []
+        self.actlist.append( (N_('Partition/Format'), self.act_start_parted, self.act_end_parted) )
+        self.actlist.append( (N_('Install Package'), self.act_start_instpkg, self.act_end_instpkg) )
+        self.actlist.append( (N_('Make initrd'), self.act_start_mkinitrd, None) )
+        self.actlist.append( (N_('Install Bootloader'), self.act_start_bootloader, None) )
         #(N_('Setup Keyboard'), self.act_start_keyboard, None)]
         self.actpos = 0
         self.discdlg_open_time = -1
@@ -271,7 +272,7 @@ class mistep_takeactions(magicstep.magicstepgroup):
             magicpopup.magicmsgbox(None, _('Format Partition Error: %s' % result),
                        magicpopup.magicmsgbox.MB_ERROR,
                        magicpopup.magicpopup.MB_OK)
-            self.rootobj.btnnext_do()
+            #self.rootobj.btnback_do()
         self.act_parted_format_start(data + 1)
 
     def act_end_parted(self):
@@ -325,6 +326,7 @@ class mistep_takeactions(magicstep.magicstepgroup):
                     self.totalsize = self.totalsize + asize
         self.totalpkg = len(self.instpkg_map.keys())
 
+##### Start install package
     def act_start_instpkg(self):
         global choosed_patuple
         global arch_map, arrangement
@@ -515,7 +517,7 @@ class mistep_takeactions(magicstep.magicstepgroup):
         self.tadlg.name_map['pkgname'].set_text('')
         self.tadlg.name_map['pkgprog'].set_fraction(1)
         self.tadlg.name_map['frame_packages'].set_sensitive(False)
-
+##### End install package
     def act_start_mkinitrd(self):
         self.tadlg.name_map['frame_other'].set_sensitive(True)
         self.rootobj.tm.push_progress(self.tadlg.name_map['otprog'],

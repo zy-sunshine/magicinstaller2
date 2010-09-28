@@ -43,11 +43,12 @@ specdir = 'spec'
 specfn  = 'spec/specinfo.py'
 pkgarr = 'result/pkgarr.py'
 pkgdirs = specdir + '/packages'
-hotfixfiles_dir = 'spec/hotfix'
-addfiles_dir = 'spec/addfiles'
+hotfixfiles_dir = specdir + '/hotfix'
+addfiles_dir = specdir + '/addfiles'
 
-rpmdb_dir = 'spec/rpmdb'
-etctar_dir = 'spec/etc_install'
+rpmdb_dir = specdir + '/rpmdb'
+etctar_dir = specdir + '/etc_install'
+
 etctar_script = os.path.join(etctar_dir, 'etc_install.sh')
 use_copy_install_mode = False
 if os.path.exists(rpmdb_dir) and \
@@ -73,6 +74,11 @@ for key in dir(specinfo):
     if (key[:2] != '__'):
         vars()[key] = specinfo.__dict__[key]
 del specinfo
+
+# For tar packages install mode.
+tarpkgdir = specdir + '/tarpackages'
+if pkgtype == 'tar':
+    pkgdirs = tarpkgdir
 
 # iso name
 max_cd_no = 9

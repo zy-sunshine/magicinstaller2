@@ -85,7 +85,8 @@ class miSrcMaker(PkgMaker.StepMaker):
         return slist, cmds
 
     def mkmisrc(self):
-        cmds = ['tar c -C $ROOT . | gzip -9 > $TARGET']
+        #cmds = ['tar c -C $ROOT . | gzip -9 > $TARGET']
+        cmds = ['tar czvf $TARGET -C $ROOT .']
         return [], cmds
 
 misrc = miSrcMaker(env)
@@ -94,12 +95,14 @@ misrc.make()
 if mi_config.develmode:
     # Pack src/magic.installer and src/etc into root.src.step1.tar.gz
     env.Command('bindir/root.src.step1.tar.gz', [env.Alias('root_src'), env.Alias('root.src.etc')],
-                ['tar c -C $destdir . | gzip -9 > $TARGET'])
+                #['tar c -C $destdir . | gzip -9 > $TARGET'])
+                ['tar czf $TARGET -C $destdir .'])
     # There will compile the src/pyext (python modules for magicinstaller)
     # Do it at develmode ,because we won't compile the python modules 
     # every time (especially at dist mode).
     env.Command('bindir/root.src.pyext.tar.gz', env.Alias('root.pyext'),
-                ['tar c -C $pyextdir . | gzip -9 > $TARGET'])
+                #['tar c -C $pyextdir . | gzip -9 > $TARGET'])
+                ['tar czf $TARGET -C $pyextdir .'])
     
 
 ### Hotfix file

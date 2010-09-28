@@ -39,6 +39,8 @@ MODULEDIR      = '--/MODULEDIR/--'
 OPERATIONDIR   = '--/OPERATIONDIR/--'
 TEXTDOMAIN     = '--/TEXTDOMAIN/--'
 
+PKGTYPE        = '--/PKGTYPE/--'
+
 full_width     = --/FULL_WIDTH/--
 full_height    = --/FULL_HEIGHT/--
 help_width     = full_width * 0.6

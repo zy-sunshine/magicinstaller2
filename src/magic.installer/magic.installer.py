@@ -45,7 +45,7 @@ import xmlgtk
 import magicstep
 import magicpopup
 from xmlgtk import N_
-USE_TEXTDOMAIN = False
+USE_TEXTDOMAIN = True
 openlog('/var/log/client.log')
 
 # Setup constants and working directory.
@@ -416,12 +416,16 @@ class mi_main (xmlgtk.xmlgtk):
 
     def btnback_clicked(self, widget, data):
         if self.stepobj_list[self.curstep].btnback_clicked(widget, data):
-            self.name_map['mi_main'].set_current_page(self.curstep - 1)
+            #self.name_map['mi_main'].set_current_page(self.curstep - 1)
+            self.btnback_do()
 
     def btnnext_clicked(self, widget, data):
         if self.stepobj_list[self.curstep].btnnext_clicked(widget, data):
             self.btnnext_do()
-
+            
+    def btnback_do(self):
+        self.switch_to_page(self.curstep - 1)
+        
     def btnnext_do(self):
 #  These code will remove special classname from stepobj_list, But we will skip some step rather remove it.
 #
