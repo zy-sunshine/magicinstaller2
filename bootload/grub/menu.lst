@@ -11,7 +11,7 @@ title 安装 Magic Linux
 	kernel /boot/mivmlinuz root=/dev/ram0 vga=788
 	initrd /boot/mirootfs.gz
 
-title 寻找第一个 Linux
+title 搜寻第一个 Linux 系统
     find --set-root --ignore-floppies --ignore-cd /boot/grub/menu.lst
     map () (hd0)
     map (hd0) ()
