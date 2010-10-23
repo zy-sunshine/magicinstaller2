@@ -192,7 +192,6 @@ if mi_config.develmode:
                  'magicstep.py', 'magicpopup.py',
                  'miutil.py',
                  'short_operations.py', 'long_operations.py',
-                 'xmlrpclib.py',
                  'getdev.py']
     depInstall(env, 'root_src', '$destdir$root_libdir', pymodules)
 

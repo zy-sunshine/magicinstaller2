@@ -51,6 +51,9 @@
            tar包中的文件目录结构是以根目录为底层目录的, tar 打包参考命令:
                 tar -czvf tarpkg.tar.gz -C /home/user/pkgfiledir .
                 tar -cjvf tarpkg.tar.bz2 -C /home/user/pkgfiledir .
+           tar 最好遵循固定格式: <tarpkgname>.<arch>.<tartype> 例如
+           foo.i686.tar.bz2 。当然如果没有 arch ，MI 会将其视为 noarch。
+           可用格式有 i386 i486 i586 i686 athlon noarch
         2. 然后修改 spec/specinfo.py 中的 pkgtype 为 "tar" .
         3. scons root.step1 && scons 就可以生成相应的 iso .
         注:  tar 包的安装顺序可以指定, 修改 spec/specinfo.py 中的 basepkg_list 列表即可.

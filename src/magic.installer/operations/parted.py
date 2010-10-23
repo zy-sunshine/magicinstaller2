@@ -115,6 +115,7 @@ elif operation_type == 'long':
                 model = iconv.iconv('gb2312', 'utf8', dev.model).encode('utf8')
                 result.append((dev.path, dev.length, model))
                 all_harddisks[dev.path] = (dev, disk, newdisklabel)
+        dolog('operations.parted.device_probe_all: %s\n' % str(result))
         return  result
 
     def get_all_partitions(mia, operid, devpath):
@@ -161,7 +162,7 @@ elif operation_type == 'long':
                     if part.type & parted.PARTITION_METADATA == 0:
                         result.append(part2result(part))
                     part = part.nextPartition()
-                # Another way to get all partitions, but not include freespace patitions.
+                # Another way to get all partitions, but not include freespace partitions.
                 #for part in disk.partitions:
                 #    result.append(part2result(part))
                     
@@ -170,6 +171,7 @@ elif operation_type == 'long':
                 #    if part.type & parted.PARTITION_METADATA == 0:
                 #        result.append(part2result(part))
                 #    part = disk.next_partition(part)
+        dolog('operations.parted.get_all_partitions: %s\n' % str(result))
         return  result
 
     def get_disk_type(mia, operid, devpath):
