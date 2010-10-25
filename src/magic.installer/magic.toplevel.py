@@ -18,14 +18,20 @@
 
 import os
 import sys
-
+import subprocess
 from mipublic import *
+
+tee_pipe = subprocess.Popen(["/usr/bin/tee", "/var/log/magic.toplevel.log"],
+                            stdin = subprocess.PIPE)
+os.dup2(tee_pipe.stdin.fileno(), sys.stdout.fileno())
+os.dup2(tee_pipe.stdin.fileno(), sys.stderr.fileno())
 
 actserver_pid = os.fork()
 if actserver_pid == 0:
     logfd = os.open('/var/log/magic.actions.server.log', os.O_CREAT | os.O_WRONLY, 0600)
     os.dup2(logfd, 2)
     os.close(logfd)
+    
     magicActionFile = ''
     magicActionFile = search_file('magic.actions.server', [hotfixdir, '/usr/bin'], exit_if_not_found = False) or magicActionFile
     magicActionFile = search_file('magic.actions.server.py', [hotfixdir, '/usr/bin'], exit_if_not_found = False) or magicActionFile
