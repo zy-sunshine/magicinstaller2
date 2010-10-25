@@ -23,6 +23,21 @@ class mistep_dosetup (magicstep.magicstep):
         magicstep.magicstep.__init__(self, rootobj, 'dosetup.xml', 'dosetup')
         self.doing = 1
         self.x_settings = {}
+        
+        # monitor
+        self.monitor_name = ''
+        self.monitor_horiz_sync = ''
+        self.monitor_vert_refresh = ''
+        # videocard
+        self.videocard_name = ''
+        self.videocard_driver = ''
+        self.videocard_videoram = ''
+        # mouse
+        self.mouse_name = ''
+        self.mouse_protocol = ''
+        self.mouse_device = ''
+        self.mouse_xemu3 = ''
+        self.mouse_shortname = ''
 
     def get_label(self):
         return  _("Do Setup")
