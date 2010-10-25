@@ -39,7 +39,7 @@ class mistep_dosetup (magicstep.magicstep):
 
     def probe_videocard_ok(self, operid, data):
         vclist = self.rootobj.tm.results[operid]
-        if len(vclist[0]) == 0:  return
+        if len(vclist) == 0 or len(vclist[0]) == 0:  return
         (vc0name, vc0driver, vc0vidram) = vclist[0]
         #self.set_data(self.rootobj.values, 'Xwindow.videocard.name', vc0name)
         #self.set_data(self.rootobj.values, 'Xwindow.videocard.driver', vc0driver)
