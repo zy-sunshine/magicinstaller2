@@ -65,14 +65,14 @@ class MirootfsMaker(PkgMaker.StepMaker):
         # permision will change.(We create the root.step1.tar.gz and other
         # rootfs tar packages use root user, only correspond with the
         # files' permision, so be careful with your system.:P )
-        cmds = [getSudoSh( 'sudo $pythonbin %s $udev_arg %s' % \
+        cmds = [getSudoSh( '$pythonbin %s $udev_arg %s' % \
                 (mkstep2_script,
                  ' '.join(toextract)) )]
         return toextract + [mkstep2_script], cmds
 
     def run_post_scripts(self):
         # Add some directory, nodes, links and check privilege.
-        cmds = [getSudoSh("sh buildpkg/post_scripts/commands.sh $ROOT"),
+        cmds = [getSudoSh("buildpkg/post_scripts/commands.sh $ROOT"),
                 getSudoSh("install -m 777 buildpkg/post_scripts/commands_chroot.sh $ROOT"),
                 getSudoSh('/usr/sbin/chroot $ROOT /commands_chroot.sh'),
                 getSudoSh('rm $ROOT/commands_chroot.sh'),

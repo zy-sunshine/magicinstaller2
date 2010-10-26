@@ -166,7 +166,9 @@ env.Command(['result/pkgarr.py'],
 if use_cp_mode:
     env.Command([os.path.join(mi_config.rpmdb_dir, '.prepared')],
             ['result/pkgarr.py', 'scripts/GenRpmdb.py'],
-            ['sudo $pythonbin scripts/GenRpmdb.py  -t $rpmdb_dir/tgtsys_root -s $pkgdirs -p result/pkgarr.py -l $tmpdir/GenRpmdb.out.log -e $tmpdir/GenRpmdb.err.log',
+            [getSudoSh("$pythonbin scripts/GenRpmdb.py  -t $rpmdb_dir/tgtsys_root " + \
+                        "-s $pkgdirs -p result/pkgarr.py -l $tmpdir/GenRpmdb.out.log " + \
+                        "-e $tmpdir/GenRpmdb.err.log"),
              '/bin/date > $TARGET'])
     env.Command([rpmdbtar],
             [os.path.join(mi_config.rpmdb_dir,'.prepared')],
