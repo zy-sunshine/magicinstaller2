@@ -24,7 +24,7 @@
 
     rpm 安装模式:
         1. 将所有 rpm 包放在 spec/packages 目录下
-        2. 然后修改 spec/specinfo.py 中的 pkgtype 为 "tar" .
+        2. 然后修改 spec/specinfo.py 中的 pkgtype 为 "rpm" .
         3. scons root.step1 && scons 就可以生成相应的 iso .
         注: rpm 包的安装顺序可以手动调节, 修改 spec/specinfo.py 中的
             basepkg_list, remove_deps, add_deps 参数即可.

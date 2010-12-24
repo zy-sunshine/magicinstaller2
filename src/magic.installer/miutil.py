@@ -18,7 +18,6 @@
 from mipublic import *
 import os
 import sys
-sys.path.insert(0, os.path.join(DATADIR, 'libs'))
 import isys
 
 USE_ISYS = False
@@ -128,7 +127,6 @@ def _init_free_loop():
             pass
     FREE_LOOP = new_free_loop
 _init_free_loop()
-
 
 def remove_empty_dir(dir):
     if not os.path.exists(dir):
@@ -336,8 +334,7 @@ def search_file(filename, pathes,
         if os.access(f, os.R_OK):
             return f
     if exit_if_not_found:
-        os.write(sys.stderr, ("Can't find %s in " % filename) + \
-                 str(pathes))
+        os.write(sys.stderr.fileno(), "Can't find %s in %s\n" % (filename, str(pathes)))
         sys.exit(1)
     return None
 

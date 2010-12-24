@@ -558,7 +558,7 @@ elif operation_type == 'long':
 
     def mount_all_tgtpart(mia, operid, mount_all_list, firstcall):
         global useudev
-
+        errmsg = ''
         if os.path.exists('/tmpfs/debug/nomnttgt'):
             dolog('TURN ON: nomnttgt\n')
         else:
@@ -573,14 +573,29 @@ elif operation_type == 'long':
                         except SystemError, em:
                             errmsg = _('swapon(%s) failed: %s')
                             errmsg = errmsg % (devfn, str(em))
-                            return  errmsg
+                            # 如果出现问题, 我们不返回, 继续之后的操作, 避免不能生成 fstab 的情况.
+                            #return  errmsg
                 else:
+                    # Wait for device block appear.
+                    fblk = False
+                    trycnt = 0
+                    for t in range(5):
+                        if os.system('ls %s' % devfn) == 0:
+                            fblk = True
+                            break
+                        else:
+                            trycnt += 1
+                            time.sleep(1)
+                        
+                    if not fblk:
+                        return _('Not exists device block on %s: \ntry time: %d\n') % (devfn, trycnt)
+
                     realpath = os.path.join(tgtsys_root, mntpoint[1:])
                     ret, mntdir = mount_dev(fstype_map[fstype][0], devfn, realpath)
                     if not ret:
                         errmsg = _('Mount %s on %s as %s failed: %s')
                         errmsg = errmsg % (devfn, realpath, fstype, mntdir)
-                        return  errmsg
+                        #return  errmsg
                 cnt = cnt + 1
                 mia.set_step(operid, cnt, len(mount_all_list))
         # Mount /proc.
@@ -606,8 +621,10 @@ elif operation_type == 'long':
                 if not os.path.isdir(devdir):
                     os.makedirs(devdir)
                 os.system('cp -a /dev/* %s' % devdir)
-
-        return  0
+        if errmsg:
+            return errmsg
+        else:
+            return  0
 
     def umount_all_tgtpart(mia, operid, mount_all_list, lastcall):
         # Umount proc.

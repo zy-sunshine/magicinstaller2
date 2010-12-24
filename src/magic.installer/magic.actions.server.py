@@ -20,10 +20,8 @@ import os
 import xmlrpclib
 import SimpleXMLRPCServer
 import sys
-sys.path.insert(0,'libs')
-import miactions
-
 from mipublic import *
+import miactions
 
 os.chdir(DATADIR)
 

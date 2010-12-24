@@ -16,7 +16,7 @@
 # with this program; if not, write to the Free Software Foundation, 59 Temple
 # Place - Suite 330, Boston, MA 02111-1307, USA.
 changequote(/--, --/)/--
-import os
+import os,sys
 kernelver      = '--/kernelver/--'  # The kernel used by installer.
 distname       = '--/distname/--'
 distver        = '--/distver/--'
@@ -34,6 +34,7 @@ DATADIR        = '--/DATADIR/--'
 CURDIR         = os.path.abspath(os.path.curdir)
 if not os.path.exists(DATADIR):
     DATADIR = CURDIR
+    sys.path.insert(0, os.path.join(CURDIR, 'libs'))
 LIBDIR         = '--/LIBDIR/--'
 MODULEDIR      = '--/MODULEDIR/--'
 OPERATIONDIR   = '--/OPERATIONDIR/--'
@@ -43,8 +44,8 @@ PKGTYPE        = '--/PKGTYPE/--'
 
 full_width     = --/FULL_WIDTH/--
 full_height    = --/FULL_HEIGHT/--
-help_width     = full_width * 0.6
-help_height    = full_height * 0.9
+HELP_WIDTH     = int(full_width * 0.6)
+HELP_HEIGHT    = int(full_height * 0.9)
 
 MBRoot         = '/mnt/MagicBooter'
 

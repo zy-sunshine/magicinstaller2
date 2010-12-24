@@ -72,6 +72,7 @@ class MirootfsMaker(PkgMaker.StepMaker):
 
     def run_post_scripts(self):
         # Add some directory, nodes, links and check privilege.
+        os.chmod('buildpkg/post_scripts/commands.sh', 0777)
         cmds = [getSudoSh("buildpkg/post_scripts/commands.sh $ROOT"),
                 getSudoSh("install -m 777 buildpkg/post_scripts/commands_chroot.sh $ROOT"),
                 getSudoSh('/usr/sbin/chroot $ROOT /commands_chroot.sh'),
