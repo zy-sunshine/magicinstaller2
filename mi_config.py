@@ -7,7 +7,7 @@ import os
 import sys
 
 # Specify the kernel version which used by MI environment.
-mikernelver = '2.6.35.4'
+mikernelver = '2.6.36.2'
 
 # If .distmode exists, enable Distributor Mode
 develmode = not os.path.exists('.distmode')

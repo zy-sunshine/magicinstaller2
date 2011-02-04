@@ -40,7 +40,7 @@ except ImportError:
 
 #import rpmshow
 
-basement_arches = {'i386' : 'y','i586' : 'y', 'i686' : 'y', 'noarch' : 'y'}
+basement_arches = {'i386' : 'y','i586' : 'y', 'i686' : 'y', 'noarch' : 'y', 'x86_64' : 'y'}
 
 instpath = 'root'
 
@@ -70,7 +70,7 @@ def print_rpmfn_map():
    for k in rpmfn_map.keys():
       result = result + "\t'%s': [ %dL,\n" % \
                (k, rpmfn_map[k][pkgpublic.totalsz])
-      result = result + "\t\t'%s',\n" % rpmfn_map[k][pkgpublic.path]
+      result = result + "\t\t%s,\n" % rpmfn_map[k][pkgpublic.path]
       result = result + "\t\t%s," % str(rpmfn_map[k][pkgpublic.group])
       deplist = rpmfn_map[k][pkgpublic.deps]
       if deplist == []:
@@ -164,7 +164,8 @@ for dir in sys.argv[1:]:
       for i in range(n_provides):
          provide_tuple = (rpmfn,
                           provide_version[i],
-                          provide_flags[i])
+                          provide_flags[i], 
+                          rpmarch)
          if provide_map.has_key(provide_name[i]):
             provide_map[provide_name[i]].append(provide_tuple)
          else:
@@ -186,12 +187,12 @@ for dir in sys.argv[1:]:
          if string.find(require_name[i], '/') >= 0:
             file_requires_map[require_name[i]] = 'y'
       # Place n_v_r_key in pkgpublic.pathes position temporary.
-      rpmfn_map[rpmfn] = [0, rpmfnpath, rpmgroup, requires, n_v_r_key]
+      rpmfn_map[rpmfn] = [0, [rpmfnpath, rpmarch, rpmsize], rpmgroup, requires, n_v_r_key]
 
 # Search all keys in file_requires_map.
 for rpmfn in rpmfn_map.keys():
-   os.write(2, 'Reread %s...\n' % rpmfn_map[rpmfn][pkgpublic.path])
-   rpmfd = os.open(rpmfn_map[rpmfn][pkgpublic.path], os.O_RDONLY)
+   os.write(2, 'Reread %s...\n' % rpmfn_map[rpmfn][pkgpublic.path][0])
+   rpmfd = os.open(rpmfn_map[rpmfn][pkgpublic.path][0], os.O_RDONLY)
    hdr = ts.hdrFromFdno(rpmfd)
    os.close(rpmfd)
    for f in hdr[rpm.RPMTAG_FILENAMES]:
@@ -203,13 +204,17 @@ for rpmfn in rpmfn_map.keys():
                      "Warning: '%s' provide '%s', but it is provided by '%s' already. Use '%s'\n" % \
                   (rpmfn, f, file_requires_map[f], file_requires_map[f]))
 
-def get_dep_from_provide_map(require):
+def get_dep_from_provide_map(require, rpmarch):
     reqname = require[0]
     if provide_map.has_key(reqname):
         prov_rpm = provide_map[reqname][0][0]
         if len(provide_map[reqname]) > 1:
             diff_prov = None
             for prov in provide_map[reqname]:
+                # choose the same arch package firstly.
+                if prov[3] == rpmarch:
+                    prov_rpm = prov[0]
+                # Multi provide.
                 if prov[0] != prov_rpm:
                     diff_prov = 1
                     break
@@ -251,7 +256,7 @@ def get_pre_providepkg(require, rpmfn):
                          (rpmfn, reqname))
             return None
     else:
-        req_tuple = get_dep_from_provide_map(require)
+        req_tuple = get_dep_from_provide_map(require, rpmfn_map[rpmfn][pkgpublic.path][1])
         if req_tuple:
             return req_tuple[0]
         else:
@@ -313,7 +318,7 @@ for rpmfn in rpmfn_map.keys():
       # Other ralations ,we can search from provide_map.
       # Additionally, we must check the version(use the flag).
       else:
-         dep_tuple = get_dep_from_provide_map(require)
+         dep_tuple = get_dep_from_provide_map(require, rpmfn_map[rpmfn][pkgpublic.path][1])
          if dep_tuple:
             newrequires.append(dep_tuple)
          else:

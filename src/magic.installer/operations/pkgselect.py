@@ -66,8 +66,6 @@ elif operation_type == 'long':
                        (os.path.basename(new_device),
                         pos_id,
                         os.path.basename(localfn))
-            dolog("tftp upload the file \"%s\" to remote server \"%s\"\n" % (localfn, remotefn) )
-            # If the next step failed, the process will be blocked, print "Transfer time out" at last.
             cli.put(localfn, remotefn)
             # Leave the mntpoint to 0 now because the mntpoint can't be get easily.
             mntpoint = 0
@@ -374,6 +372,7 @@ elif operation_type == 'long':
                 argv = ['-i', '--noorder','--nosuggest',
                         '--force','--nodeps',
                         #'--noscript',       # we use the noscript option
+                        '--ignorearch',
                         '--root', tgtsys_root,
                         pkgpath,
                     ]

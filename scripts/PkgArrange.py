@@ -383,7 +383,7 @@ for arrangement in arrangement_list:
     result = result + sep + "\n["
     sep1 = ''
     for pkginfor in arrangement:
-        pkgname = os.path.basename(pkginfor[pkgpublic.path])
+        pkgname = os.path.basename(pkginfor[pkgpublic.path][0])
         result = result + sep1 + \
                  "\n\t[%dL, '%s',\n" % (pkginfor[pkgpublic.totalsz], pkgname)
         result = result + "\t\t%s," % str(pkginfor[pkgpublic.group])
@@ -405,7 +405,8 @@ for arrangement in arrangement_list:
                     result = result + ',\n'
                 else:
                     result = result + '],'
-        pathes = pkginfor[pkgpublic.pathes]
+        #pathes = pkginfor[pkgpublic.pathes]
+        pathes = [pkginfor[pkgpublic.path]]
         if pathes == []:
             result = result + ' []'
         else:

@@ -110,7 +110,8 @@ if pkg_arr != 'none':
     for pkgtuple in arrangement[set_no]:
         for pkgpathtuple in pkgtuple[pkgpublic.pathes]:
             rpm_files.append(pkgpathtuple[0])
-
+    rpm_files = list(set(rpm_files))
+    
     #  find rsync and use it if possible
     rsync_found = False
     #DISABLE rsync, use ln only now

@@ -8,12 +8,12 @@ distname='MagicLinux'
 
 # distver is used to specify the version of the installed distribution.
 #
-distver='2.5'
+distver='2.6'
 
 # distkernelver is used to specify the kernel version which used by the
 # installed distribution.
 #
-distkernelver='2.6.30.10-smp'
+distkernelver='2.6.36.2-smp'
 
 # pkgtype is used to specify the package management scheme used by the
 # installed distribution. Now only 'rpm' is supported.
@@ -122,33 +122,32 @@ volume_limit_list = [1300*1024*1024, 640*1024*1024, 640*1024*1024]
 #
 
 # Omit it, if use 1 it will work, notice the indent is 4 spaces.
-if 0:
+if 1:
     remove_deps = {
-    'coreutils-7.0-7mgc25.i686.rpm':
-        ['util-linux-ng-2.17.2-2mgc25.i686.rpm',
-         'libcap-2.16-1mgc25.i686.rpm',
-         'gmp-4.2.4-2mgc25.i686.rpm',
-         'ncurses-5.7-2.20090207mgc25.i686.rpm',
-         'grep-2.5.3-2mgc25.i686.rpm',
-         'pam-1.1.0-2mgc25.i686.rpm',
-         'libacl-2.2.47-2mgc25.i686.rpm',
-         'info-4.13-3mgc25.i686.rpm',
-         'libattr-2.4.43-2mgc25.i686.rpm',
+    'binutils-2.20.51.0.12-2mgc26.x86_64.rpm':
+        ['chkconfig-1.3.47-1mgc26.x86_64.rpm',
+         'libstdc++-4.5.1-6mgc26.x86_64.rpm',
+         'libgcc-4.5.1-6mgc26.x86_64.rpm',
         ],
-    'glibc-2.10.1-2mgc25.i686.rpm':
-        ['glibc-common-2.10.1-2mgc25.i686.rpm',
-         'basesystem-25-1mgc25.noarch.rpm',
-         'libgcc-4.4.0-5.i686.rpm',
-         'nss-softokn-freebl-3.12.4-1mgc25.i686.rpm',
+    'glibc-2.12.90-19mgc26.x86_64.rpm':
+        ['nss-softokn-freebl-3.12.9-0.1.beta2mgc26.x86_64.rpm',
+         'libgcc-4.5.1-6mgc26.x86_64.rpm',
+         'basesystem-25-1mgc26.noarch.rpm',
+         'glibc-common-2.12.90-19mgc26.x86_64.rpm',
         ],
-    'binutils-2.19.51.0.2-1mgc25.i686.rpm':
-        ['info-4.13-3mgc25.i686.rpm',
-         'bash-4.0-1mgc25.i686.rpm',
-         'zlib-1.2.3-19mgc25.i686.rpm',
-         'glibc-2.10.1-2mgc25.i686.rpm',
+    'bash-4.1.7-3mgc26.x86_64.rpm':
+        ['glibc-2.12.90-19mgc26.x86_64.rpmglibc-2.12.90-19mgc26.x86_64.rpm',
+         'glibc-common-2.12.90-19mgc26.x86_64.rpm',
+         'ncurses-libs-5.7-9.20101128mgc26.x86_64.rpm',
         ],
-    'bash-4.0-1mgc25.i686.rpm':
-        ['ncurses-libs-5.7-2.20090207mgc25.i686.rpm',
+    'coreutils-8.5-4mgc26.x86_64.rpm':
+        ['coreutils-libs-8.5-4mgc26.x86_64.rpm',
+         'ncurses-5.7-9.20101128mgc26.x86_64.rpm',
+         'libcap-2.17-1mgc26.x86_64.rpm',
+         'libacl-2.2.49-8mgc26.x86_64.rpm',
+         'grep-2.6.3-4mgc26.x86_64.rpm',
+         'pam-1.1.0-2mgc26.x86_64.rpm',
+         'gmp-4.3.1-7mgc26.x86_64.rpm',
         ],
     }
 
@@ -169,8 +168,11 @@ basepkg_list = ['binutils',
                 #'glibc-headers',
                 #'glibc-static',
                 #'glibc-utils',
+                'ncurses-libs',
+                'ncurses',
                 'bash',
                 #'bash-completion',
+                'coreutils-libs', 
                 'coreutils',
              ]
 

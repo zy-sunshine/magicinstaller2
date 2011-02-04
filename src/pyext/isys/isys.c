@@ -193,7 +193,7 @@ static PyObject * checkLoopdevUnused(PyObject * s, PyObject * args){
 
     //Py_INCREF(Py_None);
     //return Py_None;
-    //Py_INCREF(tuple);
+    Py_INCREF(tuple);
     return tuple;
     //return Py_BuildValue("i", !rc);
 

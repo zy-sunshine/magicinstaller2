@@ -1,4 +1,5 @@
 #!/usr/bin/python
+#-*- encoding:GB18030 -*-
 # Copyright (C) 2003, Charles Wang.
 # Author:  Charles Wang <charles@linux.net.cn>
 # All rights reserved.
@@ -294,7 +295,7 @@ class mistep_takeactions(magicstep.magicstepgroup):
             if pkgarchmap.has_key(a):
                 return pkgarchmap[a]
         # It is an error to reach here!!!
-        dolog('Unresolved package: pkg = %s, pkgarchmap = %s, archcompat_list = %s\n' % (pkg, str(pkgarchmap), str(archcompat_list)))
+        dolog('Unresolved package: pkg = %s, pkgarchmap = %s, archcompat_list = %s\n' % (pkg, str(pkgarchmap), str(self.archcompat_list)))
 
     def calc_instpkg_map(self):
         global archsize_map, pkgpos_map, toplevelgrp_map
