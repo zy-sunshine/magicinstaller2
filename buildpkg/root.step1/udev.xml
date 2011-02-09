@@ -71,4 +71,16 @@ lib/libudev.so.0*
 </install>
 </package>
 
+<package>
+<files>util-linux-ng-2.17.2-2mgc25.i686.rpm</files>
+<pre_action>
+# replace it in busybox
+rm $ROOT/sbin/blkid
+</pre_action>
+<install>
+# This is needed by udev for identify ID_FS_TYPE
+sbin/blkid
+</install>
+</package>
+
 </packages>

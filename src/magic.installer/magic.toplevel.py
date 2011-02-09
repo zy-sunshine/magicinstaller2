@@ -20,65 +20,143 @@ import os
 import sys
 import subprocess
 from mipublic import *
+import time
+import signal
 
 tee_pipe = subprocess.Popen(["/usr/bin/tee", "/var/log/magic.toplevel.log"],
                             stdin = subprocess.PIPE)
 os.dup2(tee_pipe.stdin.fileno(), sys.stdout.fileno())
 os.dup2(tee_pipe.stdin.fileno(), sys.stderr.fileno())
 
-actserver_pid = os.fork()
-if actserver_pid == 0:
-    logfd = os.open('/var/log/magic.actions.server.log', os.O_CREAT | os.O_WRONLY, 0600)
-    os.dup2(logfd, 2)
-    os.close(logfd)
-    
-    magicActionFile = ''
-    magicActionFile = search_file('magic.actions.server', [hotfixdir, '/usr/bin'], exit_if_not_found = False) or magicActionFile
-    magicActionFile = search_file('magic.actions.server.py', [hotfixdir, '/usr/bin'], exit_if_not_found = False) or magicActionFile
-    print magicActionFile, 'Runing...'
-    os.execl('/usr/bin/python', '/usr/bin/python', magicActionFile)
+class FlushFile(object):
+    """Write-only flushing wrapper for file-type objects."""
+    def __init__(self, f):
+        self.f = f
+    def write(self, x):
+        self.f.write(x)
+        self.f.flush()
+    def fileno(self):
+        return self.f.fileno()
+    def flush(self):
+        self.f.flush()
 
-# default layout
-layoutopt = 'LayoutFb'
+# Replace stdout with an automatically flushing version
+sys.stdout = FlushFile(sys.__stdout__)
+sys.stderr = FlushFile(sys.__stderr__)
+
+# First is default layout
+layoutopt = ['LayoutFb', 'LayoutVesa']
+
+def file_path(filename):
+    realFile = filename
+    realFile = search_file(filename, [hotfixdir, '/usr/bin'], exit_if_not_found = False) or realFile
+    realFile = search_file(filename+'.py', [hotfixdir, '/usr/bin'], exit_if_not_found = False) or realFile
+    return realFile
+
+def start_server(args, logfn):
+    pid = os.fork()
+    if pid == 0:
+        logfd = os.open(logfn, os.O_CREAT | os.O_WRONLY, 0600)
+        os.dup2(logfd, sys.stderr.fileno())
+        os.dup2(logfd, sys.stdout.fileno())
+        os.close(logfd) 
+        os.execl(args[0], *args)
+    return pid
+
+def start_gui(args, logfn, layoutopt):
+    ppid = os.fork()
+    if ppid == 0:
+        ret = 1
+        pid = None
+        def handler(signum, frame):
+            if pid:
+                os.kill(pid, signum)
+        signal.signal(signal.SIGQUIT, handler)
+        for layout in layoutopt:
+            pid = os.fork()
+            if pid == 0:
+                logfd = os.open(logfn, os.O_CREAT | os.O_WRONLY, 0600)
+                os.dup2(logfd, sys.stderr.fileno())
+                os.dup2(logfd, sys.stdout.fileno())
+                os.close(logfd)
+                args.extend(['-layout', layout])
+                os.execl(args[0], *args)
+            status = 1
+            try:
+                if pid:
+                    status = os.waitpid(pid, 0)[1]
+            except OSError, e:
+                if e.errno == 4:
+                    # Interrupted system call, we don't really care about it.
+                    status = 0
+                    pass
+            if status == 0:
+                ret = 0
+                break
+            else:
+                # resort to other layout if failed
+                ret = 2
+                print '\nWarning: Fall back to %s.' % layout
+                print 'Pausing for 5 seconds...'
+                time.sleep(5)
+        os._exit(ret)
+    return ppid
+
+# Run logger Server
+runfile = file_path('magic.actions.logger')
+print runfile, "Running..."
+logger_server_pid = start_server(['/usr/bin/python', runfile], 
+        '/var/log/magic.actions.logger.log')
+time.sleep(1)
+
+# Run logger GUI
+runfile = file_path('magic.logger')
+print runfile, "Running..."
+p_logger_pid = start_gui(['/usr/bin/xinit', '/usr/bin/python',
+                 runfile, '--', '/usr/bin/X', ':1'],
+                '/var/log/magic.logger.log', layoutopt)
+time.sleep(1)
+
+# Run MI Server
+runfile = file_path('magic.actions')
+print runfile, "Running..."
+server_pid = start_server(['/usr/bin/python', runfile], 
+        '/var/log/magic.actions.log')
+time.sleep(1)
+
+# Run MI GUI
+runfile = file_path('magic.installer')
+print runfile, "Running..."
+p_installer_pid = start_gui(['/usr/bin/xinit', '/usr/bin/python',
+                 runfile, '--', '/usr/bin/X', ':0'],
+                '/var/log/magic.installer.log', layoutopt)
+
+def wait_pid(pid):
+    if pid:
+        try:
+            os.waitpid(pid, 0)
+        except OSError, e:
+            print str(e)
+            print "wait pid %s failed" % pid
+wait_pid(p_installer_pid)
+os.kill(p_logger_pid, signal.SIGQUIT)
+wait_pid(p_logger_pid)
+os.system("%s > /dev/null 2>&1" % file_path("magic.actions.quit"))
+os.system("%s > /dev/null 2>&1" % file_path("magic.actions.logger.quit"))
+wait_pid(server_pid)
+wait_pid(logger_server_pid)
+
+#os.waitpid(actserver_pid, 0)
+#os.waitpid(gui_pid, 0)
 
 # probe for intel i8xx video cards
-import  rhpxl.videocard
-vci = rhpxl.videocard.VideoCardInfo()
-for vc in vci.videocards:
-    if vc.getDriver() == 'i810':
-        #os.system('/sbin/modprobe agpgart')
-        layoutopt = 'LayoutI810'
-        break
-while layoutopt:
-    gui_pid = os.fork()
-    if gui_pid == 0:
-#        logfd_inst = os.open('/var/log/magic.installer.2.log', os.O_CREAT | os.O_WRONLY, 0600)
-#        os.dup2(logfd_inst, 2)
-#        os.close(logfd_inst)
-#        logfd_inst = os.open('/var/log/magic.installer.1.log', os.O_CREAT | os.O_WRONLY, 0600)
-#        os.dup2(logfd_inst, 1)
-#        os.close(logfd_inst)
-        magicInstallerFile = ''
-        magicInstallerFile = search_file('magic.installer', [hotfixdir, '/usr/bin'], exit_if_not_found = False) or magicInstallerFile
-        magicInstallerFile = search_file('magic.installer.py', [hotfixdir, '/usr/bin'], exit_if_not_found = False) or magicInstallerFile
-        print magicInstallerFile, 'Runing...'
-        os.execl('/usr/bin/xinit', '/usr/bin/xinit', '/usr/bin/python',
-                 magicInstallerFile, '--',
-                 '/usr/bin/X', '-layout', layoutopt, ':0')
-
-    status = os.waitpid(gui_pid, 0)[1]
-    # resort to VESA if failed
-    if status == 0 or layoutopt == 'LayoutVesa':
-        layoutopt = ''
-    else:
-        import time
-        print '\nWarning: Fall back to VESA.'
-        print 'Pausing for 5 seconds...'
-        time.sleep(5)
-        layoutopt = 'LayoutVesa'
-
-os.waitpid(actserver_pid, 0)
-#os.waitpid(gui_pid, 0)
+#import  rhpxl.videocard
+#vci = rhpxl.videocard.VideoCardInfo()
+#for vc in vci.videocards:
+#    if vc.getDriver() == 'i810':
+#        #os.system('/sbin/modprobe agpgart')
+#        layoutopt = 'LayoutI810'
+#        break
 
 ## The follow code is deprecated.
 ##videos = kudzu.probe(kudzu.CLASS_VIDEO, kudzu.BUS_PCI, kudzu.PROBE_ALL)

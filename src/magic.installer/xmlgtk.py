@@ -22,6 +22,7 @@ import gtk
 import string
 import types
 from gettext import gettext as _
+import pdb
 
 def __(str):
     if not str:
@@ -553,11 +554,11 @@ class xmlgtk:
         tv.set_editable(False)
         tv.set_cursor_visible(False)
         tv.set_wrap_mode(wrap_mode)
-
+        
         iter = buffer.get_iter_at_offset(0)
         buffer.insert(iter, data)
         return  widget
-
+        
     def xgc_button(self, node):
         label = __(node.getAttribute('label'))
         if label:
@@ -609,25 +610,27 @@ class xmlgtk:
 
     def xgc_optionmenu(self, node):
         values = []
-        menu = gtk.Menu()
+        widget = gtk.ComboBox()
+        menu = gtk.ListStore(str)
+        cell = gtk.CellRendererText()
+        widget.pack_start(cell)
+        widget.add_attribute(cell, 'text', 0)
         for itemnode in node.getElementsByTagName('value'):
             valstr = itemnode.getAttribute('valstr')
-            str = ''
+            tmpstr = ''
             for subnode in itemnode.childNodes:
                 if subnode.nodeType == subnode.TEXT_NODE:
-                    str = str + subnode.data
+                    tmpstr = tmpstr + subnode.data
             if valstr:
                 values.append(valstr)
             else:
-                values.append(str)
-            menu_item = gtk.MenuItem(__(str))
-            menu_item.show()
+                values.append(tmpstr)
+            menu.append([__(tmpstr)])
             name = itemnode.getAttribute('name')
             if name:
-                self.name_map[name] = menu_item
-            gtk.MenuShell.append(menu, menu_item)
-        widget = gtk.OptionMenu()
-        widget.set_menu(menu)
+                pass
+                #self.name_map[name] = menu_item
+        widget.set_model(menu)
         self._xgc_connect(widget, node, 'changed')
         value = node.getAttribute('value')
         if value:
@@ -695,10 +698,7 @@ class xmlgtk:
         return widget
 
     def xgc_combo(self, node):
-        widget = gtk.Combo()
-        editable = node.getAttribute('editable')
-        if editable == 'false':
-            widget.entry.set_editable(False)
+        items = gtk.ListStore(str)
         values = []
         for subnode in node.getElementsByTagName('value'):
             valuestr = ''
@@ -706,11 +706,14 @@ class xmlgtk:
                 if subsubnode.nodeType == subsubnode.TEXT_NODE:
                     valuestr = valuestr + subsubnode.data
             values.append(__(valuestr))
-        if len(values) > 0:
-            widget.set_popdown_strings(values)
+            items.append([__(valuestr)])
+        widget = gtk.ComboBoxEntry(items)
+        editable = node.getAttribute('editable')
+        if editable == 'false':
+            widget.set_sensitive(False)
         value = node.getAttribute('value')
         if value:
-            self.combo_map[widget] = value
+            self.combo_map[widget] = (value, values)
         return widget
 
     def xgc_image(self, node):
@@ -884,7 +887,7 @@ class xmlgtk:
                 else:
                     collist.append('')
             elif storelist[i] == gobject.type_from_name('GdkPixbuf'):
-                if type(value) == types.StringType:
+                if type(value) == types.StringType or type(value) == types.UnicodeType:
                     pixbuf = self.get_pixbuf_map(value)
                 else:
                     pixbuf = value
@@ -924,7 +927,7 @@ class xmlgtk:
             value = self.get_data(data_xml, self.optionmenu_map[widget][0])
             for i in range(len(self.optionmenu_map[widget][1])):
                 if self.optionmenu_map[widget][1][i] == value:
-                    widget.set_history(i)
+                    widget.set_active(i)
                     break
         for model in self.list_map.keys():
             cur_node = self.srh_data_node(data_xml, self.list_map[model][0])
@@ -957,7 +960,15 @@ class xmlgtk:
         for widget in self.spinbutton_map.keys():
             widget.set_value(float(self.get_data(data_xml, self.spinbutton_map[widget])))
         for widget in self.combo_map.keys():
-            widget.entry.set_text(self.get_data(data_xml, self.combo_map[widget]))
+            value = self.get_data(data_xml, self.combo_map[widget][0])
+            has_find = False
+            for i in range(len(self.combo_map[widget][1])):
+                if self.combo_map[widget][1][i] == value:
+                    widget.set_active(i)
+                    has_find = True
+                    break
+            if not has_find:
+                widget.child.set_text(self.get_data(data_xml, self.combo_map[widget][0]))
         for enable in self.enable_map.keys():
             self.enable_toggle(self.name_map[enable], enable)
         for disable in self.disable_map.keys():
@@ -983,7 +994,7 @@ class xmlgtk:
         elif w_type is gtk.Label:
             w.get_text(value)
         elif w_type is gtk.OptionMenu:
-            return self.optionmenu_map[w][1][w.get_history()]
+            return self.optionmenu_map[w][1][w.get_active()]
         elif w_type is gtk.CheckButton:
             return xgc_true_false(w.get_active())
         elif w_type is gtk.RadioButton:
@@ -996,7 +1007,7 @@ class xmlgtk:
             w.update()
             return str(w.get_value())
         elif w_type is gtk.Combo:
-            return w.entry.get_text()
+            return w.child.get_text()
         else:
             raise Exception("Unsupported type %s of widget %s" %
                             (str(w_type), widget_name))
@@ -1012,7 +1023,7 @@ class xmlgtk:
         elif w_type is gtk.OptionMenu:
             for i, v in enumerate(self.optionmenu_map[widget][1]):
                 if v == value:
-                    w.set_history(i)
+                    w.set_active(i)
                     break
         elif w_type is gtk.CheckButton:
             w.set_active(xgc_get_bool(value))
@@ -1025,7 +1036,7 @@ class xmlgtk:
         elif w_type is gtk.SpinButton:
             w.set_value(float(value))
         elif w_type is gtk.Combo:
-            w.entry.set_text(value)
+            w.child.set_text(value)
         else:
             raise Exception("Unsupported type %s of widget %s" %
                             (str(w_type), widget_name))
@@ -1076,10 +1087,14 @@ class xmlgtk:
             if valuename_list and \
                     valuename not in valuename_list:
                 continue
+            try:
+                value = self.optionmenu_map[widget][1] \
+                              [widget.get_active()]
+            except IndexError:
+                value = widget.get_model()[widget.get_active()][0]
             self.set_data(data_xmldoc,
                           valuename,
-                          self.optionmenu_map[widget][1] \
-                              [widget.get_history()])
+                          value)
 
         for model in self.list_map.keys():
             if self.readonly_map.has_key(model):
@@ -1127,13 +1142,13 @@ class xmlgtk:
                           str(widget.get_value()))
 
         for widget in self.combo_map.keys():
-            valuename = self.combo_map[widget]
+            valuename = self.combo_map[widget][0]
             if valuename_list and \
                     valuename not in valuename_list:
                 continue
             self.set_data(data_xmldoc,
                           valuename,
-                          widget.entry.get_text())
+                          widget.child.get_text())
 
     # Some additional function to help the operation of list.
     def srh_model(self, valuename):

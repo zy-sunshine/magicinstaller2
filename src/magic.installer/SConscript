@@ -25,11 +25,11 @@ Import('*')
 env = env.Clone()
 
 TOPSRCDIR = os.path.abspath('.')
-POTFILES = ['magic.installer.py', 'magicstep.py', 'magicpopup.py', 'xmlgtk.py'] \
+POTFILES = ['magic.installer.py', 'magicstep.py', 'magicpopup.py', 'xmlgtk.py', 'magic.logger.py'] \
            + glob.glob('modules/*.py') + glob.glob('operations/*.py') + \
            glob.glob('games/*.py')
-POTXMLS = ['magic.installer.xml', 'magic.autopart.xml'] + glob.glob('UIxml/*.xml') + \
-          glob.glob('games/*.xml')
+POTXMLS = ['magic.installer.xml', 'magic.autopart.xml', 'magic.logger.xml'] + glob.glob('UIxml/*.xml') + \
+          glob.glob('games/*.xml') + ['UIxml/takeactions.xml.cpinstmode']
 
 env.Command('mipublic.py', 'm4.mipublic.py',
             'm4 -DFULL_WIDTH=$full_width -DFULL_HEIGHT=$full_height' + \
@@ -86,8 +86,11 @@ if mi_config.develmode:
 
     bin_programs = ['magic.toplevel',        # MagicInstaller Toplevel Controller.
                     'magic.installer',       # MagicInstaller GUI.
-                    'magic.actions.server',  # MagicInstaller Actions Sevrer.
-                    'magic.actions.quit']    # Just a test script. It force the Actions Server quit.
+                    'magic.actions',  # MagicInstaller Actions Sevrer.
+                    'magic.actions.quit',    # Just a test script. It force the Actions Server quit.
+                    'magic.actions.logger',
+                    'magic.actions.logger.quit',
+                    'magic.logger']
 
     for bp in bin_programs:
         env['_bp'] = bp
@@ -96,7 +99,7 @@ if mi_config.develmode:
                       'chmod +x $destdir$root_bindir/${_bp}')
     del env['_bp']
 
-    pydatas = ['magic.installer.xml', 'magic.values.xml']
+    pydatas = ['magic.installer.xml', 'magic.values.xml','magic.logger.xml']
     depInstall(env, 'root_src', '$destdir$root_datadir', pydatas)
 
     def gen_magic_values_m4defs(target, source, env):
@@ -192,7 +195,7 @@ if mi_config.develmode:
                  'magicstep.py', 'magicpopup.py',
                  'miutil.py',
                  'short_operations.py', 'long_operations.py',
-                 'getdev.py']
+                 'getdev.py', 'magictaskman.py']
     depInstall(env, 'root_src', '$destdir$root_libdir', pymodules)
 
     #for pym in pymodules:

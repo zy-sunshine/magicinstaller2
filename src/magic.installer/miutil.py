@@ -52,7 +52,7 @@ class NamedTuple(tuple):
         idx = self.attr_order.index(attr)
         return self[idx]
 
-def run_bash(cmd, argv, root='/'):
+def run_bash(cmd, argv=[], root='/'):
     import subprocess
     def chroot():
         os.chroot(root)

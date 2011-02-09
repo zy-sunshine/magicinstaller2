@@ -15,7 +15,7 @@ def write_xml(*args):
     f = file('test-xmlgtk-data.result.xml', 'w')
     xml_data.writexml(f)
     f.close()
-    gtk.mainquit()
+    gtk.main_quit()
 
 window = gtk.Window(gtk.WINDOW_TOPLEVEL)
 window.connect("destroy", write_xml)
