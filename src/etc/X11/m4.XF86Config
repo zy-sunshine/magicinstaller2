@@ -48,6 +48,8 @@ Section "InputDevice"
 	Option		"Device"	"/dev/psaux"
 	Option		"Emulate3Buttons"	"no"
 	Option		"ZAxisMapping"	"4 5"
+    Option      "Resolution"    "64"
+    Option      "Sensitivity"   "0.35"
 EndSection
 
 Section "InputDevice"
@@ -57,6 +59,8 @@ Section "InputDevice"
 	Option		"Device"	"/dev/input/mice"
 	Option		"Emulate3Buttons"	"no"
 	Option		"ZAxisMapping"	"4 5"
+    Option      "Resolution"    "64"
+    Option      "Sensitivity"   "0.35"
 EndSection
 
 Section "Monitor"

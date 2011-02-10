@@ -477,7 +477,7 @@ class mistep_parted (magicstep.magicstep):
                 self.upobj.update_create_labels()
 
             def parttype_changed(self, optmenu, data):
-                if optmenu.get_history() == 1:
+                if optmenu.get_active() == 1:
                     # This means the user choose to create an Extended Partition.
                     for widget in self.group_map['noextend']:
                         widget.set_sensitive(False)
@@ -526,7 +526,7 @@ class mistep_parted (magicstep.magicstep):
                 self.aedialog.name_map['mountpoint_combo'].hide()
                 self.aedialog.name_map['swapbox'].hide()
             else:
-                if optmenu.get_history() == fstype_swap_index:
+                if optmenu.get_active() == fstype_swap_index:
                     self.aedialog.name_map['mountpoint_label'].hide()
                     self.aedialog.name_map['mountpoint_combo'].hide()
                     self.aedialog.name_map['swapbox'].show()
@@ -538,7 +538,7 @@ class mistep_parted (magicstep.magicstep):
                 omval = self.aedialog.optionmenu_map[optmenu][1]
                 for i in range(len(omval)):
                     if omval[i] == self.orig_fs:
-                        optmenu.set_history(i)
+                        optmenu.set_active(i)
                         break
 
         def create_clicked(self, widget, data):

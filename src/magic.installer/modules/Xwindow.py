@@ -179,7 +179,7 @@ class mistep_Xwindow (magicstep.magicstepgroup):
 
     def widemode_res_changed(self, optmenu, data):
         res_om = self.name_map["widemode_res_om"]
-        val = self.optionmenu_map[res_om][1][res_om.get_history()]
+        val = self.optionmenu_map[res_om][1][res_om.get_active()]
         x, y = val.split('x')
         self.name_map["widemode_x_entry"].set_text(x);
         self.name_map["widemode_y_entry"].set_text(y);

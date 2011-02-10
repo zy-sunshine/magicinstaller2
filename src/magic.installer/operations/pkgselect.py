@@ -371,11 +371,12 @@ elif operation_type == 'long':
                 cmd = '/bin/rpm'
                 argv = ['-i', '--noorder','--nosuggest',
                         '--force','--nodeps',
-                        #'--noscript',       # we use the noscript option
+                        #'--noscript',       # use the noscript option
                         '--ignorearch',
                         '--root', tgtsys_root,
                         pkgpath,
                     ]
+                #cmd_res = {'err':[], 'std': [], 'ret':0}   # DEBUG
                 cmd_res = run_bash(cmd, argv)
                 # Sign the installing pkg name in stderr
                 if cmd_res['err']:

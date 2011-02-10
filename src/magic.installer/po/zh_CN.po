@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: magic.installer 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-02-10 00:34+0800\n"
-"PO-Revision-Date: 2011-02-10 00:35+0800\n"
+"POT-Creation-Date: 2011-02-10 23:50+0800\n"
+"PO-Revision-Date: 2011-02-10 23:51+0800\n"
 "Last-Translator: zy_sunshine <zy.netsec@gmail.com>\n"
 "Language-Team: zh_CN <i18n-translation@lists.linux.net.cn>\n"
 "MIME-Version: 1.0\n"
@@ -551,7 +551,7 @@ msgid "Install Package"
 msgstr "安装软件包"
 
 #: src/magic.installer/modules/takeactions.py:107
-#: src/magic.installer/modules/takeactions.py:534
+#: src/magic.installer/modules/takeactions.py:552
 msgid "Make initrd"
 msgstr "制作 initrd"
 
@@ -559,33 +559,33 @@ msgstr "制作 initrd"
 msgid "Install Bootloader"
 msgstr "安装引导管理器"
 
-#: src/magic.installer/modules/takeactions.py:115
+#: src/magic.installer/modules/takeactions.py:117
 msgid "Take Actions"
 msgstr "实施安装"
 
-#: src/magic.installer/modules/takeactions.py:185
+#: src/magic.installer/modules/takeactions.py:187
 msgid "Get all dirty disk"
 msgstr "获取所有受影响的硬盘"
 
-#: src/magic.installer/modules/takeactions.py:205
+#: src/magic.installer/modules/takeactions.py:207
 #, python-format
 msgid "Write the partition table of %s."
 msgstr "写入 %s 的分区表。"
 
-#: src/magic.installer/modules/takeactions.py:250
+#: src/magic.installer/modules/takeactions.py:252
 msgid "Mount all target partitions."
 msgstr "加载所有目标分区。"
 
-#: src/magic.installer/modules/takeactions.py:273
+#: src/magic.installer/modules/takeactions.py:275
 #, python-format
 msgid "Format Partition Error: %s"
 msgstr "格式化磁盘错误: %s"
 
-#: src/magic.installer/modules/takeactions.py:347
+#: src/magic.installer/modules/takeactions.py:349
 msgid "Search packages"
 msgstr "搜索软件包"
 
-#: src/magic.installer/modules/takeactions.py:400
+#: src/magic.installer/modules/takeactions.py:402
 #, python-format
 msgid ""
 "Can't find packages in disc %d.\n"
@@ -594,25 +594,25 @@ msgstr ""
 "无法找到碟片 %d 中的包。\n"
 "如果您正使用 CDROM 安装系统，请此时弹出光碟并插入第 %d 张碟。"
 
-#: src/magic.installer/modules/takeactions.py:410
+#: src/magic.installer/modules/takeactions.py:412
 msgid "Last operations for package installation"
 msgstr "包安装的最后操作"
 
-#: src/magic.installer/modules/takeactions.py:417
-#: src/magic.installer/modules/takeactions.py:424
-#: src/magic.installer/modules/takeactions.py:433
+#: src/magic.installer/modules/takeactions.py:419
+#: src/magic.installer/modules/takeactions.py:426
+#: src/magic.installer/modules/takeactions.py:435
 msgid "Researching packages..."
 msgstr "正在重新搜索软件包..."
 
-#: src/magic.installer/modules/takeactions.py:440
+#: src/magic.installer/modules/takeactions.py:442
 msgid "Aborting..."
 msgstr "正在取消..."
 
-#: src/magic.installer/modules/takeactions.py:448
+#: src/magic.installer/modules/takeactions.py:450
 msgid "Umount the target filesystem(s)."
 msgstr "卸载目标文件系统。"
 
-#: src/magic.installer/modules/takeactions.py:457
+#: src/magic.installer/modules/takeactions.py:459
 msgid ""
 "Click \"OK\" to reboot your system!\n"
 "Eject the cdrom if you are installed from cdrom."
@@ -620,23 +620,28 @@ msgstr ""
 "点击“确认”以重新启动您的系统！\n"
 "如果您是光盘安装，请弹出光盘。"
 
-#: src/magic.installer/modules/takeactions.py:531
+#: src/magic.installer/modules/takeactions.py:477
+#, python-format
+msgid "Target System Arch %s is not Compatible with package arch %s"
+msgstr "目标系统的体系结构 %s 与您选择安装的包不兼容 %s"
+
+#: src/magic.installer/modules/takeactions.py:549
 msgid "Generate modprobe.conf"
 msgstr "生成 modprobe.conf"
 
-#: src/magic.installer/modules/takeactions.py:572
+#: src/magic.installer/modules/takeactions.py:590
 msgid "Prepare bootloader"
 msgstr "准备引导管理器"
 
-#: src/magic.installer/modules/takeactions.py:582
+#: src/magic.installer/modules/takeactions.py:600
 msgid "Umount all target partitions before bootloader setup."
 msgstr "设置引导管理器之前卸载所有目标分区。"
 
-#: src/magic.installer/modules/takeactions.py:588
+#: src/magic.installer/modules/takeactions.py:606
 msgid "Setup bootloader"
 msgstr "设置引导管理器"
 
-#: src/magic.installer/modules/takeactions.py:593
+#: src/magic.installer/modules/takeactions.py:611
 msgid "Mount all target partitions after bootloader setup."
 msgstr "设置引导管理器之后加载所有目标分区。"
 

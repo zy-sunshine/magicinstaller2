@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-02-10 00:34+0800\n"
+"POT-Creation-Date: 2011-02-10 23:50+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -554,7 +554,7 @@ msgid "Install Package"
 msgstr ""
 
 #: src/magic.installer/modules/takeactions.py:107
-#: src/magic.installer/modules/takeactions.py:534
+#: src/magic.installer/modules/takeactions.py:552
 msgid "Make initrd"
 msgstr ""
 
@@ -562,33 +562,33 @@ msgstr ""
 msgid "Install Bootloader"
 msgstr ""
 
-#: src/magic.installer/modules/takeactions.py:115
+#: src/magic.installer/modules/takeactions.py:117
 msgid "Take Actions"
 msgstr ""
 
-#: src/magic.installer/modules/takeactions.py:185
+#: src/magic.installer/modules/takeactions.py:187
 msgid "Get all dirty disk"
 msgstr ""
 
-#: src/magic.installer/modules/takeactions.py:205
+#: src/magic.installer/modules/takeactions.py:207
 #, python-format
 msgid "Write the partition table of %s."
 msgstr ""
 
-#: src/magic.installer/modules/takeactions.py:250
+#: src/magic.installer/modules/takeactions.py:252
 msgid "Mount all target partitions."
 msgstr ""
 
-#: src/magic.installer/modules/takeactions.py:273
+#: src/magic.installer/modules/takeactions.py:275
 #, python-format
 msgid "Format Partition Error: %s"
 msgstr ""
 
-#: src/magic.installer/modules/takeactions.py:347
+#: src/magic.installer/modules/takeactions.py:349
 msgid "Search packages"
 msgstr ""
 
-#: src/magic.installer/modules/takeactions.py:400
+#: src/magic.installer/modules/takeactions.py:402
 #, python-format
 msgid ""
 "Can't find packages in disc %d.\n"
@@ -596,47 +596,52 @@ msgid ""
 "original disc and insert the %d disc."
 msgstr ""
 
-#: src/magic.installer/modules/takeactions.py:410
+#: src/magic.installer/modules/takeactions.py:412
 msgid "Last operations for package installation"
 msgstr ""
 
-#: src/magic.installer/modules/takeactions.py:417
-#: src/magic.installer/modules/takeactions.py:424
-#: src/magic.installer/modules/takeactions.py:433
+#: src/magic.installer/modules/takeactions.py:419
+#: src/magic.installer/modules/takeactions.py:426
+#: src/magic.installer/modules/takeactions.py:435
 msgid "Researching packages..."
 msgstr ""
 
-#: src/magic.installer/modules/takeactions.py:440
+#: src/magic.installer/modules/takeactions.py:442
 msgid "Aborting..."
 msgstr ""
 
-#: src/magic.installer/modules/takeactions.py:448
+#: src/magic.installer/modules/takeactions.py:450
 msgid "Umount the target filesystem(s)."
 msgstr ""
 
-#: src/magic.installer/modules/takeactions.py:457
+#: src/magic.installer/modules/takeactions.py:459
 msgid ""
 "Click \"OK\" to reboot your system!\n"
 "Eject the cdrom if you are installed from cdrom."
 msgstr ""
 
-#: src/magic.installer/modules/takeactions.py:531
+#: src/magic.installer/modules/takeactions.py:477
+#, python-format
+msgid "Target System Arch %s is not Compatible with package arch %s"
+msgstr ""
+
+#: src/magic.installer/modules/takeactions.py:549
 msgid "Generate modprobe.conf"
 msgstr ""
 
-#: src/magic.installer/modules/takeactions.py:572
+#: src/magic.installer/modules/takeactions.py:590
 msgid "Prepare bootloader"
 msgstr ""
 
-#: src/magic.installer/modules/takeactions.py:582
+#: src/magic.installer/modules/takeactions.py:600
 msgid "Umount all target partitions before bootloader setup."
 msgstr ""
 
-#: src/magic.installer/modules/takeactions.py:588
+#: src/magic.installer/modules/takeactions.py:606
 msgid "Setup bootloader"
 msgstr ""
 
-#: src/magic.installer/modules/takeactions.py:593
+#: src/magic.installer/modules/takeactions.py:611
 msgid "Mount all target partitions after bootloader setup."
 msgstr ""
 

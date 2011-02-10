@@ -28,7 +28,7 @@ class mistep_takeactions(magicstep.magicstepgroup):
             self.topwin.add(self.widget)
             self.topwin.show()
             self.topwin.window.set_cursor(gtk.gdk.Cursor(gtk.gdk.LEFT_PTR))
-
+            
         def btntheme_clicked(self, widget, data):
             self.upobj.rootobj.btntheme_clicked(widget, data)
 
@@ -110,7 +110,9 @@ class mistep_takeactions(magicstep.magicstepgroup):
         self.actpos = 0
         self.discdlg_open_time = -1
         self.installmode = 'rpminstallmode'   # Default
-
+        self.minorarch_pkgs = []
+        self.minorarch_later = True     # push back minor arch packages
+            
     def get_label(self):
         return  _('Take Actions')
 
@@ -469,13 +471,29 @@ class mistep_takeactions(magicstep.magicstepgroup):
         while pkg_no < len(arrangement[disc_no]):
             pkgtuple = arrangement[disc_no][pkg_no]
             if self.install_allpkg or self.instpkg_map.has_key(pkgtuple[1]):
-                (apkg, aarch, asize) = self.pkg2archpkg(pkgtuple[1])
+                archpkg = self.pkg2archpkg(pkgtuple[1])
+                if not archpkg:
+                    data = (disc_no, pkg_no, 0, False)
+                    msg = _("Target System Arch %s is not Compatible with package arch %s" % (self.arch, pkgtuple[1]))
+                    self.rpmerrdialog(self, self.uixmldoc, msg, 'rpmerr.dialog', data)
+                    return
+                (apkg, aarch, asize) = archpkg
+                if self.minorarch_later and aarch != "noarch" and aarch != self.arch:
+                    self.minorarch_pkgs.append((apkg, aarch, asize))
+                    pkg_no = pkg_no + 1
+                    continue
                 apkg = os.path.basename(apkg)
                 self.add_action(apkg,
                                 self.act_instpkg_pkg_end, (disc_no, pkg_no, asize, False),
                                 'package_install', apkg, self.probe_all_disc_result[disc_no][1])
                 return
             pkg_no = pkg_no + 1
+        if self.minorarch_later and self.minorarch_pkgs:
+            (apkg, aarch, asize) = self.minorarch_pkgs.pop(0)
+            self.add_action(apkg,
+                            self.act_instpkg_pkg_end, (disc_no, pkg_no, asize, False),
+                            'package_install', apkg, self.probe_all_disc_result[disc_no][1])
+            return
         (pafile, dev, mntpoint, fstype, dir, isofn) = choosed_patuple
         self.add_action(None,
                         self.act_instpkg_disc_start, disc_no + 1,
