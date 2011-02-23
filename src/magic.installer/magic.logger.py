@@ -216,7 +216,7 @@ class magic_logger (xmlgtk.xmlgtk):
         logfile = ""
         dialog = gtk.FileChooserDialog( _('Select...'), 
                                         None, 
-                                        gtk.FILE_CHOOSER_ACTION_OPEN,
+                                        gtk.FILE_CHOOSER_ACTION_SELECT_FOLDER,
                                         (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
                                         gtk.STOCK_OPEN, gtk.RESPONSE_OK))
         dialog.set_default_response(gtk.RESPONSE_OK)
@@ -285,8 +285,9 @@ class magic_logger (xmlgtk.xmlgtk):
         self.quit()
         
     def quit(self):
-        self.tm.add_action(None, None, None, 'quit', 0)
-        
+        #self.tm.add_action(None, None, None, 'quit', 0)
+        gtk.main_quit()
+
 xgobj = magic_logger(xml_interface)
 
 def handler(signum, frame):

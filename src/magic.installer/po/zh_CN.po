@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: magic.installer 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-02-10 23:50+0800\n"
-"PO-Revision-Date: 2011-02-10 23:51+0800\n"
+"POT-Creation-Date: 2011-02-23 20:52+0800\n"
+"PO-Revision-Date: 2011-02-23 20:56+0800\n"
 "Last-Translator: zy_sunshine <zy.netsec@gmail.com>\n"
 "Language-Team: zh_CN <i18n-translation@lists.linux.net.cn>\n"
 "MIME-Version: 1.0\n"
@@ -16,9 +16,9 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 #: src/magic.installer/magic.installer.py:373
-#: src/magic.installer/po/xmltranslation.py:190
-#: src/magic.installer/po/xmltranslation.py:242
-#: src/magic.installer/po/xmltranslation.py:297
+#: src/magic.installer/po/xmltranslation.py:191
+#: src/magic.installer/po/xmltranslation.py:244
+#: src/magic.installer/po/xmltranslation.py:299
 msgid "Theme Choice"
 msgstr "场景选择"
 
@@ -252,7 +252,7 @@ msgstr "由于您将口令设为空，您将无法直接登录该用户。"
 #. TO_TRANSLATOR: All of these strings are extracted from xml file: src/magic.installer/UIxml/mouse.xml.
 #: src/magic.installer/modules/mouse.py:24
 #: src/magic.installer/po/xmltranslation.py:164
-#: src/magic.installer/po/xmltranslation.py:278
+#: src/magic.installer/po/xmltranslation.py:280
 msgid "Mouse"
 msgstr "鼠标"
 
@@ -526,66 +526,66 @@ msgstr "请不要删除即将安装的系统的启动条目。"
 msgid "Test"
 msgstr "测试"
 
-#: src/magic.installer/modules/takeactions.py:37
+#: src/magic.installer/modules/takeactions.py:40
 msgid "XGlines"
 msgstr "XGlines"
 
-#: src/magic.installer/modules/takeactions.py:44
+#: src/magic.installer/modules/takeactions.py:47
 msgid "helptext/games.xglines.en.txt"
 msgstr "helptext/games.xglines.gb.utf8.txt"
 
-#: src/magic.installer/modules/takeactions.py:57
+#: src/magic.installer/modules/takeactions.py:60
 msgid "Package not found"
 msgstr "找不到软件包"
 
-#: src/magic.installer/modules/takeactions.py:81
+#: src/magic.installer/modules/takeactions.py:84
 msgid "Package install error"
 msgstr "软件包安装出错"
 
-#: src/magic.installer/modules/takeactions.py:105
+#: src/magic.installer/modules/takeactions.py:108
 msgid "Partition/Format"
 msgstr "分区/格式化"
 
-#: src/magic.installer/modules/takeactions.py:106
+#: src/magic.installer/modules/takeactions.py:109
 msgid "Install Package"
 msgstr "安装软件包"
 
-#: src/magic.installer/modules/takeactions.py:107
-#: src/magic.installer/modules/takeactions.py:552
+#: src/magic.installer/modules/takeactions.py:110
+#: src/magic.installer/modules/takeactions.py:555
 msgid "Make initrd"
 msgstr "制作 initrd"
 
-#: src/magic.installer/modules/takeactions.py:108
+#: src/magic.installer/modules/takeactions.py:111
 msgid "Install Bootloader"
 msgstr "安装引导管理器"
 
-#: src/magic.installer/modules/takeactions.py:117
+#: src/magic.installer/modules/takeactions.py:120
 msgid "Take Actions"
 msgstr "实施安装"
 
-#: src/magic.installer/modules/takeactions.py:187
+#: src/magic.installer/modules/takeactions.py:190
 msgid "Get all dirty disk"
 msgstr "获取所有受影响的硬盘"
 
-#: src/magic.installer/modules/takeactions.py:207
+#: src/magic.installer/modules/takeactions.py:210
 #, python-format
 msgid "Write the partition table of %s."
 msgstr "写入 %s 的分区表。"
 
-#: src/magic.installer/modules/takeactions.py:252
+#: src/magic.installer/modules/takeactions.py:255
 msgid "Mount all target partitions."
 msgstr "加载所有目标分区。"
 
-#: src/magic.installer/modules/takeactions.py:275
+#: src/magic.installer/modules/takeactions.py:278
 #, python-format
 msgid "Format Partition Error: %s"
 msgstr "格式化磁盘错误: %s"
 
-#: src/magic.installer/modules/takeactions.py:349
+#: src/magic.installer/modules/takeactions.py:352
 msgid "Search packages"
 msgstr "搜索软件包"
 
-#: src/magic.installer/modules/takeactions.py:402
+#: src/magic.installer/modules/takeactions.py:405
 #, python-format
 msgid ""
 "Can't find packages in disc %d.\n"
@@ -594,25 +594,25 @@ msgstr ""
 "无法找到碟片 %d 中的包。\n"
 "如果您正使用 CDROM 安装系统，请此时弹出光碟并插入第 %d 张碟。"
 
-#: src/magic.installer/modules/takeactions.py:412
+#: src/magic.installer/modules/takeactions.py:415
 msgid "Last operations for package installation"
 msgstr "包安装的最后操作"
 
-#: src/magic.installer/modules/takeactions.py:419
-#: src/magic.installer/modules/takeactions.py:426
-#: src/magic.installer/modules/takeactions.py:435
+#: src/magic.installer/modules/takeactions.py:422
+#: src/magic.installer/modules/takeactions.py:429
+#: src/magic.installer/modules/takeactions.py:438
 msgid "Researching packages..."
 msgstr "正在重新搜索软件包..."
 
-#: src/magic.installer/modules/takeactions.py:442
+#: src/magic.installer/modules/takeactions.py:445
 msgid "Aborting..."
 msgstr "正在取消..."
 
-#: src/magic.installer/modules/takeactions.py:450
+#: src/magic.installer/modules/takeactions.py:453
 msgid "Umount the target filesystem(s)."
 msgstr "卸载目标文件系统。"
 
-#: src/magic.installer/modules/takeactions.py:459
+#: src/magic.installer/modules/takeactions.py:462
 msgid ""
 "Click \"OK\" to reboot your system!\n"
 "Eject the cdrom if you are installed from cdrom."
@@ -620,28 +620,28 @@ msgstr ""
 "点击“确认”以重新启动您的系统！\n"
 "如果您是光盘安装，请弹出光盘。"
 
-#: src/magic.installer/modules/takeactions.py:477
+#: src/magic.installer/modules/takeactions.py:480
 #, python-format
 msgid "Target System Arch %s is not Compatible with package arch %s"
 msgstr "目标系统的体系结构 %s 与您选择安装的包不兼容 %s"
 
-#: src/magic.installer/modules/takeactions.py:549
+#: src/magic.installer/modules/takeactions.py:552
 msgid "Generate modprobe.conf"
 msgstr "生成 modprobe.conf"
 
-#: src/magic.installer/modules/takeactions.py:590
+#: src/magic.installer/modules/takeactions.py:593
 msgid "Prepare bootloader"
 msgstr "准备引导管理器"
 
-#: src/magic.installer/modules/takeactions.py:600
+#: src/magic.installer/modules/takeactions.py:603
 msgid "Umount all target partitions before bootloader setup."
 msgstr "设置引导管理器之前卸载所有目标分区。"
 
-#: src/magic.installer/modules/takeactions.py:606
+#: src/magic.installer/modules/takeactions.py:609
 msgid "Setup bootloader"
 msgstr "设置引导管理器"
 
-#: src/magic.installer/modules/takeactions.py:611
+#: src/magic.installer/modules/takeactions.py:614
 msgid "Mount all target partitions after bootloader setup."
 msgstr "设置引导管理器之后加载所有目标分区。"
 
@@ -790,7 +790,7 @@ msgid "Apply the selected auto-partition profile"
 msgstr "应用所选的自动分区方案"
 
 #: src/magic.installer/po/xmltranslation.py:20
-#: src/magic.installer/po/xmltranslation.py:200
+#: src/magic.installer/po/xmltranslation.py:201
 msgid "_Apply"
 msgstr "应用(_A)"
 
@@ -1351,377 +1351,382 @@ msgstr "垂直扫描率"
 
 #. TO_TRANSLATOR: All of these strings are extracted from xml file: src/magic.installer/UIxml/mi_main.xml.
 #: src/magic.installer/po/xmltranslation.py:189
-#: src/magic.installer/po/xmltranslation.py:241
-#: src/magic.installer/po/xmltranslation.py:296
+#: src/magic.installer/po/xmltranslation.py:242
+#: src/magic.installer/po/xmltranslation.py:298
 msgid "Steps"
 msgstr "步骤"
 
-#: src/magic.installer/po/xmltranslation.py:191
-#: src/magic.installer/po/xmltranslation.py:284
+#: src/magic.installer/po/xmltranslation.py:190
+#: src/magic.installer/po/xmltranslation.py:243
+msgid "_Logger"
+msgstr "备份日志(_L)"
+
+#: src/magic.installer/po/xmltranslation.py:192
+#: src/magic.installer/po/xmltranslation.py:286
 msgid "_Help"
 msgstr "求助(_H)"
 
-#: src/magic.installer/po/xmltranslation.py:192
+#: src/magic.installer/po/xmltranslation.py:193
 msgid "_Finish"
 msgstr "完成(_F)"
 
-#: src/magic.installer/po/xmltranslation.py:193
+#: src/magic.installer/po/xmltranslation.py:194
 msgid "_Next"
 msgstr "下一页(_N)"
 
-#: src/magic.installer/po/xmltranslation.py:194
+#: src/magic.installer/po/xmltranslation.py:195
 msgid "_Back"
 msgstr "上一页(_B)"
 
-#: src/magic.installer/po/xmltranslation.py:195
+#: src/magic.installer/po/xmltranslation.py:196
 msgid "_Cancel the Installation"
 msgstr "放弃安装(_C)"
 
-#: src/magic.installer/po/xmltranslation.py:196
+#: src/magic.installer/po/xmltranslation.py:197
 msgid "Click the button to choose the theme that you like."
 msgstr "点击按钮以切换到您喜欢的场景。"
 
 #. TO_TRANSLATOR: All of these strings are extracted from xml file: src/magic.installer/UIxml/mi_dialog.xml.
-#: src/magic.installer/po/xmltranslation.py:198
+#: src/magic.installer/po/xmltranslation.py:199
 msgid "_Yes"
 msgstr "是(_Y)"
 
-#: src/magic.installer/po/xmltranslation.py:199
+#: src/magic.installer/po/xmltranslation.py:200
 msgid "_OK"
 msgstr "确认(_O)"
 
-#: src/magic.installer/po/xmltranslation.py:201
+#: src/magic.installer/po/xmltranslation.py:202
 msgid "_Cancel"
 msgstr "取消(_C)"
 
-#: src/magic.installer/po/xmltranslation.py:202
+#: src/magic.installer/po/xmltranslation.py:203
 msgid "_No"
 msgstr "否(_N)"
 
-#: src/magic.installer/po/xmltranslation.py:203
+#: src/magic.installer/po/xmltranslation.py:204
 msgid "_Ignore"
 msgstr "忽略(_I)"
 
 #. TO_TRANSLATOR: All of these strings are extracted from xml file: src/magic.installer/UIxml/accounts.xml.
-#: src/magic.installer/po/xmltranslation.py:205
+#: src/magic.installer/po/xmltranslation.py:206
 msgid "Hostname"
 msgstr "主机名"
 
-#: src/magic.installer/po/xmltranslation.py:206
+#: src/magic.installer/po/xmltranslation.py:207
 msgid "_Hostname :"
 msgstr "主机名(_H)："
 
-#: src/magic.installer/po/xmltranslation.py:207
+#: src/magic.installer/po/xmltranslation.py:208
 msgid "The password of root"
 msgstr "根用户口令"
 
-#: src/magic.installer/po/xmltranslation.py:208
+#: src/magic.installer/po/xmltranslation.py:209
 msgid "IMPORTANT: The password of root account is the key of your system, choose it carefully please and don't forget it. Please do not use the password shorter than 3 characters for security."
 msgstr "重要：根用户口令对您的系统来说非常关键，请慎重选择并不要忘记。为了安全，请不要使用少于 3 个字符的口令。"
 
-#: src/magic.installer/po/xmltranslation.py:209
+#: src/magic.installer/po/xmltranslation.py:210
 msgid "_Root password :"
 msgstr "根用户口令(_R)："
 
-#: src/magic.installer/po/xmltranslation.py:210
+#: src/magic.installer/po/xmltranslation.py:211
 msgid "Root password _confirm :"
 msgstr "根用户口令确认(_C)："
 
-#: src/magic.installer/po/xmltranslation.py:211
+#: src/magic.installer/po/xmltranslation.py:212
 msgid "If you want to add more user, please click 'Add user'."
 msgstr "如果您需要添加更多用户，请点击“添加用户”。"
 
-#: src/magic.installer/po/xmltranslation.py:212
+#: src/magic.installer/po/xmltranslation.py:213
 msgid "_Add user"
 msgstr "添加用户(_A)"
 
-#: src/magic.installer/po/xmltranslation.py:213
+#: src/magic.installer/po/xmltranslation.py:214
 msgid "_Edit user"
 msgstr "编辑用户(_E)"
 
-#: src/magic.installer/po/xmltranslation.py:214
+#: src/magic.installer/po/xmltranslation.py:215
 msgid "_Remove user"
 msgstr "删除用户(_R)"
 
-#: src/magic.installer/po/xmltranslation.py:215
+#: src/magic.installer/po/xmltranslation.py:216
 msgid "Username"
 msgstr "用户名"
 
-#: src/magic.installer/po/xmltranslation.py:216
+#: src/magic.installer/po/xmltranslation.py:217
 msgid "Shell"
 msgstr "Shell"
 
-#: src/magic.installer/po/xmltranslation.py:217
+#: src/magic.installer/po/xmltranslation.py:218
 msgid "Home directory"
 msgstr "家目录"
 
-#: src/magic.installer/po/xmltranslation.py:218
+#: src/magic.installer/po/xmltranslation.py:219
 msgid "UID"
 msgstr "UID"
 
-#: src/magic.installer/po/xmltranslation.py:219
+#: src/magic.installer/po/xmltranslation.py:220
 msgid "_Username :"
 msgstr "用户名(_U)："
 
-#: src/magic.installer/po/xmltranslation.py:220
+#: src/magic.installer/po/xmltranslation.py:221
 msgid "_Password :"
 msgstr "口令(_P)："
 
-#: src/magic.installer/po/xmltranslation.py:221
+#: src/magic.installer/po/xmltranslation.py:222
 msgid "_Confirm Password :"
 msgstr "口令确认(_C)："
 
-#: src/magic.installer/po/xmltranslation.py:222
+#: src/magic.installer/po/xmltranslation.py:223
 msgid "_Shell :"
 msgstr "_Shell："
 
-#: src/magic.installer/po/xmltranslation.py:223
+#: src/magic.installer/po/xmltranslation.py:224
 msgid "Custom _home directory"
 msgstr "定制家目录(_H)"
 
-#: src/magic.installer/po/xmltranslation.py:224
+#: src/magic.installer/po/xmltranslation.py:225
 msgid "Custom U_ID"
 msgstr "定制 U_ID"
 
 #. TO_TRANSLATOR: All of these strings are extracted from xml file: src/magic.installer/UIxml/welcome.xml.
-#: src/magic.installer/po/xmltranslation.py:226
+#: src/magic.installer/po/xmltranslation.py:227
 msgid "Welcome to the MagicLinux. It is a composition of Chinese Linux lovers. Enjoy it!"
 msgstr "欢迎使用 MagicLinux。它是中国 Linux 爱好者的作品。Enjoy it！"
 
-#: src/magic.installer/po/xmltranslation.py:227
+#: src/magic.installer/po/xmltranslation.py:228
 msgid "Most of the softwares that distributed in MagicLinux are licensed by free software license. These licenses include: GPL, LGPL, MPL, BSD License, and so on. This program, MagicInstaller, is licensed by General Public License. If you are not agree General Public License, sure you can't use this MagicInstaller to install MagicLinux. Read it carefully please."
 msgstr "由 MagicLinux 发行的大部分软件都是以自由软件许可证发行的。这些许可证包括：GPL、LGPL、MPL、BSD License 等等。本程序，即 MagicInstaller，是按照 GNU 通用公共许可证 (GPL) 发行的。如果您不同意 GPL，您就不能使用本安装程序安装 MagicLinux。请仔细阅读。"
 
-#: src/magic.installer/po/xmltranslation.py:228
-#: src/magic.installer/po/xmltranslation.py:232
+#: src/magic.installer/po/xmltranslation.py:229
+#: src/magic.installer/po/xmltranslation.py:233
 msgid "I _Agree"
 msgstr "我同意(_A)"
 
-#: src/magic.installer/po/xmltranslation.py:229
-#: src/magic.installer/po/xmltranslation.py:233
+#: src/magic.installer/po/xmltranslation.py:230
+#: src/magic.installer/po/xmltranslation.py:234
 msgid "I _DISAGREE"
 msgstr "我不同意(_D)"
 
-#: src/magic.installer/po/xmltranslation.py:230
+#: src/magic.installer/po/xmltranslation.py:231
 msgid "You have agree the license"
 msgstr "您已经同意了许可证"
 
-#: src/magic.installer/po/xmltranslation.py:231
+#: src/magic.installer/po/xmltranslation.py:232
 msgid "It is very important to noticed that there is NO WARRANTY. I take it out for emphasis even it is contained in General Public License already. Read the following text carefully please."
 msgstr "没有担保是非常重要的。虽然 GPL 已经含有没有担保的条文，但我仍然把它提取出来加以强调。请仔细阅读以下条文。注意：请您在安装 Magic Linux 操作系统前，拔下所有移动存储设备，包括但不限于：移动硬盘、闪存盘(U 盘、MP3、MP4、MP5)、存储卡、存储棒、数码相机、移动电话，等等。这是为了避免由于插拔这些设备造成安装前后系统分区发生变化，导致 Magic Linux 操作系统不能正常启动。除非您希望将您的 Magic Linux 安装到移动硬盘或者容量不少于 4GB 的闪存盘上。"
 
-#: src/magic.installer/po/xmltranslation.py:234
+#: src/magic.installer/po/xmltranslation.py:235
 msgid "You have agree the nowarranty"
 msgstr "您已同意没有担保"
 
 #. TO_TRANSLATOR: All of these strings are extracted from xml file: src/magic.installer/UIxml/takeactions.xml.
 #. TO_TRANSLATOR: All of these strings are extracted from xml file: src/magic.installer/UIxml/takeactions.xml.cpinstmode.
-#: src/magic.installer/po/xmltranslation.py:236
-#: src/magic.installer/po/xmltranslation.py:287
+#: src/magic.installer/po/xmltranslation.py:237
+#: src/magic.installer/po/xmltranslation.py:289
 msgid "Release Notes"
 msgstr "发行说明"
 
-#: src/magic.installer/po/xmltranslation.py:237
-#: src/magic.installer/po/xmltranslation.py:288
+#: src/magic.installer/po/xmltranslation.py:238
+#: src/magic.installer/po/xmltranslation.py:290
 msgid "helptext/release.en.txt"
 msgstr "helptext/release.gb.utf8.txt"
 
-#: src/magic.installer/po/xmltranslation.py:238
-#: src/magic.installer/po/xmltranslation.py:289
+#: src/magic.installer/po/xmltranslation.py:239
+#: src/magic.installer/po/xmltranslation.py:291
 msgid "Authors"
 msgstr "作者"
 
-#: src/magic.installer/po/xmltranslation.py:239
-#: src/magic.installer/po/xmltranslation.py:290
+#: src/magic.installer/po/xmltranslation.py:240
+#: src/magic.installer/po/xmltranslation.py:292
 msgid "helptext/authors.en.txt"
 msgstr "helptext/authors.gb.utf8.txt"
 
-#: src/magic.installer/po/xmltranslation.py:240
-#: src/magic.installer/po/xmltranslation.py:291
+#: src/magic.installer/po/xmltranslation.py:241
+#: src/magic.installer/po/xmltranslation.py:293
 msgid "NOTE: All required information have been collected. Click 'Next' to take the real action (partition, format, packages installation and other setup) and there is no chance to revert... Are you sure?"
 msgstr "注意：已收集了所有必要的信息。点击“下一页”以开始实际安装 (分区、格式化、包安装和其它设置) 而且无法恢复... 您确认吗？"
 
-#: src/magic.installer/po/xmltranslation.py:243
-#: src/magic.installer/po/xmltranslation.py:298
+#: src/magic.installer/po/xmltranslation.py:245
+#: src/magic.installer/po/xmltranslation.py:300
 msgid "xglines"
 msgstr "xglines"
 
-#: src/magic.installer/po/xmltranslation.py:244
-#: src/magic.installer/po/xmltranslation.py:299
+#: src/magic.installer/po/xmltranslation.py:246
+#: src/magic.installer/po/xmltranslation.py:301
 msgid "Partition/Format Progress"
 msgstr "分区/格式化进度"
 
-#: src/magic.installer/po/xmltranslation.py:245
-#: src/magic.installer/po/xmltranslation.py:300
+#: src/magic.installer/po/xmltranslation.py:247
+#: src/magic.installer/po/xmltranslation.py:302
 msgid "Operation:"
 msgstr "操作："
 
-#: src/magic.installer/po/xmltranslation.py:246
-#: src/magic.installer/po/xmltranslation.py:301
+#: src/magic.installer/po/xmltranslation.py:248
+#: src/magic.installer/po/xmltranslation.py:303
 msgid "Progress:"
 msgstr "进度："
 
-#: src/magic.installer/po/xmltranslation.py:247
-#: src/magic.installer/po/xmltranslation.py:302
+#: src/magic.installer/po/xmltranslation.py:249
+#: src/magic.installer/po/xmltranslation.py:304
 msgid "Installation Progress"
 msgstr "安装进度"
 
-#: src/magic.installer/po/xmltranslation.py:248
-#: src/magic.installer/po/xmltranslation.py:303
+#: src/magic.installer/po/xmltranslation.py:250
+#: src/magic.installer/po/xmltranslation.py:305
 msgid "Package:"
 msgstr "软件包："
 
-#: src/magic.installer/po/xmltranslation.py:249
-#: src/magic.installer/po/xmltranslation.py:304
+#: src/magic.installer/po/xmltranslation.py:251
+#: src/magic.installer/po/xmltranslation.py:306
 msgid "Total Progress:"
 msgstr "总进度："
 
-#: src/magic.installer/po/xmltranslation.py:250
-#: src/magic.installer/po/xmltranslation.py:305
+#: src/magic.installer/po/xmltranslation.py:252
+#: src/magic.installer/po/xmltranslation.py:307
 msgid "Package Progress:"
 msgstr "包进度："
 
-#: src/magic.installer/po/xmltranslation.py:251
-#: src/magic.installer/po/xmltranslation.py:306
+#: src/magic.installer/po/xmltranslation.py:253
+#: src/magic.installer/po/xmltranslation.py:308
 msgid "Package Number"
 msgstr "软件包数量"
-
-#: src/magic.installer/po/xmltranslation.py:252
-#: src/magic.installer/po/xmltranslation.py:256
-#: src/magic.installer/po/xmltranslation.py:307
-#: src/magic.installer/po/xmltranslation.py:311
-msgid "Total:"
-msgstr "总计："
-
-#: src/magic.installer/po/xmltranslation.py:253
-#: src/magic.installer/po/xmltranslation.py:257
-#: src/magic.installer/po/xmltranslation.py:308
-#: src/magic.installer/po/xmltranslation.py:312
-msgid "Done:"
-msgstr "完成："
 
 #: src/magic.installer/po/xmltranslation.py:254
 #: src/magic.installer/po/xmltranslation.py:258
 #: src/magic.installer/po/xmltranslation.py:309
 #: src/magic.installer/po/xmltranslation.py:313
+msgid "Total:"
+msgstr "总计："
+
+#: src/magic.installer/po/xmltranslation.py:255
+#: src/magic.installer/po/xmltranslation.py:259
+#: src/magic.installer/po/xmltranslation.py:310
+#: src/magic.installer/po/xmltranslation.py:314
+msgid "Done:"
+msgstr "完成："
+
+#: src/magic.installer/po/xmltranslation.py:256
+#: src/magic.installer/po/xmltranslation.py:260
+#: src/magic.installer/po/xmltranslation.py:311
+#: src/magic.installer/po/xmltranslation.py:315
 msgid "Remain:"
 msgstr "剩余："
 
-#: src/magic.installer/po/xmltranslation.py:255
-#: src/magic.installer/po/xmltranslation.py:310
+#: src/magic.installer/po/xmltranslation.py:257
+#: src/magic.installer/po/xmltranslation.py:312
 msgid "Package Size"
 msgstr "软件包大小"
 
-#: src/magic.installer/po/xmltranslation.py:259
-#: src/magic.installer/po/xmltranslation.py:314
+#: src/magic.installer/po/xmltranslation.py:261
+#: src/magic.installer/po/xmltranslation.py:316
 msgid "Time"
 msgstr "时间"
 
-#: src/magic.installer/po/xmltranslation.py:260
-#: src/magic.installer/po/xmltranslation.py:315
+#: src/magic.installer/po/xmltranslation.py:262
+#: src/magic.installer/po/xmltranslation.py:317
 msgid "Total(est):"
 msgstr "总时间(估)："
 
-#: src/magic.installer/po/xmltranslation.py:261
-#: src/magic.installer/po/xmltranslation.py:316
+#: src/magic.installer/po/xmltranslation.py:263
+#: src/magic.installer/po/xmltranslation.py:318
 msgid "Elapsed:"
 msgstr "已用时间："
 
-#: src/magic.installer/po/xmltranslation.py:262
-#: src/magic.installer/po/xmltranslation.py:317
+#: src/magic.installer/po/xmltranslation.py:264
+#: src/magic.installer/po/xmltranslation.py:319
 msgid "Remain(est):"
 msgstr "剩余(估)："
 
-#: src/magic.installer/po/xmltranslation.py:263
-#: src/magic.installer/po/xmltranslation.py:318
+#: src/magic.installer/po/xmltranslation.py:265
+#: src/magic.installer/po/xmltranslation.py:320
 msgid "Rescan the packages."
 msgstr "重新搜索软件包。"
 
-#: src/magic.installer/po/xmltranslation.py:264
-#: src/magic.installer/po/xmltranslation.py:270
-#: src/magic.installer/po/xmltranslation.py:319
-#: src/magic.installer/po/xmltranslation.py:325
+#: src/magic.installer/po/xmltranslation.py:266
+#: src/magic.installer/po/xmltranslation.py:272
+#: src/magic.installer/po/xmltranslation.py:321
+#: src/magic.installer/po/xmltranslation.py:327
 msgid "_Retry"
 msgstr "重试(_R)"
 
-#: src/magic.installer/po/xmltranslation.py:265
-#: src/magic.installer/po/xmltranslation.py:320
+#: src/magic.installer/po/xmltranslation.py:267
+#: src/magic.installer/po/xmltranslation.py:322
 msgid "Abort the installation of the following packages and continues to the next step of installtion."
 msgstr "放弃对以下包的安装并继续随后的安装步骤。"
 
-#: src/magic.installer/po/xmltranslation.py:266
-#: src/magic.installer/po/xmltranslation.py:321
+#: src/magic.installer/po/xmltranslation.py:268
+#: src/magic.installer/po/xmltranslation.py:323
 msgid "_Abort"
 msgstr "放弃(_A)"
 
-#: src/magic.installer/po/xmltranslation.py:267
-#: src/magic.installer/po/xmltranslation.py:273
-#: src/magic.installer/po/xmltranslation.py:322
-#: src/magic.installer/po/xmltranslation.py:328
+#: src/magic.installer/po/xmltranslation.py:269
+#: src/magic.installer/po/xmltranslation.py:275
+#: src/magic.installer/po/xmltranslation.py:324
+#: src/magic.installer/po/xmltranslation.py:330
 msgid "Abort the installation, umount the filesystems and reboot the system right now."
 msgstr "放弃安装，卸载文件系统并立刻重新启动系统。"
 
-#: src/magic.installer/po/xmltranslation.py:268
-#: src/magic.installer/po/xmltranslation.py:274
-#: src/magic.installer/po/xmltranslation.py:323
-#: src/magic.installer/po/xmltranslation.py:329
+#: src/magic.installer/po/xmltranslation.py:270
+#: src/magic.installer/po/xmltranslation.py:276
+#: src/magic.installer/po/xmltranslation.py:325
+#: src/magic.installer/po/xmltranslation.py:331
 msgid "Re_boot"
 msgstr "重新启动(_B)"
 
-#: src/magic.installer/po/xmltranslation.py:269
-#: src/magic.installer/po/xmltranslation.py:324
+#: src/magic.installer/po/xmltranslation.py:271
+#: src/magic.installer/po/xmltranslation.py:326
 msgid "Retry installing this package."
 msgstr "再次尝试安装此软件包。"
 
-#: src/magic.installer/po/xmltranslation.py:271
-#: src/magic.installer/po/xmltranslation.py:326
+#: src/magic.installer/po/xmltranslation.py:273
+#: src/magic.installer/po/xmltranslation.py:328
 msgid "Skip installing this package."
 msgstr "跳过此软件包，继续安装下一个。"
 
-#: src/magic.installer/po/xmltranslation.py:272
-#: src/magic.installer/po/xmltranslation.py:327
+#: src/magic.installer/po/xmltranslation.py:274
+#: src/magic.installer/po/xmltranslation.py:329
 msgid "_Skip"
 msgstr "跳过(_S)"
 
 #. TO_TRANSLATOR: All of these strings are extracted from xml file: src/magic.installer/UIxml/finish.xml.
-#: src/magic.installer/po/xmltranslation.py:276
+#: src/magic.installer/po/xmltranslation.py:278
 msgid "Congratulation! Your system has been installed and setup successfully. Click 'Finish' to reboot system and enjoy it. Be note that if you are install it from CDROM you should remove the ejected CDROM so your system can boot from your harddisk."
 msgstr "祝贺您！您已经成功地安装并设置了系统。点击“完成”以重新启动系统并享用它。请注意如果您是从光盘安装，请取出弹出的光盘以便您的系统能够从您的硬盘启动。"
 
 #. TO_TRANSLATOR: All of these strings are extracted from xml file: src/magic.installer/games/xglines.xml.
-#: src/magic.installer/po/xmltranslation.py:280
+#: src/magic.installer/po/xmltranslation.py:282
 msgid "TOP Score"
 msgstr "最高分"
 
-#: src/magic.installer/po/xmltranslation.py:281
+#: src/magic.installer/po/xmltranslation.py:283
 msgid "Current Score"
 msgstr "当前得分"
 
-#: src/magic.installer/po/xmltranslation.py:282
+#: src/magic.installer/po/xmltranslation.py:284
 msgid "The Next Three"
 msgstr "下三个"
 
-#: src/magic.installer/po/xmltranslation.py:283
+#: src/magic.installer/po/xmltranslation.py:285
 msgid "_Restart"
 msgstr "重新开始(_R)"
 
-#: src/magic.installer/po/xmltranslation.py:285
+#: src/magic.installer/po/xmltranslation.py:287
 msgid "_Quit"
 msgstr "退出(_Q)"
 
-#: src/magic.installer/po/xmltranslation.py:292
+#: src/magic.installer/po/xmltranslation.py:294
 msgid "Please select the install mode."
 msgstr "请选择安装模式"
 
-#: src/magic.installer/po/xmltranslation.py:293
+#: src/magic.installer/po/xmltranslation.py:295
 msgid "If you do not know which should be selected, please select Copy Install Mode (Recommended)."
 msgstr "如果你不知道应该选择哪种模式, 请选择拷贝安装模式 (推荐)."
 
-#: src/magic.installer/po/xmltranslation.py:294
+#: src/magic.installer/po/xmltranslation.py:296
 msgid "_Copy Install Mode (Recommended)"
 msgstr "拷贝安装模式(推荐)(_C)"
 
-#: src/magic.installer/po/xmltranslation.py:295
+#: src/magic.installer/po/xmltranslation.py:297
 msgid "_Rpm  Install Mode"
 msgstr "Rpm 安装模式(_R)"
 

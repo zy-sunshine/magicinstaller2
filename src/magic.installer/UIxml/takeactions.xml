@@ -45,12 +45,18 @@ text="((NOTE: All required information have been collected. Click 'Next' to take
 	    <label expand="true"/>
 	    <frame margin="4">
 	      <hbox margin="4">
-	        <button tips="((Theme Choice))" clicked="btntheme_clicked" pack="start">
-		  <image file="images/gnome-ccthemes-24.png" fill="true"/>
-		</button>
-		<button tips="((xglines))" clicked="popup_xglines" pack="end">
-		  <image file="games/xglines.png" fill="true"/>
-		</button>
+          <button name="btnlogger" clicked="btnlogger_clicked" pack="start">
+            <hbox>
+              <image file="images/stock_help_24.png"/>
+              <label text="((_Logger))" use_underline="true" expand="true" fill="true"/>
+            </hbox>
+          </button> 
+	      <button tips="((Theme Choice))" clicked="btntheme_clicked" pack="start">
+		    <image file="images/gnome-ccthemes-24.png" fill="true"/>
+		  </button>
+		  <button tips="((xglines))" clicked="popup_xglines" pack="end">
+		    <image file="games/xglines.png" fill="true"/>
+		  </button>
 	      </hbox>
 	    </frame>
 	  </vbox>

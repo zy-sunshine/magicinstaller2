@@ -408,6 +408,9 @@ class mi_main (xmlgtk.xmlgtk):
         thetable.show()
         self.themedlg.name_map['themes'].pack_start(thetable, True, True)
         
+    def btnlogger_clicked(self, widget, data):
+        self.tm.add_action(None, None, None, 'start_magiclogger', 0)
+
 mi_win = gtk.Window(gtk.WINDOW_TOPLEVEL)
 mi_win.connect('destroy', gtk.main_quit)
 

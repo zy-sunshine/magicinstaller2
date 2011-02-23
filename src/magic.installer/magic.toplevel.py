@@ -109,13 +109,13 @@ logger_server_pid = start_server(['/usr/bin/python', runfile],
         '/var/log/magic.actions.logger.log')
 time.sleep(1)
 
-# Run logger GUI
-runfile = file_path('magic.logger')
-print runfile, "Running..."
-p_logger_pid = start_gui(['/usr/bin/xinit', '/usr/bin/python',
-                 runfile, '--', '/usr/bin/X', ':1'],
-                '/var/log/magic.logger.log', layoutopt)
-time.sleep(1)
+## Run logger GUI
+#runfile = file_path('magic.logger')
+#print runfile, "Running..."
+#p_logger_pid = start_gui(['/usr/bin/xinit', '/usr/bin/python',
+#                 runfile, '--', '/usr/bin/X', ':1'],
+#                '/var/log/magic.logger.log', layoutopt)
+#time.sleep(1)
 
 # Run MI Server
 runfile = file_path('magic.actions')
@@ -139,15 +139,13 @@ def wait_pid(pid):
             print str(e)
             print "wait pid %s failed" % pid
 wait_pid(p_installer_pid)
-os.kill(p_logger_pid, signal.SIGQUIT)
-wait_pid(p_logger_pid)
+#os.kill(p_logger_pid, signal.SIGQUIT)
+#wait_pid(p_logger_pid)
 os.system("%s > /dev/null 2>&1" % file_path("magic.actions.quit"))
 os.system("%s > /dev/null 2>&1" % file_path("magic.actions.logger.quit"))
 wait_pid(server_pid)
 wait_pid(logger_server_pid)
 
-#os.waitpid(actserver_pid, 0)
-#os.waitpid(gui_pid, 0)
 
 # probe for intel i8xx video cards
 #import  rhpxl.videocard

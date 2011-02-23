@@ -8,12 +8,12 @@ distname='MagicLinux'
 
 # distver is used to specify the version of the installed distribution.
 #
-distver='2.6'
+distver='2.5'
 
 # distkernelver is used to specify the kernel version which used by the
 # installed distribution.
 #
-distkernelver='2.6.36.2-smp'
+distkernelver='2.6.30.10-smp'
 
 # pkgtype is used to specify the package management scheme used by the
 # installed distribution. Now only 'rpm' is supported.

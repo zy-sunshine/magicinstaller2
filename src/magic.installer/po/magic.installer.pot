@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-02-10 23:50+0800\n"
+"POT-Creation-Date: 2011-02-23 20:52+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,9 +17,9 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 #: src/magic.installer/magic.installer.py:373
-#: src/magic.installer/po/xmltranslation.py:190
-#: src/magic.installer/po/xmltranslation.py:242
-#: src/magic.installer/po/xmltranslation.py:297
+#: src/magic.installer/po/xmltranslation.py:191
+#: src/magic.installer/po/xmltranslation.py:244
+#: src/magic.installer/po/xmltranslation.py:299
 msgid "Theme Choice"
 msgstr ""
 
@@ -255,7 +255,7 @@ msgstr ""
 #. TO_TRANSLATOR: All of these strings are extracted from xml file: src/magic.installer/UIxml/mouse.xml.
 #: src/magic.installer/modules/mouse.py:24
 #: src/magic.installer/po/xmltranslation.py:164
-#: src/magic.installer/po/xmltranslation.py:278
+#: src/magic.installer/po/xmltranslation.py:280
 msgid "Mouse"
 msgstr ""
 
@@ -529,66 +529,66 @@ msgstr ""
 msgid "Test"
 msgstr ""
 
-#: src/magic.installer/modules/takeactions.py:37
+#: src/magic.installer/modules/takeactions.py:40
 msgid "XGlines"
 msgstr ""
 
-#: src/magic.installer/modules/takeactions.py:44
+#: src/magic.installer/modules/takeactions.py:47
 msgid "helptext/games.xglines.en.txt"
 msgstr ""
 
-#: src/magic.installer/modules/takeactions.py:57
+#: src/magic.installer/modules/takeactions.py:60
 msgid "Package not found"
 msgstr ""
 
-#: src/magic.installer/modules/takeactions.py:81
+#: src/magic.installer/modules/takeactions.py:84
 msgid "Package install error"
 msgstr ""
 
-#: src/magic.installer/modules/takeactions.py:105
+#: src/magic.installer/modules/takeactions.py:108
 msgid "Partition/Format"
 msgstr ""
 
-#: src/magic.installer/modules/takeactions.py:106
+#: src/magic.installer/modules/takeactions.py:109
 msgid "Install Package"
 msgstr ""
 
-#: src/magic.installer/modules/takeactions.py:107
-#: src/magic.installer/modules/takeactions.py:552
+#: src/magic.installer/modules/takeactions.py:110
+#: src/magic.installer/modules/takeactions.py:555
 msgid "Make initrd"
 msgstr ""
 
-#: src/magic.installer/modules/takeactions.py:108
+#: src/magic.installer/modules/takeactions.py:111
 msgid "Install Bootloader"
 msgstr ""
 
-#: src/magic.installer/modules/takeactions.py:117
+#: src/magic.installer/modules/takeactions.py:120
 msgid "Take Actions"
 msgstr ""
 
-#: src/magic.installer/modules/takeactions.py:187
+#: src/magic.installer/modules/takeactions.py:190
 msgid "Get all dirty disk"
 msgstr ""
 
-#: src/magic.installer/modules/takeactions.py:207
+#: src/magic.installer/modules/takeactions.py:210
 #, python-format
 msgid "Write the partition table of %s."
 msgstr ""
 
-#: src/magic.installer/modules/takeactions.py:252
+#: src/magic.installer/modules/takeactions.py:255
 msgid "Mount all target partitions."
 msgstr ""
 
-#: src/magic.installer/modules/takeactions.py:275
+#: src/magic.installer/modules/takeactions.py:278
 #, python-format
 msgid "Format Partition Error: %s"
 msgstr ""
 
-#: src/magic.installer/modules/takeactions.py:349
+#: src/magic.installer/modules/takeactions.py:352
 msgid "Search packages"
 msgstr ""
 
-#: src/magic.installer/modules/takeactions.py:402
+#: src/magic.installer/modules/takeactions.py:405
 #, python-format
 msgid ""
 "Can't find packages in disc %d.\n"
@@ -596,52 +596,52 @@ msgid ""
 "original disc and insert the %d disc."
 msgstr ""
 
-#: src/magic.installer/modules/takeactions.py:412
+#: src/magic.installer/modules/takeactions.py:415
 msgid "Last operations for package installation"
 msgstr ""
 
-#: src/magic.installer/modules/takeactions.py:419
-#: src/magic.installer/modules/takeactions.py:426
-#: src/magic.installer/modules/takeactions.py:435
+#: src/magic.installer/modules/takeactions.py:422
+#: src/magic.installer/modules/takeactions.py:429
+#: src/magic.installer/modules/takeactions.py:438
 msgid "Researching packages..."
 msgstr ""
 
-#: src/magic.installer/modules/takeactions.py:442
+#: src/magic.installer/modules/takeactions.py:445
 msgid "Aborting..."
 msgstr ""
 
-#: src/magic.installer/modules/takeactions.py:450
+#: src/magic.installer/modules/takeactions.py:453
 msgid "Umount the target filesystem(s)."
 msgstr ""
 
-#: src/magic.installer/modules/takeactions.py:459
+#: src/magic.installer/modules/takeactions.py:462
 msgid ""
 "Click \"OK\" to reboot your system!\n"
 "Eject the cdrom if you are installed from cdrom."
 msgstr ""
 
-#: src/magic.installer/modules/takeactions.py:477
+#: src/magic.installer/modules/takeactions.py:480
 #, python-format
 msgid "Target System Arch %s is not Compatible with package arch %s"
 msgstr ""
 
-#: src/magic.installer/modules/takeactions.py:549
+#: src/magic.installer/modules/takeactions.py:552
 msgid "Generate modprobe.conf"
 msgstr ""
 
-#: src/magic.installer/modules/takeactions.py:590
+#: src/magic.installer/modules/takeactions.py:593
 msgid "Prepare bootloader"
 msgstr ""
 
-#: src/magic.installer/modules/takeactions.py:600
+#: src/magic.installer/modules/takeactions.py:603
 msgid "Umount all target partitions before bootloader setup."
 msgstr ""
 
-#: src/magic.installer/modules/takeactions.py:606
+#: src/magic.installer/modules/takeactions.py:609
 msgid "Setup bootloader"
 msgstr ""
 
-#: src/magic.installer/modules/takeactions.py:611
+#: src/magic.installer/modules/takeactions.py:614
 msgid "Mount all target partitions after bootloader setup."
 msgstr ""
 
@@ -786,7 +786,7 @@ msgid "Apply the selected auto-partition profile"
 msgstr ""
 
 #: src/magic.installer/po/xmltranslation.py:20
-#: src/magic.installer/po/xmltranslation.py:200
+#: src/magic.installer/po/xmltranslation.py:201
 msgid "_Apply"
 msgstr ""
 
@@ -1356,149 +1356,154 @@ msgstr ""
 
 #. TO_TRANSLATOR: All of these strings are extracted from xml file: src/magic.installer/UIxml/mi_main.xml.
 #: src/magic.installer/po/xmltranslation.py:189
-#: src/magic.installer/po/xmltranslation.py:241
-#: src/magic.installer/po/xmltranslation.py:296
+#: src/magic.installer/po/xmltranslation.py:242
+#: src/magic.installer/po/xmltranslation.py:298
 msgid "Steps"
 msgstr ""
 
-#: src/magic.installer/po/xmltranslation.py:191
-#: src/magic.installer/po/xmltranslation.py:284
-msgid "_Help"
+#: src/magic.installer/po/xmltranslation.py:190
+#: src/magic.installer/po/xmltranslation.py:243
+msgid "_Logger"
 msgstr ""
 
 #: src/magic.installer/po/xmltranslation.py:192
-msgid "_Finish"
+#: src/magic.installer/po/xmltranslation.py:286
+msgid "_Help"
 msgstr ""
 
 #: src/magic.installer/po/xmltranslation.py:193
-msgid "_Next"
+msgid "_Finish"
 msgstr ""
 
 #: src/magic.installer/po/xmltranslation.py:194
-msgid "_Back"
+msgid "_Next"
 msgstr ""
 
 #: src/magic.installer/po/xmltranslation.py:195
-msgid "_Cancel the Installation"
+msgid "_Back"
 msgstr ""
 
 #: src/magic.installer/po/xmltranslation.py:196
+msgid "_Cancel the Installation"
+msgstr ""
+
+#: src/magic.installer/po/xmltranslation.py:197
 msgid "Click the button to choose the theme that you like."
 msgstr ""
 
 #. TO_TRANSLATOR: All of these strings are extracted from xml file: src/magic.installer/UIxml/mi_dialog.xml.
-#: src/magic.installer/po/xmltranslation.py:198
+#: src/magic.installer/po/xmltranslation.py:199
 msgid "_Yes"
 msgstr ""
 
-#: src/magic.installer/po/xmltranslation.py:199
+#: src/magic.installer/po/xmltranslation.py:200
 msgid "_OK"
 msgstr ""
 
-#: src/magic.installer/po/xmltranslation.py:201
+#: src/magic.installer/po/xmltranslation.py:202
 msgid "_Cancel"
 msgstr ""
 
-#: src/magic.installer/po/xmltranslation.py:202
+#: src/magic.installer/po/xmltranslation.py:203
 msgid "_No"
 msgstr ""
 
-#: src/magic.installer/po/xmltranslation.py:203
+#: src/magic.installer/po/xmltranslation.py:204
 msgid "_Ignore"
 msgstr ""
 
 #. TO_TRANSLATOR: All of these strings are extracted from xml file: src/magic.installer/UIxml/accounts.xml.
-#: src/magic.installer/po/xmltranslation.py:205
+#: src/magic.installer/po/xmltranslation.py:206
 msgid "Hostname"
 msgstr ""
 
-#: src/magic.installer/po/xmltranslation.py:206
+#: src/magic.installer/po/xmltranslation.py:207
 msgid "_Hostname :"
 msgstr ""
 
-#: src/magic.installer/po/xmltranslation.py:207
+#: src/magic.installer/po/xmltranslation.py:208
 msgid "The password of root"
 msgstr ""
 
-#: src/magic.installer/po/xmltranslation.py:208
+#: src/magic.installer/po/xmltranslation.py:209
 msgid ""
 "IMPORTANT: The password of root account is the key of your system, choose it "
 "carefully please and don't forget it. Please do not use the password shorter "
 "than 3 characters for security."
 msgstr ""
 
-#: src/magic.installer/po/xmltranslation.py:209
+#: src/magic.installer/po/xmltranslation.py:210
 msgid "_Root password :"
 msgstr ""
 
-#: src/magic.installer/po/xmltranslation.py:210
+#: src/magic.installer/po/xmltranslation.py:211
 msgid "Root password _confirm :"
 msgstr ""
 
-#: src/magic.installer/po/xmltranslation.py:211
+#: src/magic.installer/po/xmltranslation.py:212
 msgid "If you want to add more user, please click 'Add user'."
 msgstr ""
 
-#: src/magic.installer/po/xmltranslation.py:212
+#: src/magic.installer/po/xmltranslation.py:213
 msgid "_Add user"
 msgstr ""
 
-#: src/magic.installer/po/xmltranslation.py:213
+#: src/magic.installer/po/xmltranslation.py:214
 msgid "_Edit user"
 msgstr ""
 
-#: src/magic.installer/po/xmltranslation.py:214
+#: src/magic.installer/po/xmltranslation.py:215
 msgid "_Remove user"
 msgstr ""
 
-#: src/magic.installer/po/xmltranslation.py:215
+#: src/magic.installer/po/xmltranslation.py:216
 msgid "Username"
 msgstr ""
 
-#: src/magic.installer/po/xmltranslation.py:216
+#: src/magic.installer/po/xmltranslation.py:217
 msgid "Shell"
 msgstr ""
 
-#: src/magic.installer/po/xmltranslation.py:217
+#: src/magic.installer/po/xmltranslation.py:218
 msgid "Home directory"
 msgstr ""
 
-#: src/magic.installer/po/xmltranslation.py:218
+#: src/magic.installer/po/xmltranslation.py:219
 msgid "UID"
 msgstr ""
 
-#: src/magic.installer/po/xmltranslation.py:219
+#: src/magic.installer/po/xmltranslation.py:220
 msgid "_Username :"
 msgstr ""
 
-#: src/magic.installer/po/xmltranslation.py:220
+#: src/magic.installer/po/xmltranslation.py:221
 msgid "_Password :"
 msgstr ""
 
-#: src/magic.installer/po/xmltranslation.py:221
+#: src/magic.installer/po/xmltranslation.py:222
 msgid "_Confirm Password :"
 msgstr ""
 
-#: src/magic.installer/po/xmltranslation.py:222
+#: src/magic.installer/po/xmltranslation.py:223
 msgid "_Shell :"
 msgstr ""
 
-#: src/magic.installer/po/xmltranslation.py:223
+#: src/magic.installer/po/xmltranslation.py:224
 msgid "Custom _home directory"
 msgstr ""
 
-#: src/magic.installer/po/xmltranslation.py:224
+#: src/magic.installer/po/xmltranslation.py:225
 msgid "Custom U_ID"
 msgstr ""
 
 #. TO_TRANSLATOR: All of these strings are extracted from xml file: src/magic.installer/UIxml/welcome.xml.
-#: src/magic.installer/po/xmltranslation.py:226
+#: src/magic.installer/po/xmltranslation.py:227
 msgid ""
 "Welcome to the MagicLinux. It is a composition of Chinese Linux lovers. "
 "Enjoy it!"
 msgstr ""
 
-#: src/magic.installer/po/xmltranslation.py:227
+#: src/magic.installer/po/xmltranslation.py:228
 msgid ""
 "Most of the softwares that distributed in MagicLinux are licensed by free "
 "software license. These licenses include: GPL, LGPL, MPL, BSD License, and "
@@ -1507,209 +1512,209 @@ msgid ""
 "MagicInstaller to install MagicLinux. Read it carefully please."
 msgstr ""
 
-#: src/magic.installer/po/xmltranslation.py:228
-#: src/magic.installer/po/xmltranslation.py:232
+#: src/magic.installer/po/xmltranslation.py:229
+#: src/magic.installer/po/xmltranslation.py:233
 msgid "I _Agree"
 msgstr ""
 
-#: src/magic.installer/po/xmltranslation.py:229
-#: src/magic.installer/po/xmltranslation.py:233
+#: src/magic.installer/po/xmltranslation.py:230
+#: src/magic.installer/po/xmltranslation.py:234
 msgid "I _DISAGREE"
 msgstr ""
 
-#: src/magic.installer/po/xmltranslation.py:230
+#: src/magic.installer/po/xmltranslation.py:231
 msgid "You have agree the license"
 msgstr ""
 
-#: src/magic.installer/po/xmltranslation.py:231
+#: src/magic.installer/po/xmltranslation.py:232
 msgid ""
 "It is very important to noticed that there is NO WARRANTY. I take it out for "
 "emphasis even it is contained in General Public License already. Read the "
 "following text carefully please."
 msgstr ""
 
-#: src/magic.installer/po/xmltranslation.py:234
+#: src/magic.installer/po/xmltranslation.py:235
 msgid "You have agree the nowarranty"
 msgstr ""
 
 #. TO_TRANSLATOR: All of these strings are extracted from xml file: src/magic.installer/UIxml/takeactions.xml.
 #. TO_TRANSLATOR: All of these strings are extracted from xml file: src/magic.installer/UIxml/takeactions.xml.cpinstmode.
-#: src/magic.installer/po/xmltranslation.py:236
-#: src/magic.installer/po/xmltranslation.py:287
+#: src/magic.installer/po/xmltranslation.py:237
+#: src/magic.installer/po/xmltranslation.py:289
 msgid "Release Notes"
 msgstr ""
 
-#: src/magic.installer/po/xmltranslation.py:237
-#: src/magic.installer/po/xmltranslation.py:288
+#: src/magic.installer/po/xmltranslation.py:238
+#: src/magic.installer/po/xmltranslation.py:290
 msgid "helptext/release.en.txt"
 msgstr ""
 
-#: src/magic.installer/po/xmltranslation.py:238
-#: src/magic.installer/po/xmltranslation.py:289
+#: src/magic.installer/po/xmltranslation.py:239
+#: src/magic.installer/po/xmltranslation.py:291
 msgid "Authors"
 msgstr ""
 
-#: src/magic.installer/po/xmltranslation.py:239
-#: src/magic.installer/po/xmltranslation.py:290
+#: src/magic.installer/po/xmltranslation.py:240
+#: src/magic.installer/po/xmltranslation.py:292
 msgid "helptext/authors.en.txt"
 msgstr ""
 
-#: src/magic.installer/po/xmltranslation.py:240
-#: src/magic.installer/po/xmltranslation.py:291
+#: src/magic.installer/po/xmltranslation.py:241
+#: src/magic.installer/po/xmltranslation.py:293
 msgid ""
 "NOTE: All required information have been collected. Click 'Next' to take the "
 "real action (partition, format, packages installation and other setup) and "
 "there is no chance to revert... Are you sure?"
 msgstr ""
 
-#: src/magic.installer/po/xmltranslation.py:243
-#: src/magic.installer/po/xmltranslation.py:298
-msgid "xglines"
-msgstr ""
-
-#: src/magic.installer/po/xmltranslation.py:244
-#: src/magic.installer/po/xmltranslation.py:299
-msgid "Partition/Format Progress"
-msgstr ""
-
 #: src/magic.installer/po/xmltranslation.py:245
 #: src/magic.installer/po/xmltranslation.py:300
-msgid "Operation:"
+msgid "xglines"
 msgstr ""
 
 #: src/magic.installer/po/xmltranslation.py:246
 #: src/magic.installer/po/xmltranslation.py:301
-msgid "Progress:"
+msgid "Partition/Format Progress"
 msgstr ""
 
 #: src/magic.installer/po/xmltranslation.py:247
 #: src/magic.installer/po/xmltranslation.py:302
-msgid "Installation Progress"
+msgid "Operation:"
 msgstr ""
 
 #: src/magic.installer/po/xmltranslation.py:248
 #: src/magic.installer/po/xmltranslation.py:303
-msgid "Package:"
+msgid "Progress:"
 msgstr ""
 
 #: src/magic.installer/po/xmltranslation.py:249
 #: src/magic.installer/po/xmltranslation.py:304
-msgid "Total Progress:"
+msgid "Installation Progress"
 msgstr ""
 
 #: src/magic.installer/po/xmltranslation.py:250
 #: src/magic.installer/po/xmltranslation.py:305
-msgid "Package Progress:"
+msgid "Package:"
 msgstr ""
 
 #: src/magic.installer/po/xmltranslation.py:251
 #: src/magic.installer/po/xmltranslation.py:306
-msgid "Package Number"
+msgid "Total Progress:"
 msgstr ""
 
 #: src/magic.installer/po/xmltranslation.py:252
-#: src/magic.installer/po/xmltranslation.py:256
 #: src/magic.installer/po/xmltranslation.py:307
-#: src/magic.installer/po/xmltranslation.py:311
-msgid "Total:"
+msgid "Package Progress:"
 msgstr ""
 
 #: src/magic.installer/po/xmltranslation.py:253
-#: src/magic.installer/po/xmltranslation.py:257
 #: src/magic.installer/po/xmltranslation.py:308
-#: src/magic.installer/po/xmltranslation.py:312
-msgid "Done:"
+msgid "Package Number"
 msgstr ""
 
 #: src/magic.installer/po/xmltranslation.py:254
 #: src/magic.installer/po/xmltranslation.py:258
 #: src/magic.installer/po/xmltranslation.py:309
 #: src/magic.installer/po/xmltranslation.py:313
-msgid "Remain:"
+msgid "Total:"
 msgstr ""
 
 #: src/magic.installer/po/xmltranslation.py:255
-#: src/magic.installer/po/xmltranslation.py:310
-msgid "Package Size"
-msgstr ""
-
 #: src/magic.installer/po/xmltranslation.py:259
+#: src/magic.installer/po/xmltranslation.py:310
 #: src/magic.installer/po/xmltranslation.py:314
-msgid "Time"
+msgid "Done:"
 msgstr ""
 
+#: src/magic.installer/po/xmltranslation.py:256
 #: src/magic.installer/po/xmltranslation.py:260
+#: src/magic.installer/po/xmltranslation.py:311
 #: src/magic.installer/po/xmltranslation.py:315
-msgid "Total(est):"
+msgid "Remain:"
+msgstr ""
+
+#: src/magic.installer/po/xmltranslation.py:257
+#: src/magic.installer/po/xmltranslation.py:312
+msgid "Package Size"
 msgstr ""
 
 #: src/magic.installer/po/xmltranslation.py:261
 #: src/magic.installer/po/xmltranslation.py:316
-msgid "Elapsed:"
+msgid "Time"
 msgstr ""
 
 #: src/magic.installer/po/xmltranslation.py:262
 #: src/magic.installer/po/xmltranslation.py:317
-msgid "Remain(est):"
+msgid "Total(est):"
 msgstr ""
 
 #: src/magic.installer/po/xmltranslation.py:263
 #: src/magic.installer/po/xmltranslation.py:318
-msgid "Rescan the packages."
+msgid "Elapsed:"
 msgstr ""
 
 #: src/magic.installer/po/xmltranslation.py:264
-#: src/magic.installer/po/xmltranslation.py:270
 #: src/magic.installer/po/xmltranslation.py:319
-#: src/magic.installer/po/xmltranslation.py:325
-msgid "_Retry"
+msgid "Remain(est):"
 msgstr ""
 
 #: src/magic.installer/po/xmltranslation.py:265
 #: src/magic.installer/po/xmltranslation.py:320
+msgid "Rescan the packages."
+msgstr ""
+
+#: src/magic.installer/po/xmltranslation.py:266
+#: src/magic.installer/po/xmltranslation.py:272
+#: src/magic.installer/po/xmltranslation.py:321
+#: src/magic.installer/po/xmltranslation.py:327
+msgid "_Retry"
+msgstr ""
+
+#: src/magic.installer/po/xmltranslation.py:267
+#: src/magic.installer/po/xmltranslation.py:322
 msgid ""
 "Abort the installation of the following packages and continues to the next "
 "step of installtion."
 msgstr ""
 
-#: src/magic.installer/po/xmltranslation.py:266
-#: src/magic.installer/po/xmltranslation.py:321
+#: src/magic.installer/po/xmltranslation.py:268
+#: src/magic.installer/po/xmltranslation.py:323
 msgid "_Abort"
 msgstr ""
 
-#: src/magic.installer/po/xmltranslation.py:267
-#: src/magic.installer/po/xmltranslation.py:273
-#: src/magic.installer/po/xmltranslation.py:322
-#: src/magic.installer/po/xmltranslation.py:328
+#: src/magic.installer/po/xmltranslation.py:269
+#: src/magic.installer/po/xmltranslation.py:275
+#: src/magic.installer/po/xmltranslation.py:324
+#: src/magic.installer/po/xmltranslation.py:330
 msgid ""
 "Abort the installation, umount the filesystems and reboot the system right "
 "now."
 msgstr ""
 
-#: src/magic.installer/po/xmltranslation.py:268
-#: src/magic.installer/po/xmltranslation.py:274
-#: src/magic.installer/po/xmltranslation.py:323
-#: src/magic.installer/po/xmltranslation.py:329
+#: src/magic.installer/po/xmltranslation.py:270
+#: src/magic.installer/po/xmltranslation.py:276
+#: src/magic.installer/po/xmltranslation.py:325
+#: src/magic.installer/po/xmltranslation.py:331
 msgid "Re_boot"
-msgstr ""
-
-#: src/magic.installer/po/xmltranslation.py:269
-#: src/magic.installer/po/xmltranslation.py:324
-msgid "Retry installing this package."
 msgstr ""
 
 #: src/magic.installer/po/xmltranslation.py:271
 #: src/magic.installer/po/xmltranslation.py:326
+msgid "Retry installing this package."
+msgstr ""
+
+#: src/magic.installer/po/xmltranslation.py:273
+#: src/magic.installer/po/xmltranslation.py:328
 msgid "Skip installing this package."
 msgstr ""
 
-#: src/magic.installer/po/xmltranslation.py:272
-#: src/magic.installer/po/xmltranslation.py:327
+#: src/magic.installer/po/xmltranslation.py:274
+#: src/magic.installer/po/xmltranslation.py:329
 msgid "_Skip"
 msgstr ""
 
 #. TO_TRANSLATOR: All of these strings are extracted from xml file: src/magic.installer/UIxml/finish.xml.
-#: src/magic.installer/po/xmltranslation.py:276
+#: src/magic.installer/po/xmltranslation.py:278
 msgid ""
 "Congratulation! Your system has been installed and setup successfully. Click "
 "'Finish' to reboot system and enjoy it. Be note that if you are install it "
@@ -1718,40 +1723,40 @@ msgid ""
 msgstr ""
 
 #. TO_TRANSLATOR: All of these strings are extracted from xml file: src/magic.installer/games/xglines.xml.
-#: src/magic.installer/po/xmltranslation.py:280
+#: src/magic.installer/po/xmltranslation.py:282
 msgid "TOP Score"
 msgstr ""
 
-#: src/magic.installer/po/xmltranslation.py:281
+#: src/magic.installer/po/xmltranslation.py:283
 msgid "Current Score"
 msgstr ""
 
-#: src/magic.installer/po/xmltranslation.py:282
+#: src/magic.installer/po/xmltranslation.py:284
 msgid "The Next Three"
 msgstr ""
 
-#: src/magic.installer/po/xmltranslation.py:283
+#: src/magic.installer/po/xmltranslation.py:285
 msgid "_Restart"
 msgstr ""
 
-#: src/magic.installer/po/xmltranslation.py:285
+#: src/magic.installer/po/xmltranslation.py:287
 msgid "_Quit"
 msgstr ""
 
-#: src/magic.installer/po/xmltranslation.py:292
+#: src/magic.installer/po/xmltranslation.py:294
 msgid "Please select the install mode."
 msgstr ""
 
-#: src/magic.installer/po/xmltranslation.py:293
+#: src/magic.installer/po/xmltranslation.py:295
 msgid ""
 "If you do not know which should be selected, please select Copy Install Mode "
 "(Recommended)."
 msgstr ""
 
-#: src/magic.installer/po/xmltranslation.py:294
+#: src/magic.installer/po/xmltranslation.py:296
 msgid "_Copy Install Mode (Recommended)"
 msgstr ""
 
-#: src/magic.installer/po/xmltranslation.py:295
+#: src/magic.installer/po/xmltranslation.py:297
 msgid "_Rpm  Install Mode"
 msgstr ""

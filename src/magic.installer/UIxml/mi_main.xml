@@ -19,6 +19,12 @@
     <progressbar name="mi_step" pack="start" expand="true" fill="true" show="false"/>
   </hbox>
   <hbox name="mi_action" margin="4" spacing="8">
+    <button name="btnlogger" clicked="btnlogger_clicked" pack="start">
+      <hbox>
+        <image file="images/stock_help_24.png"/>
+        <label text="((_Logger))" use_underline="true" expand="true" fill="true"/>
+      </hbox>
+    </button> 
     <button tips="((Theme Choice))" clicked="btntheme_clicked" pack="start">
       <image file="images/gnome-ccthemes-24.png" fill="true"/>
     </button>

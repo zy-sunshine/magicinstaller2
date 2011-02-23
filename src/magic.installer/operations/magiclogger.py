@@ -61,4 +61,14 @@ if operation_type == 'long':
             return str(msg)
 
         return 0
+
+    def file_path(filename):
+        realFile = filename
+        realFile = search_file(filename, [hotfixdir, '/usr/bin'], exit_if_not_found = False) or realFile
+        realFile = search_file(filename+'.py', [hotfixdir, '/usr/bin'], exit_if_not_found = False) or realFile
+        return realFile
         
+    def start_magiclogger(mia, operid, param):
+        os.system("/usr/bin/xinit /usr/bin/python %s -- /usr/bin/X :1" % file_path("magic.logger"))
+        return 0
+

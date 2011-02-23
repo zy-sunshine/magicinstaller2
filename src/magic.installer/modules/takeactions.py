@@ -32,6 +32,9 @@ class mistep_takeactions(magicstep.magicstepgroup):
         def btntheme_clicked(self, widget, data):
             self.upobj.rootobj.btntheme_clicked(widget, data)
 
+        def btnlogger_clicked(self, widget, data):
+            self.upobj.rootobj.btnlogger_clicked(widget, data)
+
         def popup_xglines(self, widget, data):
             framexml = parseString('<?xml version="1.0"?><frame type="in"><frame name="slot" type="out"/></frame>')
             self.gamebox = magicpopup.magicpopup(None, framexml, _('XGlines'), 0)
