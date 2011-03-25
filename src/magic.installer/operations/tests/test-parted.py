@@ -1,7 +1,9 @@
 #!/usr/bin/python
 # Copyright (C) 2003, Charles Wang <charles@linux.net.cn>
 # Author:  Charles Wang
-
+import sys
+sys.path.insert(0, "../..")
+sys.path.insert(0, "../../libs")
 import parted
 
 operation_type = 'long'

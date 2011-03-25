@@ -44,8 +44,17 @@ elif operation_type == 'long':
     isoloop = 'loop3'  # Use the last loop device.
     cur_rpm_fd = 0
     ts = None
-    pkg_install_list = []
-    use_noscript = False
+    
+    # If we use use_noscripts we should open the option --noscripts in rpm command,
+    # and then we will do some configuration in instpkg_post.
+    use_noscripts = False
+    # if we not use_noscripts option, when package accept a noscripts parameter during
+    # install, it will also use --noscripts option to avoid run pre_install and
+    # post_install scripts, run these scripts in instpkg_post at last(same as use_noscripts).
+    noscripts_pkg_list = []
+    noscripts_log = '/var/log/run_noscripts.log'
+    tmp_noscripts_dir = 'tmp/MI_noscripts'
+
     installmode = 'rpminstallmode'
     rpmdb = 'rpmdb.tar.bz2'
     etctar = 'etc.tar.bz2'
@@ -319,11 +328,11 @@ elif operation_type == 'long':
             self.mia.set_step(self.operid, self.tell(), self.total_size)
             return file.read(self, size)
 
-    def package_install(mia, operid, pkgname, firstpkg):
+    def package_install(mia, operid, pkgname, firstpkg, noscripts):
         global tgtsys_root
         use_ts = False
         pkgpath = os.path.join(os.path.dirname(firstpkg), pkgname)
-        dolog('pkg_install(%s, %s)\n' % (pkgname, str(pkgpath)))
+        #dolog('pkg_install(%s, %s)\n' % (pkgname, str(pkgpath)))
         
         def do_ts_install():
             global ts
@@ -358,24 +367,22 @@ elif operation_type == 'long':
                 return str(errmsg)
                 
         def do_bash_rpm_install():
-            global pkg_install_list
-            global use_noscript
+            global noscripts_pkg_list
+            global use_noscripts
             mia.set_step(operid, 1, 1)
-            # If we use use_noscript we should open the option --noscript in rpm command,
-            # and then we will do some configuration in instpkg_post.
-            use_noscript = False
-            if use_noscript:
-                pkg_install_list.append(pkgpath)
                 
             try:
                 cmd = '/bin/rpm'
                 argv = ['-i', '--noorder','--nosuggest',
                         '--force','--nodeps',
-                        #'--noscript',       # use the noscript option
                         '--ignorearch',
                         '--root', tgtsys_root,
                         pkgpath,
                     ]
+                if use_noscripts or noscripts:
+                    argv.append('--noscripts')
+                    noscripts_pkg_list.append(pkgpath)
+
                 #cmd_res = {'err':[], 'std': [], 'ret':0}   # DEBUG
                 cmd_res = run_bash(cmd, argv)
                 # Sign the installing pkg name in stderr
@@ -516,10 +523,11 @@ elif operation_type == 'long':
         return  0
 
     def instpkg_post(mia, operid, dev, mntpoint, dir, fstype):
-        if installmode == 'rpminstallmode' and use_noscript:
-            # we will excute all the pre_in and post_in scripts there, if we use
-            # the --noscript option during rpm installation
-            def run_pre_post_in_script(tgtsys_root, path):
+        if installmode == 'rpminstallmode' and noscripts_pkg_list:
+            # we will execute all the pre_in and post_in scripts there, if we use
+            # the --noscripts option during rpm installation
+            dolog('Execute Pre Post Scripts:\n\t%s\n' % str(noscripts_pkg_list))
+            def run_pre_post_in_script(tgtsys_root):
                 def get_pkg_name(pkgrpm):
                     pkg = os.path.basename(pkgrpm)
                     pkgname = ''
@@ -529,31 +537,49 @@ elif operation_type == 'long':
                     except ValueError, e:
                         return pkg
                     return pkgname
+                def write_script(script_cmd, script_file, mode='w'):
+                    tfd = open(script_file, mode)
+                    tfd.write(script_cmd)
+                    tfd.close()
                 def excute_pre_post(h):
+                    pkgnvr = "%s-%s-%s" % (h['name'],h['version'],h['release'])
+                    script_dir = os.path.join(tgtsys_root, tmp_noscripts_dir)
+                    scripts = []
                     if h[rpm.RPMTAG_PREIN]:
-                        ret = os.system(h[rpm.RPMTAG_PREIN])
-                        if ret != 0:
-                            dolog('error pre_install in %s-%s-%s\n' \
-                                    % (h['name'],h['version'],h['release']))
+                        script_name = "%s.preinstall.sh" % pkgnvr
+                        script_path = os.path.join(script_dir, script_name)
+                        write_script(h[rpm.RPMTAG_PREIN], script_path)
+                        scripts.append(script_name)
                     if h[rpm.RPMTAG_POSTIN]:
-                        ret = os.system(h[rpm.RPMTAG_POSTIN])
+                        script_name = "%s.postinstall.sh" % pkgnvr
+                        script_path = os.path.join(script_dir, script_name)
+                        write_script(h[rpm.RPMTAG_POSTIN], script_path)
+                        scripts.append(script_name)
+                    for script_name in scripts:
+                        spath = os.path.join('/', tmp_noscripts_dir, script_name)
+                        write_script("**%s\n" % script_name, noscripts_log, 'a')  # do log
+                        ret = os.system("/usr/sbin/chroot %s /bin/sh %s  2>&1 >> %s" % (tgtsys_root, spath, noscripts_log))
                         if ret != 0:
-                            dolog('error post_install in %s-%s-%s\n' \
-                                    % (h['name'],h['version'],h['release']))
-                os.chroot(tgtsys_root)
-                ts_m = rpm.TransactionSet()
-                for pkg in pkg_install_list:
+                            err_msg = 'Error run scripts(noscripts) in %s-%s-%s\n' \
+                                    % (h['name'],h['version'],h['release'])
+                            dolog(err_msg)
+                            write_script(err_msg, noscripts_log, 'a')   # do log
+                write_script('Execute Pre Post Scripts:\n\t%s\n' % str(noscripts_pkg_list), noscripts_log, 'a')  # do log            
+                script_dir = os.path.join(tgtsys_root, tmp_noscripts_dir)
+                if not os.path.exists(script_dir):
+                    os.makedirs(script_dir)
+                ts_m = rpm.TransactionSet(tgtsys_root)
+                global noscripts_pkg_list
+                for pkg in noscripts_pkg_list:
                     pkgname = get_pkg_name(pkg)
                     mi = ts_m.dbMatch('name', pkgname)
                     for h in mi:
                         if h['name'] == pkgname:
                             excute_pre_post(h)
+                noscripts_pkg_list = []
 
-            from multiprocessing import Process
-            p = Process(target=run_pre_post_in_script)
-            p.start()
-            p.join()
-            
+            run_pre_post_in_script(tgtsys_root)
+
         if installmode == 'copyinstallmode':
             tgt_tmp_config_dir = os.path.join(tgtsys_root, tmp_config_dir)
             rpmdb_abs = os.path.join(tgt_tmp_config_dir, rpmdb)

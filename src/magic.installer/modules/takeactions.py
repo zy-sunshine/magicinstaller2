@@ -473,6 +473,7 @@ class mistep_takeactions(magicstep.magicstepgroup):
         (disc_no, pkg_no) = data
         while pkg_no < len(arrangement[disc_no]):
             pkgtuple = arrangement[disc_no][pkg_no]
+            noscripts = pkgtuple[6]     # pkgpublic.noscripts == 6.
             if self.install_allpkg or self.instpkg_map.has_key(pkgtuple[1]):
                 archpkg = self.pkg2archpkg(pkgtuple[1])
                 if not archpkg:
@@ -488,14 +489,16 @@ class mistep_takeactions(magicstep.magicstepgroup):
                 apkg = os.path.basename(apkg)
                 self.add_action(apkg,
                                 self.act_instpkg_pkg_end, (disc_no, pkg_no, asize, False),
-                                'package_install', apkg, self.probe_all_disc_result[disc_no][1])
+                                'package_install', apkg, self.probe_all_disc_result[disc_no][1],
+                                noscripts)
                 return
             pkg_no = pkg_no + 1
         if self.minorarch_later and self.minorarch_pkgs:
             (apkg, aarch, asize) = self.minorarch_pkgs.pop(0)
             self.add_action(apkg,
                             self.act_instpkg_pkg_end, (disc_no, pkg_no, asize, False),
-                            'package_install', apkg, self.probe_all_disc_result[disc_no][1])
+                            'package_install', apkg, self.probe_all_disc_result[disc_no][1],
+                            noscripts)
             return
         (pafile, dev, mntpoint, fstype, dir, isofn) = choosed_patuple
         self.add_action(None,

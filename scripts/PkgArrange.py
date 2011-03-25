@@ -58,6 +58,8 @@ toplevel_groups     = mi_config.toplevel_groups
 add_deps            = mi_config.add_deps
 remove_deps         = mi_config.remove_deps
 basepkg_list        = mi_config.basepkg_list
+abs_pos             = mi_config.abs_pos
+noscripts_list      = mi_config.noscripts_list
 
 # To resolve the loop dependency, there are two method.
 # The first is use remove_deps to broke the loop. This method can control the
@@ -298,10 +300,12 @@ if use_script_in_dep:
 #--------------------------
 del(minset_map) # Free the space.
 
+
 # Now the minset_list contain the minimum set for all placement set.
 volume_size = 0
 curlist = []
 arrangement_list = []
+arrangement_pkgfn_list = []
 minset_count = 0
 volume_count = 0
 pkg_count = 0
@@ -317,7 +321,7 @@ for minset in minset_list:
                 if logfd != 2:
                     os.write(2, errmsg)
                 sys.exit(1)
-            arrangement_list.append(curlist)
+            arrangement_pkgfn_list.append(curlist)
             curlist = []
             volume_size = 0
             del volume_limit_list[0]
@@ -330,12 +334,34 @@ for minset in minset_list:
                 sys.exit(1)
             pkg_count = 0
         volume_size = volume_size + pkgsize
-        curlist.append(packages_infor[pkgfn])
-        pkgpos_map[pkgfn] = (volume_count, pkg_count)
+        #curlist.append(packages_infor[pkgfn])
+        curlist.append(pkgfn)
+        #pkgpos_map[pkgfn] = (volume_count, pkg_count)
         pkg_count = pkg_count + 1
     minset_count = minset_count + 1
 
 if curlist != []:
+    arrangement_pkgfn_list.append(curlist)
+
+# Change absolute position of pkg according to specinfo.py:abs_pos
+# [(pkgname,(cd_pos,pkg_pos)),]
+# we not conside about the size of ISO.
+for pkg_pos_name, (cd_pos, pkg_pos) in abs_pos:
+    list_tmp = arrangement_pkgfn_list[:]
+    for s in range(len(list_tmp)):
+        if pkg_pos_name in list_tmp[s]:
+            arrangement_pkgfn_list[s].remove(pkg_pos_name)
+            arrangement_pkgfn_list[cd_pos][pkg_pos:pkg_pos] = [pkg_pos_name]
+            break
+
+# Calculate pkg_pos and transform arrangement_list
+for volume_count in range(len(arrangement_pkgfn_list)):
+    curlist = []
+    arrangement_pkgfn = arrangement_pkgfn_list[volume_count]
+    for pkg_count in range(len(arrangement_pkgfn)):
+        pkgfn = arrangement_pkgfn[pkg_count]
+        curlist.append(packages_infor[pkgfn])
+        pkgpos_map[pkgfn] = (volume_count, pkg_count)
     arrangement_list.append(curlist)
 
 # Calculate total package size for all arch.
@@ -425,6 +451,13 @@ for arrangement in arrangement_list:
                 result = result + '\n\t\t%s,' % packages_weight_number[pkgname]
             else:
                 result = result + '\n\t\t0,'
+        else:
+            result = result + '\n\t\t-1,'
+        # noscripts flag
+        if pkgname in noscripts_list:
+            result = result + '\n\t\tTrue,'
+        else:
+            result = result + '\n\t\tFalse,'
         result = result + ']'
         sep1 = ','
     result = result + "]\n"

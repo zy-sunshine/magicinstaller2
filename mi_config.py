@@ -67,6 +67,8 @@ toplevel_groups = {}
 add_deps = {}
 remove_deps = {}
 basepkg_list = []
+abs_pos = []
+noscripts_list = []
 
 # merge specinfo
 import specinfo

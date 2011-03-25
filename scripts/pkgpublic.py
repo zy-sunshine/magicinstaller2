@@ -5,6 +5,8 @@ path    = 1
 group   = 2
 deps    = 3
 pathes  = 4
+pkgweight = 5
+noscripts = 6
 
 arch_map = { 'i386':   ['i386'],
              'i486':   ['i486', 'i386'],

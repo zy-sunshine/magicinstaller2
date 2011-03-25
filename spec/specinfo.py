@@ -122,7 +122,7 @@ volume_limit_list = [1300*1024*1024, 640*1024*1024, 640*1024*1024]
 #
 
 # Omit it, if use 1 it will work, notice the indent is 4 spaces.
-if 1:
+if 0:
     remove_deps = {
     'binutils-2.20.51.0.12-2mgc26.x86_64.rpm':
         ['chkconfig-1.3.47-1mgc26.x86_64.rpm',
@@ -175,6 +175,14 @@ basepkg_list = ['binutils',
                 'coreutils-libs', 
                 'coreutils',
              ]
+######################################################################
+# abs_pos is a list of absolute package positon.
+#abs_pos = [("openldap-clients-2.4.15-1mgc25.i686.rpm", (0, 149)),]
+
+######################################################################
+# noscripts_list is a list of package not execute package scriptlet(s)
+#noscripts_list = ['MAKEDEV-3.24-2mgc25.i686.rpm',
+#                  'hal-0.5.13-5mgc25.i686.rpm',]
 
 ######################################################################
 # autopart_profile is used to add the auto-partition
