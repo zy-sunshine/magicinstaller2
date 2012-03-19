@@ -52,7 +52,7 @@ elif operation_type == 'long':
     # install, it will also use --noscripts option to avoid run pre_install and
     # post_install scripts, run these scripts in instpkg_post at last(same as use_noscripts).
     noscripts_pkg_list = []
-    noscripts_log = '/var/log/run_noscripts.log'
+    noscripts_log = '/var/log/mi/run_noscripts.log'
     tmp_noscripts_dir = 'tmp/MI_noscripts'
 
     installmode = 'rpminstallmode'
@@ -523,6 +523,7 @@ elif operation_type == 'long':
         return  0
 
     def instpkg_post(mia, operid, dev, mntpoint, dir, fstype):
+        global noscripts_pkg_list
         if installmode == 'rpminstallmode' and noscripts_pkg_list:
             # we will execute all the pre_in and post_in scripts there, if we use
             # the --noscripts option during rpm installation
@@ -569,7 +570,6 @@ elif operation_type == 'long':
                 if not os.path.exists(script_dir):
                     os.makedirs(script_dir)
                 ts_m = rpm.TransactionSet(tgtsys_root)
-                global noscripts_pkg_list
                 for pkg in noscripts_pkg_list:
                     pkgname = get_pkg_name(pkg)
                     mi = ts_m.dbMatch('name', pkgname)

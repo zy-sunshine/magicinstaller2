@@ -46,7 +46,7 @@ import magicstep
 import magicpopup
 from xmlgtk import N_
 USE_TEXTDOMAIN = True
-openlog('/var/log/client.log')
+openlog('/var/log/mi/client.log')
 
 # Setup constants and working directory.
 os.chdir(DATADIR)
@@ -148,6 +148,10 @@ class mi_main (xmlgtk.xmlgtk):
         self.set_data(self.values, 'network.hostname', distname)
         self.set_data(self.values, 'bootloader.linuxlabel', distname)
 
+        stepid = -1
+        confdir = '/tmpfs/step_conf/'
+        if not os.path.exists(confdir):
+            os.mkdir(confdir)
         for groupnode in confnode.getElementsByTagName('group'):
             groupname = groupnode.getAttribute('name')
             for modulenode in groupnode.getElementsByTagName('module'):
@@ -158,14 +162,18 @@ class mi_main (xmlgtk.xmlgtk):
                     classname = 'mistep_' + pyfname
                     if classname[-3:] == '.py':
                         classname = classname[:-3]
-                    self.stepobj_list.append(eval(classname + '(self)'))
+                    clsobj = eval(classname + '(self)')
+                    stepid += 1
+                    clsobj.stepid = stepid
+                    clsobj.confdir = confdir
+                    self.stepobj_list.append(clsobj)
                     self.stepobj_group_list.append(groupname)
                     self.namestep_map[classname] = len(self.stepobj_list) - 1
                     self.available_steps.append(1)
                     
         self.uixml = uixml
         xmlgtk.xmlgtk.__init__(self, uixml, 'whole')
-        self.tm = taskman(325, self.name_map['mi_step'],
+        self.tm = taskman(1325, self.name_map['mi_step'],
                           self.name_map['mi_step_label'])
                           
         self.stepsarr = []
@@ -195,10 +203,14 @@ class mi_main (xmlgtk.xmlgtk):
             if os.path.exists(debugFile):
                 start_step = stepno
                 break
+                
+        self.curstep = start_step
         self.stepsarr[start_step].set_from_file('images/applet-busy.png')
         self.stepobj_list[start_step].widget.show()         # First show this widget
         self.enter_step(start_step)                         # Second judge the enter condition (or execute something)
-        self.switch2step(start_step)                        # Third switch to dest page (execute set_current_page,in reality)
+        #self.switch2step(start_step)                        # Third switch to dest page (execute set_current_page,in reality)
+        self.name_map['mi_main'].set_current_page(start_step)
+        self.stepobj_list[start_step].init()
 
     def btnback_sensitive(self, sensitive):
         widget = self.name_widget('btnback')
@@ -231,6 +243,7 @@ class mi_main (xmlgtk.xmlgtk):
         return 1
 
     def switch2step(self, dststep):
+        if self.curstep == dststep: return
         dolog('From %d: switch2step(%d/%s)\n' % \
               (self.curstep, dststep, self.stepobj_list[dststep].get_label()))
         stepobj = self.stepobj_list[dststep]
@@ -239,11 +252,12 @@ class mi_main (xmlgtk.xmlgtk):
                 self.name_map[btn].show()
             else:
                 self.name_map[btn].hide()
-        self.stepobj_list[dststep].widget.show()
-        self.stepobj_list[self.curstep].widget.hide()
-        self.curstep = dststep
         self.name_map['mi_main'].set_current_page(dststep)
+        self.stepobj_list[self.curstep].widget.hide()
+        self.stepobj_list[self.curstep].fini()
         self.stepobj_list[dststep].widget.show()
+        self.stepobj_list[dststep].init()
+        self.curstep = dststep
 
     def enter_step(self, step):
         stepobj = self.stepobj_list[step]

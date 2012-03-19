@@ -19,7 +19,7 @@
 
 import gtk
 from gettext import gettext as _
-from xml.dom.minidom import parse
+from xml.dom.minidom import parse, parseString
 import os
 
 import xmlgtk
@@ -40,9 +40,43 @@ class magicstep (xmlgtk.xmlgtk):
                                  [hotfixdir, '.'],
                                  postfix = 'UIxml')
         uixml = parse(uixml_path)
+        ### hack to add a debug title
+        rootnode = None
+        if not uirootname:
+            uixml_rootnode = uixml.documentElement
+        else:
+            uixml_rootnodes = uixml.getElementsByTagName(uirootname)
+            if uixml_rootnodes == []:
+                uixml_rootnode = uixml.documentElement
+            else:
+                for uixml_rootnode in uixml_rootnodes[0].childNodes:
+                    if uixml_rootnode.nodeType == uixml_rootnode.ELEMENT_NODE:
+                        break
+        newdom = parseString('<vbox margin="4"><label name="dbgmsg" line_wrap="true" fill="true" text="test label"/></vbox>').documentElement
+        uixml_rootnode.appendChild(newdom)
         xmlgtk.xmlgtk.__init__(self, uixml, uirootname)
         self.fill_values(self.values)
+        self.stepid = None
+        self.confdir = ''
+        
+    def init(self):
+        print 'init %d' % self.stepid
+        if self.stepid > 0 and self.confdir:
+            preconf = os.path.join(self.confdir, 'step%s.xml' % (self.stepid - 1))
+            if os.path.exists(preconf):
+                self.values = parse(preconf).documentElement
 
+        self.name_map['dbgmsg'].set_text('step %d' % self.stepid)
+        
+    def fini(self):
+        print 'fini %d' % self.stepid
+        curconf = os.path.join(self.confdir, 'step%s.xml' % self.stepid)
+        print curconf
+        f = open(curconf, 'w')
+        self.values.ownerDocument.writexml(f)
+        f.close()
+        
+    
     def get_label(self):
         return _("UNDEFINED")
 

@@ -37,7 +37,7 @@ mia = miactions.MIActions(128, 128*1024, 128*1024)
 if mia.pid > 0:
     # Control process.
     # Run short operation and transfer long operation to action process.
-    openlog('/var/log/shortop.log')
+    openlog('/var/log/mi/shortop.log')
 
     import short_operations
 
@@ -66,7 +66,9 @@ if mia.pid > 0:
                 # Return the operation identifier to the caller.
                 if EXPERT_MODE:
                     dolog('Put long.%s() with %s' % (method, params))
-                id = mia.put_operation(xmlrpclib.dumps(params, methodname=method, allow_none = 1))
+                    t = xmlrpclib.dumps(params, methodname=method, allow_none = 1)
+                    dolog('%s', t)
+                id = mia.put_operation(t)
                 if EXPERT_MODE:
                     dolog(', and get id %d.\n' % (id))
                 return id
@@ -76,7 +78,7 @@ if mia.pid > 0:
         allow_reuse_address = True
 
     server = ReuseXMLRPCServer(  #SimpleXMLRPCServer.SimpleXMLRPCServer( \
-        ('127.0.0.1', 325),
+        ('127.0.0.1', 1325),
         SimpleXMLRPCServer.SimpleXMLRPCRequestHandler,
         None)
     server.register_instance(MIAction())
@@ -90,7 +92,7 @@ if mia.pid > 0:
 
 elif mia.pid == 0:
     # Action process. For long operation only.
-    openlog('/var/log/longop.log')
+    openlog('/var/log/mi/longop.log')
 
     import long_operations
 
