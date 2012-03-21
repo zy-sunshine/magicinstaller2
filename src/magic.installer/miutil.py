@@ -96,8 +96,9 @@ def openlog(filename):
             print 'Open log file %s failed.\n' % filename
             logf = None
 
-def dolog(str):
+def dolog(str, *args, **argw):
     global logf, dolog
+
     if dolog:
         if logf:
             logf.write('%s' % str)
@@ -357,3 +358,113 @@ def convert_str_size(size):
         except ValueError:
             return None
     return size * k
+
+
+#
+# colors, for nice output
+#
+
+class color_default:
+    def __init__(self):
+        self.name = 'default'
+        self.black =    '\x1b[0;30m'
+        self.red =  '\x1b[0;31m'
+        self.green =    '\x1b[0;32m'
+        self.yellow =   '\x1b[0;33m'
+        self.blue = '\x1b[0;34m'
+        self.magenta =  '\x1b[0;35m'
+        self.cyan = '\x1b[0;36m'
+        self.white =    '\x1b[0;37m'
+        self.normal =   '\x1b[0m'
+        self.bold = '\x1b[1m'
+        self.clear =    '\x1b[J'
+
+class color_bw:
+    def __init__(self):
+        self.name = 'bw'
+        self.black =    '\x1b[0;30m'
+        self.red =  '\x1b[0m'
+        self.green =    '\x1b[0m'
+        self.yellow =   '\x1b[0m'
+        self.blue = '\x1b[0m'
+        self.magenta =  '\x1b[0m'
+        self.cyan = '\x1b[0m'
+        self.white =    '\x1b[0m'
+        self.normal =   '\x1b[0m'
+        self.bold = '\x1b[0m'
+        self.clear =    '\x1b[J'
+
+color_classes = {
+    'default':  color_default,
+    'bw':       color_bw
+}
+color_c = color_classes['default']()
+
+#
+# different useful prints
+#
+
+def printl(line, color = color_c.normal, bold = 0):
+    "Prints a line with a color"
+    out = ''
+    if line and line[0] == '\r':
+        clear_line()
+    if bold:
+        out = color_c.bold
+    out = color + out + line + color_c.normal
+    safe_write(out)
+    safe_flush()
+
+def perror(line):
+    "Prints an error"
+    out = ''
+    out += color_c.yellow + color_c.bold + '!' + color_c.normal
+    out += color_c.red + color_c.bold + '!' + color_c.normal
+    out += color_c.blue + color_c.bold + '!' + color_c.normal
+    out += ' ' + color_c.green + color_c.bold + line + color_c.normal + '\a'
+    safe_write(out)
+    safe_flush()
+
+def pexc(line):
+    "Prints an exception"
+    out = '\n'
+    out += ( color_c.cyan + color_c.bold + '!' + color_c.normal ) * 3
+    safe_write(out)
+    safe_write(color_c.bold + line)
+    safe_flush()
+    traceback.print_exc()
+    safe_write(color_c.normal)
+    safe_write('\n')
+    safe_flush()
+
+def beep(q = 0):
+    "Beeps unless it's told to be quiet"
+    if not q:
+        printl('\a')
+
+
+def safe_flush():
+    """Safely flushes stdout. It fixes a strange issue with flush and
+    nonblocking io, when flushing too fast."""
+    c = 0
+    while c < 100:
+        try:
+            sys.stdout.flush()
+            return
+        except IOError:
+            c +=1
+            time.sleep(0.01 * c)
+    raise Exception, 'flushed too many times, giving up. Please report!'
+
+def safe_write(text):
+    """Safely writes to stdout. It fixes the same issue that safe_flush,
+    that is, writing too fast raises errors due to nonblocking fd."""
+    c = 1
+    while c:
+        try:
+            sys.stdout.write(text)
+            return
+        except IOError:
+            c += 1
+            time.sleep(0.01 * c)
+    raise Exception, 'wrote too many times, giving up. Please report!'

@@ -62,6 +62,7 @@ elif operation_type == 'long':
     tmp_config_dir = 'tmp/MI_configure'
     
     def pkgarr_probe(mia, operid, hdpartlist):
+        dolog("=====pkgarr_probe starting...")
         def probe_position(localfn, pos_id, cli, device, new_device, fstype, dir, isofn):
             if not os.path.exists(localfn):
                 return None
@@ -102,12 +103,17 @@ elif operation_type == 'long':
                                           'iso9660',
                                           os.path.join('/dev', cd.device))),
             cdlist)
+        dolog('======all_drives: %s' % all_drives)
         for (device, fstype, new_device) in all_drives:
             if not fstype_map.has_key(fstype):
                 continue
             if fstype_map[fstype][0] == '':
                 continue
-
+            if fstype == 'iso9660':
+                if os.system('dd if=%s bs=1 count=1 of=/dev/null &>/dev/null' % device) != 0:
+                    dolog('%s cannot use\n' % device)
+                    # cdrom cannot use
+                    continue
             ret, mntdir = mount_dev(fstype_map[fstype][0], device)
             if not ret:
                 syslog.syslog(syslog.LOG_ERR,
@@ -122,6 +128,7 @@ elif operation_type == 'long':
                 else:
                     search_dirs = hd_papathes
                 pos_id = 0
+                dolog("============search_dirs %s\n" % search_dirs)
                 for dir in search_dirs:
                     pos_id = pos_id + 1
                     # Try bare pafile.
@@ -130,6 +137,7 @@ elif operation_type == 'long':
                     if r:
                         result.append(r)
                     # Try pafile in bootcd and debugbootcd.
+                    dolog("=============%s\n" % bootcdfn)
                     for (pi_add, isofn) in ((100, bootcdfn),):
                         isopath = os.path.join(mntdir, dir, isofn)
                         if not os.path.exists(isopath):

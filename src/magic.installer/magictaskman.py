@@ -5,6 +5,7 @@ import gobject
 import socket
 import time
 import gtk
+from mipublic import *
 # The task manager: It only manage the long operation.
 class taskman :
     def __init__(self, port, action_prog, aplabel):
@@ -73,6 +74,8 @@ class taskman :
         except socket.error:
             # put action failed.
             return  False
+        #except xmlrpclib.Fault:
+        #    import pdb; pdb.set_trace()
         # put action successfully.
         self.tasks[0].pop(0) # Remove it from queue head.
         self.run_tmid = tmid
@@ -120,8 +123,6 @@ class taskman :
         except socket.error:
             # get results failed.
             return  False
-        except:
-            import pdb; pdb.set_trace()
         for result_xmlstr in new_result_list:
             res_tuple = xmlrpclib.loads(result_xmlstr)
             id = res_tuple[0][0]

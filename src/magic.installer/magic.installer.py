@@ -157,8 +157,9 @@ class mi_main (xmlgtk.xmlgtk):
             for modulenode in groupnode.getElementsByTagName('module'):
                 pyfname = modulenode.getAttribute('file')
                 if pyfname:
-                    execfile(search_file(pyfname, [hotfixdir, '.'],
-                                         postfix = 'modules'))
+                    pypath = search_file(pyfname, [hotfixdir, '.'],
+                                         postfix = 'modules')
+                    execfile(pypath)
                     classname = 'mistep_' + pyfname
                     if classname[-3:] == '.py':
                         classname = classname[:-3]
@@ -166,6 +167,7 @@ class mi_main (xmlgtk.xmlgtk):
                     stepid += 1
                     clsobj.stepid = stepid
                     clsobj.confdir = confdir
+                    clsobj.pypath = pypath
                     self.stepobj_list.append(clsobj)
                     self.stepobj_group_list.append(groupname)
                     self.namestep_map[classname] = len(self.stepobj_list) - 1

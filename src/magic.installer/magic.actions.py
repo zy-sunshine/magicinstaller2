@@ -57,20 +57,20 @@ if mia.pid > 0:
                 return  mia.probe_step()
             if short_operations.__dict__.has_key(method):
                 if EXPERT_MODE:
-                    dolog('Run short.%s() with %s,\n' % (method, params))
+                    printl('Run short.%s() with %s,\n' % (method, params), color_c.red)
                 result = short_operations.__dict__[method](*params)
                 if EXPERT_MODE:
-                    dolog('    which returns %r\n' % (result,))
+                    printl('    which returns %r\n' % (result,), color_c.red)
                 return result
             else: # This is a long operation.
                 # Return the operation identifier to the caller.
                 if EXPERT_MODE:
-                    dolog('Put long.%s() with %s' % (method, params))
+                    printl('Put long.%s() with %s' % (method, params), color_c.red)
                     t = xmlrpclib.dumps(params, methodname=method, allow_none = 1)
-                    dolog('%s', t)
+                    dolog('%s' % t)
                 id = mia.put_operation(t)
                 if EXPERT_MODE:
-                    dolog(', and get id %d.\n' % (id))
+                    printl(', and get id %d.\n' % (id), color_c.red)
                 return id
 
     class ReuseXMLRPCServer(SimpleXMLRPCServer.SimpleXMLRPCServer):
@@ -104,13 +104,13 @@ elif mia.pid == 0:
             (params, method) = xmlrpclib.loads(opera)
             if long_operations.__dict__.has_key(method):
                 if EXPERT_MODE:
-                    dolog('Run long.%s() with %s and id %d,\n' % (method, params, id))
+                    printl('Run long.%s() with %s and id %d,\n' % (method, params, id), color_c.blue)
                 result = eval('long_operations.%s(mia, id, *params)' % method)
                 if EXPERT_MODE:
-                    dolog('    which returns %r.\n' % (result,))
+                    printl('    which returns %r.\n' % (result,), color_c.blue)
                 mia.put_result(xmlrpclib.dumps((id, result), methodname=method, allow_none = 1))
             else:
                 if EXPERT_MODE:
-                    dolog('ERROR: NOT SUPPORTED method %s().\n' % method)
+                    printl('ERROR: NOT SUPPORTED method %s().\n' % method, color_c.blue)
                 mia.put_result(xmlrpclib.dumps((id, 'NOT_SUPPORT'), methodname=method, allow_none = 1))
     closelog()

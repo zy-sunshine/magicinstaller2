@@ -1018,7 +1018,7 @@ class mistep_parted (magicstep.magicstep):
         global pkgarr_probe_result
         pkgarr_probe_result = self.rootobj.tm.results[operid]
         pkgarr_probe_status = OP_STATUS_DONE
-        dolog('pkgarr: %s\n' % str(pkgarr_probe_result))
+        dolog('pkgarr_probe_result: %s\n' % str(pkgarr_probe_result))
 
     def got_win_probe_result(self, operid, data):
         global win_probe_status

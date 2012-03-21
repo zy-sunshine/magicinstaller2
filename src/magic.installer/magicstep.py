@@ -36,10 +36,10 @@ class magicstep (xmlgtk.xmlgtk):
         self.skip_stepnames = []
         
         self.values = rootobj.values.documentElement # Just a short cut.
-        uixml_path = search_file(uixml_file,
+        self.uixml_path = search_file(uixml_file,
                                  [hotfixdir, '.'],
                                  postfix = 'UIxml')
-        uixml = parse(uixml_path)
+        uixml = parse(self.uixml_path)
         ### hack to add a debug title
         rootnode = None
         if not uirootname:
@@ -58,6 +58,7 @@ class magicstep (xmlgtk.xmlgtk):
         self.fill_values(self.values)
         self.stepid = None
         self.confdir = ''
+        self.pypath = ''
         
     def init(self):
         print 'init %d' % self.stepid
@@ -66,7 +67,8 @@ class magicstep (xmlgtk.xmlgtk):
             if os.path.exists(preconf):
                 self.values = parse(preconf).documentElement
 
-        self.name_map['dbgmsg'].set_text('step %d' % self.stepid)
+        self.name_map['dbgmsg'].set_text('step %d ui: %s py: %s' % (self.stepid,
+                self.uixml_path, self.pypath))
         
     def fini(self):
         print 'fini %d' % self.stepid

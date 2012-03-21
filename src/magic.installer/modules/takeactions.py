@@ -105,10 +105,15 @@ class mistep_takeactions(magicstep.magicstepgroup):
         magicstep.magicstepgroup.__init__(self, rootobj, 'takeactions.xml',
                                           ['notes', 'ensure'], 'step')
         self.actlist = []
-        self.actlist.append( (N_('Partition/Format'), self.act_start_parted, self.act_end_parted) )
+        
+        if not DEBUG_MODE:
+            # skip format and mount partition
+            self.actlist.append( (N_('Partition/Format'), self.act_start_parted, self.act_end_parted) )
+
         self.actlist.append( (N_('Install Package'), self.act_start_instpkg, self.act_end_instpkg) )
-        self.actlist.append( (N_('Make initrd'), self.act_start_mkinitrd, None) )
-        self.actlist.append( (N_('Install Bootloader'), self.act_start_bootloader, None) )
+        if not DEBUG_MODE:
+            self.actlist.append( (N_('Make initrd'), self.act_start_mkinitrd, None) )
+            self.actlist.append( (N_('Install Bootloader'), self.act_start_bootloader, None) )
         #(N_('Setup Keyboard'), self.act_start_keyboard, None)]
         self.actpos = 0
         self.discdlg_open_time = -1
@@ -619,10 +624,11 @@ class mistep_takeactions(magicstep.magicstepgroup):
                         'mount_all_tgtpart', mount_all_list, 0)
 
     def nextop(self, operid, data):
-        result = self.rootobj.tm.results[operid]
-        if result:
-            # Error occurred. Stop it?
-            dolog('ERROR: %s\n' % str(result))
+        if operid:
+            result = self.rootobj.tm.results[operid]
+            if result:
+                # Error occurred. Stop it?
+                dolog('ERROR: %s\n' % str(result))
 
         dolog('nextop\n')
         self.act_leave()
