@@ -65,10 +65,11 @@ if USE_TEXTDOMAIN:
         gettext.textdomain(TEXTDOMAIN)
         
 from magictaskman import *
+CONF = MiConfig()
 #--- all_part_infor --------------------------------------------------
 # If 'reprobe_all_disk_required' is set to True, the parted step must reprobe
 # all disks.
-reprobe_all_disks_required = 0
+CONF.reprobe_all_disks_required = 0
 
 # all_part_infor is a map which indexed by device filename, such as '/dev/hda'.
 # Its value is a list. The element of the list is a tuple. Each tuple represent
@@ -77,41 +78,47 @@ reprobe_all_disks_required = 0
 #               orig_filesystem/format_to_filesystem, mountpoint, not_touched)
 # The all_part_infor is filled by parted module for each leave.
 # It is read by the other modules that run after parted.
-all_part_infor = {}
+
+CONF.all_part_infor = {}
 
 # list of (orig_partdevname, filesystem, new_partdevname)
-all_orig_part = []
+CONF.all_orig_part = []
 
 # root_device: used to store the partition device file name mount on '/'.
-root_device = None
+CONF.root_device = None
 
 # boot_device: used to store the partition device file name which contain '/boot'.
-boot_device = None
+CONF.boot_device = None
 
 # swap_device: used to store the partition device file name which used as swap.
-swap_device = None
+CONF.swap_device = None
 
-mount_all_list = []
+CONF.mount_all_list = []
 
-skipxsetting = 0
+CONF.skipxsetting = 0
 
-path_tftproot = '/tmpfs/tftpboot'
+CONF.path_tftproot = '/tmpfs/tftpboot'
 
-OP_STATUS_NONE = 0
-OP_STATUS_DOING = 1
-OP_STATUS_DONE = 2
-path_allpa = os.path.join(path_tftproot, 'allpa')
-pkgarr_probe_status = OP_STATUS_NONE
-pkgarr_probe_result = None
-win_probe_status = OP_STATUS_NONE
-win_probe_result = None
+class Status:
+    def __init__(self):
+        pass    
+STAT = Status()
+STAT.OP_STATUS_NONE = 0
+STAT.OP_STATUS_DOING = 1
+STAT.OP_STATUS_DONE = 2
 
-choosed_patuple = ()
-arch_map = {}
-arrangement = []
-archsize_map = {}
-pkgpos_map = {}
-toplevelgrp_map = {}
+CONF.path_allpa = os.path.join(path_tftproot, 'allpa')
+STAT.pkgarr_probe_status = STAT.OP_STATUS_NONE
+CONF.pkgarr_probe_result = None
+STAT.win_probe_status = STAT.OP_STATUS_NONE
+CONF.win_probe_result = None
+
+CONF.choosed_patuple = ()
+CONF.arch_map = {}
+CONF.arrangement = []
+CONF.archsize_map = {}
+CONF.pkgpos_map = {}
+CONF.toplevelgrp_map = {}
 
 def get_devinfo(devfn):
     global all_part_infor

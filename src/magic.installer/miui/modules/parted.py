@@ -1,24 +1,18 @@
 #!/usr/bin/python
-# Copyright (C) 2003, Charles Wang.
-# Author:  Charles Wang <charles@linux.net.cn>
-# All rights reserved.
-#
-# This program is free software; you can redistribute it and/or modify it
-# under the terms of the GNU General Public License as published by the Free
-# Software Foundation; either version 2, or (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful, but WITHOUT
-# ANY WARRANT; without even the implied warranty of MERCHANTABILITY or FITNESS
-# FOR A PARTICULAR PURPOSE. See the GNU General Public LIcense for more
-# details.
-#
-# You should have received a copy of the GNU General Public License along
-# with this program; if not, write to the Free Software Foundation, 59 Temple
-# Place - Suite 330, Boston, MA 02111-1307, USA.
+from miui import _
+from miui.utils import magicstep, magicpopup, xmlgtk
+import gtk
+from miutil import search_file
+from miconfig import MiConfig
+from milogger import MiLogger
+
+CONF = MiConfig.get_instance()
+logger = Logger.get_instance('modules')
+dolog = logger.dolog
 
 fstype_swap_index = -1
 
-class mistep_parted (magicstep.magicstep):
+class MIStep_parted (magicstep.magicstep):
 
 ### Harddisk Class
     class  harddisk(xmlgtk.xmlgtk):
@@ -813,8 +807,8 @@ class mistep_parted (magicstep.magicstep):
         self.probeall_status = OP_STATUS_DONE
 
     def reprobe_all(self):
-        global  reprobe_all_disks_required
-        if reprobe_all_disks_required:
+        CONF.reprobe_all_disks_required
+        if CONF.reprobe_all_disks_required:
             self.probeall_status = OP_STATUS_DOING
             for hdobj in self.hdobj_list:
                 del hdobj
@@ -822,7 +816,7 @@ class mistep_parted (magicstep.magicstep):
             self.rootobj.tm.add_action(_('Probe all harddisk'),
                                        self.probe_all_ok, None,
                                        'device_probe_all', 0)
-            reprobe_all_disks_required = 0
+            CONF.reprobe_all_disks_required = 0
 
 ##### Enter & Leave Check
     def enter(self):
@@ -1074,7 +1068,7 @@ class mistep_parted (magicstep.magicstep):
                                    magicpopup.magicpopup.MB_OK)
             return
         err = True
-        profile_file = search_file('magic.autopart.xml', [hotfixdir, '.'], exit_if_not_found = False)
+        profile_file = search_file('magic.autopart.xml', [CONF.hotfixdir, '.'], exit_if_not_found = False)
         dolog('fname2: %s\n' % profile_file)
         if profile_file:
             dE = parse(profile_file).documentElement
@@ -1236,7 +1230,7 @@ class mistep_parted (magicstep.magicstep):
 
     def xgc_autopart_optionmenu(self, node):
         # Fill up auto part profile option menu
-        fname = search_file('magic.autopart.xml', [hotfixdir, '.'],
+        fname = search_file('magic.autopart.xml', [CONF.hotfixdir, '.'],
                             exit_if_not_found = False)
         is_empty = True
         if fname:

@@ -1,0 +1,615 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<magic.values>
+ <welcome>
+  <license>disagree
+  </license>
+  <nowarranty>disagree
+  </nowarranty>
+ </welcome>
+ <network>
+  <hostname>
+  </hostname>
+ </network>
+ <accounts>
+  <root>
+   <password>
+   </password>
+   <passwordconfirm>
+   </passwordconfirm>
+  </root>
+  <userlist>
+  </userlist>
+ </accounts>
+ <scsi>
+  <modules>
+  </modules>
+ </scsi>
+ <parted>
+  <profile>
+  </profile>
+ </parted>
+ <autopart>autopart_profile
+ </autopart>
+ <bootloader>
+  <bltype>grub
+  </bltype>
+  <timeout>10
+  </timeout>
+  <instpos>mbr
+  </instpos>
+  <usepassword>false
+  </usepassword>
+  <password>
+  </password>
+  <lba>false
+  </lba>
+  <options>vga=791 splash=silent,fadein,theme:default console=tty1
+  </options>
+  <entrylist>
+  </entrylist>
+  <default>linux
+  </default>
+  <doslabel>Windows
+  </doslabel>
+  <linuxlabel>
+  </linuxlabel>
+  <boot_device>
+  </boot_device>
+  <mbr_device>
+  </mbr_device>
+  <win_device>
+  </win_device>
+ </bootloader>
+ <package>
+  <choosedgroup>
+   <select id="ALL">
+   </select>
+  </choosedgroup>
+ </package>
+ <takeactions>
+  <installmode>rpminstallmode
+  </installmode>
+ </takeactions>
+ <startsetup>
+  <skipXsetting>1
+  </skipXsetting>
+ </startsetup>
+ <Xwindow>
+  <monitor>
+   <name>Unknown
+   </name>
+   <horiz_sync>31.5-37.9
+   </horiz_sync>
+   <vert_refresh>50-70
+   </vert_refresh>
+  </monitor>
+  <videocard>
+   <name>Unknown
+   </name>
+   <driver>vga
+   </driver>
+   <videoram>1024
+   </videoram>
+  </videocard>
+  <mouse>
+   <name>Unknown
+   </name>
+   <protocol>none
+   </protocol>
+   <device>none
+   </device>
+   <xemu3>false
+   </xemu3>
+   <shortname>unknown
+   </shortname>
+  </mouse>
+  <modes>
+   <m640x8>false
+   </m640x8>
+   <m800x8>false
+   </m800x8>
+   <m1024x8>false
+   </m1024x8>
+   <m1280x8>false
+   </m1280x8>
+   <m640x15>false
+   </m640x15>
+   <m800x15>false
+   </m800x15>
+   <m1024x15>false
+   </m1024x15>
+   <m1280x15>false
+   </m1280x15>
+   <m640x16>false
+   </m640x16>
+   <m800x16>false
+   </m800x16>
+   <m1024x16>false
+   </m1024x16>
+   <m1280x16>false
+   </m1280x16>
+   <m640x24>false
+   </m640x24>
+   <m800x24>false
+   </m800x24>
+   <m1024x24>false
+   </m1024x24>
+   <m1280x24>false
+   </m1280x24>
+   <widemode_res>
+   </widemode_res>
+   <widemode_x>
+   </widemode_x>
+   <widemode_y>
+   </widemode_y>
+   <widemode_depth>24
+   </widemode_depth>
+   <widemode_refresh>60
+   </widemode_refresh>
+  </modes>
+  <init>gra
+  </init>
+ </Xwindow>
+ <lists>
+  <vender_list>
+   <row c0="ADI">
+   </row>
+   <row c0="AOC">
+   </row>
+   <row c0="AST">
+   </row>
+   <row c0="AT&amp;T">
+   </row>
+   <row c0="Aamazing">
+   </row>
+   <row c0="Acer">
+   </row>
+   <row c0="Action Systems, Inc.">
+   </row>
+   <row c0="Actix">
+   </row>
+   <row c0="Adara">
+   </row>
+   <row c0="Amptron International,Inc.">
+   </row>
+   <row c0="Apollo">
+   </row>
+   <row c0="Apple">
+   </row>
+   <row c0="Belinea">
+   </row>
+   <row c0="BenQ">
+   </row>
+   <row c0="Bridge">
+   </row>
+   <row c0="Brother">
+   </row>
+   <row c0="Bus Computer Systems">
+   </row>
+   <row c0="CMC">
+   </row>
+   <row c0="CTL">
+   </row>
+   <row c0="CTX">
+   </row>
+   <row c0="Carroll Touch">
+   </row>
+   <row c0="Colorgraphic">
+   </row>
+   <row c0="Compal">
+   </row>
+   <row c0="Compaq">
+   </row>
+   <row c0="Compdyne">
+   </row>
+   <row c0="Compeq USA/Focus">
+   </row>
+   <row c0="Conrac">
+   </row>
+   <row c0="Cordata">
+   </row>
+   <row c0="Cornerstone">
+   </row>
+   <row c0="Cybervision">
+   </row>
+   <row c0="Daewoo">
+   </row>
+   <row c0="Darius">
+   </row>
+   <row c0="Daytek">
+   </row>
+   <row c0="Dell">
+   </row>
+   <row c0="Delta">
+   </row>
+   <row c0="Digital Equipment Corp.">
+   </row>
+   <row c0="EMC">
+   </row>
+   <row c0="ESCOM">
+   </row>
+   <row c0="Eizo">
+   </row>
+   <row c0="Eizo Nanao">
+   </row>
+   <row c0="Elitegroup Computer Systems">
+   </row>
+   <row c0="Elsa AG">
+   </row>
+   <row c0="Epson">
+   </row>
+   <row c0="Everex Systems, Inc.">
+   </row>
+   <row c0="Falco Data Products, Inc.">
+   </row>
+   <row c0="Fora, Inc.">
+   </row>
+   <row c0="Forefront Technology Corp.">
+   </row>
+   <row c0="Fujikama O.A. Distribution">
+   </row>
+   <row c0="Fujitsu">
+   </row>
+   <row c0="Funai Electric Company of Taiwan">
+   </row>
+   <row c0="Futura">
+   </row>
+   <row c0="Gateway">
+   </row>
+   <row c0="Generic CRT Display">
+   </row>
+   <row c0="Generic LCD Display">
+   </row>
+   <row c0="Geritec">
+   </row>
+   <row c0="GoldStar Technology, Inc.">
+   </row>
+   <row c0="Golden Dragon">
+   </row>
+   <row c0="HCI">
+   </row>
+   <row c0="Hanns.G">
+   </row>
+   <row c0="Hansol Electronics">
+   </row>
+   <row c0="Hewlett-Packard">
+   </row>
+   <row c0="Highscreen">
+   </row>
+   <row c0="Hitachi, Ltd.">
+   </row>
+   <row c0="Hyundai Electronics Industries Co., Ltd.">
+   </row>
+   <row c0="Hyundai Electronics Industries Co.,Ltd.">
+   </row>
+   <row c0="Hyundai IT Corporation">
+   </row>
+   <row c0="IBM">
+   </row>
+   <row c0="ICL">
+   </row>
+   <row c0="Iiyama">
+   </row>
+   <row c0="Ikegami">
+   </row>
+   <row c0="Image Systems Corp.">
+   </row>
+   <row c0="ImageQuest Co., Ltd.">
+   </row>
+   <row c0="Impression">
+   </row>
+   <row c0="Intra Electronics USA, Inc.">
+   </row>
+   <row c0="Iocomm International Technology Corp.">
+   </row>
+   <row c0="JVC Information Products Co.">
+   </row>
+   <row c0="KFC">
+   </row>
+   <row c0="KFC Computek Components Corp.">
+   </row>
+   <row c0="KLH Computers">
+   </row>
+   <row c0="Komodo">
+   </row>
+   <row c0="Korea Data Systems">
+   </row>
+   <row c0="LG Electronics Inc.">
+   </row>
+   <row c0="Leading Technology, Inc.">
+   </row>
+   <row c0="Lenovo">
+   </row>
+   <row c0="Link Computer, Inc.">
+   </row>
+   <row c0="Lite-On">
+   </row>
+   <row c0="Logitec">
+   </row>
+   <row c0="MAG Technology Co., Ltd.">
+   </row>
+   <row c0="MED">
+   </row>
+   <row c0="MacroView">
+   </row>
+   <row c0="Magnavox">
+   </row>
+   <row c0="Maxdata Computer">
+   </row>
+   <row c0="MegaImage">
+   </row>
+   <row c0="Megavision">
+   </row>
+   <row c0="MiTAC">
+   </row>
+   <row c0="Microtec">
+   </row>
+   <row c0="Microvitec, Inc.">
+   </row>
+   <row c0="Miro Computer Products AG">
+   </row>
+   <row c0="Mitsuba Corp.">
+   </row>
+   <row c0="Mitsubishi">
+   </row>
+   <row c0="Modgraph">
+   </row>
+   <row c0="Monitronix">
+   </row>
+   <row c0="Morse">
+   </row>
+   <row c0="NEC">
+   </row>
+   <row c0="Nanao">
+   </row>
+   <row c0="Nissei Sangyo">
+   </row>
+   <row c0="Nokia">
+   </row>
+   <row c0="OKI">
+   </row>
+   <row c0="Olivetti">
+   </row>
+   <row c0="Optiquest">
+   </row>
+   <row c0="Orchestra">
+   </row>
+   <row c0="PC Brand">
+   </row>
+   <row c0="PLB">
+   </row>
+   <row c0="Packard Bell">
+   </row>
+   <row c0="Panasonic">
+   </row>
+   <row c0="Peacock">
+   </row>
+   <row c0="Philips">
+   </row>
+   <row c0="Premier">
+   </row>
+   <row c0="Princeton">
+   </row>
+   <row c0="Proview">
+   </row>
+   <row c0="QDS">
+   </row>
+   <row c0="Quantex">
+   </row>
+   <row c0="Qume">
+   </row>
+   <row c0="REDMS Group">
+   </row>
+   <row c0="Radius">
+   </row>
+   <row c0="RasterOps">
+   </row>
+   <row c0="Relisys">
+   </row>
+   <row c0="Royal Information Company">
+   </row>
+   <row c0="SGI">
+   </row>
+   <row c0="Sampo">
+   </row>
+   <row c0="Samsung">
+   </row>
+   <row c0="Samtron">
+   </row>
+   <row c0="Seiko">
+   </row>
+   <row c0="Shamrock">
+   </row>
+   <row c0="Siemens Nixdorf">
+   </row>
+   <row c0="Sliding Unika">
+   </row>
+   <row c0="Smile">
+   </row>
+   <row c0="Sony">
+   </row>
+   <row c0="Sun">
+   </row>
+   <row c0="Sunshine">
+   </row>
+   <row c0="Sylvania">
+   </row>
+   <row c0="TECO">
+   </row>
+   <row c0="TPG">
+   </row>
+   <row c0="TTX">
+   </row>
+   <row c0="TVM">
+   </row>
+   <row c0="TW Casper">
+   </row>
+   <row c0="Talon">
+   </row>
+   <row c0="Tandberg">
+   </row>
+   <row c0="Targa">
+   </row>
+   <row c0="Tatung">
+   </row>
+   <row c0="Taxan">
+   </row>
+   <row c0="Toshiba">
+   </row>
+   <row c0="Unisys">
+   </row>
+   <row c0="ViewSonic">
+   </row>
+   <row c0="Vobis">
+   </row>
+   <row c0="WYSE">
+   </row>
+   <row c0="Yakumo Electronics">
+   </row>
+   <row c0="Zenith">
+   </row>
+  </vender_list>
+  <card_list>
+   <row c1="apm" c0="Alliance ProMotion cards, inlcluding AT24, AT3D, and AT25">
+   </row>
+   <row c1="ark" c0="ARK Logic chipsets">
+   </row>
+   <row c1="ast" c0="ASpeedTech chipsets">
+   </row>
+   <row c1="chips" c0="Chips and Technologies chipsets, including CT655xx, CT64xxx, CT68xxx, and CT690x0">
+   </row>
+   <row c1="cirrus" c0="Cirrus CL-GD54xx/7548 cards">
+   </row>
+   <row c1="cyrix" c0="Cyrix MediaGX, MediaGXi, and MediaGXm processors">
+   </row>
+   <row c1="fbdev" c0="Linux framebuffer">
+   </row>
+   <row c1="glint" c0="3DLabs/Texas Instruments GLINT and Permedia cards">
+   </row>
+   <row c1="i128" c0="Number 9 Imagine 128 cards">
+   </row>
+   <row c1="i740" c0="Intel I740 chipset">
+   </row>
+   <row c1="imstt" c0="Integrated Micro Solutions Twin Turbo 128">
+   </row>
+   <row c1="intel" c0="Intel integrated graphics chipsets">
+   </row>
+   <row c1="mach64" c0="ATI Mach8, Mach32, Mach64, and RageXL cards">
+   </row>
+   <row c1="mga" c0="Matrox Millennium, Mystique, and G-series">
+   </row>
+   <row c1="neomagic" c0="NeoMagic MagicGraph 128, 256">
+   </row>
+   <row c1="newport" c0="SGI Indy/Indigo2 Newport card">
+   </row>
+   <row c1="nouveau" c0="Experimental driver for nVidia cards">
+   </row>
+   <row c1="nsc" c0="National Semiconductors Geode Processor">
+   </row>
+   <row c1="nv" c0="nVidia Riva 128, RIVA TNT, GeForce, nForce, and QUADRO cards">
+   </row>
+   <row c1="openchrome" c0="VIA Unichrome (CLE266, KM400/KN400, K8M800/K8N800, PM8X0, CN400) chipsets">
+   </row>
+   <row c1="r128" c0="ATI Rage128 cards, including Rage Fury, XPERT 128, and XPERT 99">
+   </row>
+   <row c1="radeon" c0="ATI Radeon cards, including Radeon Mobility and FireGL">
+   </row>
+   <row c1="rendition" c0="Rendition/Micron Verite cards">
+   </row>
+   <row c1="s3" c0="S3 964, 968, Trio, Aurora64, and Trio64 cards">
+   </row>
+   <row c1="s3virge" c0="S3 ViRGE and Trio3D cards">
+   </row>
+   <row c1="savage" c0="S3 Savage, SuperSavage, Twister, and ProSavage chipsets">
+   </row>
+   <row c1="siliconmotion" c0="Silicon Motion Lynx and Cougar chipsets">
+   </row>
+   <row c1="sis" c0="Silicon Integrated Systems SiS chipsets">
+   </row>
+   <row c1="sisusb" c0="Silicon Integrated Systems SiS315E/PRO USB adpater">
+   </row>
+   <row c1="sunbw2" c0="Sun BW2 framebuffer">
+   </row>
+   <row c1="suncg14" c0="Sun CG14 framebuffer">
+   </row>
+   <row c1="suncg3" c0="Sun CG3 framebuffer">
+   </row>
+   <row c1="suncg6" c0="Sun GX/Turbo GX (cgsix) framebuffer">
+   </row>
+   <row c1="sunffb" c0="Sun Creator, Creator 3D, Elite 3D framebuffer">
+   </row>
+   <row c1="sunleo" c0="Sun Leo (ZX) framebuffer">
+   </row>
+   <row c1="suntcx" c0="Sun TCX framebuffer">
+   </row>
+   <row c1="tdfx" c0="3Dfx Voodoo Banshee, Voodoo 3, Voodoo 4, Voodoo 5 cards">
+   </row>
+   <row c1="tga" c0="DEC TGA chipset">
+   </row>
+   <row c1="trident" c0="Trident Blade, CyberBlade, 3DImage, ProVidia, TGUI, and Cyber9xxx cards">
+   </row>
+   <row c1="tseng" c0="Tseng Labs ET4000, ET6000, and ET6100 cards">
+   </row>
+   <row c1="vesa" c0="Generic VESA-compliant video cards">
+   </row>
+   <row c1="vga" c0="Generic VGA video cards">
+   </row>
+   <row c1="vmware" c0="VMWare virtual video cards">
+   </row>
+   <row c1="voodoo" c0="Voodoo1 and Voodoo2 cards">
+   </row>
+  </card_list>
+  <mouse_list>
+   <row c3="false" c2="ttyS" c1="IntelliMouse" c0="ASCII - MieMouse (serial)">
+   </row>
+   <row c3="true" c2="input/mice" c1="IMPS/2" c0="Generic - 2 Button Mouse (PS/2)">
+   </row>
+   <row c3="true" c2="input/mice" c1="IMPS/2" c0="Generic - 2 Button Mouse (USB)">
+   </row>
+   <row c3="true" c2="ttyS" c1="Microsoft" c0="Generic - 2 Button Mouse (serial)">
+   </row>
+   <row c3="false" c2="input/mice" c1="IMPS/2" c0="Generic - 3 Button Mouse (PS/2)">
+   </row>
+   <row c3="false" c2="input/mice" c1="IMPS/2" c0="Generic - 3 Button Mouse (USB)">
+   </row>
+   <row c3="false" c2="ttyS" c1="Microsoft" c0="Generic - 3 Button Mouse (serial)">
+   </row>
+   <row c3="false" c2="input/mice" c1="IMPS/2" c0="Generic - Wheel Mouse (PS/2)">
+   </row>
+   <row c3="false" c2="input/mice" c1="IMPS/2" c0="Generic - Wheel Mouse (USB)">
+   </row>
+   <row c3="true" c2="ttyS" c1="IntelliMouse" c0="Genius - NetMouse (serial)">
+   </row>
+   <row c3="true" c2="ttyS" c1="ThinkingMouse" c0="Kensington - Thinking Mouse (serial)">
+   </row>
+   <row c3="false" c2="ttyS" c1="Logitech" c0="Logitech - C7 Mouse (serial, old C7 type)">
+   </row>
+   <row c3="false" c2="ttyS" c1="MouseMan" c0="Logitech - CC Series (serial)">
+   </row>
+   <row c3="false" c2="ttyS" c1="IntelliMouse" c0="Logitech - MouseMan+/FirstMouse+ (serial)">
+   </row>
+   <row c3="false" c2="ttyS" c1="MouseMan" c0="Logitech - MouseMan/FirstMouse (serial)">
+   </row>
+   <row c3="true" c2="ttyS" c1="MMHittab" c0="MM - MM HitTablet (serial)">
+   </row>
+   <row c3="true" c2="ttyS" c1="MMSeries" c0="MM - MM Series (serial)">
+   </row>
+   <row c3="true" c2="ttyS" c1="Microsoft" c0="Microsoft - Compatible Mouse (serial)">
+   </row>
+   <row c3="false" c2="ttyS" c1="IntelliMouse" c0="Microsoft - IntelliMouse (serial)">
+   </row>
+   <row c3="true" c2="ttyS" c1="Auto" c0="Microsoft - Rev 2.1A or higher (serial)">
+   </row>
+   <row c3="true" c2="ttyS" c1="MouseSystems" c0="Mouse Systems - Mouse (serial)">
+   </row>
+   <row c3="false" c2="none" c1="none" c0="No - mouse">
+   </row>
+   <row c3="false" c2="sunmouse" c1="sun" c0="Sun - Mouse">
+   </row>
+   <row c3="true" c2="input/mice" c1="IMPS/2" c0="Synaptics - Synaptics Touchpad">
+   </row>
+   <row c3="true" c2="input/mice" c1="vmmouse" c0="VMWare - VMWare Mouse">
+   </row>
+  </mouse_list>
+ </lists>
+</magic.values>

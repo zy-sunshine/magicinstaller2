@@ -1,22 +1,8 @@
 #!/usr/bin/python
-# Copyright (C) 2003, Charles Wang.
-# Author:  Charles Wang <charles@linux.net.cn>
-# All rights reserved.
-#
-# This program is free software; you can redistribute it and/or modify it
-# under the terms of the GNU General Public License as published by the Free
-# Software Foundation; either version 2, or (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful, but WITHOUT
-# ANY WARRANT; without even the implied warranty of MERCHANTABILITY or FITNESS
-# FOR A PARTICULAR PURPOSE. See the GNU General Public LIcense for more
-# details.
-#
-# You should have received a copy of the GNU General Public License along
-# with this program; if not, write to the Free Software Foundation, 59 Temple
-# Place - Suite 330, Boston, MA 02111-1307, USA.
+from miui import _
+from miui.utils import magicstep
 
-class mistep_scsi (magicstep.magicstep):
+class MIStep_scsi (magicstep.magicstep):
     def __init__(self, rootobj):
         self.first_fill = None
         magicstep.magicstep.__init__(self, rootobj, 'scsi.xml', 'scsi')
@@ -25,10 +11,10 @@ class mistep_scsi (magicstep.magicstep):
         return  _("SCSI Driver")
 
     def enter(self):
-        global  reprobe_all_disks_required
+        CONF.reprobe_all_disks_required
         if not self.first_fill:
             self.do_first_fill()
-        reprobe_all_disks_required = 0
+        CONF.reprobe_all_disks_required = 0
         return  1
 
     def leave(self):
@@ -65,7 +51,7 @@ class mistep_scsi (magicstep.magicstep):
                                               magicpopup.magicmsgbox.MB_INFO, 0)
 
     def get_modprobe_result(self, operid, data):
-        global  reprobe_all_disks_required
+        CONF.reprobe_all_disks_required
         success = self.rootobj.tm.results[operid]
         self.waitdlg.topwin.destroy()
         if not success:
@@ -73,7 +59,7 @@ class mistep_scsi (magicstep.magicstep):
                                    magicpopup.magicmsgbox.MB_ERROR,
                                    magicpopup.magicpopup.MB_OK)
         else:
-            reprobe_all_disks_required = 1
+            CONF.reprobe_all_disks_required = 1
             stepobj = self.rootobj.stepobj_list[self.rootobj.curstep + 1] # reprobe disk
             stepobj.reprobe_all()
 
