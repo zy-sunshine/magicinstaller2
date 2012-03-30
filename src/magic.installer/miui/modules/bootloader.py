@@ -1,6 +1,7 @@
 #!/usr/bin/python
 from miui import _
 from miui.utils import magicstep
+from miutils.common import STAT
 
 class MIStep_bootloader (magicstep.magicstepgroup):
     def __init__(self, rootobj):
@@ -26,7 +27,7 @@ class MIStep_bootloader (magicstep.magicstepgroup):
     def check_leave_choose(self):
         global win_probe_status
 
-        if win_probe_status != OP_STATUS_DONE:
+        if win_probe_status != STAT.OP_STATUS_DONE:
             magicpopup.magicmsgbox(None, _('Please wait a while for the search of Windows partition.'),
                                    magicpopup.magicmsgbox.MB_INFO,
                                    magicpopup.magicpopup.MB_OK)

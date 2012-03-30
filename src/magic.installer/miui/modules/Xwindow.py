@@ -1,6 +1,7 @@
 # -*- python -*-
 from miui import _
 from miui.utils import magicstep
+import rhpxl.monitor, rhpxl.videocard, rhpxl.mouse
 
 class MIStep_Xwindow (magicstep.magicstepgroup):
     def __init__(self, rootobj):
@@ -63,15 +64,15 @@ class MIStep_Xwindow (magicstep.magicstepgroup):
                                    self.probe_mouse_ok, None,
                                    'probe_mouse', 0)
 
-    def probe_monitor_ok(self, operid, data):
-        (m_name, m_horiz, m_vert) = self.rootobj.tm.results[operid]
+    def probe_monitor_ok(self, tdata, data):
+        (m_name, m_horiz, m_vert) = tdata
         self.set_data(self.rootobj.values, 'Xwindow.monitor.name', m_name)
         self.set_data(self.rootobj.values, 'Xwindow.monitor.horiz_sync', m_horiz)
         self.set_data(self.rootobj.values, 'Xwindow.monitor.vert_refresh', m_vert)
         self.fill_values(self.rootobj.values.documentElement)
 
-    def probe_videocard_ok(self, operid, data):
-        vclist = self.rootobj.tm.results[operid]
+    def probe_videocard_ok(self, tdata, data):
+        vclist = tdata
         if len(vclist) == 0 or len(vclist[0]) == 0:  return
         (vc0name, vc0driver, vc0vidram) = vclist[0]
         self.set_data(self.rootobj.values, 'Xwindow.videocard.name', vc0name)
@@ -79,8 +80,8 @@ class MIStep_Xwindow (magicstep.magicstepgroup):
         self.set_data(self.rootobj.values, 'Xwindow.videocard.videoram', str(vc0vidram))
         self.fill_values(self.rootobj.values.documentElement)
 
-    def probe_mouse_ok(self, operid, data):
-        mouse = self.rootobj.tm.results[operid]
+    def probe_mouse_ok(self, tdata, data):
+        mouse = tdata
         (name, protocol, device, xemu3, shortname) = mouse
         self.set_data(self.rootobj.values, 'Xwindow.mouse.name', name)
         self.set_data(self.rootobj.values, 'Xwindow.mouse.protocol', protocol)
@@ -151,8 +152,8 @@ class MIStep_Xwindow (magicstep.magicstepgroup):
                                    self.test_x_settings_result, None,
                                    'test_x_settings', self.x_settings)
 
-    def test_x_settings_result(self, operid, data):
-        result = self.rootobj.tm.results[operid]
+    def test_x_settings_result(self, tdata, data):
+        result = tdata
         print 'test_x_settings:', result
         if result == 'SUCCESS':
             magicpopup.magicmsgbox(None, _('Success!'),

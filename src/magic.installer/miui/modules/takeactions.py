@@ -1,6 +1,11 @@
 #!/usr/bin/python
 from miui import _
 from miui.utils import magicstep, magicpopup, xmlgtk
+from miutils.miconfig import MiConfig
+CONF = MiConfig.get_instance()
+CONF_DEBUG_MODE = CONF.LOAD.CONF_DEBUG_MODE
+CONF_FULL_WIDTH = CONF.LOAD.CONF_FULL_WIDTH
+CONF_FULL_HEIGHT = CONF.LOAD.CONF_FULL_HEIGHT
 
 class MIStep_takeactions(magicstep.magicstepgroup):
     class tadialog(xmlgtk.xmlgtk):
@@ -8,7 +13,7 @@ class MIStep_takeactions(magicstep.magicstepgroup):
             self.upobj = upobj
             xmlgtk.xmlgtk.__init__(self, uixml, uirootname)
             self.topwin = gtk.Window(gtk.WINDOW_TOPLEVEL)
-            self.topwin.set_size_request(full_width, full_height)
+            self.topwin.set_size_request(CONF_FULL_WIDTH, CONF_FULL_HEIGHT)
             self.topwin.set_position(gtk.WIN_POS_CENTER_ALWAYS)
             self.topwin.add(self.widget)
             self.topwin.show()
@@ -91,15 +96,15 @@ class MIStep_takeactions(magicstep.magicstepgroup):
                                           ['notes', 'ensure'], 'step')
         self.actlist = []
         
-        if not DEBUG_MODE:
+        if not CONF_DEBUG_MODE:
             # skip format and mount partition
-            self.actlist.append( (N_('Partition/Format'), self.act_start_parted, self.act_end_parted) )
+            self.actlist.append( (_('Partition/Format'), self.act_start_parted, self.act_end_parted) )
 
-        self.actlist.append( (N_('Install Package'), self.act_start_instpkg, self.act_end_instpkg) )
-        if not DEBUG_MODE:
-            self.actlist.append( (N_('Make initrd'), self.act_start_mkinitrd, None) )
-            self.actlist.append( (N_('Install Bootloader'), self.act_start_bootloader, None) )
-        #(N_('Setup Keyboard'), self.act_start_keyboard, None)]
+        self.actlist.append( (_('Install Package'), self.act_start_instpkg, self.act_end_instpkg) )
+        if not CONF_DEBUG_MODE:
+            self.actlist.append( (_('Make initrd'), self.act_start_mkinitrd, None) )
+            self.actlist.append( (_('Install Bootloader'), self.act_start_bootloader, None) )
+        #(_('Setup Keyboard'), self.act_start_keyboard, None)]
         self.actpos = 0
         self.discdlg_open_time = -1
         self.installmode = 'rpminstallmode'   # Default
@@ -161,13 +166,13 @@ class MIStep_takeactions(magicstep.magicstepgroup):
         else:
             self.add_action(None, self.act_finish, None, 'sleep', 0)
 
-    def act_finish(self, operid, data):
+    def act_finish(self, tdata, data):
         self.rootobj.tm.pop_progress()
         self.tadlg.name_map['otname'].set_text('')
         self.tadlg.name_map['otprog'].set_fraction(1)
         self.tadlg.name_map['frame_other'].set_sensitive(False)
         self.tadlg.topwin.destroy()
-#        self.rootobj.btnnext_do()
+
 
     def act_start_parted(self):
         self.tadlg.name_map['pfprog'].set_fraction(0)
@@ -181,8 +186,8 @@ class MIStep_takeactions(magicstep.magicstepgroup):
                         self.act_parted_get_dirty_result, None,
                         'get_all_dirty_disk', 0)
 
-    def act_parted_get_dirty_result(self, operid, data):
-        self.dirty_disks = self.rootobj.tm.results[operid]
+    def act_parted_get_dirty_result(self, tdata, data):
+        self.dirty_disks = tdata
         self.format_list = []
         for devpath in all_part_infor.keys():
             for part_tuple in all_part_infor[devpath]:
@@ -204,8 +209,8 @@ class MIStep_takeactions(magicstep.magicstepgroup):
         else:
             self.act_parted_format_start(0)
 
-    def act_parted_commit_result(self, operid, data):
-        result = self.rootobj.tm.results[operid]
+    def act_parted_commit_result(self, tdata, data):
+        result = tdata
         if result:
             # Error occurred. Stop it?
             dolog('commit_result ERROR: %s\n' % str(result))
@@ -218,7 +223,7 @@ class MIStep_takeactions(magicstep.magicstepgroup):
 
     def act_parted_format_start(self, pos):
         global  mount_all_list
-        global  choosed_patuple
+
         if pos < len(self.format_list):
             actinfor = 'Formating %s on %s%d.'
             actinfor = actinfor % (self.format_list[pos][2],
@@ -247,20 +252,20 @@ class MIStep_takeactions(magicstep.magicstepgroup):
                             'mount_all_tgtpart', mount_all_list, 'y')
             # Check whether the packages are stored in mounted partitions.
             pkgmntpoint = 0
-            (pafile, dev, mntpoint, fstype, dir, isofn) = choosed_patuple
+            (pafile, dev, mntpoint, fstype, dir, isofn) = CONF.RUN.g_choosed_patuple
             for (mntpoint, devfn, fstype) in mount_all_list:
                 if dev == devfn:
                     pkgmntpoint = mntpoint
                     if len(pkgmntpoint) > 0 and pkgmntpoint[0] == '/':
                         pkgmntpoint = pkgmntpoint[1:]
-                    choosed_patuple = (pafile, dev, pkgmntpoint,
+                    CONF.RUN.g_choosed_patuple = (pafile, dev, pkgmntpoint,
                                        fstype, dir, isofn)
                     dolog('The packages is placed in the mounted partition(%s)\n' %\
                           pkgmntpoint)
                     break
 
-    def act_parted_format_result(self, operid, data):
-        result = self.rootobj.tm.results[operid]
+    def act_parted_format_result(self, tdata, data):
+        result = tdata
         if result:
             # Error occurred. Stop it?
             # Yes, we should stop it, and we should stop at mount failed place too.
@@ -278,10 +283,9 @@ class MIStep_takeactions(magicstep.magicstepgroup):
         self.tadlg.name_map['frame_parted'].set_sensitive(False)
 
     def pkg2archpkg(self, pkg):
-        global arrangement, pkgpos_map
-        (disc_no, pkg_no) = pkgpos_map[pkg]
+        (disc_no, pkg_no) = CONF.RUN.g_pkgpos_map[pkg]
         pkgarchmap = {}
-        pkgpathes = arrangement[disc_no][pkg_no][4] # pkgpublic.pathes == 4.
+        pkgpathes = CONF.RUN.g_arrangement[disc_no][pkg_no][4] # pkgpublic.pathes == 4.
         for (apkg, aarch, asize) in pkgpathes:
             if aarch == 'noarch':
                 return (apkg, aarch, asize)
@@ -293,7 +297,6 @@ class MIStep_takeactions(magicstep.magicstepgroup):
         dolog('Unresolved package: pkg = %s, pkgarchmap = %s, archcompat_list = %s\n' % (pkg, str(pkgarchmap), str(self.archcompat_list)))
 
     def calc_instpkg_map(self):
-        global archsize_map, pkgpos_map, toplevelgrp_map
         datanode = self.srh_data_node(self.values, 'package.choosedgroup')
         choosed_list = []
         self.totalsize = 0
@@ -304,40 +307,38 @@ class MIStep_takeactions(magicstep.magicstepgroup):
             thisid = selnode.getAttribute('id')
             if thisid == 'ALL':
                 self.install_allpkg = 1
-                self.totalsize = archsize_map[self.arch]
+                self.totalsize = CONF.RUN.g_archsize_map[self.arch]
                 break
             choosed_list.append(thisid)
         if self.install_allpkg:
-            self.totalpkg = len(pkgpos_map.keys())
+            self.totalpkg = len(CONF.RUN.g_pkgpos_map.keys())
             return
         for grp in ['lock'] + choosed_list:
-            if not toplevelgrp_map.has_key(grp):
+            if not CONF.RUN.g_toplevelgrp_map.has_key(grp):
                 # Omit the invalid group name.
                 continue
-            for pkg in toplevelgrp_map[grp].keys():
+            for pkg in CONF.RUN.g_toplevelgrp_map[grp].keys():
                 if not self.instpkg_map.has_key(pkg):
                     (apkg, aarch, asize) = self.pkg2archpkg(pkg)
-                    self.disc_map[pkgpos_map[pkg][0]] = 'y'
+                    self.disc_map[CONF.RUN.g_pkgpos_map[pkg][0]] = 'y'
                     self.instpkg_map[pkg] = 'y'
                     self.totalsize = self.totalsize + asize
         self.totalpkg = len(self.instpkg_map.keys())
 
 ##### Start install package
     def act_start_instpkg(self):
-        global choosed_patuple
-        global arch_map, arrangement
         self.tadlg.name_map['frame_packages'].set_sensitive(True)
         self.rootobj.tm.push_progress(self.tadlg.name_map['pkgprog'],
                                       self.tadlg.name_map['pkgname'])
         self.arch = self.rootobj.tm.actserver.get_arch()
-        self.archcompat_list = arch_map[self.arch]
+        self.archcompat_list = CONF.RUN.g_arch_map[self.arch]
         dolog('Detected Arch: %s\n' % str(self.arch))
         self.calc_instpkg_map()
         dolog('install_allpkg = %s\n' % str(self.install_allpkg))
         self.disc_first_pkgs = []
-        for disc_no in range(len(arrangement)):
-            self.disc_first_pkgs.append(arrangement[disc_no][0][1])
-        (pafile, dev, mntpoint, fstype, dir, isofn) = choosed_patuple
+        for disc_no in range(len(CONF.RUN.g_arrangement)):
+            self.disc_first_pkgs.append(CONF.RUN.g_arrangement[disc_no][0][1])
+        (pafile, dev, mntpoint, fstype, dir, isofn) = CONF.RUN.g_choosed_patuple
         dolog('disc_first_pkgs: %s\n' % str(self.disc_first_pkgs))
         self.add_action(_('Search packages'),
                         self.act_instpkg_prepare, None,
@@ -352,11 +353,10 @@ class MIStep_takeactions(magicstep.magicstepgroup):
         s = int(tmdiff) % 60
         return '%02d:%02d:%02d' % (h, m, s)
 
-    def act_instpkg_prepare(self, operid, data):
-        global choosed_patuple
-        (errmsg, self.probe_all_disc_result) = self.rootobj.tm.results[operid]
+    def act_instpkg_prepare(self, tdata, data):
+        (errmsg, self.probe_all_disc_result) = tdata
         dolog('probe_all_disc_result: %s\n' % str(self.probe_all_disc_result))
-        (pafile, dev, mntpoint, fstype, dir, isofn) = choosed_patuple
+        (pafile, dev, mntpoint, fstype, dir, isofn) = CONF.RUN.g_choosed_patuple
         self.donepkg = 0
         self.cursize = 0
         self.starttime = time.time()
@@ -375,16 +375,14 @@ class MIStep_takeactions(magicstep.magicstepgroup):
                         self.act_instpkg_disc_start, 0,
                         'instpkg_prep', dev, mntpoint, dir, fstype, self.installmode)
 
-    def act_instpkg_disc_start(self, operid, disc_no):
-        global choosed_patuple, arrangement
-
+    def act_instpkg_disc_start(self, tdata, disc_no):
         if self.discdlg_open_time > 0:
             # Do adjustment to omit the influence of replace disc.
             self.starttime = self.starttime + \
                              (time.time() - self.discdlg_open_time)
             self.discdlg_open_time = -1
-        (pafile, dev, mntpoint, fstype, dir, isofn) =  choosed_patuple
-        while disc_no < len(arrangement):
+        (pafile, dev, mntpoint, fstype, dir, isofn) =  CONF.RUN.g_choosed_patuple
+        while disc_no < len(CONF.RUN.g_arrangement):
             if not self.install_allpkg and not self.disk_map.has_key(disc_no):
                 # Skip the disc which is not needed.
                 disc_no = disc_no + 1
@@ -407,46 +405,41 @@ class MIStep_takeactions(magicstep.magicstepgroup):
                         'instpkg_post', dev, mntpoint, dir, fstype)
 
     def retry_clicked(self, widget, data):
-        global choosed_patuple
-        (pafile, dev, mntpoint, fstype, dir, isofn) = choosed_patuple
+        (pafile, dev, mntpoint, fstype, dir, isofn) = CONF.RUN.g_choosed_patuple
         self.add_action(_('Researching packages...'),
                         self.reprobe_all_disc_0, None,
                         'instpkg_post', dev, mntpoint, dir, fstype)
         
-    def reprobe_all_disc_0(self, operid, data):
-        global choosed_patuple
-        (pafile, dev, mntpoint, fstype, dir, isofn) = choosed_patuple
+    def reprobe_all_disc_0(self, tdata, data):
+        (pafile, dev, mntpoint, fstype, dir, isofn) = CONF.RUN.g_choosed_patuple
         self.add_action(_('Researching packages...'),
                         self.reprobe_all_disc_1, None,
                         'probe_all_disc', dev, mntpoint, dir, fstype, self.disc_first_pkgs)
 
-    def reprobe_all_disc_1(self, operid, data):
-        global choosed_patuple
-        (errmsg, self.probe_all_disc_result) = self.rootobj.tm.results[operid]
+    def reprobe_all_disc_1(self, tdata, data):
+        (errmsg, self.probe_all_disc_result) = tdata
         dolog('probe_all_disc_result: %s\n' % str(self.probe_all_disc_result))
-        (pafile, dev, mntpoint, fstype, dir, isofn) = choosed_patuple
+        (pafile, dev, mntpoint, fstype, dir, isofn) = CONF.RUN.g_choosed_patuple
         self.add_action(_('Researching packages...'),
                         self.act_instpkg_disc_start, self.cur_disc_no,
                         'instpkg_prep', dev, mntpoint, dir, fstype, self.installmode)
 
     def abort_clicked(self, widget, data):
-        global choosed_patuple
-        (pafile, dev, mntpoint, fstype, dir, isofn) = choosed_patuple
+        (pafile, dev, mntpoint, fstype, dir, isofn) = CONF.RUN.g_choosed_patuple
         self.add_action(_('Aborting...'),
                         self.nextop, None,
                         'instpkg_post', dev, mntpoint, dir, fstype)
 
     def reboot_clicked(self, widget, data):
         global mount_all_list
-        global choosed_patuple
-        (pafile, dev, mntpoint, fstype, dir, isofn) = choosed_patuple
+        (pafile, dev, mntpoint, fstype, dir, isofn) = CONF.RUN.g_choosed_patuple
         msg = _('Umount the target filesystem(s).')
         self.add_action(msg, None, None,
                         'instpkg_post', dev, mntpoint, dir, fstype)
         self.add_action(msg, self.reboot_0, None,
                         'umount_all_tgtpart', mount_all_list, 'y')
 
-    def reboot_0(self, operid, data):
+    def reboot_0(self, tdata, data):
         self.rebootdlg = \
                        magicpopup.magicmsgbox(self,
                                               _('Click "OK" to reboot your system!\nEject the cdrom if you are installed from cdrom.'),
@@ -458,11 +451,10 @@ class MIStep_takeactions(magicstep.magicstepgroup):
         self.add_action('Quit', None, None, 'quit', 0)
         self.rebootdlg.topwin.destroy()
 
-    def act_instpkg_pkg_start(self, operid, data):
-        global choosed_patuple, arrangement
+    def act_instpkg_pkg_start(self, tdata, data):
         (disc_no, pkg_no) = data
-        while pkg_no < len(arrangement[disc_no]):
-            pkgtuple = arrangement[disc_no][pkg_no]
+        while pkg_no < len(CONF.RUN.g_arrangement[disc_no]):
+            pkgtuple = CONF.RUN.g_arrangement[disc_no][pkg_no]
             noscripts = pkgtuple[6]     # pkgpublic.noscripts == 6.
             if self.install_allpkg or self.instpkg_map.has_key(pkgtuple[1]):
                 archpkg = self.pkg2archpkg(pkgtuple[1])
@@ -490,12 +482,12 @@ class MIStep_takeactions(magicstep.magicstepgroup):
                             'package_install', apkg, self.probe_all_disc_result[disc_no][1],
                             noscripts)
             return
-        (pafile, dev, mntpoint, fstype, dir, isofn) = choosed_patuple
+        (pafile, dev, mntpoint, fstype, dir, isofn) = CONF.RUN.g_choosed_patuple
         self.add_action(None,
                         self.act_instpkg_disc_start, disc_no + 1,
                         'instpkg_disc_post', dev, mntpoint, dir, fstype, isofn, self.probe_all_disc_result[disc_no][1])
 
-    def act_instpkg_pkg_end(self, operid, data):
+    def act_instpkg_pkg_end(self, tdata, data):
         #--- FIXME ---
         # It doesn't check the result of package_install now, but it should...
         # It should popup an dialog to let the user choose 'continue' or
@@ -503,7 +495,7 @@ class MIStep_takeactions(magicstep.magicstepgroup):
         (disc_no, pkg_no, asize, is_skip) = data
 
         if not is_skip:
-            res = self.rootobj.tm.results[operid]
+            res = tdata
             if res != 0:
                 self.rpmerrdialog(self, self.uixmldoc, res, 'rpmerr.dialog', data)
                 return
@@ -525,7 +517,7 @@ class MIStep_takeactions(magicstep.magicstepgroup):
             self.tadlg.name_map['remaintime'].set_text(self.tmfmt(elapsed * remainsize / self.cursize))
         self.tadlg.name_map['topprog'].set_fraction(float(self.cursize)/float(self.totalsize))
         self.tadlg.name_map['pkgprog'].set_fraction(1)
-        self.act_instpkg_pkg_start(operid, (disc_no, pkg_no + 1))
+        self.act_instpkg_pkg_start(tdata, (disc_no, pkg_no + 1))
 
     def act_end_instpkg(self):
         self.rootobj.tm.pop_progress()
@@ -587,9 +579,9 @@ class MIStep_takeactions(magicstep.magicstepgroup):
                         'prepare_' + bltype, timeout, usepassword, password,
                         lba, options, entries, default, instpos, bootdev, mbr_device, win_device, win_fs)
 
-    def bl_umount(self, operid, data):
+    def bl_umount(self, tdata, data):
         global mount_all_list
-        res = self.rootobj.tm.results[operid]
+        res = tdata
         if type(res) == types.IntType:
             self.add_action(None, self.nextop, None, 'sleep', 0)
             return
@@ -597,20 +589,20 @@ class MIStep_takeactions(magicstep.magicstepgroup):
                         self.bl_setup, (data, res),
                         'umount_all_tgtpart', mount_all_list, 0)
 
-    def bl_setup(self, operid, data):
+    def bl_setup(self, tdata, data):
         (bltype, (grubdev, grubsetupdev, grubopt)) = data
         self.add_action(_('Setup bootloader'), self.bl_mount, None,
                         'setup_' + bltype, grubdev, grubsetupdev, grubopt)
 
-    def bl_mount(self, operid, data):
+    def bl_mount(self, tdata, data):
         global mount_all_list
         self.add_action(_('Mount all target partitions after bootloader setup.'),
                         self.nextop, None,
                         'mount_all_tgtpart', mount_all_list, 0)
 
-    def nextop(self, operid, data):
-        if operid:
-            result = self.rootobj.tm.results[operid]
+    def nextop(self, tdata, data):
+        if tdata:
+            result = tdata
             if result:
                 # Error occurred. Stop it?
                 dolog('ERROR: %s\n' % str(result))

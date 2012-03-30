@@ -1,6 +1,8 @@
 #!/usr/bin/python
 from miui import _
 from miui.utils import magicstep
+from miutils.miconfig import MiConfig
+CONF = MiConfig.get_instance()
 
 class MIStep_scsi (magicstep.magicstep):
     def __init__(self, rootobj):
@@ -11,7 +13,7 @@ class MIStep_scsi (magicstep.magicstep):
         return  _("SCSI Driver")
 
     def enter(self):
-        CONF.reprobe_all_disks_required
+        CONF.RUN.reprobe_all_disks_required
         if not self.first_fill:
             self.do_first_fill()
         CONF.reprobe_all_disks_required = 0
@@ -50,9 +52,9 @@ class MIStep_scsi (magicstep.magicstep):
         self.waitdlg = magicpopup.magicmsgbox(None, _('Please wait......'),
                                               magicpopup.magicmsgbox.MB_INFO, 0)
 
-    def get_modprobe_result(self, operid, data):
+    def get_modprobe_result(self, tdata, data):
         CONF.reprobe_all_disks_required
-        success = self.rootobj.tm.results[operid]
+        success = tdata
         self.waitdlg.topwin.destroy()
         if not success:
             magicpopup.magicmsgbox(None, _('Load module failed.'),
@@ -147,7 +149,7 @@ class MIStep_scsi (magicstep.magicstep):
                     mod = fn[:fn.rfind('.')]
                     loaded = mod in loaded_module_list
                     self.modulelist.append([None, loaded, mod, mod])
-        os.path.walk('/lib/modules/%s/kernel/drivers/scsi' % kernelver,
+        os.path.walk('/lib/modules/%s/kernel/drivers/scsi' % CONF.LOAD.CONF_KERNELVER,
                      find_kmod, None)
         self.modulelist.sort(modcmp)
 

@@ -19,5 +19,5 @@ class MIStep_testops (magicstep.magicstep):
         self.name_map['sleepbtn'].set_sensitive(False)
         self.rootobj.tm.add_action('Test Op: Sleep', self.stopsleep, None, 'sleep', 5)
 
-    def stopsleep(self, operid, data):
+    def stopsleep(self, tdata, data):
         self.name_map['sleepbtn'].set_sensitive(True)

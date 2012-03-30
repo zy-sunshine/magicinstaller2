@@ -1,43 +1,27 @@
 #!/usr/bin/python
-# Copyright (C) 2003, Charles Wang.
-# Author:  Charles Wang <charles@linux.net.cn>
-# All rights reserved.
-#
-# This program is free software; you can redistribute it and/or modify it
-# under the terms of the GNU General Public License as published by the Free
-# Software Foundation; either version 2, or (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful, but WITHOUT
-# ANY WARRANT; without even the implied warranty of MERCHANTABILITY or FITNESS
-# FOR A PARTICULAR PURPOSE. See the GNU General Public LIcense for more
-# details.
-#
-# You should have received a copy of the GNU General Public License along
-# with this program; if not, write to the Free Software Foundation, 59 Temple
-# Place - Suite 330, Boston, MA 02111-1307, USA.
-
-
-import gtk
+import os
+import gtk, xmlgtk
 from gettext import gettext as _
 from xml.dom.minidom import parse, parseString
-import os
 
-import xmlgtk
-import magicpopup
+from miutils.common import search_file
+from miui.utils import magicpopup
 
-from mipublic import hotfixdir, search_file
+from miutils.miconfig import MiConfig
+CONF = MiConfig.get_instance()
+from miutils.milogger import ClientLogger
+log = ClientLogger.get_instance(ClientLogger, __name__)
 
 class magicstep (xmlgtk.xmlgtk):
     def __init__(self, rootobj, uixml_file, uirootname=None):
         self.rootobj = rootobj
-
         # magic.installer-->btnnext_do() will remove these classname from steps.
         # Added by zy_sunshine
         self.skip_stepnames = []
         
         self.values = rootobj.values.documentElement # Just a short cut.
         self.uixml_path = search_file(uixml_file,
-                                 [hotfixdir, '.'],
+                                 [CONF.LOAD.CONF_HOTFIXDIR, '.'],
                                  postfix = 'UIxml')
         uixml = parse(self.uixml_path)
         ### hack to add a debug title
@@ -53,7 +37,7 @@ class magicstep (xmlgtk.xmlgtk):
                     if uixml_rootnode.nodeType == uixml_rootnode.ELEMENT_NODE:
                         break
         newdom = parseString('<vbox margin="4"><label name="dbgmsg" line_wrap="true" fill="true" text="test label"/></vbox>').documentElement
-        uixml_rootnode.appendChild(newdom)
+        #uixml_rootnode.appendChild(newdom)     # TODO: open for debug
         xmlgtk.xmlgtk.__init__(self, uixml, uirootname)
         self.fill_values(self.values)
         self.stepid = None
@@ -106,14 +90,18 @@ class magicstepgroup (magicstep):
         self.substep = substep_list[0]
 
     def subswitch(self, substep):
+        log.d('subswitch substep: %s, self.substep: %s' % (substep, self.substep))
         if substep != self.substep:
             self.name_map[self.substep].hide()
+            log.d('hide %s' % self.substep)
             self.name_map[substep].show()
+            log.d('show %s' % substep)
             if hasattr(self, 'switch_%s_%s' % (self.substep, substep)):
                 eval('self.switch_%s_%s()' % (self.substep, substep))
             self.substep = substep
 
     def enter(self):
+        log.d('enter')
         if hasattr(self, 'check_enter_%s' % self.substep):
             return eval('self.check_enter_%s()' % self.substep)
         # Always switch to substep_list.

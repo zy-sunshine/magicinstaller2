@@ -1,7 +1,7 @@
 #!/usr/bin/python
 from miui import _
 from miui.utils import magicstep, magicpopup
-
+from xml.dom.minidom import parseString
 class MIStep_accounts (magicstep.magicstepgroup):
     class account_dialog (magicpopup.magicpopup):
         def __init__(self, uixml, stepobj):
@@ -98,7 +98,7 @@ class MIStep_accounts (magicstep.magicstepgroup):
                 self.set_data(self.tmpdoc, 'homedir', 'true')
                 self.set_data(self.tmpdoc, 'customhomedir', homedir)
             uid = model.get_value(self.iter, 4)
-            if uid == N_('Auto'):
+            if uid == _('Auto'):
                 self.set_data(self.tmpdoc, 'uid', 'false')
                 self.set_data(self.tmpdoc, 'customuid', '500')
             else:
@@ -149,7 +149,7 @@ class MIStep_accounts (magicstep.magicstepgroup):
         if uid == 'true':
             uid = str(int(float(self.get_data(self.tmpvalues, 'customuid'))))
         else:
-            uid = N_('Auto')
+            uid = _('Auto')
         newrow = self.rootobj.values.createElement('row')
         newrow.setAttribute('c0', username)
         newrow.setAttribute('c1', password)

@@ -26,8 +26,8 @@ class MIStep_dosetup (magicstep.magicstep):
     def get_label(self):
         return  _("Do Setup")
 
-    def probe_monitor_ok(self, operid, data):
-        (m_name, m_horiz, m_vert) = self.rootobj.tm.results[operid]
+    def probe_monitor_ok(self, tdata, data):
+        (m_name, m_horiz, m_vert) = tdata
         #self.set_data(self.rootobj.values, 'Xwindow.monitor.name', m_name)
         #self.set_data(self.rootobj.values, 'Xwindow.monitor.horiz_sync', m_horiz)
         #self.set_data(self.rootobj.values, 'Xwindow.monitor.vert_refresh', m_vert)
@@ -36,8 +36,8 @@ class MIStep_dosetup (magicstep.magicstep):
         self.monitor_horiz_sync = m_horiz
         self.monitor_vert_refresh = m_vert
 
-    def probe_videocard_ok(self, operid, data):
-        vclist = self.rootobj.tm.results[operid]
+    def probe_videocard_ok(self, tdata, data):
+        vclist = tdata
         if len(vclist) == 0 or len(vclist[0]) == 0:  return
         (vc0name, vc0driver, vc0vidram) = vclist[0]
         #self.set_data(self.rootobj.values, 'Xwindow.videocard.name', vc0name)
@@ -48,8 +48,8 @@ class MIStep_dosetup (magicstep.magicstep):
         self.videocard_driver = vc0driver
         self.videocard_videoram = vc0vidram
 
-    def probe_mouse_ok(self, operid, data):
-        mouse = self.rootobj.tm.results[operid]
+    def probe_mouse_ok(self, tdata, data):
+        mouse = tdata
         (name, protocol, device, xemu3, shortname) = mouse
         #self.set_data(self.rootobj.values, 'Xwindow.mouse.name', name)
         #self.set_data(self.rootobj.values, 'Xwindow.mouse.protocol', protocol)
@@ -204,17 +204,17 @@ class MIStep_dosetup (magicstep.magicstep):
             return  0
         return  1
 
-    def doshort(self, operid, data):
+    def doshort(self, tdata, data):
         hostname = self.get_data(self.values, 'network.hostname')
         ret = self.rootobj.tm.actserver.config_network_short(hostname)
         ret = self.rootobj.tm.actserver.config_keyboard()
         self.rootobj.tm.add_action(_('Run post install script'), self.do_umount_all, None,
                                    'run_post_install', 0)
 
-    def do_umount_all(self, operid, data):
+    def do_umount_all(self, tdata, data):
         self.rootobj.tm.add_action(_('Umount all target partition(s)'), self.done, None,
                                    'umount_all_tgtpart', mount_all_list, 'y')
 
-    def done(self, operid, data):
+    def done(self, tdata, data):
         self.doing = None
         self.rootobj.btnnext_do()

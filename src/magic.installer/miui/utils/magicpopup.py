@@ -1,26 +1,8 @@
 #!/usr/bin/python
-# Copyright (C) 2003, Charles Wang.
-# Author:  Charles Wang <charles@linux.net.cn>
-# All rights reserved.
-#
-# This program is free software; you can redistribute it and/or modify it
-# under the terms of the GNU General Public License as published by the Free
-# Software Foundation; either version 2, or (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful, but WITHOUT
-# ANY WARRANT; without even the implied warranty of MERCHANTABILITY or FITNESS
-# FOR A PARTICULAR PURPOSE. See the GNU General Public LIcense for more
-# details.
-#
-# You should have received a copy of the GNU General Public License along
-# with this program; if not, write to the Free Software Foundation, 59 Temple
-# Place - Suite 330, Boston, MA 02111-1307, USA.
-
 import gtk
 from gettext import gettext as _
 from xml.dom.minidom import parse
 
-from mipublic import *
 import xmlgtk
 
 class magicpopup (xmlgtk.xmlgtk):
@@ -98,12 +80,17 @@ class magicmsgbox (magicpopup):
 
 class magichelp_popup(magicpopup):
     def __init__(self, helpfile):
+        from miutils.miconfig import MiConfig
+        CONF = MiConfig.get_instance()
+        CONF_HELP_WIDTH = CONF.LOAD.CONF_HELP_WIDTH
+        CONF_HELP_HEIGHT = CONF.LOAD.CONF_HELP_HEIGHT
+        
         uixml = parse('UIxml/mi_dialog.xml')
         textnodes = uixml.getElementsByTagName('text')
         for tn in textnodes:
             tn.setAttribute('filename', helpfile)
         magicpopup.__init__(self, self, uixml, _('Help'), magicpopup.MB_OK, 'helpdialog')
-        self.topwin.set_size_request(HELP_WIDTH, HELP_HEIGHT)
+        self.topwin.set_size_request(CONF_HELP_WIDTH, CONF_HELP_HEIGHT)
         self.topwin.set_resizable(False)
 
     def ok_clicked(self, widget, data):

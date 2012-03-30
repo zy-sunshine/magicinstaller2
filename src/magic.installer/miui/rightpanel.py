@@ -1,5 +1,7 @@
 #!/usr/bin/python
 import gtk
+from miutils.milogger import ClientLogger
+log = ClientLogger.get_instance(ClientLogger, __name__)
 
 class MIRightPanel(gtk.Frame):
     def __init__(self, sself, *args, **kw):
@@ -10,7 +12,8 @@ class MIRightPanel(gtk.Frame):
 
     def switch(self, widget):
         if self.curwidget is not None:
+            self.curwidget.hide()
             self.remove(self.curwidget)
-            self.curwidget = widget
-            self.curwidget.show_all()
-            self.add(self.curwidget)
+        self.curwidget = widget
+        self.curwidget.show()
+        self.add(self.curwidget)

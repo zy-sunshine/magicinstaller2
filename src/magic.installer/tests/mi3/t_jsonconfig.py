@@ -30,4 +30,5 @@ if __name__ == '__main__':
     mc.save_to_file('config.json')
     mc2 = MiConfig()
     mc2.load_from_file('config.json')
+    import pdb; pdb.set_trace()
     mc2.dump()
