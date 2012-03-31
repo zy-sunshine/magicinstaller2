@@ -1,22 +1,21 @@
 #!/usr/bin/python
-import os.path
-import string
-import time
-import getdev
-import isys
-
+import os, time, string
+import getdev, isys
+from miutils.common import mount_dev, umount_dev
 from miutils.miconfig import MiConfig
 CONF = MiConfig.get_instance()
 CONF_INITRD_FN = CONF.LOAD.CONF_INITRD_FN
 CONF_KERNEL_FN = CONF.LOAD.CONF_KERNEL_FN
 CONF_DISTKERNELVER = CONF.LOAD.CONF_DISTKERNELVER
 CONF_TGTSYS_ROOT = CONF.LOAD.CONF_TGTSYS_ROOT
+CONF_FSTYPE_MAP = CONF.LOAD.CONF_FSTYPE_MAP
 
 from miutils.miregister import MiRegister
 register = MiRegister()
 
-from miutils.milogger import get_long_dolog
-dolog = get_long_dolog(__name__).w
+from miserver.utils import Logger
+Log = Logger.get_instance(__name__)
+dolog = Log.i
 
 @register.server_handler('long')
 def do_mkinitrd(mia, operid, dummy):

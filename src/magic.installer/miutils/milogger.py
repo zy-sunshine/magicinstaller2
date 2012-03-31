@@ -176,20 +176,3 @@ def TestColorMiLogger():
 if __name__ == '__main__':
     TestMiLogger()
     #TestColorLogger()
-    
-    
-    
-#------------------- dolog -----------------
-# some trick needed by miserver TODO: remove it
-from miutils.milogger import ServerLogger_Short, ServerLogger_Long
-def get_short_dolog(name):
-    return ServerLogger_Short.get_instance(ServerLogger_Short, name)
-    
-def get_long_dolog(name):
-    return ServerLogger_Long.get_instance(ServerLogger_Long, name)
-
-def delete_log():
-    #### TODO: fix multi process do log action
-    ServerLogger_Short.del_instances(ServerLogger_Short)
-    ServerLogger_Long.del_instances(ServerLogger_Long)
-    

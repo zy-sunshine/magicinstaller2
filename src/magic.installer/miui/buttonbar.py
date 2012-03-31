@@ -1,6 +1,6 @@
 #!/usr/bin/python
 import gtk
-from miui import _
+from miui.utils import _
 
 class MIButtonBar(gtk.HBox):
     def __init__(self, sself, *args, **kw):

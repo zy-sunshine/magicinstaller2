@@ -1,15 +1,17 @@
 #!/usr/bin/python
-from gettext import gettext as _
-import string
-import os
-import os.path
-
-import rhpxl.monitor
-import rhpxl.videocard
-import rhpxl.mouse
+from miserver.utils import _
+import os, string
+import rhpxl.monitor, rhpxl.videocard, rhpxl.mouse
 
 from miutils.miregister import MiRegister
 register = MiRegister()
+from miserver.utils import Logger
+Log = Logger.get_instance(__name__)
+dolog = Log.i
+
+from miutils.miconfig import MiConfig
+CONF = MiConfig.get_instance()
+CONF_TGTSYS_ROOT = CONF.LOAD.CONF_TGTSYS_ROOT
 
 @register.server_handler('long')
 def avoid_none(val, default):
@@ -61,7 +63,6 @@ def gen_x_config(mia, operid, x_settings):
         else:
             return  trim_num(s)
 
-    global  tgtsys_root
     (mouse_name, mouse_protocol,
      mouse_device, mouse_xemu3,
      mouse_shortname) = x_settings['mouse']
@@ -262,9 +263,9 @@ Section "Screen"
 ''' % (default_depth,  display_string)
 
     # Generate the XF86Config file.
-    if not os.path.isdir(os.path.join(tgtsys_root, 'etc/X11')):
-        os.makedirs(os.path.join(tgtsys_root, 'etc/X11'))
-    f = file(os.path.join(tgtsys_root, 'etc/X11/XF86Config'), 'w')
+    if not os.path.isdir(os.path.join(CONF_TGTSYS_ROOT, 'etc/X11')):
+        os.makedirs(os.path.join(CONF_TGTSYS_ROOT, 'etc/X11'))
+    f = file(os.path.join(CONF_TGTSYS_ROOT, 'etc/X11/XF86Config'), 'w')
     f.write(serverlayout)
     f.write(files)
     f.write(module)
@@ -275,47 +276,45 @@ Section "Screen"
     f.write(screen)
     f.close()
     os.system('cp %s %s' % \
-              (os.path.join(tgtsys_root, 'etc/X11/XF86Config'),
-               os.path.join(tgtsys_root, 'etc/X11/xorg.conf')))
+              (os.path.join(CONF_TGTSYS_ROOT, 'etc/X11/XF86Config'),
+               os.path.join(CONF_TGTSYS_ROOT, 'etc/X11/xorg.conf')))
     # Fix /etc/inittab
     if x_settings['init'] == 'text':
         os.system('/bin/sed -i s/id:.:initdefault/id:3:initdefault/ %s' % \
-                      (os.path.join(tgtsys_root, 'etc/inittab')))
+                      (os.path.join(CONF_TGTSYS_ROOT, 'etc/inittab')))
     else:
         os.system('/bin/sed -i s/id:.:initdefault/id:5:initdefault/ %s' % \
-                  (os.path.join(tgtsys_root, 'etc/inittab')))
-    os.system('/usr/sbin/chroot %s /usr/bin/fc-cache -f' % tgtsys_root)
+                  (os.path.join(CONF_TGTSYS_ROOT, 'etc/inittab')))
+    os.system('/usr/sbin/chroot %s /usr/bin/fc-cache -f' % CONF_TGTSYS_ROOT)
     return  1
 
 @register.server_handler('long')
 def test_x_settings(mia, operid, x_settings):
-    global  tgtsys_root
-
-    if not os.path.exists(tgtsys_root):
+    if not os.path.exists(CONF_TGTSYS_ROOT):
         return  _('Failed: The target system is not exists yet.')
-    if not os.path.exists(os.path.join(tgtsys_root, 'usr/bin/xinit')):
+    if not os.path.exists(os.path.join(CONF_TGTSYS_ROOT, 'usr/bin/xinit')):
         return  _('Failed: xinit is not installed.')
-    if not os.path.exists(os.path.join(tgtsys_root, 'usr/bin/X')):
+    if not os.path.exists(os.path.join(CONF_TGTSYS_ROOT, 'usr/bin/X')):
         return  _('Failed: X is not inistalled.')
 
-    mark_file = os.path.join(tgtsys_root, 'tmp/testxdlg/probe_x_mark')
+    mark_file = os.path.join(CONF_TGTSYS_ROOT, 'tmp/testxdlg/probe_x_mark')
     gen_x_config(mia, operid, x_settings)
     os.system('/bin/gunzip -c %s | /bin/tar x -C %s' % \
-              (os.path.join('operations', 'testxdlg.tar.gz'), tgtsys_root))
+              (os.path.join('operations', 'testxdlg.tar.gz'), CONF_TGTSYS_ROOT))
     os.system('/bin/touch %s' % mark_file)
-    os.system('/usr/sbin/chroot %s /usr/bin/xinit /tmp/testxdlg/testxdlg -- /usr/bin/X :1' % tgtsys_root)
+    os.system('/usr/sbin/chroot %s /usr/bin/xinit /tmp/testxdlg/testxdlg -- /usr/bin/X :1' % CONF_TGTSYS_ROOT)
     if not os.path.exists(mark_file):
         result = 'SUCCESS'
     else:
         result = _('Failed: Please recheck X settings.')
-    os.system('/bin/rm -rf %s' % os.path.join(tgtsys_root, 'tmp/testxdlg'))
+    os.system('/bin/rm -rf %s' % os.path.join(CONF_TGTSYS_ROOT, 'tmp/testxdlg'))
     return  result
 
 @register.server_handler('long')
 def backup_xconfig(mia, operid, dummy):
     os.system('sync')
     xorg_files = ['xorg.conf', 'XF86Config']
-    tgt_etc_x = os.path.join(tgtsys_root, 'etc/X11')
+    tgt_etc_x = os.path.join(CONF_TGTSYS_ROOT, 'etc/X11')
     for xorg_file in xorg_files:
         if os.path.exists(os.path.join(tgt_etc_x, xorg_file)):
             os.system('mv %s %s' % \

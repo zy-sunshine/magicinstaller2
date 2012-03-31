@@ -1,5 +1,5 @@
 #!/usr/bin/python
-from miui import _
+from miui.utils import _
 from miui.utils import magicstep
 
 class MIStep_testops (magicstep.magicstep):

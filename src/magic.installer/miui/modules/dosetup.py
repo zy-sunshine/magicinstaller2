@@ -1,6 +1,8 @@
 #!/usr/bin/python
-from miui import _
+from miui.utils import _, Logger
 from miui.utils import magicstep
+Log = Logger.get_instance(__name__)
+dolog = Log.i
 
 class MIStep_dosetup (magicstep.magicstep):
     def __init__(self, rootobj):
@@ -174,7 +176,6 @@ class MIStep_dosetup (magicstep.magicstep):
             self.rootobj.tm.add_action(_('Backup Xwindow configuration files'),
                                      None, None, 'backup_xconfig', 0)
 
-        global mount_all_list
         self.rootobj.btnback_sensitive(False)
         self.rootobj.btnnext_sensitive(False)
 
@@ -213,7 +214,7 @@ class MIStep_dosetup (magicstep.magicstep):
 
     def do_umount_all(self, tdata, data):
         self.rootobj.tm.add_action(_('Umount all target partition(s)'), self.done, None,
-                                   'umount_all_tgtpart', mount_all_list, 'y')
+                                   'umount_all_tgtpart', CONF.RUN.g_mount_all_list, 'y')
 
     def done(self, tdata, data):
         self.doing = None

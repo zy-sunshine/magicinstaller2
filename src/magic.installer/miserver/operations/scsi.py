@@ -6,6 +6,9 @@ CONF_TGTSYS_ROOT = CONF.LOAD.CONF_TGTSYS_ROOT
 
 from miutils.miregister import MiRegister
 register = MiRegister()
+from miserver.utils import Logger
+Log = Logger.get_instance(__name__)
+dolog = Log.i
 
 @register.server_handler('short')
 def get_all_scsi_modules():

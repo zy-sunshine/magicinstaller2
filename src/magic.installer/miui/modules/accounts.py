@@ -1,7 +1,8 @@
 #!/usr/bin/python
-from miui import _
+from miui.utils import _
 from miui.utils import magicstep, magicpopup
 from xml.dom.minidom import parseString
+
 class MIStep_accounts (magicstep.magicstepgroup):
     class account_dialog (magicpopup.magicpopup):
         def __init__(self, uixml, stepobj):

@@ -2,7 +2,7 @@
 #coding=utf-8
 import os, sys
 import gtk, gobject
-from miui import _
+from miui.utils import _
 from miui.leftpanel import MILeftPanel
 from miui.rightpanel import MIRightPanel
 from miui.top import MITop

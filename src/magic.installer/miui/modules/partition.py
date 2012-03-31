@@ -1,17 +1,15 @@
 #!/usr/bin/python
-import os, gtk, string
-import parted
-from miui import _
+import os, gtk, string, parted
+from miui.utils import _, Logger
 from miui.utils import magicstep, magicpopup, xmlgtk
 from xml.dom.minidom import parse, parseString
-from miutils.common import search_file
+from miutils.common import search_file, get_devinfo, convert_str_size
 
 from miutils.miconfig import MiConfig
 CONF = MiConfig.get_instance()
 
-from miutils.milogger import ClientLogger
-log = ClientLogger.get_instance(ClientLogger, __name__)
-dolog = log.i
+Log = Logger.get_instance(__name__)
+dolog = Log.i
 
 from miutils.common import STAT
 
@@ -946,9 +944,9 @@ class MIStep_partition (magicstep.magicstep):
                                    'win_probe', CONF.RUN.g_all_orig_part)
         bt_instpos = self.get_data(self.values, 'bootloader.instpos')
         if bt_instpos == 'boot' and \
-               string.find(get_devinfo(CONF.RUN.g_boot_device).flags, 'b') < 0:
+               string.find(get_devinfo(CONF.RUN.g_boot_device, CONF.RUN.g_all_part_infor).flags, 'b') < 0:
             warnmsg = _('Could not install the bootloader into %s as you will because it contain %s which will prevent the bootloader boot your system. Reset to MBR forcely.')
-            warnmsg = warnmsg % (CONF.RUN.g_boot_device, get_devinfo(CONF.RUN.g_boot_device).fstype)
+            warnmsg = warnmsg % (CONF.RUN.g_boot_device, get_devinfo(CONF.RUN.g_boot_device, CONF.RUN.g_all_part_infor).fstype)
             magicpopup.magicmsgbox(None, warnmsg,
                                    magicpopup.magicmsgbox.MB_WARNING,
                                    magicpopup.magicpopup.MB_OK)

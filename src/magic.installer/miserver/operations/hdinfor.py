@@ -3,6 +3,9 @@ import os
 import string
 from miutils.miregister import MiRegister
 register = MiRegister()
+from miserver.utils import Logger
+Log = Logger.get_instance(__name__)
+dolog = Log.i
 
 @register.server_handler('short')
 def get_arch():

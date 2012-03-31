@@ -1,5 +1,5 @@
 #!/usr/bin/python
-from miui import _
+from miui.utils import _
 from miui.utils import magicstep
 from miutils.miconfig import MiConfig
 CONF = MiConfig.get_instance()

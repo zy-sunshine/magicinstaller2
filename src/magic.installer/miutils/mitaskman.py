@@ -1,11 +1,13 @@
 #!/usr/bin/python
 #coding=utf-8
-import xmlrpclib
-import gobject
-import socket
+import gobject, gtk
+import xmlrpclib, socket
 import time
-import gtk
 from xml.dom.minidom import parseString
+
+from miui.utils import Logger
+Log = Logger.get_instance(__name__)
+dolog = Log.i
 
 # The task manager: It only manage the long operation.
 class MiTaskman :

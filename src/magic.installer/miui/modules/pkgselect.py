@@ -1,9 +1,14 @@
 #!/usr/bin/python
-from miui import _
+import os
+from miui.utils import _
 from miui.utils import magicstep, magicpopup
 from miutils.common import STAT
+from xml.dom.minidom import Document
 from miutils.miconfig import MiConfig
 CONF = MiConfig.get_instance()
+from miui.utils import Logger
+Log = Logger.get_instance(__name__)
+dolog = Log.i
 
 class MIStep_pkgselect (magicstep.magicstepgroup):
     def __init__(self, rootobj):
@@ -15,14 +20,13 @@ class MIStep_pkgselect (magicstep.magicstepgroup):
         return  _("Package Select")
 
     def popup_srcpos_dialog(self):
-        global pkgarr_probe_result
         valdoc = Document()
         self.srcpos_value_doc = valdoc
         topele = valdoc.createElement('data')
         valdoc.appendChild(topele)
         valtopele = valdoc.createElement('srcposlist')
         topele.appendChild(valtopele)
-        for (pafile, dev, mntpoint, fstype, dir, isofn) in pkgarr_probe_result:
+        for (pafile, dev, mntpoint, fstype, dir, isofn) in CONF.RUN.g_pkgarr_probe_result:
             rowele = valdoc.createElement('row')
             rowele.setAttribute('c0', pafile)
             rowele.setAttribute('c1', dev)
@@ -47,7 +51,7 @@ class MIStep_pkgselect (magicstep.magicstepgroup):
             CONF.RUN.g_arrangement = l_map['arrangement']
             CONF.RUN.g_archsize_map = l_map['archsize_map']
             CONF.RUN.g_pkgpos_map = l_map['pkgpos_map']
-            CONF.RUN.gtoplevelgrp_map = l_map['toplevelgrp_map']
+            CONF.RUN.g_toplevelgrp_map = l_map['toplevelgrp_map']
             del(g_map)
             del(l_map)
         except:
@@ -77,13 +81,11 @@ class MIStep_pkgselect (magicstep.magicstepgroup):
         return 1
 
     def srcpos_ok_clicked(self, widget, data):
-        global  pkgarr_probe_result
-
         (model, iter) = \
                 self.srcpos_dialog.name_map['srcposlist_treeview'].get_selection().get_selected()
         if iter:
             pafile = model.get_value(iter, 0)
-            for patuple in pkgarr_probe_result:
+            for patuple in CONF.RUN.g_pkgarr_probe_result:
                 if patuple[0] == pafile:
                     break
             if self.tryload_file(patuple):
@@ -104,30 +106,28 @@ class MIStep_pkgselect (magicstep.magicstepgroup):
         self.popup_srcpos_dialog()
 
     def enter(self):
-        pkgarr_probe_status = CONF.RUN.pkgarr_probe_status
-        global pkgarr_probe_result
-        if pkgarr_probe_status != STAT.OP_STATUS_DONE:
+        if CONF.RUN.g_pkgarr_probe_status != STAT.OP_STATUS_DONE:
             magicpopup.magicmsgbox(None, _('Please wait a while for the search of package arrangement information.'),
                                    magicpopup.magicmsgbox.MB_INFO,
                                    magicpopup.magicpopup.MB_OK)
             return 0
-        if len(pkgarr_probe_result) == 0:
+        if len(CONF.RUN.g_pkgarr_probe_result) == 0:
             magicpopup.magicmsgbox(None, _('Not any package arrangement information can be found!\nPlease return to the parted step to check your setup.'),
                                    magicpopup.magicmsgbox.MB_ERROR,
                                    magicpopup.magicpopup.MB_OK)
             return 0
-        if len(pkgarr_probe_result) > 1:
-            print pkgarr_probe_result
+        if len(CONF.RUN.g_pkgarr_probe_result) > 1:
+            dolog("CONF.RUN.g_pkgarr_probe_result: %s" % CONF.RUN.g_pkgarr_probe_result)
             popup = 'true'
             if self.pa_choose:
-                for result in pkgarr_probe_result:
+                for result in CONF.RUN.g_pkgarr_probe_result:
                     if self.pa_choose == result[0]:
                         popup = None
                         break
             if popup:
                 self.popup_srcpos_dialog()
         else:
-            if not self.tryload_file(pkgarr_probe_result[0]):
+            if not self.tryload_file(CONF.RUN.g_pkgarr_probe_result[0]):
                 magicpopup.magicmsgbox(None,
                                        _('Load the only package arrangement failed!\nPlease return to the parted step to check your step.'),
                                        magicpopup.magicmsgbox.MB_ERROR,

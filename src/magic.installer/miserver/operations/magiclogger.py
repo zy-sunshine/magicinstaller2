@@ -2,10 +2,14 @@
 #coding=utf8
 import time
 from miutils.miconfig import MiConfig
+from miutils.common import run_bash, mount_dev, umount_dev, search_file
 CONF = MiConfig.get_instance()
 CONF_HOTFIXDIR = CONF.LOAD.CONF_HOTFIXDIR
 from miutils.miregister import MiRegister
 register = MiRegister()
+from miserver.utils import Logger
+Log = Logger.get_instance(__name__)
+dolog = Log.i
 
 def copy_logfiles(logfiles, destdir):
     ret = []

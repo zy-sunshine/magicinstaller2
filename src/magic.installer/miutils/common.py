@@ -4,6 +4,11 @@ import sys
 import isys
 USE_ISYS = False
 
+# only mount dev and umount dev dolog, so we use server Logger
+from miutils.milogger import ServerLogger_Long
+Log = ServerLogger_Long.get_instance(ServerLogger_Long, __name__)
+dolog = Log.i
+
 class AttrDict(dict):
     """A dict class, holding the dict. Two extra method to get dict
     value, e.g.:
@@ -323,4 +328,23 @@ class Status:
         pass
     
 STAT = Status()
+
+def get_devinfo(devfn, all_part_infor):
+    from miutils.miconfig import MiConfig
+    CONF = MiConfig.get_instance()
+    CONF_FSTYPE_MAP = CONF.LOAD.CONF_FSTYPE_MAP
+    for dev in all_part_infor:
+        for tup in all_part_infor[dev]:
+            if '%s%s' % (dev, tup[0]) == devfn:
+                r = AttrDict()
+                r['parted_fstype'] = tup[6]
+                r['mountpoint'] = tup[7]
+                r['not_touched'] = tup[8]
+                try:
+                    r['fstype'] = CONF_FSTYPE_MAP[tup[6]][0]
+                    r['flags'] = CONF_FSTYPE_MAP[tup[6]][4]
+                except KeyError:
+                    raise KeyError, 'Unregconized filesystem type %s.' % tup[6]
+                return r
+    raise KeyError, 'Device %s not exists in all_part_infor.' % devfn
 

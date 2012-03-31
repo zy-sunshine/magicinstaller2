@@ -1,12 +1,8 @@
 #!/usr/bin/python
 import os, glob, sys, syslog
-import time
-import getdev
-import rpm
-import isys
-import tftpc
-import tarfile
-
+import rpm, tarfile, time
+import isys, tftpc, getdev
+from miutils.common import mount_dev, umount_dev, run_bash
 from miutils.miconfig import MiConfig
 CONF = MiConfig.get_instance()
 CONF_DISTNAME = CONF.LOAD.CONF_DISTNAME
@@ -20,8 +16,9 @@ CONF_ISOFN_FMT = CONF.LOAD.CONF_ISOFN_FMT
 from miutils.miregister import MiRegister
 register = MiRegister()
 
-from miutils.milogger import get_long_dolog
-dolog = get_long_dolog(__name__).w
+from miserver.utils import Logger
+Log = Logger.get_instance(__name__)
+dolog = Log.i
 
 cd_papath = '%s/base' % CONF_DISTNAME
 hd_papathes = ['boot',
@@ -66,6 +63,7 @@ def pkgarr_probe(mia, operid, hdpartlist):
                    (os.path.basename(new_device),
                     pos_id,
                     os.path.basename(localfn))
+        dolog('tftpc update %s to remote %s...' % (localfn, remotefn))
         cli.put(localfn, remotefn)
         # Leave the mntpoint to 0 now because the mntpoint can't be get easily.
         mntpoint = 0
@@ -636,3 +634,11 @@ def instpkg_post(mia, operid, dev, mntpoint, dir, fstype):
         syslog.syslog(syslog.LOG_ERR, 'sync failed: %s' % str(errmsg))
         return str(errmsg)
     return  0
+
+if __name__ == '__main__':
+    from miserver.utils import FakeMiactions
+    mia = FakeMiactions()
+    operid = 999
+    hdpartlist = [['/dev/sda1', 'ntfs', '/dev/sda1'], ['/dev/sda2', 'ntfs', '/dev/sda2'], ['/dev/sda5', 'linux-swap(v1)', '/dev/sda5'], ['/dev/sda6', 'ext3', '/dev/sda6'], ['/dev/sda7', 'ext4', '/dev/sda7'], ['/dev/sda8', 'ntfs', '/dev/sda8'], ['/dev/sda1', 'ntfs', '/dev/sda1'], ['/dev/sda2', 'ntfs', '/dev/sda2'], ['/dev/sda5', 'linux-swap(v1)', '/dev/sda5'], ['/dev/sda6', 'ext3', '/dev/sda6'], ['/dev/sda7', 'ext4', '/dev/sda7'], ['/dev/sda8', 'ntfs', '/dev/sda8']]
+    pkgarr_probe(mia, operid, hdpartlist)
+    

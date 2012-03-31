@@ -1,11 +1,16 @@
 #!/usr/bin/python
-from miui import _
+from miui.utils import _, Logger
 from miui.utils import magicstep, magicpopup, xmlgtk
 from miutils.miconfig import MiConfig
+from miutils.common import get_devinfo
+
 CONF = MiConfig.get_instance()
 CONF_DEBUG_MODE = CONF.LOAD.CONF_DEBUG_MODE
 CONF_FULL_WIDTH = CONF.LOAD.CONF_FULL_WIDTH
 CONF_FULL_HEIGHT = CONF.LOAD.CONF_FULL_HEIGHT
+
+Log = Logger.get_instance(__name__)
+dolog = Log.i
 
 class MIStep_takeactions(magicstep.magicstepgroup):
     class tadialog(xmlgtk.xmlgtk):
@@ -156,7 +161,6 @@ class MIStep_takeactions(magicstep.magicstepgroup):
         self.actlist[self.actpos][1]()
 
     def act_leave(self):
-        global mount_all_list
         if self.actlist[self.actpos][2]:
             self.actlist[self.actpos][2]()
         self.statusarr[self.actpos].set_from_file('images/applet-okay.png')
@@ -189,8 +193,8 @@ class MIStep_takeactions(magicstep.magicstepgroup):
     def act_parted_get_dirty_result(self, tdata, data):
         self.dirty_disks = tdata
         self.format_list = []
-        for devpath in all_part_infor.keys():
-            for part_tuple in all_part_infor[devpath]:
+        for devpath in CONF.RUN.g_all_part_infor.keys():
+            for part_tuple in CONF.RUN.g_all_part_infor[devpath]:
                 if part_tuple[5] == 'true':
                     self.format_list.append((devpath,
                                              part_tuple[3],
@@ -222,8 +226,6 @@ class MIStep_takeactions(magicstep.magicstepgroup):
         return 0
 
     def act_parted_format_start(self, pos):
-        global  mount_all_list
-
         if pos < len(self.format_list):
             actinfor = 'Formating %s on %s%d.'
             actinfor = actinfor % (self.format_list[pos][2],
@@ -236,24 +238,24 @@ class MIStep_takeactions(magicstep.magicstepgroup):
                             self.format_list[pos][1], # part_start.
                             self.format_list[pos][2]) # fstype
         else:
-            mount_all_list = []
-            for devpath in all_part_infor.keys():
-                for part_tuple in all_part_infor[devpath]:
+            CONF.RUN.g_mount_all_list = []
+            for devpath in CONF.RUN.g_all_part_infor.keys():
+                for part_tuple in CONF.RUN.g_all_part_infor[devpath]:
                     if part_tuple[7] == '':  # mountpoint
                         continue
                     mntpoint = part_tuple[7]
                     devfn = '%s%d' % (devpath, part_tuple[0])
                     fstype = part_tuple[6]
-                    mount_all_list.append((mntpoint, devfn, fstype))
-            mount_all_list.sort(self.malcmp)
-            dolog('mount_all_list: %s\n' % str(mount_all_list))
+                    CONF.RUN.g_mount_all_list.append((mntpoint, devfn, fstype))
+            CONF.RUN.g_mount_all_list.sort(self.malcmp)
+            dolog('CONF.RUN.g_mount_all_list: %s\n' % str(CONF.RUN.g_mount_all_list))
             self.add_action(_('Mount all target partitions.'),
                             self.nextop, None,
-                            'mount_all_tgtpart', mount_all_list, 'y')
+                            'mount_all_tgtpart', CONF.RUN.g_mount_all_list, 'y')
             # Check whether the packages are stored in mounted partitions.
             pkgmntpoint = 0
             (pafile, dev, mntpoint, fstype, dir, isofn) = CONF.RUN.g_choosed_patuple
-            for (mntpoint, devfn, fstype) in mount_all_list:
+            for (mntpoint, devfn, fstype) in CONF.RUN.g_mount_all_list:
                 if dev == devfn:
                     pkgmntpoint = mntpoint
                     if len(pkgmntpoint) > 0 and pkgmntpoint[0] == '/':
@@ -431,13 +433,12 @@ class MIStep_takeactions(magicstep.magicstepgroup):
                         'instpkg_post', dev, mntpoint, dir, fstype)
 
     def reboot_clicked(self, widget, data):
-        global mount_all_list
         (pafile, dev, mntpoint, fstype, dir, isofn) = CONF.RUN.g_choosed_patuple
         msg = _('Umount the target filesystem(s).')
         self.add_action(msg, None, None,
                         'instpkg_post', dev, mntpoint, dir, fstype)
         self.add_action(msg, self.reboot_0, None,
-                        'umount_all_tgtpart', mount_all_list, 'y')
+                        'umount_all_tgtpart', CONF.RUN.g_mount_all_list, 'y')
 
     def reboot_0(self, tdata, data):
         self.rebootdlg = \
@@ -540,10 +541,6 @@ class MIStep_takeactions(magicstep.magicstepgroup):
         self.add_action(_('Make initrd'), self.nextop, None, 'do_mkinitrd', 0)
 
     def act_start_bootloader(self):
-        global all_part_infor
-        global root_device
-        global boot_device
-
         bltype = self.get_data(self.values, 'bootloader.bltype')
         instpos = self.get_data(self.values, 'bootloader.instpos')
         mbr_device = self.get_data(self.values, 'bootloader.mbr_device')
@@ -552,12 +549,12 @@ class MIStep_takeactions(magicstep.magicstepgroup):
         if bltype == 'none':
             self.add_action(None, self.nextop, None, 'sleep', 0)
             return
-        if root_device == boot_device:
+        if CONF.RUN.g_root_device == CONF.RUN.g_boot_device:
             bootdev = ''
         else:
-            bootdev = boot_device
+            bootdev = CONF.RUN.g_boot_device
         if win_device:
-            win_fs = get_devinfo(win_device).fstype
+            win_fs = get_devinfo(win_device, CONF.RUN.g_all_part_infor).fstype
         else:
             win_fs = ''
         timeout = int(float(self.get_data(self.values, 'bootloader.timeout')))
@@ -580,14 +577,13 @@ class MIStep_takeactions(magicstep.magicstepgroup):
                         lba, options, entries, default, instpos, bootdev, mbr_device, win_device, win_fs)
 
     def bl_umount(self, tdata, data):
-        global mount_all_list
         res = tdata
         if type(res) == types.IntType:
             self.add_action(None, self.nextop, None, 'sleep', 0)
             return
         self.add_action(_('Umount all target partitions before bootloader setup.'),
                         self.bl_setup, (data, res),
-                        'umount_all_tgtpart', mount_all_list, 0)
+                        'umount_all_tgtpart', CONF.RUN.g_mount_all_list, 0)
 
     def bl_setup(self, tdata, data):
         (bltype, (grubdev, grubsetupdev, grubopt)) = data
@@ -595,10 +591,9 @@ class MIStep_takeactions(magicstep.magicstepgroup):
                         'setup_' + bltype, grubdev, grubsetupdev, grubopt)
 
     def bl_mount(self, tdata, data):
-        global mount_all_list
         self.add_action(_('Mount all target partitions after bootloader setup.'),
                         self.nextop, None,
-                        'mount_all_tgtpart', mount_all_list, 0)
+                        'mount_all_tgtpart', CONF.RUN.g_mount_all_list, 0)
 
     def nextop(self, tdata, data):
         if tdata:

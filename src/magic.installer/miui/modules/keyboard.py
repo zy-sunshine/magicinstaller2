@@ -1,5 +1,5 @@
-# -*- python -*-
-from miui import _
+#!/usr/bin/python
+from miui.utils import _
 from miui.utils import magicstep
 
 class MIStep_keyboard (magicstep.magicstep):

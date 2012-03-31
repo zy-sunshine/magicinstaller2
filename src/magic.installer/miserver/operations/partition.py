@@ -1,14 +1,11 @@
 #!/usr/bin/python
 #encoding=utf8
 
-from gettext import gettext as _
-import iconv
-import sys
-import getdev
-import parted
-import _ped
-import isys
-
+from miui.utils import _
+import sys, iconv
+import getdev, isys
+import parted, _ped
+from miutils.common import mount_dev, umount_dev
 # Because the short operation and long operation are run in different process,
 # they can't share the parted results. So all operations except status-free
 # operation have to be 'long' even if it can terminate immediately.
@@ -22,8 +19,9 @@ CONF_TGTSYS_ROOT = CONF.LOAD.CONF_TGTSYS_ROOT
 from miutils.miregister import MiRegister
 register = MiRegister()
 
-from miutils.milogger import get_long_dolog
-dolog = get_long_dolog(__name__).w
+from miserver.utils import Logger
+Log = Logger.get_instance(__name__)
+dolog = Log.i
 
 # Status-free operations.
 @register.server_handler('short')
@@ -55,7 +53,6 @@ def all_disk_type():
 # Status globals
 
 parted_MIN_FREESPACE = 2048  # 1M
-all_harddisks = {}
 
 # Status-Related operations.
 
@@ -74,7 +71,6 @@ def device_probe_all(mia, operid, dummy):
         
         return hd_list
 
-    global all_harddisks
     mia.set_step(operid, 0, -1)
     result = []
     # The following commented code is implemented by kudzu.
@@ -94,7 +90,7 @@ def device_probe_all(mia, operid, dummy):
             # Model might contain GB2312, it must be convert to Unicode.
             model = iconv.iconv('gb2312', 'utf8', dev.model).encode('utf8')
             result.append((dev.path, dev.length, model))
-            all_harddisks[dev.path] = (dev, disk, newdisklabel)
+            CONF.RUN.g_all_harddisks[dev.path] = (dev, disk, newdisklabel)
     #dolog('operations.parted.device_probe_all: %s\n' % str(result))
     return  result
 
@@ -135,8 +131,8 @@ def get_all_partitions(mia, operid, devpath):
                 fs_type_name, label, part.geometry.start, part.geometry.end, avaflags)
 
     result = []
-    if all_harddisks.has_key(devpath):
-        disk = all_harddisks[devpath][1]
+    if CONF.RUN.g_all_harddisks.has_key(devpath):
+        disk = CONF.RUN.g_all_harddisks[devpath][1]
         if disk:
             part = disk.getFirstPartition()
             while part:
@@ -157,8 +153,8 @@ def get_all_partitions(mia, operid, devpath):
 
 @register.server_handler('long')
 def get_disk_type(mia, operid, devpath):
-    if all_harddisks.has_key(devpath):
-        disk = all_harddisks[devpath][1]
+    if CONF.RUN.g_all_harddisks.has_key(devpath):
+        disk = CONF.RUN.g_all_harddisks[devpath][1]
         if disk:
             if disk.supportsFeature(parted.DISK_TYPE_PARTITION_NAME):
                 support_partition_name = 'true'
@@ -236,8 +232,8 @@ def _grow_over_small_freespace(start_in, end_in, disk):
 @register.server_handler('long')
 def add_partition(mia, operid, devpath, parttype, fstype, start, end):
     fstype = revision_fstype(fstype)
-    if all_harddisks.has_key(devpath):
-        (dev, disk, dirty_or_not) = all_harddisks[devpath]
+    if CONF.RUN.g_all_harddisks.has_key(devpath):
+        (dev, disk, dirty_or_not) = CONF.RUN.g_all_harddisks[devpath]
         if disk:
             #constraint = dev.constraint_any()
             constraint = parted.Constraint(device=dev)#exactGeom=newgeom)
@@ -278,15 +274,15 @@ def add_partition(mia, operid, devpath, parttype, fstype, start, end):
             #    return (-1, str(exc_info[1]))
             except _ped.PartitionException, errmsg:
                 return(-1, str(errmsg))
-            all_harddisks[devpath] = (dev, disk, 'y')
+            CONF.RUN.g_all_harddisks[devpath] = (dev, disk, 'y')
             return (newpart.geometry.start, '')
     return (-1, _("Can't find the specified disk."))
 
 @register.server_handler('long')
 def set_flags_and_label(mia, operid, devpath, part_start,
                         true_flags, false_flags, set_label, label):
-    if all_harddisks.has_key(devpath):
-        disk = all_harddisks[devpath][1]
+    if CONF.RUN.g_all_harddisks.has_key(devpath):
+        disk = CONF.RUN.g_all_harddisks[devpath][1]
         if disk:
             part = disk.getFirstPartition()
             while part:
@@ -311,13 +307,13 @@ def set_flags_and_label(mia, operid, devpath, part_start,
             #            part.set_name(label)
             #        break
             #    part = disk.next_partition(part)
-            all_harddisks[devpath] = (all_harddisks[devpath][0], disk, 'y')
+            CONF.RUN.g_all_harddisks[devpath] = (CONF.RUN.g_all_harddisks[devpath][0], disk, 'y')
     return  0
 
 @register.server_handler('long')
 def delete_partition(mia, operid, devpath, part_start):
-    if all_harddisks.has_key(devpath):
-        disk  = all_harddisks[devpath][1]
+    if CONF.RUN.g_all_harddisks.has_key(devpath):
+        disk  = CONF.RUN.g_all_harddisks[devpath][1]
         if disk:
             part = disk.getFirstPartition()
             while part:
@@ -326,7 +322,7 @@ def delete_partition(mia, operid, devpath, part_start):
                     disk.removePartition(part)
                     break
                 part = part.nextPartition()
-            all_harddisks[devpath] = (all_harddisks[devpath][0], disk, 'y')
+            CONF.RUN.g_all_harddisks[devpath] = (CONF.RUN.g_all_harddisks[devpath][0], disk, 'y')
         #if disk:
         #    part = disk.next_partition()
         #    while part:
@@ -334,53 +330,53 @@ def delete_partition(mia, operid, devpath, part_start):
         #            disk.delete_partition(part)
         #            break
         #        part = disk.next_partition(part)
-        #    all_harddisks[devpath] = (all_harddisks[devpath][0], disk, 'y')
+        #    CONF.RUN.g_all_harddisks[devpath] = (CONF.RUN.g_all_harddisks[devpath][0], disk, 'y')
     return get_all_partitions(mia, operid, devpath)
 
 @register.server_handler('long')
 def reload_partition_table(mia, operid, devpath):
-    if all_harddisks.has_key(devpath):
-        dev = all_harddisks[devpath][0]
+    if CONF.RUN.g_all_harddisks.has_key(devpath):
+        dev = CONF.RUN.g_all_harddisks[devpath][0]
         try:
-            all_harddisks[devpath] = (dev, parted.Disk(dev), None)
+            CONF.RUN.g_all_harddisks[devpath] = (dev, parted.Disk(dev), None)
         except _ped.DiskLabelException:
             dltype = parted.diskType['msdos']
-            all_harddisks[devpath] = (dev, parted.freshDisk(device=dev, ty=dltype), 'y')
+            CONF.RUN.g_all_harddisks[devpath] = (dev, parted.freshDisk(device=dev, ty=dltype), 'y')
         #try:
-        #    all_harddisks[devpath] = (dev, parted.PedDisk.new(dev), None)
+        #    CONF.RUN.g_all_harddisks[devpath] = (dev, parted.PedDisk.new(dev), None)
         #except parted.error:
         #    dltype = parted.disk_type_get('msdos')
-        #    all_harddisks[devpath] = (dev, dev.disk_new_fresh(dltype), 'y')
+        #    CONF.RUN.g_all_harddisks[devpath] = (dev, dev.disk_new_fresh(dltype), 'y')
     return 0
 
 @register.server_handler('long')
 def disk_new_fresh(mia, operid, devpath, dltype):
     #dltype = parted.disk_type_get(dltype)
     dltype = parted.diskType[dltype]
-    if dltype and all_harddisks.has_key(devpath):
-        dev = all_harddisks[devpath][0]
-        #all_harddisks[devpath] = (dev, dev.disk_new_fresh(dltype), 'y')
-        all_harddisks[devpath] = (dev, parted.freshDisk(device=dev, ty=dltype), 'y')
+    if dltype and CONF.RUN.g_all_harddisks.has_key(devpath):
+        dev = CONF.RUN.g_all_harddisks[devpath][0]
+        #CONF.RUN.g_all_harddisks[devpath] = (dev, dev.disk_new_fresh(dltype), 'y')
+        CONF.RUN.g_all_harddisks[devpath] = (dev, parted.freshDisk(device=dev, ty=dltype), 'y')
     return 0
 
 @register.server_handler('long')
 def get_all_dirty_disk(mia, operid, dummy):
     mia.set_step(operid, 0, -1)
     result = []
-    for devpath in all_harddisks.keys():
-        if all_harddisks[devpath][2]:
+    for devpath in CONF.RUN.g_all_harddisks.keys():
+        if CONF.RUN.g_all_harddisks[devpath][2]:
             result.append(devpath)
     return  result
 
 @register.server_handler('long')
 def commit_devpath(mia, operid, devpath):
     mia.set_step(operid, 0, -1)
-    if all_harddisks.has_key(devpath):
-        disk  = all_harddisks[devpath][1]
+    if CONF.RUN.g_all_harddisks.has_key(devpath):
+        disk  = CONF.RUN.g_all_harddisks[devpath][1]
         if disk:
             try:
                 disk.commit()
-                all_harddisks[devpath] = (all_harddisks[devpath][0], disk, None)
+                CONF.RUN.g_all_harddisks[devpath] = (CONF.RUN.g_all_harddisks[devpath][0], disk, None)
             #except parted.error, errmsg:
             except parted.DiskException as errmsg:
                 return  str(errmsg)
@@ -395,9 +391,9 @@ def format_partition(mia, operid, devpath, part_start, fstype):
     if CONF_FSTYPE_MAP[fstype][1] == '':
         errmsg = _('Format %s is not supported.')
         return errmsg % fstype
-    if not all_harddisks.has_key(devpath):
+    if not CONF.RUN.g_all_harddisks.has_key(devpath):
         return _('No such device: ') + devpath
-    disk = all_harddisks[devpath][1]
+    disk = CONF.RUN.g_all_harddisks[devpath][1]
     if not disk:
         return _('Not any partition table found on: ') + devpath
     #part = disk.next_partition()

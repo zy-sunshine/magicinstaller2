@@ -1,5 +1,5 @@
 #!/usr/bin/python
-from gettext import gettext as _
+from miui.utils import _
 from miui.utils import magicstep, magicpopup
 
 class MIStep_welcome (magicstep.magicstep):

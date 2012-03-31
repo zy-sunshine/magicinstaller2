@@ -131,6 +131,7 @@
         "g_win_probe_result": [],
         "g_archsize_map": {},
         "g_path_tftproot": "/tmpfs/tftpboot",
-        "g_choosed_patuple": []
+        "g_choosed_patuple": [],
+        "g_all_harddisks" : {}
     }
 }

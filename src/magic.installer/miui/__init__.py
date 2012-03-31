@@ -1,5 +1,4 @@
 #!/usr/bin/python
-import os.path
 #from locale import getdefaultlocale
 #from gettext import GNUTranslations
 #
@@ -9,4 +8,3 @@ import os.path
 #
 #def _(text):
 #    return gnutrans.gettext(text).decode(gnutrans.charset())
-from gettext import gettext as _

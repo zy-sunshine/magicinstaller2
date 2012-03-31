@@ -6,8 +6,9 @@ CONF_TGTSYS_ROOT = CONF.LOAD.CONF_TGTSYS_ROOT
 from miutils.miregister import MiRegister
 register = MiRegister()
 
-from miutils.milogger import get_long_dolog
-dolog = get_long_dolog(__name__).w
+from miserver.utils import Logger
+Log = Logger.get_instance(__name__)
+dolog = Log.i
 
 @register.server_handler('long')
 def setup_accounts(mia, operid, rootpasswd, acclist):
