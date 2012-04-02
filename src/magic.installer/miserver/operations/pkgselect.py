@@ -639,6 +639,18 @@ if __name__ == '__main__':
     from miserver.utils import FakeMiactions
     mia = FakeMiactions()
     operid = 999
-    hdpartlist = [['/dev/sda1', 'ntfs', '/dev/sda1'], ['/dev/sda2', 'ntfs', '/dev/sda2'], ['/dev/sda5', 'linux-swap(v1)', '/dev/sda5'], ['/dev/sda6', 'ext3', '/dev/sda6'], ['/dev/sda7', 'ext4', '/dev/sda7'], ['/dev/sda8', 'ntfs', '/dev/sda8'], ['/dev/sda1', 'ntfs', '/dev/sda1'], ['/dev/sda2', 'ntfs', '/dev/sda2'], ['/dev/sda5', 'linux-swap(v1)', '/dev/sda5'], ['/dev/sda6', 'ext3', '/dev/sda6'], ['/dev/sda7', 'ext4', '/dev/sda7'], ['/dev/sda8', 'ntfs', '/dev/sda8']]
+    hdpartlist = [
+        ['/dev/sda1', 'ntfs', '/dev/sda1'], 
+        ['/dev/sda2', 'ntfs', '/dev/sda2'], 
+        ['/dev/sda5', 'linux-swap(v1)', '/dev/sda5'], 
+        ['/dev/sda6', 'ext3', '/dev/sda6'], 
+        ['/dev/sda7', 'ext4', '/dev/sda7'], 
+        ['/dev/sda8', 'ntfs', '/dev/sda8'], 
+        ['/dev/sda1', 'ntfs', '/dev/sda1'], 
+        ['/dev/sda2', 'ntfs', '/dev/sda2'], 
+        ['/dev/sda5', 'linux-swap(v1)', '/dev/sda5'], 
+        ['/dev/sda6', 'ext3', '/dev/sda6'], 
+        ['/dev/sda7', 'ext4', '/dev/sda7'], 
+        ['/dev/sda8', 'ntfs', '/dev/sda8']]
     pkgarr_probe(mia, operid, hdpartlist)
     

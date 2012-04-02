@@ -14,9 +14,11 @@ from xml.dom.minidom import parse
 from miutils.common import search_file
 from miutils.miconfig import MiConfig
 CONF = MiConfig.get_instance()
-from miutils.milogger import ClientLogger
-log = ClientLogger.get_instance(ClientLogger, __name__)
 from miutils.mitaskman import MiTaskman
+
+from miui.utils import Logger
+Log = Logger.get_instance(__name__)
+dolog = Log.i
 
 class Step(object):
     def __init__(self, s_id, name, obj, title, valid):
@@ -129,7 +131,7 @@ class MIMainWindow(gtk.Window):
                     start_stepid = stepid
                     break
         step = self.steps.get_step_by_id(start_stepid)
-        log.i('Start step: %s' % step)
+        Log.i('Start step: %s' % step)
         self.load_env(step.id)
         self.switch_to_page(step.name)
         
@@ -161,12 +163,12 @@ class MIMainWindow(gtk.Window):
                      self.leave_step(self.curstep) and 
                      self.enter_step(nextstep) ): # 如果向前, 则检查进入离开条件
                      
-            log.i('switch_to_page "%s" step from %s to %s Success' % (name, self.curstep, nextstep))
+            Log.i('switch_to_page "%s" step from %s to %s Success' % (name, self.curstep, nextstep))
             self.rightpanel.switch(step.obj.widget)
             self.leftpanel.switch(self.curstep, step.id)
             self.curstep = nextstep
         else:
-            log.w('switch_to_page "%s" step from %s to %s Failed' % (name, self.curstep, nextstep))
+            Log.w('switch_to_page "%s" step from %s to %s Failed' % (name, self.curstep, nextstep))
             # Call set_current_page is useless here, so use timeout
             # to switch back.
             #gobject.timeout_add(10, self.page_restore)
@@ -220,8 +222,10 @@ class MIMainWindow(gtk.Window):
         
     def skip_steps(self, skip_stepnames):
         for name in skip_stepnames:
+            dolog('Skip Step: %s ...' % name)
             self.steps.get_step_by_name(name).valid = False
             self.leftpanel.skip_step(name)
+            dolog('Skip Step: %s Done' % name)
 
     def get_next_available_step(self, curstep):
         n_step_id = 0
@@ -250,6 +254,7 @@ class MIMainWindow(gtk.Window):
                 #gobject.timeout_add(10, self.page_restore)
 
 
+#-------------------------- TODO ---------------------------------------
 
     def btnfinish_clicked(self, widget, data):
         if self.stepobj_list[self.curstep].btnfinish_clicked(widget, data):

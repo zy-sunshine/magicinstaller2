@@ -831,6 +831,12 @@ class MIStep_partition (magicstep.magicstep):
         return  1
 
     def leave(self):
+        # Clean global settings and fill them below
+        CONF.RUN.g_all_part_info = {}
+        CONF.RUN.g_all_orig_part = []
+        CONF.RUN.g_root_device = None
+        CONF.RUN.g_boot_device = None
+        CONF.RUN.g_swap_device = None
         # Set mbr_device
         devfn_list = [hdobj.devfn for hdobj in self.hdobj_list]
         mbr_device = self.get_data(self.values, 'bootloader.mbr_device')

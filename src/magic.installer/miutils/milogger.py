@@ -18,6 +18,10 @@ class MiLogger(object):
 
     __lock = threading.Lock() # used to synchronize code
     __logpath = CONF_LOG_FILE
+        
+    __logf = None
+    __logf_opened = False
+    __logf_ref_c = 0
     
     @staticmethod
     def get_instance(Class, TAG):
@@ -25,7 +29,7 @@ class MiLogger(object):
         if not Class.__insts.has_key(TAG):
             Class.__insts[TAG] = object.__new__(Class)
             object.__init__(Class.__insts[TAG])
-            printer.d('MiLogger.get_instance --> Create a MiLogger Instance: %s %s\n' % (TAG, Class.__insts[TAG]))
+            printer.d('MiLogger.get_instance --> Create a MiLogger Instance: %s %s Class: %s\n' % (TAG, Class.__insts[TAG], hex(id(Class))))
             Class.__lock.release()
             Class.__insts[TAG].init(TAG)
             Class.__lock.acquire()
@@ -45,38 +49,35 @@ class MiLogger(object):
     @staticmethod
     def get_logpath(Class):
         return Class.__logpath
-        
-    logf = None
-    logf_ref_c = 0
     
     def init(self, TAG):
         self.TAG = TAG
-        self.openlog(self.__logpath)
+        #self.openlog(self.__logpath)  ### some error to log file. remove it temporary.
         
     def openlog(self, filename):
         self.__lock.acquire()
-        if self.logf:
-            self.logf_ref_c += 1
+        if self.__logf_opened:
+            self.__logf_ref_c += 1
             self.__lock.release()
             return
         if CONF_DOLOG:
-            self.logf = file(filename, 'w')
+            self.__logf = open(filename, 'w')
+            self.__logf_opened = True
             printer.d('MiLogger.openlog --> Open file %s\n' % filename)
-            self.logf_ref_c += 1
+            self.__logf_ref_c += 1
         self.__lock.release()
 
     def dolog(self, msg, *args, **kw):
-        if CONF_DOLOG:
-            self.__lock.acquire()
-            if self.logf:
-                msg = '[%s][%s][%s]%s\n' % ( datetime.now(), 
-                                           kw.has_key('mtype') and kw['mtype'] or 'NORM',
-                                           self.TAG, msg.strip())
-                self.logf.write(msg)
-                self.logf.flush()
-                if kw.has_key('pr'):
-                    kw['pr'](msg)
-            self.__lock.release()
+        self.__lock.acquire()
+        msg = '[%s][%s][%s]%s\n' % ( datetime.now(), 
+                                    kw.has_key('mtype') and kw['mtype'] or 'NORM',
+                                    self.TAG, msg.strip())
+        #if CONF_DOLOG and self.__logf:
+        #    self.__logf.write(msg) ### some error to log file. remove it temporary.
+        #    self.__logf.flush()
+        if kw.has_key('pr'):
+            kw['pr'](msg)
+        self.__lock.release()
             
     def i(self, msg, *args, **kw):
         self.dolog(msg, mtype='INFO', pr = printer.i)
@@ -96,19 +97,19 @@ class MiLogger(object):
     def closelog(self):
         self.__lock.acquire()
         if CONF_DOLOG:
-            self.logf_ref_c -= 1
-            if self.logf_ref_c != 0:
+            self.__logf_ref_c -= 1
+            if self.__logf_ref_c != 0:
                 self.__lock.release()
                 return
             else:
-                if self.logf:
+                if self.__logf:
                     printer.d('MiLogger.closelog --> Close file %s\n' % self.__logpath)
-                    self.logf.close()
+                    self.__logf.close()
         self.__lock.release()
 
     def uninit(self):
         printer.d('MiLogger.uninit --> del %s\n' % self)
-        self.closelog()
+        #self.closelog() ### some error to log file. remove it temporary.
         
 def GetSingleLoggerClass(classname, logpath):
     newClass = type(classname, (MiLogger,), {})

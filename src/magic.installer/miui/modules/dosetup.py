@@ -151,7 +151,7 @@ class MIStep_dosetup (magicstep.magicstep):
     def startup_action(self):
         # If we skip X Setting, we should auto detect the hardware, and copy
         # the generated Xorg.conf to target system.
-        if 1:#skipxsetting:
+        if 1:#CONF.RUN.g_skipxsetting:
             self.rootobj.tm.add_action(_('Probe Monitor'),
                                    self.probe_monitor_ok, None,
                                    'probe_monitor', 0)
@@ -163,7 +163,7 @@ class MIStep_dosetup (magicstep.magicstep):
                                    'probe_mouse', 0)
 
     def enter(self):
-        if skipxsetting:
+        if CONF.RUN.g_skipxsetting:
             if not self.gen_x_settings():
                 magicpopup.magicmsgbox(None,
                                    _('Failed to collect the information about Xwindow configuration.'),

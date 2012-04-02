@@ -3,6 +3,9 @@ from miui.utils import _
 from miui.utils import magicstep
 from miutils.miconfig import MiConfig
 CONF = MiConfig.get_instance()
+from miutils.milogger import ClientLogger
+Log = ClientLogger.get_instance(ClientLogger, __name__)
+dolog = Log.i
 
 class MIStep_startsetup (magicstep.magicstep):
     def __init__(self, rootobj):
@@ -18,8 +21,8 @@ class MIStep_startsetup (magicstep.magicstep):
                 valuename_list = ['startsetup.skipXsetting'])
         skipx = self.get_data(self.values, 'startsetup.skipXsetting')
         if skipx == '1':
-            self.skip_stepnames.append('mistep_Xwindow')
+            self.skip_stepnames.append('Xwindow')
             CONF.RUN.g_skipxsetting = 1
         else:
-            skipxsetting = 0
+            CONF.RUN.g_skipxsetting = 0
         return  1

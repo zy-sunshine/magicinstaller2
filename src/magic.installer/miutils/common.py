@@ -44,6 +44,7 @@ def run_bash(cmd, argv=[], root='/'):
     def chroot():
         os.chroot(root)
     cmd_res = {}
+    dolog('runbash: %s %s' % (cmd, ' '.join(argv)))
     res = subprocess.Popen([cmd] + argv, 
                             stdout = subprocess.PIPE, 
                             stderr = subprocess.PIPE, 

@@ -1,4 +1,5 @@
 #!/usr/bin/python
+import os, gtk, time
 from miui.utils import _, Logger
 from miui.utils import magicstep, magicpopup, xmlgtk
 from miutils.miconfig import MiConfig
@@ -389,9 +390,11 @@ class MIStep_takeactions(magicstep.magicstepgroup):
                 # Skip the disc which is not needed.
                 disc_no = disc_no + 1
                 continue
+            dolog("probe_all_disc_result: %s" % self.probe_all_disc_result)
             if disc_no >= len(self.probe_all_disc_result) \
                    or not self.probe_all_disc_result[disc_no]:
                 self.cur_disc_no = disc_no
+                import pdb; pdb.set_trace()
                 msgtxt = _("Can't find packages in disc %d.\nIf you are using CDROM to install system, it is the chance to eject the original disc and insert the %d disc.")
                 msgtxt = msgtxt % (disc_no + 1, disc_no + 1)
                 self.discdlg_open_time = time.time()
@@ -456,7 +459,14 @@ class MIStep_takeactions(magicstep.magicstepgroup):
         (disc_no, pkg_no) = data
         while pkg_no < len(CONF.RUN.g_arrangement[disc_no]):
             pkgtuple = CONF.RUN.g_arrangement[disc_no][pkg_no]
-            noscripts = pkgtuple[6]     # pkgpublic.noscripts == 6.
+            #noscripts = pkgtuple[6]     # pkgpublic.noscripts == 6.
+            noscripts = False   #### noscripts get out of range
+            #-> noscripts = pkgtuple[6]     # pkgpublic.noscripts == 6.
+            #(Pdb) print pkgtuple
+            #[118253L, 'nss-softokn-freebl-3.13.3-1mgc30.i686.rpm', ['System Environment', 'Base'], ['glibc-2.15-1mgc30.i686.rpm'], [['./nss-softokn-freebl-3.13.3-1mgc30.i686.rpm', 'i686', 118253L]]]
+            #(Pdb) print len(pkgtuple)
+            #5
+
             if self.install_allpkg or self.instpkg_map.has_key(pkgtuple[1]):
                 archpkg = self.pkg2archpkg(pkgtuple[1])
                 if not archpkg:
