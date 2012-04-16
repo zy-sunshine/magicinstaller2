@@ -5,9 +5,7 @@ import gtk
 import sys
 from xml.dom.minidom import parse
 
-sys.path.insert(0, '..')
-
-import xmlgtk
+from miui.utils import xmlgtk
 
 xml_data = parse('t-xmlgtk-data.xml')
 

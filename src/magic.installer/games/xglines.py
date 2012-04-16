@@ -20,9 +20,9 @@ import os.path
 from random import randint
 from xml.dom.minidom import parse
 
-import gtk
+import gtk, gobject
 
-import xmlgtk
+from miui.utils import xmlgtk
 
 class xglines (xmlgtk.xmlgtk):
     def __init__(self, gamepath, help_func, quit_func):
@@ -65,7 +65,7 @@ class xglines (xmlgtk.xmlgtk):
             image.show()
 
         self.game_start()
-        self.timeout_id = gtk.timeout_add(100, self.anim_timeout)
+        self.timeout_id = gobject.timeout_add(100, self.anim_timeout)
 
     def __del__(self):
         gtk.timeout_remove(self.timeout_id)

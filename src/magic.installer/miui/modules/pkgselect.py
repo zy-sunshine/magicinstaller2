@@ -26,12 +26,12 @@ class MIStep_pkgselect (magicstep.magicstepgroup):
         valdoc.appendChild(topele)
         valtopele = valdoc.createElement('srcposlist')
         topele.appendChild(valtopele)
-        for (pafile, dev, mntpoint, fstype, dir, isofn) in CONF.RUN.g_pkgarr_probe_result:
+        for (pafile, dev, fstype, reldir, isofn) in CONF.RUN.g_pkgarr_probe_result:
             rowele = valdoc.createElement('row')
             rowele.setAttribute('c0', pafile)
             rowele.setAttribute('c1', dev)
             rowele.setAttribute('c2', fstype)
-            rowele.setAttribute('c3', '/' + dir)
+            rowele.setAttribute('c3', '/' + reldir)
             rowele.setAttribute('c4', isofn)
             valtopele.appendChild(rowele)
         self.srcpos_dialog = magicpopup.magicpopup( \
@@ -41,7 +41,7 @@ class MIStep_pkgselect (magicstep.magicstepgroup):
         self.srcpos_dialog.fill_values(topele)
 
     def tryload_file(self, patuple):
-        (pafile, dev, mntpoint, fstype, dir, isofn) = patuple
+        (pafile, dev, fstype, reldir, isofn) = patuple
 
         g_map = {}
         l_map = {}
@@ -76,7 +76,7 @@ class MIStep_pkgselect (magicstep.magicstepgroup):
         self.fill_values(topele)
         self.fill_values(self.values)
         self.pa_choose = pafile
-        self.name_map['srcpos_show'].set_text(os.path.join(dev, dir, isofn))
+        self.name_map['srcpos_show'].set_text(os.path.join(dev, reldir, isofn))
         CONF.RUN.g_choosed_patuple = patuple
         return 1
 

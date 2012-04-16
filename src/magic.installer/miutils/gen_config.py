@@ -29,8 +29,15 @@ def fill_config(config):
     CONF.CONF_FSTYPE_MAP = {'iso9660': ('iso9660', '', -1, -1, ''), 'fat32': ('vfat', 'internal', 1, -1, 'b'), 'linux-swap': ('', 'internal', -1, -1, ''), 'ntfs': ('ntfs-3g', '/sbin/mkfs.ntfs -Q', 1, -1, ''), 'reiserfs': ('reiserfs', '/sbin/mkreiserfs -f -f', 33, -1, 'b'), 'xfs': ('xfs', '/sbin/mkfs.xfs -q -f', 5, -1, 'b'), 'ext4': ('ext4', '/sbin/mkfs.ext4', 1, -1, 'b'), 'ext3': ('ext3', '/sbin/mkfs.ext3 -I 128', 1, -1, 'b'), 'ext2': ('ext2', 'internal', 1, -1, 'b'), 'fat16': ('vfat', 'internal', 1, 2048, 'b'), 'jfs': ('jfs', '/sbin/mkfs.jfs -q', 16, -1, 'b')}
     CONF.CONF_BINDIR = '/usr/bin'
     CONF.CONF_TGTSYS_ROOT = '/tmpfs/tgtsys'
+    CONF.CONF_MNT_ROOT = '/tmpfs/mnt'
+    CONF.CONF_PKGARR_FILE = "pkgarr.py"
+    
+    CONF.CONF_PKGARR_SER_CDPATH = ['%s/base' % CONF.CONF_DISTNAME]
+    CONF.CONF_PKGARR_SER_HDPATH = ['boot', CONF.CONF_DISTNAME, 'usr/share/MagicInstaller', '', 'tmp']
+    CONF.CONF_ISOLOOP = 'loop3'  # Use the last loop device to mount iso files.
+    
     CONF.CONF_PKGTYPE = 'rpm'
-    CONF.CONF_BOOTCDFN = 'MagicLinux-3.0-1.iso'
+    CONF.CONF_BOOTCDFN = 'MagicLinux-3.0-1.iso'     #### the first iso is the boot iso, it has grub and pkgarr.py
     CONF.CONF_ISOFN_FMT = '%s-%s-%d.iso'
     CONF.CONF_DEBUG_MODE = 1
     CONF.CONF_DOLOG = True

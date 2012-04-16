@@ -5,9 +5,7 @@ import gtk
 import sys
 from xml.dom.minidom import parse
 
-sys.path.insert(0, '..')
-
-import xmlgtk
+from miui.utils import xmlgtk
 
 class t0_xmlgtk(xmlgtk.xmlgtk):
     def __init__(self, uixmldoc, uixml_rootname=None):

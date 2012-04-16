@@ -1,10 +1,13 @@
 {
     "LOAD": {
+        "CONF_PKGARR_SER_CDPATH": [
+            "MagicLinux/base"
+        ],
         "CONF_LOG_FILE": "/var/log/mi/mi.log",
         "CONF_HELP_HEIGHT": 540.0,
         "CONF_DISTVER": "3.0",
         "CONF_USEUDEV": true,
-        "CONF_MBROOT": "/mnt/MagicBooter",
+        "CONF_PKGARR_FILE": "pkgarr.py",
         "CONF_TEXTDOMAIN": "magic.installer",
         "CONF_PKGTYPE": "rpm",
         "CONF_DATADIR": "/home/sunshine/workspace/magicinstaller2/src/magic.installer",
@@ -96,6 +99,7 @@
             ]
         },
         "CONF_HOTFIXDIR": "/tmp/update",
+        "CONF_ISOLOOP": "loop3",
         "CONF_FULL_HEIGHT": 600,
         "CONF_TEXT_MODE": 0,
         "CONF_DOLOG": true,
@@ -104,9 +108,18 @@
         "CONF_OPERATIONDIR": "/usr/share/MagicInstaller/operations",
         "CONF_DISTKERNELVER": "3.3.0-0.rc3.git6.2mgc30.i686.PAE",
         "CONF_DISTNAME": "MagicLinux",
+        "CONF_PKGARR_SER_HDPATH": [
+            "boot",
+            "MagicLinux",
+            "usr/share/MagicInstaller",
+            "",
+            "tmp"
+        ],
         "CONF_BOOTCDFN": "MagicLinux-3.0-1.iso",
         "CONF_BINDIR": "/usr/bin",
         "CONF_ISOFN_FMT": "%s-%s-%d.iso",
+        "CONF_MBROOT": "/mnt/MagicBooter",
+        "CONF_MNT_ROOT": "/tmpfs/mnt",
         "CONF_MODULEDIR": "/usr/share/MagicInstaller/modules"
     },
     "RUN": {
@@ -119,10 +132,11 @@
         "g_pkgarr_probe_result": [],
         "g_skipxsetting": 0,
         "g_all_orig_part": [],
-        "g_path_allpa": "/tmpfs/tftpboot/allpa",
+        "g_all_harddisks": {},
         "g_pkgpos_map": {},
         "g_arrangement": [],
         "g_win_probe_status": 0,
+        "g_path_allpa": "/tmpfs/tftpboot/allpa",
         "g_all_part_infor": {},
         "g_arch_map": {},
         "g_root_device": null,
@@ -131,7 +145,6 @@
         "g_win_probe_result": [],
         "g_archsize_map": {},
         "g_path_tftproot": "/tmpfs/tftpboot",
-        "g_choosed_patuple": [],
-        "g_all_harddisks" : {}
+        "g_choosed_patuple": []
     }
 }

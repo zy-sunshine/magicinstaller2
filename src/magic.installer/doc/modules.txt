@@ -1,0 +1,17 @@
+accounts.py         magicstepgroup
+bootloader.py       magicstepgroup
+dosetup.py
+fdisk
+finish.py
+keyboard.py
+mouse.py
+network.py
+parted.py
+pkgselect.py        magicstepgroup
+SConscript
+scsi.py
+startsetup.py
+takeactions.py      magicstepgroup
+testops.py
+welcome.py
+Xwindow.py          magicstepgroup

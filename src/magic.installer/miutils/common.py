@@ -349,3 +349,7 @@ def get_devinfo(devfn, all_part_infor):
                 return r
     raise KeyError, 'Device %s not exists in all_part_infor.' % devfn
 
+def cdrom_available(blk_path):
+    if not os.path.exists(blk_path): return False
+    else: return os.system('dd if=%s bs=1 count=1 of=/dev/null &>/dev/null' % blk_path) == 0
+    

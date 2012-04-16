@@ -133,7 +133,8 @@ class MIMainWindow(gtk.Window):
         step = self.steps.get_step_by_id(start_stepid)
         Log.i('Start step: %s' % step)
         self.load_env(step.id)
-        self.switch_to_page(step.name)
+        #self.switch_to_page(step.name)
+        self.switch_to_page('welcome')
         
     def load_env(self, stepid):
         if stepid > 0:
@@ -144,7 +145,9 @@ class MIMainWindow(gtk.Window):
                     conf_file = conf_file % s_id
                     find_it = True
                     break
-            if find_it: CONF.load_from_file(conf_file)
+            if find_it:
+                CONF = MiConfig.get_instance()
+                CONF.load_from_file(conf_file)
     def btnnext_sensitive(self, sensitive):
         self.buttonbar.next.set_sensitive(sensitive)
     
@@ -253,7 +256,17 @@ class MIMainWindow(gtk.Window):
                 ## to switch back.
                 #gobject.timeout_add(10, self.page_restore)
 
-
+    def cb_push_leftpanel(self, widget):
+        self.leftpanel.push(widget)
+        
+    def cb_pop_leftpanel(self):
+        return self.leftpanel.pop()
+        
+    def cb_push_rightpanel(self, widget):
+        self.rightpanel.push(widget)
+        
+    def cb_pop_rightpanel(self):
+        return self.rightpanel.pop()
 #-------------------------- TODO ---------------------------------------
 
     def btnfinish_clicked(self, widget, data):

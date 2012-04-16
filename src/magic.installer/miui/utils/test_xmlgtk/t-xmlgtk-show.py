@@ -4,9 +4,7 @@
 import sys
 import gtk
 from xml.dom.minidom import parse
-sys.path.insert(0, '.')
-sys.path.insert(0, '..')
-import xmlgtk
+from miui.utils import xmlgtk
 
 if len(sys.argv) not in (2, 3):
     print "Usage: python t-xmlgtk-show.py uixmldoc [rootname]"

@@ -4,7 +4,8 @@ from miui.utils import _, Logger
 from miui.utils import magicstep, magicpopup, xmlgtk
 from miutils.miconfig import MiConfig
 from miutils.common import get_devinfo
-
+from games.xglines import xglines
+from xml.dom.minidom import parse, parseString
 CONF = MiConfig.get_instance()
 CONF_DEBUG_MODE = CONF.LOAD.CONF_DEBUG_MODE
 CONF_FULL_WIDTH = CONF.LOAD.CONF_FULL_WIDTH
@@ -13,93 +14,93 @@ CONF_FULL_HEIGHT = CONF.LOAD.CONF_FULL_HEIGHT
 Log = Logger.get_instance(__name__)
 dolog = Log.i
 
-class MIStep_takeactions(magicstep.magicstepgroup):
-    class tadialog(xmlgtk.xmlgtk):
-        def __init__(self, upobj, uixml, uirootname=None):
+class tadialog(xmlgtk.xmlgtk):
+    def __init__(self, upobj, uixml, uirootname=None):
+        self.upobj = upobj
+        xmlgtk.xmlgtk.__init__(self, uixml, uirootname)
+        #self.topwin = gtk.Window(gtk.WINDOW_TOPLEVEL)
+        #self.topwin.set_size_request(CONF_FULL_WIDTH, CONF_FULL_HEIGHT)
+        #self.topwin.set_position(gtk.WIN_POS_CENTER_ALWAYS)
+        #self.topwin.add(self.widget)
+        #self.topwin.show()
+        #self.topwin.window.set_cursor(gtk.gdk.Cursor(gtk.gdk.LEFT_PTR))
+        
+    def btntheme_clicked(self, widget, data):
+        self.upobj.rootobj.btntheme_clicked(widget, data)
+
+    def btnlogger_clicked(self, widget, data):
+        self.upobj.rootobj.btnlogger_clicked(widget, data)
+
+    def popup_xglines(self, widget, data):
+        framexml = parseString('<?xml version="1.0"?><frame type="in"><frame name="slot" type="out"/></frame>')
+        self.gamebox = magicpopup.magicpopup(None, framexml, _('XGlines'), 0)
+        self.gameobj = xglines('games', self.help_gamebox, self.close_gamebox)
+        self.gameobj.widget.show()
+        self.gamebox.name_map['slot'].add(self.gameobj.widget)
+
+    def help_gamebox(self, name):
+        if name == 'xglines':
+            magicpopup.magichelp_popup(_('helptext/games.xglines.en.txt'))
+
+    def close_gamebox(self):
+        self.gamebox.topwin.destroy()
+        del self.gameobj
+        
+class discdialog(magicpopup.magicpopup):
+    def __init__(self, upobj, uixml, msg, uirootname=None):
+        if upobj:
             self.upobj = upobj
-            xmlgtk.xmlgtk.__init__(self, uixml, uirootname)
-            self.topwin = gtk.Window(gtk.WINDOW_TOPLEVEL)
-            self.topwin.set_size_request(CONF_FULL_WIDTH, CONF_FULL_HEIGHT)
-            self.topwin.set_position(gtk.WIN_POS_CENTER_ALWAYS)
-            self.topwin.add(self.widget)
-            self.topwin.show()
-            self.topwin.window.set_cursor(gtk.gdk.Cursor(gtk.gdk.LEFT_PTR))
-            
-        def btntheme_clicked(self, widget, data):
-            self.upobj.rootobj.btntheme_clicked(widget, data)
+        else:
+            self.upobj = self
+        magicpopup.magicpopup.__init__(self, upobj, uixml,
+                                        _('Package not found'), 0,
+                                        uirootname)
+        self.name_map['msg'].set_text(msg)
 
-        def btnlogger_clicked(self, widget, data):
-            self.upobj.rootobj.btnlogger_clicked(widget, data)
+    def retry_clicked(self, widget, data):
+        self.upobj.retry_clicked(widget, data)
+        self.topwin.destroy()
 
-        def popup_xglines(self, widget, data):
-            framexml = parseString('<?xml version="1.0"?><frame type="in"><frame name="slot" type="out"/></frame>')
-            self.gamebox = magicpopup.magicpopup(None, framexml, _('XGlines'), 0)
-            self.gameobj = xglines('games', self.help_gamebox, self.close_gamebox)
-            self.gameobj.widget.show()
-            self.gamebox.name_map['slot'].add(self.gameobj.widget)
+    def abort_clicked(self, widget, data):
+        self.upobj.abort_clicked(widget, data)
+        self.topwin.destroy()
 
-        def help_gamebox(self, name):
-            if name == 'xglines':
-                magicpopup.magichelp_popup(_('helptext/games.xglines.en.txt'))
+    def reboot_clicked(self, widget, data):
+        self.upobj.reboot_clicked(widget, data)
+        self.topwin.destroy()
 
-        def close_gamebox(self):
-            self.gamebox.topwin.destroy()
-            del self.gameobj
+class rpmerrdialog(magicpopup.magicpopup):
+    """Rpm install error dialog."""
+    def __init__(self, upobj, uixml, msg, uirootname, data):
+        if upobj:
+            self.upobj = upobj
+        else:
+            self.upobj = self
+        magicpopup.magicpopup.__init__(self, upobj, uixml,
+                                        _('Package install error'), 0,
+                                        uirootname)
+        self.name_map['msg'].set_text(msg)
+        self.data = data
 
-    class discdialog(magicpopup.magicpopup):
-        def __init__(self, upobj, uixml, msg, uirootname=None):
-            if upobj:
-                self.upobj = upobj
-            else:
-                self.upobj = self
-            magicpopup.magicpopup.__init__(self, upobj, uixml,
-                                           _('Package not found'), 0,
-                                           uirootname)
-            self.name_map['msg'].set_text(msg)
+    def retry_clicked(self, widget, data):
+        (disc_no, pkg_no, asize, is_skip) = self.data
+        self.upobj.act_instpkg_pkg_start(-1, (disc_no, pkg_no))
+        self.topwin.destroy()
 
-        def retry_clicked(self, widget, data):
-            self.upobj.retry_clicked(widget, data)
-            self.topwin.destroy()
+    def skip_clicked(self, widget, data):
+        (disc_no, pkg_no, asize, is_skip) = self.data
+        self.upobj.act_instpkg_pkg_end(-1, (disc_no, pkg_no, asize, True))
+        self.topwin.destroy()
 
-        def abort_clicked(self, widget, data):
-            self.upobj.abort_clicked(widget, data)
-            self.topwin.destroy()
+    def reboot_clicked(self, widget, data):
+        self.upobj.reboot_clicked(widget, data)
+        self.topwin.destroy()
 
-        def reboot_clicked(self, widget, data):
-            self.upobj.reboot_clicked(widget, data)
-            self.topwin.destroy()
-
-    class rpmerrdialog(magicpopup.magicpopup):
-        """Rpm install error dialog."""
-        def __init__(self, upobj, uixml, msg, uirootname, data):
-            if upobj:
-                self.upobj = upobj
-            else:
-                self.upobj = self
-            magicpopup.magicpopup.__init__(self, upobj, uixml,
-                                           _('Package install error'), 0,
-                                           uirootname)
-            self.name_map['msg'].set_text(msg)
-            self.data = data
-
-        def retry_clicked(self, widget, data):
-            (disc_no, pkg_no, asize, is_skip) = self.data
-            self.upobj.act_instpkg_pkg_start(-1, (disc_no, pkg_no))
-            self.topwin.destroy()
-
-        def skip_clicked(self, widget, data):
-            (disc_no, pkg_no, asize, is_skip) = self.data
-            self.upobj.act_instpkg_pkg_end(-1, (disc_no, pkg_no, asize, True))
-            self.topwin.destroy()
-
-        def reboot_clicked(self, widget, data):
-            self.upobj.reboot_clicked(widget, data)
-            self.topwin.destroy()
-
+class MIStep_takeactions(magicstep.magicstepgroup):
     def __init__(self, rootobj):
         self.rootobj = rootobj
         magicstep.magicstepgroup.__init__(self, rootobj, 'takeactions.xml',
-                                          ['notes', 'ensure'], 'step')
+                                          ['notes', 'ensure', 'doactions'], 'step')
         self.actlist = []
         
         if not CONF_DEBUG_MODE:
@@ -116,32 +117,13 @@ class MIStep_takeactions(magicstep.magicstepgroup):
         self.installmode = 'rpminstallmode'   # Default
         self.minorarch_pkgs = []
         self.minorarch_later = True     # push back minor arch packages
-            
-    def get_label(self):
-        return  _('Take Actions')
-
-    def btnnext_clicked(self, widget, data):
-        if self.substep != self.substep_list[-1]:
-            return magicstep.magicstepgroup.btnnext_clicked(self, widget, data)
-        # Get the Install Mode
-        self.fetch_values(self.rootobj.values,
-                    valuename_list = ['takeactions.installmode']) 
-        instmode = self.get_data(self.values, 'takeactions.installmode')
-        
-        if instmode == 'copyinstallmode':
-            # Copy Install Mode
-            self.installmode = 'copyinstallmode'
-        elif instmode == 'rpminstallmode':
-            # Rpm Install Mode
-            self.installmode = 'rpminstallmode'
-        
         self.add_action = self.rootobj.tm.add_action
+        
+        self.tadlg = tadialog(self, self.uixmldoc, 'actions.dialog')
         self.statusarr = []
-        tadlg = self.tadialog(self, self.uixmldoc, 'actions.dialog')
-        self.tadlg = tadlg
         width = 3
         height = (len(self.actlist) + width - 1) / width
-        table = tadlg.name_map['stepsshow']
+        table = self.tadlg.name_map['stepsshow']
         for i in range(len(self.actlist)):
             image = gtk.Image()
             image.set_from_file('images/applet-blank.png')
@@ -154,9 +136,50 @@ class MIStep_takeactions(magicstep.magicstepgroup):
             table.attach(label, 1, 2, i, i + 1,
                          gtk.EXPAND | gtk.FILL, gtk.EXPAND | gtk.FILL,
                          0, 0)
+                         
+        self.left_panel = self.tadlg.name_map['leftpanel']
+        parent = self.left_panel.parent
+        parent.remove(self.left_panel)
+        self.right_panel = self.tadlg.name_map['rightpanel']
+        parent = self.right_panel.parent
+        parent.remove(self.right_panel)
+        
+    def get_label(self):
+        return  _('Take Actions')
+        
+    def get_left_panel(self):
+        return self.left_panel
+        
+    def get_right_panel(self):
+        return self.right_panel
+        
+    def check_enter_doactions(self):
+        #### TODO: set the next back button sensitive
+        # self.rootobj.btnback_sensitive(False)
+        # self.rootobj.btnnext_sensitive(False)
+        # Get the Install Mode
+        self.fetch_values(self.rootobj.values,
+                    valuename_list = ['takeactions.installmode']) 
+        instmode = self.get_data(self.values, 'takeactions.installmode')
+        
+        if instmode == 'copyinstallmode':
+            # Copy Install Mode
+            self.installmode = 'copyinstallmode'
+        elif instmode == 'rpminstallmode':
+            # Rpm Install Mode
+            self.installmode = 'rpminstallmode'
+        
+        self.rootobj.cb_push_leftpanel(self.get_left_panel())
+        self.rootobj.cb_push_rightpanel(self.get_right_panel())
+        
         self.act_enter()
         return 1
-
+        
+    def check_leave_doactions(self):
+        self.rootobj.cb_pop_leftpanel()
+        self.rootobj.cb_pop_rightpanel()
+        return 1
+    
     def act_enter(self):
         self.statusarr[self.actpos].set_from_file('images/applet-busy.png')
         self.actlist[self.actpos][1]()
@@ -242,7 +265,7 @@ class MIStep_takeactions(magicstep.magicstepgroup):
             CONF.RUN.g_mount_all_list = []
             for devpath in CONF.RUN.g_all_part_infor.keys():
                 for part_tuple in CONF.RUN.g_all_part_infor[devpath]:
-                    if part_tuple[7] == '':  # mountpoint
+                    if part_tuple[7] == '':  # mountpoint ### TODO
                         continue
                     mntpoint = part_tuple[7]
                     devfn = '%s%d' % (devpath, part_tuple[0])
@@ -250,22 +273,25 @@ class MIStep_takeactions(magicstep.magicstepgroup):
                     CONF.RUN.g_mount_all_list.append((mntpoint, devfn, fstype))
             CONF.RUN.g_mount_all_list.sort(self.malcmp)
             dolog('CONF.RUN.g_mount_all_list: %s\n' % str(CONF.RUN.g_mount_all_list))
-            self.add_action(_('Mount all target partitions.'),
-                            self.nextop, None,
-                            'mount_all_tgtpart', CONF.RUN.g_mount_all_list, 'y')
-            # Check whether the packages are stored in mounted partitions.
-            pkgmntpoint = 0
-            (pafile, dev, mntpoint, fstype, dir, isofn) = CONF.RUN.g_choosed_patuple
-            for (mntpoint, devfn, fstype) in CONF.RUN.g_mount_all_list:
-                if dev == devfn:
-                    pkgmntpoint = mntpoint
-                    if len(pkgmntpoint) > 0 and pkgmntpoint[0] == '/':
-                        pkgmntpoint = pkgmntpoint[1:]
-                    CONF.RUN.g_choosed_patuple = (pafile, dev, pkgmntpoint,
-                                       fstype, dir, isofn)
-                    dolog('The packages is placed in the mounted partition(%s)\n' %\
-                          pkgmntpoint)
-                    break
+            #self.add_action(_('Mount all target partitions.'),
+                            #self.nextop, None,
+                            #'mount_all_tgtpart', CONF.RUN.g_mount_all_list, 'y')
+            self.nextop(None, None)
+                            
+            #### Because we can mount device many times, so we not check below
+            ## Check whether the packages are stored in mounted partitions.
+            #pkgmntpoint = 0
+            #(pafile, dev, fstype, dir, isofn) = CONF.RUN.g_choosed_patuple
+            #for (mntpoint, devfn, fstype) in CONF.RUN.g_mount_all_list:
+                #if dev == devfn:
+                    #pkgmntpoint = mntpoint
+                    #if len(pkgmntpoint) > 0 and pkgmntpoint[0] == '/':
+                        #pkgmntpoint = pkgmntpoint[1:]
+                    #CONF.RUN.g_choosed_patuple = (pafile, dev, pkgmntpoint,
+                                       #fstype, dir, isofn)
+                    #dolog('The packages is placed in the mounted partition(%s)\n' %\
+                          #pkgmntpoint)
+                    #break
 
     def act_parted_format_result(self, tdata, data):
         result = tdata
@@ -327,7 +353,8 @@ class MIStep_takeactions(magicstep.magicstepgroup):
                     self.instpkg_map[pkg] = 'y'
                     self.totalsize = self.totalsize + asize
         self.totalpkg = len(self.instpkg_map.keys())
-
+        
+############################ install package ###################################
 ##### Start install package
     def act_start_instpkg(self):
         self.tadlg.name_map['frame_packages'].set_sensitive(True)
@@ -341,11 +368,11 @@ class MIStep_takeactions(magicstep.magicstepgroup):
         self.disc_first_pkgs = []
         for disc_no in range(len(CONF.RUN.g_arrangement)):
             self.disc_first_pkgs.append(CONF.RUN.g_arrangement[disc_no][0][1])
-        (pafile, dev, mntpoint, fstype, dir, isofn) = CONF.RUN.g_choosed_patuple
+        (pafile, dev, fstype, reldir, bootiso_relpath) = CONF.RUN.g_choosed_patuple
         dolog('disc_first_pkgs: %s\n' % str(self.disc_first_pkgs))
         self.add_action(_('Search packages'),
                         self.act_instpkg_prepare, None,
-                        'probe_all_disc', dev, mntpoint, dir, fstype, self.disc_first_pkgs)
+                        'probe_all_disc', dev, fstype, bootiso_relpath, reldir, self.disc_first_pkgs)
 
     def szfmt(self, sz):
         return '%0.2fM' % (sz / 1024.0 / 1024.0)
@@ -357,9 +384,10 @@ class MIStep_takeactions(magicstep.magicstepgroup):
         return '%02d:%02d:%02d' % (h, m, s)
 
     def act_instpkg_prepare(self, tdata, data):
-        (errmsg, self.probe_all_disc_result) = tdata
+        import pdb;pdb.set_trace()
+        self.probe_all_disc_result = tdata
         dolog('probe_all_disc_result: %s\n' % str(self.probe_all_disc_result))
-        (pafile, dev, mntpoint, fstype, dir, isofn) = CONF.RUN.g_choosed_patuple
+        (pafile, dev, fstype, reldir, bootiso_relpath) = CONF.RUN.g_choosed_patuple
         self.donepkg = 0
         self.cursize = 0
         self.starttime = time.time()
@@ -376,7 +404,7 @@ class MIStep_takeactions(magicstep.magicstepgroup):
 
         self.add_action(None,
                         self.act_instpkg_disc_start, 0,
-                        'instpkg_prep', dev, mntpoint, dir, fstype, self.installmode)
+                        'instpkg_prep', dev, fstype, bootiso_relpath, reldir, self.installmode)
 
     def act_instpkg_disc_start(self, tdata, disc_no):
         if self.discdlg_open_time > 0:
@@ -384,7 +412,7 @@ class MIStep_takeactions(magicstep.magicstepgroup):
             self.starttime = self.starttime + \
                              (time.time() - self.discdlg_open_time)
             self.discdlg_open_time = -1
-        (pafile, dev, mntpoint, fstype, dir, isofn) =  CONF.RUN.g_choosed_patuple
+        (pafile, dev, fstype, reldir, isofn) =  CONF.RUN.g_choosed_patuple
         while disc_no < len(CONF.RUN.g_arrangement):
             if not self.install_allpkg and not self.disk_map.has_key(disc_no):
                 # Skip the disc which is not needed.
@@ -403,58 +431,12 @@ class MIStep_takeactions(magicstep.magicstepgroup):
             iso_fn = self.probe_all_disc_result[disc_no][0]
             self.add_action(None,
                             self.act_instpkg_pkg_start, (disc_no, 0),
-                            'instpkg_disc_prep', dev, mntpoint, dir, fstype, iso_fn)
+                            'instpkg_disc_prep', dev, reldir, fstype, iso_fn)
             return
         self.add_action(_('Last operations for package installation'),
                         self.nextop, None,
-                        'instpkg_post', dev, mntpoint, dir, fstype)
-
-    def retry_clicked(self, widget, data):
-        (pafile, dev, mntpoint, fstype, dir, isofn) = CONF.RUN.g_choosed_patuple
-        self.add_action(_('Researching packages...'),
-                        self.reprobe_all_disc_0, None,
-                        'instpkg_post', dev, mntpoint, dir, fstype)
-        
-    def reprobe_all_disc_0(self, tdata, data):
-        (pafile, dev, mntpoint, fstype, dir, isofn) = CONF.RUN.g_choosed_patuple
-        self.add_action(_('Researching packages...'),
-                        self.reprobe_all_disc_1, None,
-                        'probe_all_disc', dev, mntpoint, dir, fstype, self.disc_first_pkgs)
-
-    def reprobe_all_disc_1(self, tdata, data):
-        (errmsg, self.probe_all_disc_result) = tdata
-        dolog('probe_all_disc_result: %s\n' % str(self.probe_all_disc_result))
-        (pafile, dev, mntpoint, fstype, dir, isofn) = CONF.RUN.g_choosed_patuple
-        self.add_action(_('Researching packages...'),
-                        self.act_instpkg_disc_start, self.cur_disc_no,
-                        'instpkg_prep', dev, mntpoint, dir, fstype, self.installmode)
-
-    def abort_clicked(self, widget, data):
-        (pafile, dev, mntpoint, fstype, dir, isofn) = CONF.RUN.g_choosed_patuple
-        self.add_action(_('Aborting...'),
-                        self.nextop, None,
-                        'instpkg_post', dev, mntpoint, dir, fstype)
-
-    def reboot_clicked(self, widget, data):
-        (pafile, dev, mntpoint, fstype, dir, isofn) = CONF.RUN.g_choosed_patuple
-        msg = _('Umount the target filesystem(s).')
-        self.add_action(msg, None, None,
-                        'instpkg_post', dev, mntpoint, dir, fstype)
-        self.add_action(msg, self.reboot_0, None,
-                        'umount_all_tgtpart', CONF.RUN.g_mount_all_list, 'y')
-
-    def reboot_0(self, tdata, data):
-        self.rebootdlg = \
-                       magicpopup.magicmsgbox(self,
-                                              _('Click "OK" to reboot your system!\nEject the cdrom if you are installed from cdrom.'),
-                                              magicpopup.magicmsgbox.MB_ERROR,
-                                              magicpopup.magicpopup.MB_OK,
-                                              'reboot_0_')
-
-    def reboot_0_ok_clicked(self, widget, data):
-        self.add_action('Quit', None, None, 'quit', 0)
-        self.rebootdlg.topwin.destroy()
-
+                        'instpkg_post', dev, reldir, fstype)
+                        
     def act_instpkg_pkg_start(self, tdata, data):
         (disc_no, pkg_no) = data
         while pkg_no < len(CONF.RUN.g_arrangement[disc_no]):
@@ -493,10 +475,10 @@ class MIStep_takeactions(magicstep.magicstepgroup):
                             'package_install', apkg, self.probe_all_disc_result[disc_no][1],
                             noscripts)
             return
-        (pafile, dev, mntpoint, fstype, dir, isofn) = CONF.RUN.g_choosed_patuple
+        (pafile, dev, fstype, reldir, isofn) = CONF.RUN.g_choosed_patuple
         self.add_action(None,
                         self.act_instpkg_disc_start, disc_no + 1,
-                        'instpkg_disc_post', dev, mntpoint, dir, fstype, isofn, self.probe_all_disc_result[disc_no][1])
+                        'instpkg_disc_post', dev, reldir, fstype, isofn, self.probe_all_disc_result[disc_no][1])
 
     def act_instpkg_pkg_end(self, tdata, data):
         #--- FIXME ---
@@ -549,7 +531,7 @@ class MIStep_takeactions(magicstep.magicstepgroup):
                             'scsi_modprobe_conf', scsi_module_list)
         dolog('action_mkinitrd\n')
         self.add_action(_('Make initrd'), self.nextop, None, 'do_mkinitrd', 0)
-
+############################ Bootloader ###################################
     def act_start_bootloader(self):
         bltype = self.get_data(self.values, 'bootloader.bltype')
         instpos = self.get_data(self.values, 'bootloader.instpos')
@@ -582,9 +564,13 @@ class MIStep_takeactions(magicstep.magicstepgroup):
         dolog('%s\n' % str(('setup_' + bltype, timeout, usepassword,
                             password, lba, options, entries, default,
                             instpos, bootdev, mbr_device, win_device, win_fs)))
+        #### TODO: add clean server operate.
+        
         self.add_action(_('Prepare bootloader'), self.bl_umount, bltype,
                         'prepare_' + bltype, timeout, usepassword, password,
                         lba, options, entries, default, instpos, bootdev, mbr_device, win_device, win_fs)
+        ### TODO: real do self.bl_setup() and support grub2
+        ### and then do nextop.
 
     def bl_umount(self, tdata, data):
         res = tdata
@@ -597,13 +583,8 @@ class MIStep_takeactions(magicstep.magicstepgroup):
 
     def bl_setup(self, tdata, data):
         (bltype, (grubdev, grubsetupdev, grubopt)) = data
-        self.add_action(_('Setup bootloader'), self.bl_mount, None,
+        self.add_action(_('Setup bootloader'), None, None,
                         'setup_' + bltype, grubdev, grubsetupdev, grubopt)
-
-    def bl_mount(self, tdata, data):
-        self.add_action(_('Mount all target partitions after bootloader setup.'),
-                        self.nextop, None,
-                        'mount_all_tgtpart', CONF.RUN.g_mount_all_list, 0)
 
     def nextop(self, tdata, data):
         if tdata:
@@ -614,3 +595,83 @@ class MIStep_takeactions(magicstep.magicstepgroup):
 
         dolog('nextop\n')
         self.act_leave()
+        
+############################ Ghraphic Button Action ###################################
+
+    def retry_clicked(self, widget, data):
+        (pafile, dev, fstype, reldir, isofn) = CONF.RUN.g_choosed_patuple
+        self.add_action(_('Researching packages...'),
+                        self.reprobe_all_disc_0, None,
+                        'instpkg_post', dev, reldir, fstype)
+        
+    def reprobe_all_disc_0(self, tdata, data):
+        (pafile, dev, fstype, reldir, isofn) = CONF.RUN.g_choosed_patuple
+        self.add_action(_('Researching packages...'),
+                        self.reprobe_all_disc_1, None,
+                        'probe_all_disc', dev, reldir, fstype, self.disc_first_pkgs)
+
+    def reprobe_all_disc_1(self, tdata, data):
+        (errmsg, self.probe_all_disc_result) = tdata
+        dolog('probe_all_disc_result: %s\n' % str(self.probe_all_disc_result))
+        (pafile, dev, fstype, reldir, isofn) = CONF.RUN.g_choosed_patuple
+        self.add_action(_('Researching packages...'),
+                        self.act_instpkg_disc_start, self.cur_disc_no,
+                        'instpkg_prep', dev, reldir, fstype, self.installmode)
+
+    def abort_clicked(self, widget, data):
+        (pafile, dev, fstype, reldir, isofn) = CONF.RUN.g_choosed_patuple
+        self.add_action(_('Aborting...'),
+                        self.nextop, None,
+                        'instpkg_post', dev, reldir, fstype)
+
+    def reboot_clicked(self, widget, data):
+        (pafile, dev, fstype, reldir, isofn) = CONF.RUN.g_choosed_patuple
+        msg = _('Umount the target filesystem(s).')
+        self.add_action(msg, None, None,
+                        'instpkg_post', dev, mntpoint, dir, fstype)
+        #### TODO Add an clean server operator
+        #self.add_action(msg, self.reboot_0, None,
+                        #'umount_all_tgtpart', CONF.RUN.g_mount_all_list, 'y')
+        reboot_0(None, None)
+
+    def reboot_0(self, tdata, data):
+        self.rebootdlg = \
+                       magicpopup.magicmsgbox(self,
+                                              _('Click "OK" to reboot your system!\nEject the cdrom if you are installed from cdrom.'),
+                                              magicpopup.magicmsgbox.MB_ERROR,
+                                              magicpopup.magicpopup.MB_OK,
+                                              'reboot_0_')
+
+    def reboot_0_ok_clicked(self, widget, data):
+        self.add_action('Quit', None, None, 'quit', 0)
+        self.rebootdlg.topwin.destroy()
+
+def TestTaDialog():
+    import gtk
+    from miutils.common import search_file
+    import gtk
+    uixml_file = 'takeactions.xml'
+    uixml_path = search_file( uixml_file,
+                              [CONF.LOAD.CONF_HOTFIXDIR, '.'],
+                              postfix = 'UIxml')
+    uixmldoc = parse(uixml_path)
+    tadlg = tadialog(None, uixmldoc, 'actions.dialog')
+    tadlg.name_map['otname'].set_text('')
+    tadlg.name_map['otprog'].set_fraction(1)
+    tadlg.name_map['frame_other'].set_sensitive(False)
+    #import pdb; pdb.set_trace()
+    #tadlg.topwin.destroy()
+    gtk.main()
+        
+def TestMIStep_takeactions():
+    import gtk
+    from mitest import TestMIStep
+    win = TestMIStep(gtk.WINDOW_TOPLEVEL)
+    h = MIStep_takeactions(win)
+    win.add_mistep(h)
+    win.show_all()
+    gtk.main()
+    
+if __name__ == '__main__':
+    TestMIStep_takeactions()
+    

@@ -4,8 +4,8 @@ import simplejson as json
 from miutils import printer
 
 class MiConfig_SubCategory(object):
-    def __init__(self, confobj, section):
-        self.__dict__['confobj'] = confobj
+    def __init__(self, sself, section):
+        self.__dict__['confobj'] = sself
         self.__dict__['section'] = section
     
     def __getattr__(self, key):
@@ -14,6 +14,7 @@ class MiConfig_SubCategory(object):
         #if not confobj.has_option(section, key):
         #    confobj.set(section, key, None)
         #try:
+        #ret = self.__dict__['sself'].__dict__['confobj'][section][key]
         ret = confobj[section][key]
         #except:
         #    import pdb;pdb.set_trace()
@@ -23,6 +24,11 @@ class MiConfig_SubCategory(object):
         confobj = self.__dict__['confobj']
         section = self.__dict__['section']
         confobj[section][key] = value
+        
+    def items(self):
+        confobj = self.__dict__['confobj']
+        section = self.__dict__['section']
+        return confobj[section].items()
         
 class MiConfig(object):
     def __init__():
@@ -54,12 +60,6 @@ class MiConfig(object):
     def __getattr__(self, key):
         confobj = self.__dict__['confobj']
         secobjs = self.__dict__['secobjs']
-
-        if not confobj.has_key(key):
-            confobj[key] = {}
-        if not secobjs.has_key(key):
-            secobjs[key] = MiConfig_SubCategory(confobj, key)
-
         return secobjs[key]
         
         
@@ -72,11 +72,20 @@ class MiConfig(object):
     def load_from_file(self, conf_file):
         printer.d('MiConfig.load_from_file --> %s\n' % conf_file)
         with open(conf_file, 'r') as configfile:
-            self.__dict__['confobj'] = json.load(configfile)
+            self.__dict__['confobj'].clear()
+            self.__dict__['confobj'].update(json.load(configfile))
+        confobj = self.__dict__['confobj']
+        secobjs = self.__dict__['secobjs']
+        secobjs.clear()
+        for key in confobj.keys():
+            secobjs[key] = MiConfig_SubCategory(confobj, key)
         
     def dump(self):
-        for key, value in self.__dict__['confobj'].items():
-            print '%s => %s' % (key, value)
+        confobj = self.__dict__['confobj']
+        secobjs = self.__dict__['secobjs']
+        for key in self.secobjs.keys():
+            for key, value in secobjs[key].items():
+                print key, value
 
     def __del__(self):
         printer.d('MiConfig.__del__ --> %s' % self)
@@ -103,6 +112,16 @@ def TestMiConfig_LoadConfig():
     print '-'*40
     mc2.dump()
     
+def TestMiConfig_LoadConfig2():
+    mc = MiConfig.get_instance()
+    mc.load_from_file('t-config.json')
+    mc.dump()
+    print '-'*40
+    mc2 = MiConfig.get_instance()
+    mc2.load_from_file('/tmpfs/step_conf/step_3.json')
+    mc.dump()
+    
 if __name__ == '__main__':
     TestMiConfig_SaveConfig()
     TestMiConfig_LoadConfig()
+    TestMiConfig_LoadConfig2()

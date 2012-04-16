@@ -2,7 +2,7 @@
 import os, glob, sys, syslog
 import rpm, tarfile, time
 import isys, tftpc, getdev
-from miutils.common import mount_dev, umount_dev, run_bash
+from miutils.common import mount_dev, umount_dev, run_bash, cdrom_available
 from miutils.miconfig import MiConfig
 CONF = MiConfig.get_instance()
 CONF_DISTNAME = CONF.LOAD.CONF_DISTNAME
@@ -12,6 +12,12 @@ CONF_TGTSYS_ROOT = CONF.LOAD.CONF_TGTSYS_ROOT
 CONF_PKGTYPE = CONF.LOAD.CONF_PKGTYPE
 CONF_BOOTCDFN = CONF.LOAD.CONF_BOOTCDFN
 CONF_ISOFN_FMT = CONF.LOAD.CONF_ISOFN_FMT
+CONF_MNT_ROOT = CONF.LOAD.CONF_MNT_ROOT
+
+CONF_PKGARR_FILE = CONF.LOAD.CONF_PKGARR_FILE
+CONF_PKGARR_SER_HDPATH = CONF.LOAD.CONF_PKGARR_SER_HDPATH
+CONF_PKGARR_SER_CDPATH = CONF.LOAD.CONF_PKGARR_SER_CDPATH
+CONF_ISOLOOP = CONF.LOAD.CONF_ISOLOOP
 
 from miutils.miregister import MiRegister
 register = MiRegister()
@@ -20,14 +26,6 @@ from miserver.utils import Logger
 Log = Logger.get_instance(__name__)
 dolog = Log.i
 
-cd_papath = '%s/base' % CONF_DISTNAME
-hd_papathes = ['boot',
-               CONF_DISTNAME,
-               'usr/share/MagicInstaller',
-               '',
-               'tmp']
-pafile = 'pkgarr.py'
-isoloop = 'loop3'  # Use the last loop device.
 cur_rpm_fd = 0
 ts = None
 
@@ -47,10 +45,69 @@ etctar = 'etc.tar.bz2'
 etc_script = 'etc_install.sh'
 tmp_config_dir = 'tmp/MI_configure'
 
+dev_hd = None # the harddisk device where save packages.
+dev_iso = None # the iso where save pkgs.
+dev_tgt = None # the 
+
+class MiDevice(object):
+    def __init__(self, blk_path, fstype):
+        self.blk_path = blk_path
+        self.fstype = fstype
+        self.has_mounted = False
+        self.mntdir = ''
+        self.loopmntdir = os.path.join(CONF_MNT_ROOT, CONF_ISOLOOP)
+        
+    def do_mount(self):
+        if self.has_mounted: return True
+        if not self.blk_path: Log.e('MiDevice.do_mount block path is "%s" ' % self.blk_path); return False
+        # Priority to treat iso virtual device
+        if self.fstype == 'iso9660':
+            if not cdrom_available(self.blk_path):
+                Log.w('MiDevice.do_mount %s type device "%s" cannot be used\n' % (self.fstype, self.blk_path))
+                return False
+            else:
+                isopath = self.blk_path
+                ret, errmsg = mount_dev('iso9660', isopath, self.loopmntdir, flags='loop')
+                if not ret:
+                    Log.e("LoMount %s on %s as %s failed: %s" %  (isopath, self.loopmntdir, 'iso9660', str(errmsg)))
+                    return False
+                else:
+                    self.mntdir = self.loopmntdir
+                    self.has_mounted = True
+                    return True
+                    
+        # Then treat Harddisk Device
+        ret, mntdir = mount_dev(self.fstype, self.blk_path)
+        if not ret:
+            Log.e("MiDevice.do_mount Mount %s on %s as %s failed: %s" % \
+                          (self.blk_path, mntdir, self.fstype, str(mntdir)))
+            return False
+        else:
+            self.mntdir = mntdir
+            self.has_mounted = True
+            return True
+            
+    def do_umount(self):
+        if not self.has_mounted: return True
+        ret, errmsg = umount_dev(self.mntdir)
+        if not ret: Log.e("MiDevice.do_umount UMount(%s) failed: %s" % (self.mntdir, str(errmsg))); return False
+        else: self.has_mounted = False; return True
+        
+    def iter_searchfiles(self, fs_lst, pathes):
+        if not self.do_mount(): return
+        if not self.mntdir: return
+        for p in pathes:
+            for fn in fs_lst:
+                pp = os.path.join(self.mntdir, p, fn)
+                if os.access(pp, os.R_OK):
+                    yield pp, p
+        self.do_umount()
+
 @register.server_handler('long')
 def pkgarr_probe(mia, operid, hdpartlist):
-    dolog("=====pkgarr_probe starting...")
-    def probe_position(localfn, pos_id, cli, device, new_device, fstype, dir, isofn):
+    dolog("pkgarr_probe starting...")
+    def probe_position(localfn, pos_id, cli, device, new_device, fstype, reldir, isofn):
+        dolog('probe_position: %s, %s, %s, %s, %s, %s, %s, %s' % (localfn, pos_id, cli, device, new_device, fstype, reldir, isofn))
         if not os.path.exists(localfn):
             return None
         try:
@@ -59,237 +116,133 @@ def pkgarr_probe(mia, operid, hdpartlist):
             syslog.syslog(syslog.LOG_ERR,
                           "Load %s failed(%s)." % (localfn, str(errmsg)))
             return None
-        remotefn = 'allpa/%s.%d.%s' % \
-                   (os.path.basename(new_device),
-                    pos_id,
-                    os.path.basename(localfn))
+        remotefn = 'allpa/%s.%d.%s' % (os.path.basename(new_device), pos_id, os.path.basename(localfn))
         dolog('tftpc update %s to remote %s...' % (localfn, remotefn))
         cli.put(localfn, remotefn)
-        # Leave the mntpoint to 0 now because the mntpoint can't be get easily.
-        mntpoint = 0
-        return (remotefn, new_device, mntpoint, fstype, dir, isofn)
-        # The format like ('allpa/hdc.1.pkgarr.py', '/dev/hdc', 0, 'iso9660', 'MagicLinux/base', '')
-
-    global cd_papath
-    global hd_papathes
-    global pafile
-    global isoloop
-
-    loopmntdir = os.path.join('/tmpfs/mnt', isoloop)
-    if not os.path.isdir(loopmntdir):
-        os.makedirs(loopmntdir)
+        return [remotefn, new_device, fstype, reldir, isofn]
+        # The format like ('allpa/hdc.1.pkgarr.py', '/dev/hdc', 'iso9660', 'MagicLinux/base', '')
+        # ['allpa/sda6.100.pkgarr.py', '/dev/sda6', 'ext3', 'MagicLinux/base', 'MagicLinux-3.0-1.iso']
     mia.set_step(operid, 0, -1)
     cli = tftpc.TFtpClient()
     cli.connect('127.0.0.1')
     result = []
     all_drives = hdpartlist
-    #cdlist = kudzu.probe(kudzu.CLASS_CDROM,
-    #                     kudzu.BUS_IDE | kudzu.BUS_SCSI | kudzu.BUS_MISC,
-    #                     kudzu.PROBE_ALL)
     cdlist = getdev.probe(getdev.CLASS_CDROM)
     map(lambda cd: all_drives.append((os.path.join('/dev', cd.device),
                                       'iso9660',
                                       os.path.join('/dev', cd.device))),
-        cdlist)
-    dolog('======all_drives: %s' % all_drives)
+                                      cdlist)
+    dolog('all_drives: %s' % all_drives)
+    pos_id = -1
     for (device, fstype, new_device) in all_drives:
         if not CONF_FSTYPE_MAP.has_key(fstype):
             continue
         if CONF_FSTYPE_MAP[fstype][0] == '':
             continue
-        if fstype == 'iso9660':
-            if os.system('dd if=%s bs=1 count=1 of=/dev/null &>/dev/null' % device) != 0:
-                dolog('%s cannot use\n' % device)
-                # cdrom cannot use
-                continue
-        ret, mntdir = mount_dev(CONF_FSTYPE_MAP[fstype][0], device)
-        if not ret:
-            syslog.syslog(syslog.LOG_ERR,
-                          "Mount %s on %s as %s failed: %s" % \
-                          (device, mntdir, CONF_FSTYPE_MAP[fstype][0], str(mntdir)))
-        else:
-            syslog.syslog(syslog.LOG_INFO,
-                      "Probe: Device = %s Mount = %s Fstype = %s" % \
-                      (device, mntdir, fstype))
-            if fstype == 'iso9660':
-                search_dirs = [cd_papath]
+        midev = MiDevice(device, CONF_FSTYPE_MAP[fstype][0])
+        for f, reldir in midev.iter_searchfiles([CONF_PKGARR_FILE, CONF_BOOTCDFN], CONF_PKGARR_SER_HDPATH):
+            if f.endswith('iso'):
+                midev_iso = MiDevice(f, 'iso9660')
+                for pkgarr, relative_dir in midev_iso.iter_searchfiles([CONF_PKGARR_FILE], CONF_PKGARR_SER_CDPATH):
+                    pos_id += 1
+                    r = probe_position(pkgarr, 100 + pos_id, cli,
+                        device, new_device, CONF_FSTYPE_MAP[fstype][0], relative_dir, CONF_BOOTCDFN)
+                    if r:
+                        r[-1] = os.path.join(reldir, r[-1]) #### revise iso relative path
+                        result.append(r)
             else:
-                search_dirs = hd_papathes
-            pos_id = 0
-            dolog("============search_dirs %s\n" % search_dirs)
-            for dir in search_dirs:
-                pos_id = pos_id + 1
-                # Try bare pafile.
-                localfn = os.path.join(mntdir, dir, pafile)
-                r = probe_position(localfn, pos_id, cli, device, new_device, fstype, dir, '')
-                if r:
-                    result.append(r)
-                # Try pafile in bootcd and debugbootcd.
-                dolog("=============%s\n" % CONF_BOOTCDFN)
-                for (pi_add, isofn) in ((100, CONF_BOOTCDFN),):
-                    isopath = os.path.join(mntdir, dir, isofn)
-                    if not os.path.exists(isopath):
-                        continue
-                    ret, errmsg = mount_dev('iso9660', isopath, loopmntdir, flags='loop')
-                    if not ret:
-                        syslog.syslog(syslog.LOG_ERR,
-                                      "LoMount %s on %s as %s failed: %s" % \
-                                      (isopath, loopmntdir,
-                                       'iso9660', str(errmsg)))
-                    else:
-                        localfn = os.path.join(loopmntdir, cd_papath, pafile)
-                        r = probe_position(localfn, pi_add + pos_id, cli,
-                                           device, new_device, fstype, dir, isofn)
-                        ret, errmsg = umount_dev(loopmntdir)
-                        if not ret:
-                            syslog.syslog(syslog.LOG_ERR,
-                                          "LoUMount %s from %s failed: %s" % \
-                                          (isopath,
-                                           loopmntdir,
-                                           str(errmsg)))
-                            #return str(errmsg)
-                        if r:
-                            result.append(r)
-                    ret, errmsg = umount_dev(loopmntdir)
-                    if not ret:
-                        syslog.syslog(syslog.LOG_ERR,
-                                "UMount(%s) failed: %s" % (loopmntdir, str(errmsg)))
-                        #return  str(errmsg)
-        ret, errmsg = umount_dev(mntdir)
-        if not ret:
-            syslog.syslog(syslog.LOG_ERR,
-                    "UMount(%s) failed: %s" % (loopmntdir, str(errmsg)))
+                pos_id += 1
+                r = probe_position(pkgarr, pos_id, cli,
+                    device, new_device, fstype, reldir, '')
+                if r: result.append(r)
+    
     del(cli)
+    Log.w("_____________%s" % result)
     return result
 
 @register.server_handler('long')
-def probe_all_disc(mia, operid, device, mntpoint, dir, fstype, disc_first_pkgs):
+def probe_all_disc(mia, operid, device, devfstype, bootiso_relpath, pkgarr_reldir, disc_first_pkgs):
     '''
         probe the package from all disk
-        dir is the directory name between / and /packages
+        bootiso_relpath is the first iso path relative path of device /
+        pkgarr_reldir is the relative directory path of pkgarr.py of device / OR iso dir /
     '''
-    global  isoloop
     dolog('probe_all_disc(%s, %s, %s, %s, %s)\n' % \
-          (device, str(mntpoint), dir, fstype, disc_first_pkgs))
-    loopmntdir = os.path.join('/tmpfs/mnt', isoloop)
-    if mntpoint != 0:
-        # The packages are placed in the mounted partitions.
-        mntdir = os.path.join(CONF_TGTSYS_ROOT, mntpoint)
-    else:
-        mntdir = os.path.join('/tmpfs/mnt', os.path.basename(device))
-        ret, errmsg = mount_dev(CONF_FSTYPE_MAP[fstype][0], device, mntdir)
-        if not ret:
-            syslog.syslog(syslog.LOG_ERR,
-                          "Mount %s on %s as %s failed: %s" % \
-                          (device, mntdir, CONF_FSTYPE_MAP[fstype][0], str(errmsg)))
-            return  (str(errmsg), [])
+          (device, devfstype, bootiso_relpath, pkgarr_reldir, disc_first_pkgs))
+    
+    midev = MiDevice(device, devfstype)
+
+    bootiso_fn = CONF_ISOFN_FMT % (CONF_DISTNAME, CONF_DISTVER, 1)
+    # If probe in iso ,but bootiso_fn is not match error occur
+    if bootiso_relpath and not os.path.basename(bootiso_relpath) == bootiso_fn:
+        Log.e('probe_all_disc iso format is wrong: bootiso_relpath: %s bootiso_fn: %s', (bootiso_relpath, bootiso_relpath))
+        return None
+        
+    probe_ret = None
     result = []
     for disc_no in range(len(disc_first_pkgs)):
-        proberes = 0
-        for probedir in ['../packages',
-                         'packages',
-                         '../packages-%d' % (disc_no + 1),
-                         'packages-%d' % (disc_no + 1)]:
-            probepath = os.path.realpath(os.path.join(mntdir, dir, probedir))
-            if not os.path.isdir(probepath):
-                continue
-            probepkg = os.path.join(probepath, disc_first_pkgs[disc_no])
-            if os.path.isfile(probepkg):
-                proberes = (0, probepkg)
-                break
-        if not proberes:
-            discfn = CONF_ISOFN_FMT % (CONF_DISTNAME, CONF_DISTVER, disc_no + 1)
-            discpath = os.path.join(mntdir, dir, discfn)
-            if os.path.isfile(discpath):
-                ret, errmsg = mount_dev('iso9660', discpath, mntdir=loopmntdir, flags='loop')
-                if not ret:
-                    syslog.syslog(syslog.LOG_ERR,
-                                  "LoMount %s on %s as %s failed: %s" % \
-                                  (discpath, loopmntdir,
-                                   'iso9660', str(errmsg)))
-                else:
-                    probepkg = os.path.join(loopmntdir, '%s/packages' % CONF_DISTNAME, disc_first_pkgs[disc_no])
-                    if os.path.isfile(probepkg):
-                        dolog('Have found the first_pkg %s in iso %s\n' % (probepkg, discpath))
-                        proberes = (discpath, probepkg)
-                    ret, errmsg = umount_dev(loopmntdir)
-                    if not ret:
-                        syslog.syslog(syslog.LOG_ERR,
-                                      "LoUMount %s from %s failed: %s" % \
-                                      (discpath,
-                                       loopmntdir,
-                                       str(errmsg)))
-                        return  (str(errmsg), [])
-        if proberes:
-            result.append(proberes)
+        pkg_probe_path = [  '../packages',
+                            'packages',
+                            '../packages-%d' % (disc_no + 1),
+                            'packages-%d' % (disc_no + 1)]
+        if bootiso_relpath:
+            # deal with iso case
+            iso_fn = CONF_ISOFN_FMT % (CONF_DISTNAME, CONF_DISTVER, disc_no + 1)
+            iso_relpath = os.path.join(os.path.dirname(bootiso_relpath), iso_fn)
+            pkgs = [ os.path.join(p, disc_first_pkgs[disc_no]) for p in pkg_probe_path ]
+            for f, reldir in midev.iter_searchfiles([iso_relpath], ['']):
+                midev_iso = MiDevice(f, 'iso9660')
+                for pkgpath, relative_dir in midev_iso.iter_searchfiles(pkgs, [pkgarr_reldir]):
+                    probe_ret = ( iso_fn, os.path.join(relative_dir, os.path.basename(pkgpath)) )
+        else:
+            # deal with harddisk case
+            pkgs = [ os.path.join(p, disc_first_pkgs[disc_no]) for p in pkg_probe_path ]
+            for f, reldir in midev.iter_searchfiles(pkgs, [pkgarr_reldir]):
+                probe_ret = ('', os.path.join(reldir, os.path.basename(f)))
+        if probe_ret:
+            result.append(probe_ret)
+
     dolog('probe_all_disc return result is : %s\n' % str(result))
-    if mntpoint == 0:
-        ret, errmsg = umount_dev(mntdir)
-        if not ret:
-            syslog.syslog(syslog.LOG_ERR,
-                          "UMount(%s) failed: %s" % (mntdir, str(errmsg)))
-            if result != []:
-                # we can't umount the mntdir, but if we have found the package result we must return it.
-                return(0, result)
-            else:
-                return (str(errmsg), [])
-    return  (0, result)
+    return  result
 
 @register.server_handler('long')
-def instpkg_prep(mia, operid, dev, mntpoint, dir, fstype, instmode):
+def instpkg_prep(mia, operid, dev, fstype, bootiso_relpath, reldir, instmode):
+    ######### TODO: !!! there to get get get
     # Set the package install mode.
     global installmode
-    installmode = instmode
-    if CONF_PKGTYPE == 'rpm':
-        dolog('InstallMode: Rpm Packages %s\n' % installmode)
-    elif CONF_PKGTYPE == 'tar':
-        dolog('InstallMode: Tar Packages\n')
+    global current_dev
+    global current_iso
     
-    dolog('instpkg_prep(%s, %s, %s, %s)\n' % (dev, mntpoint, dir, fstype))
+    installmode = instmode
+    if CONF_PKGTYPE == 'rpm': dolog('InstallMode: Rpm Packages %s\n' % installmode)
+    elif CONF_PKGTYPE == 'tar': dolog('InstallMode: Tar Packages\n')
+    dolog('instpkg_prep(%s, %s, %s, %s)\n' % (dev, fstype, bootiso_relpath, reldir))
     #--- This code is according to rpm.spec in rpm-4.2-0.69.src.rpm. ---
     # This code is specific to rpm.
     var_lib_rpm = os.path.join(CONF_TGTSYS_ROOT, 'var/lib/rpm')
     if not os.path.isdir(var_lib_rpm):
         os.makedirs(var_lib_rpm)
-    #touch_files = ['Basenames', 'Conflictname', 'Dirnames', 'Group',
-                   #'Installtid', 'Name', 'Packages', 'Providename',
-                   #'Provideversion', 'Requirename', 'Requireversion',
-                   #'Triggername', 'Filemd5s', 'Pubkeys', 'Sha1header',
-                   #'Sigmd5', '__db.001', '__db.002', '__db.003',
-                   #'__db.004', '__db.005', '__db.006', '__db.007',
-                   #'__db.008', '__db.009']
-    #os.system('touch ' +
-              #string.join(map(lambda x: os.path.join(var_lib_rpm, x),
-                              #touch_files)))
-    #-------------------------------------------------------------------
-    if fstype == 'iso9660':
-        return  0  # It is ok for CDROM installation.
-    # It is harddisk installation.
-    global  isoloop
-    loopmntdir = os.path.join('/tmpfs/mnt', isoloop)
-    if not os.path.isdir(loopmntdir):
-        os.makedirs(loopmntdir)
-    if mntpoint != 0:
-        mntdir = os.path.join(CONF_TGTSYS_ROOT, mntpoint)
-    else:
-        mntdir = os.path.join('/tmpfs/mnt', os.path.basename(dev))
-        ret, errmsg = mount_dev(CONF_FSTYPE_MAP[fstype][0], dev, mntdir)
-        if not ret:
-            return  str(errmsg)
+        
+    current_dev = MiDevice(dev, fstype)
+    if bootiso_relpath:
+        # an iso file on harddisk
+        current_iso = MiDevice(current_dev.get_file_path())
+
+    if not ret:
+        return  str(errmsg)
     return  0
 
 @register.server_handler('long')
-def instpkg_disc_prep(mia, operid, dev, mntpoint, dir, fstype, iso_fn):
-    global  isoloop
-    dolog('instpkg_disc_prep(%s, %s, %s, %s, %s)\n' % \
-          (dev, mntpoint, dir, fstype, iso_fn))
+def instpkg_disc_prep(mia, operid, dev, reldir, fstype, iso_fn):
+    dolog('instpkg_disc_prep(%s, %s, %s, %s)\n' % \
+          (dev, reldir, fstype, iso_fn))
     if mntpoint != 0:
-        mntdir = os.path.join(CONF_TGTSYS_ROOT, mntpoint)
+        mntdir = os.path.join(CONF_TGTSYS_ROOT, mntxxxpoint) #### TODO mount use device
     else:
-        mntdir = os.path.join('/tmpfs/mnt', os.path.basename(dev))
+        mntdir = os.path.join(CONF_MNT_ROOT, os.path.basename(dev))
     if fstype == 'iso9660':
         # It is CDROM installation.
-        # assert(mntpoint == 0) because CDROM can't be mount as part
+        # assert(mntxxxpoint == 0) because CDROM can't be mount as part  #### TODO
         #    of target system.
         ret, errmsg = mount_dev(CONF_FSTYPE_MAP[fstype][0], dev, mntdir)
         if not ret:
@@ -297,7 +250,7 @@ def instpkg_disc_prep(mia, operid, dev, mntpoint, dir, fstype, iso_fn):
     elif iso_fn:
         # iso file is placed in mntdir.
         isopath = os.path.join(mntdir, dir, iso_fn)
-        loopmntdir = os.path.join('/tmpfs/mnt/', isoloop)
+        loopmntdir = os.path.join('/tmpfs/mnt/', CONF_ISOLOOP)
         ret, errmsg = mount_dev('iso9660', isopath, mntdir=loopmntdir, flags='loop')
         if not ret:
             syslog.syslog(syslog.LOG_ERR,
@@ -461,7 +414,7 @@ def package_install(mia, operid, pkgname, firstpkg, noscripts):
         return 0
 
 @register.server_handler('long')
-def instpkg_disc_post(mia, operid, dev, mntpoint, dir, fstype, iso_fn, first_pkg):
+def instpkg_disc_post(mia, operid, dev, reldir, fstype, iso_fn, first_pkg):
     # determine the rpmdb.tar.bz2 and etc.tar.bz2. If exist copy it to tmp_config_dir in target system.
     rpmpkgdir = os.path.dirname(first_pkg)
     rpmdb_abs = os.path.join(rpmpkgdir, rpmdb)
@@ -482,20 +435,19 @@ def instpkg_disc_post(mia, operid, dev, mntpoint, dir, fstype, iso_fn, first_pkg
         else:
             dolog('copy %s to target system successfully.\n' % rpmdb)
             
-    global isoloop
-    dolog('instpkg_disc_post(%s, %s, %s, %s, %s)\n' % \
-          (dev, mntpoint, dir, fstype, iso_fn))
+    dolog('instpkg_disc_post(%s, %s, %s, %s)\n' % \
+          (dev, reldir, fstype, iso_fn))
     # We don't know which package start the minilogd but it
     # will lock the disk, so it must be killed.
     if os.system('/usr/bin/killall minilogd') == 0:
         time.sleep(2)
-    if mntpoint != 0:
-        mntdir = os.path.join(CONF_TGTSYS_ROOT, mntpoint)
+    if mntxxxpoint != 0: #### TODO
+        mntdir = os.path.join(CONF_TGTSYS_ROOT, mntxxxpoint)
     else:
-        mntdir = os.path.join('/tmpfs/mnt', os.path.basename(dev))
+        mntdir = os.path.join(CONF_MNT_ROOT, os.path.basename(dev))
     if fstype == 'iso9660':
         # It is CDROM installation.
-        # assert(mntpoint == 0) because CDROM can't be mount as part
+        # assert(mntxxxpoint == 0) because CDROM can't be mount as part ### TODO
         #    of target system.
         ret, errmsg = umount_dev(mntdir)
         if not ret:
@@ -513,7 +465,7 @@ def instpkg_disc_post(mia, operid, dev, mntpoint, dir, fstype, iso_fn, first_pkg
             return str(errmsg)
     elif iso_fn:
         # iso file is placed in mntdir.
-        loopmntdir = os.path.join('/tmpfs/mnt/', isoloop)
+        loopmntdir = os.path.join('/tmpfs/mnt/', CONF_ISOLOOP)
         ret, errmsg = umount_dev(loopmntdir)
         if not ret:
             syslog.syslog(syslog.LOG_ERR, 'LoUMount %s from %s failed: %s' % \
@@ -524,7 +476,7 @@ def instpkg_disc_post(mia, operid, dev, mntpoint, dir, fstype, iso_fn, first_pkg
     return  0
 
 @register.server_handler('long')
-def instpkg_post(mia, operid, dev, mntpoint, dir, fstype):
+def instpkg_post(mia, operid, dev, reldir, fstype):
     global noscripts_pkg_list
     if installmode == 'rpminstallmode' and noscripts_pkg_list:
         # we will execute all the pre_in and post_in scripts there, if we use
@@ -615,14 +567,14 @@ def instpkg_post(mia, operid, dev, mntpoint, dir, fstype):
         dolog('Close TransactionSet\n')
         ts.closeDB()
         ts = None
-    dolog('instpkg_post(%s, %s, %s, %s)\n' % (dev, mntpoint, dir, fstype))
+    dolog('instpkg_post(%s, %s, %s)\n' % (dev, reldir, fstype))
     if fstype == 'iso9660':
         return  0  # It is ok for CDROM installation.
     mia.set_step(operid, 0, -1) # Sync is the long operation.
-    if mntpoint != 0:
-        mntdir = os.path.join(CONF_TGTSYS_ROOT, mntpoint)
+    if mntxxxpoint != 0: #### TODO;
+        mntdir = os.path.join(CONF_TGTSYS_ROOT, mntxxxpoint)     ####TODO
     else:
-        mntdir = os.path.join('/tmpfs/mnt', os.path.basename(dev))
+        mntdir = os.path.join(CONF_MNT_ROOT, os.path.basename(dev))
         ret, errmsg = umount_dev(mntdir)
         if not ret:
             syslog.syslog(syslog.LOG_ERR, 'UMount(%s) failed: %s' % \
@@ -635,22 +587,33 @@ def instpkg_post(mia, operid, dev, mntpoint, dir, fstype):
         return str(errmsg)
     return  0
 
+class MiaTest(object):
+    def __init__(self):
+        from miserver.utils import FakeMiactions
+        self.mia = FakeMiactions()
+        self.operid = 999
+        
+class Test(MiaTest):
+    def __init__(self):
+        MiaTest.__init__(self)
+        
+    def test_pkgarr_probe(self):
+        hdpartlist = [
+            ['/dev/sda1', 'ntfs', '/dev/sda1'], 
+            ['/dev/sda2', 'ntfs', '/dev/sda2'], 
+            ['/dev/sda5', 'linux-swap(v1)', '/dev/sda5'], 
+            ['/dev/sda6', 'ext3', '/dev/sda6'], 
+            ['/dev/sda7', 'ext4', '/dev/sda7'], 
+            ['/dev/sda8', 'ntfs', '/dev/sda8'], ]
+        pkgarr_probe(self.mia, self.operid, hdpartlist)
+    
+    def test_probe_all_disc(self):
+        probe_all_disc(self.mia, self.operid, '/dev/sda6', 'ext3', 'MagicLinux-3.0-1.iso', 'MagicLinux/base', ['nss-softokn-freebl-3.13.3-1mgc30.i686.rpm'])
+        ### RESULT: probe_all_disc return result is : [('MagicLinux-3.0-1.iso', 'MagicLinux/base/nss-softokn-freebl-3.13.3-1mgc30.i686.rpm')]
+        
 if __name__ == '__main__':
-    from miserver.utils import FakeMiactions
-    mia = FakeMiactions()
-    operid = 999
-    hdpartlist = [
-        ['/dev/sda1', 'ntfs', '/dev/sda1'], 
-        ['/dev/sda2', 'ntfs', '/dev/sda2'], 
-        ['/dev/sda5', 'linux-swap(v1)', '/dev/sda5'], 
-        ['/dev/sda6', 'ext3', '/dev/sda6'], 
-        ['/dev/sda7', 'ext4', '/dev/sda7'], 
-        ['/dev/sda8', 'ntfs', '/dev/sda8'], 
-        ['/dev/sda1', 'ntfs', '/dev/sda1'], 
-        ['/dev/sda2', 'ntfs', '/dev/sda2'], 
-        ['/dev/sda5', 'linux-swap(v1)', '/dev/sda5'], 
-        ['/dev/sda6', 'ext3', '/dev/sda6'], 
-        ['/dev/sda7', 'ext4', '/dev/sda7'], 
-        ['/dev/sda8', 'ntfs', '/dev/sda8']]
-    pkgarr_probe(mia, operid, hdpartlist)
+    test = Test()
+    #test.test_pkgarr_probe()
+    test.test_probe_all_disc()
+    
     

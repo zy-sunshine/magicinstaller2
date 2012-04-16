@@ -1,16 +1,13 @@
 #!/usr/bin/python
 import os
 import gtk, xmlgtk
-from gettext import gettext as _
 from xml.dom.minidom import parse, parseString
-
 from miutils.common import search_file
 from miui.utils import magicpopup
-
+from miui.utils import _, Logger
 from miutils.miconfig import MiConfig
 CONF = MiConfig.get_instance()
-from miutils.milogger import ClientLogger
-log = ClientLogger.get_instance(ClientLogger, __name__)
+Log = Logger.get_instance(__name__)
 
 class magicstep (xmlgtk.xmlgtk):
     def __init__(self, rootobj, uixml_file, uirootname=None):
@@ -90,18 +87,23 @@ class magicstepgroup (magicstep):
         self.substep = substep_list[0]
 
     def subswitch(self, substep):
-        log.d('subswitch substep: %s, self.substep: %s' % (substep, self.substep))
+        Log.d('subswitch substep: %s, self.substep: %s' % (substep, self.substep))
         if substep != self.substep:
-            self.name_map[self.substep].hide()
-            log.d('hide %s' % self.substep)
+            if not self.name_map.has_key(substep):
+                Log.w("%s step is not in UIxml, please fill it yourself, and check it work" % substep)
+                self.substep = substep
+                return
+            if self.name_map.has_key(self.substep):
+                Log.d('hide %s' % self.substep)
+                self.name_map[self.substep].hide()
             self.name_map[substep].show()
-            log.d('show %s' % substep)
+            Log.d('show %s' % substep)
             if hasattr(self, 'switch_%s_%s' % (self.substep, substep)):
                 eval('self.switch_%s_%s()' % (self.substep, substep))
             self.substep = substep
 
     def enter(self):
-        log.d('enter')
+        Log.d('enter')
         if hasattr(self, 'check_enter_%s' % self.substep):
             return eval('self.check_enter_%s()' % self.substep)
         # Always switch to substep_list.

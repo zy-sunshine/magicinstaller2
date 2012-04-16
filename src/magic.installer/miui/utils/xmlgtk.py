@@ -261,8 +261,8 @@ class xmlgtk:
         lower = float(self._xgc_attr(node, 'lower', '0'))
         upper = float(self._xgc_attr(node, 'upper', '31'))
         stepinc = float(self._xgc_attr(node, 'stepinc', '1'))
-        pagesize = self._xgc_attr(node, 'pagesize', '4')
-        pageinc = self._xgc_attr(node, 'pageinc', pagesize)
+        pagesize = float(self._xgc_attr(node, 'pagesize', '0'))
+        pageinc = float(self._xgc_attr(node, 'pageinc', '4'))
         return gtk.Adjustment(lower, lower, upper, stepinc,
                               float(pageinc), float(pagesize))
 

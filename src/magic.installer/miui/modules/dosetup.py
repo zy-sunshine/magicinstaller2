@@ -209,12 +209,14 @@ class MIStep_dosetup (magicstep.magicstep):
         hostname = self.get_data(self.values, 'network.hostname')
         ret = self.rootobj.tm.actserver.config_network_short(hostname)
         ret = self.rootobj.tm.actserver.config_keyboard()
-        self.rootobj.tm.add_action(_('Run post install script'), self.do_umount_all, None,
+        
+        self.rootobj.tm.add_action(_('Run post install script'), None, None,
                                    'run_post_install', 0)
+        #### TODO: add operation clean server
 
-    def do_umount_all(self, tdata, data):
-        self.rootobj.tm.add_action(_('Umount all target partition(s)'), self.done, None,
-                                   'umount_all_tgtpart', CONF.RUN.g_mount_all_list, 'y')
+    #def do_umount_all(self, tdata, data):
+        #self.rootobj.tm.add_action(_('Umount all target partition(s)'), self.done, None,
+                                   #'umount_all_tgtpart', CONF.RUN.g_mount_all_list, 'y')
 
     def done(self, tdata, data):
         self.doing = None

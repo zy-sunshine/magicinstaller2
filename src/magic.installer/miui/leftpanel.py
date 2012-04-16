@@ -1,7 +1,7 @@
 #!/usr/bin/python
 import gtk
-from miutils.milogger import ClientLogger
-log = ClientLogger.get_instance(ClientLogger, __name__)
+from miui.utils import Logger
+Log = Logger.get_instance(__name__)
 
 class StepButton(gtk.Button):
     def __init__(self, img_path, label_text, *args, **kw):
@@ -36,10 +36,12 @@ class MILeftPanel(gtk.Frame):
         self.vbox.set_border_width(4)
         self.vbox.set_spacing(4)
         self.vbox.show()
-        self.add(self.vbox)
+        self.stash_stack = []
+        self.stash_stack.append(self.vbox)
+        self.add(self.stash_stack[-1])
         
     def addstep(self, name):
-        log.d('addstep %s' % name)
+        Log.d('addstep %s' % name)
         step = self.sself.steps.get_step_by_name(name)
 
         btn = StepButton('images/applet-blank.png', step.title)
@@ -56,5 +58,19 @@ class MILeftPanel(gtk.Frame):
         self.sself.switch_to_page(name)
         
     def switch(self, from_id, to_id):
-        self.btn_lst[from_id].change_image('images/applet-blank.png')
+        Log.d('leftpanel.switch: %s, %s', (from_id, to_id))
+        if from_id > 0: self.btn_lst[from_id].change_image('images/applet-okay.png')
         self.btn_lst[to_id].change_image('images/applet-busy.png')
+        
+    def push(self, widget):
+        if self.stash_stack: self.remove(self.stash_stack[-1])
+        self.stash_stack.append(widget)
+        self.add(self.stash_stack[-1])
+        
+    def pop(self):
+        self.remove(self.stash_stack[-1])
+        widget = self.stash_stack.pop()
+        if self.stash_stack: self.add(self.stash_stack[-1])
+        return widget
+        
+        
