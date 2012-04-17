@@ -1,7 +1,7 @@
 #!/usr/bin/python
 import gtk
-from miutils.milogger import ClientLogger
-log = ClientLogger.get_instance(ClientLogger, __name__)
+from miui.utils import Logger
+Log = Logger.get_instance(__name__)
 
 class MIRightPanel(gtk.Frame):
     def __init__(self, sself, *args, **kw):
@@ -10,7 +10,7 @@ class MIRightPanel(gtk.Frame):
         self.set_size_request(600, 500)
         self.curwidget = None
         self.stash_stack = []
-        
+
     def switch(self, widget):
         if self.curwidget is not None:
             self.curwidget.hide()
@@ -20,15 +20,16 @@ class MIRightPanel(gtk.Frame):
         self.stash_stack.append(self.curwidget)
         self.curwidget.show()
         self.add(self.curwidget)
-        
+
     def push(self, widget):
-        if self.stash_stack: self.remove(self.stash_stack[-1])
+        if self.stash_stack: self.remove(self.stash_stack[-1]); self.stash_stack[-1].hide()
         self.stash_stack.append(widget)
+        self.stash_stack[-1].show()
         self.add(self.stash_stack[-1])
         
     def pop(self):
         self.remove(self.stash_stack[-1])
         widget = self.stash_stack.pop()
-        if self.stash_stack: self.add(self.stash_stack[-1])
+        if self.stash_stack: self.stash_stack[-1].show(); self.add(self.stash_stack[-1])
+        widget.hide()
         return widget
-        

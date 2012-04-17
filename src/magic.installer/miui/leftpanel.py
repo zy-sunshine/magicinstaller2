@@ -63,14 +63,15 @@ class MILeftPanel(gtk.Frame):
         self.btn_lst[to_id].change_image('images/applet-busy.png')
         
     def push(self, widget):
-        if self.stash_stack: self.remove(self.stash_stack[-1])
+        if self.stash_stack: self.remove(self.stash_stack[-1]); self.stash_stack[-1].hide()
         self.stash_stack.append(widget)
+        self.stash_stack[-1].show()
         self.add(self.stash_stack[-1])
         
     def pop(self):
         self.remove(self.stash_stack[-1])
         widget = self.stash_stack.pop()
-        if self.stash_stack: self.add(self.stash_stack[-1])
+        if self.stash_stack: self.stash_stack[-1].show(); self.add(self.stash_stack[-1])
+        widget.hide()
         return widget
-        
         
