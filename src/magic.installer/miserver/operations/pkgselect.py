@@ -47,14 +47,15 @@ tmp_config_dir = 'tmp/MI_configure'
 
 dev_hd = None # the harddisk device where save packages.
 dev_iso = None # the iso where save pkgs.
-dev_tgt = None # the 
+dev_tgt = None # the target system device.
 
 class MiDevice(object):
-    def __init__(self, blk_path, fstype):
+    def __init__(self, blk_path, fstype, mntdir = ''):
         self.blk_path = blk_path
         self.fstype = fstype
         self.has_mounted = False
-        self.mntdir = ''
+        self.mntdir = mntdir
+        self.mntdir_fixed = self.mntdir and True or False
         self.loopmntdir = os.path.join(CONF_MNT_ROOT, CONF_ISOLOOP)
         
     def do_mount(self):
@@ -67,41 +68,63 @@ class MiDevice(object):
                 return False
             else:
                 isopath = self.blk_path
-                ret, errmsg = mount_dev('iso9660', isopath, self.loopmntdir, flags='loop')
+                mountdir = self.mntdir_fixed and self.mntdir or self.loopmntdir
+                ret, errmsg = mount_dev('iso9660', isopath, mountdir, flags='loop')
                 if not ret:
-                    Log.e("LoMount %s on %s as %s failed: %s" %  (isopath, self.loopmntdir, 'iso9660', str(errmsg)))
+                    Log.e("LoMount %s on %s as %s failed: %s" %  (isopath, mountdir, 'iso9660', str(errmsg)))
                     return False
                 else:
-                    self.mntdir = self.loopmntdir
+                    if not self.mntdir_fixed: self.mntdir = self.loopmntdir
                     self.has_mounted = True
                     return True
                     
         # Then treat Harddisk Device
-        ret, mntdir = mount_dev(self.fstype, self.blk_path)
+        if not self.mntdir_fixed:
+            ret, mntdir = mount_dev(self.fstype, self.blk_path)
+        else:
+            ret, mntdir = mount_dev(self.fstype, self.blk_path, self.mntdir)
         if not ret:
             Log.e("MiDevice.do_mount Mount %s on %s as %s failed: %s" % \
                           (self.blk_path, mntdir, self.fstype, str(mntdir)))
             return False
         else:
-            self.mntdir = mntdir
+            if not self.mntdir_fixed: self.mntdir = mntdir
             self.has_mounted = True
             return True
             
+    def get_file_path(self, relpath):
+        ''' only use after mount and before umount '''
+        return os.path.join(self.mntdir, relpath)
+        
+    def get_mountdir(self):
+        return self.mntdir
+    
     def do_umount(self):
         if not self.has_mounted: return True
         ret, errmsg = umount_dev(self.mntdir)
-        if not ret: Log.e("MiDevice.do_umount UMount(%s) failed: %s" % (self.mntdir, str(errmsg))); return False
-        else: self.has_mounted = False; return True
+        if not ret:
+            Log.e("MiDevice.do_umount UMount(%s) failed: %s" % (self.mntdir, str(errmsg))); return False
+        else:
+            self.has_mounted = False
+            if not self.mntdir_fixed: self.mntdir = ''
+            return True
+            
+    def get_dev(self):
+        return self.blk_path
         
     def iter_searchfiles(self, fs_lst, pathes):
-        if not self.do_mount(): return
-        if not self.mntdir: return
+        opt_mount = True
+        if self.has_mounted:
+            opt_mount = False
+        if opt_mount:
+            if not self.do_mount(): return
         for p in pathes:
             for fn in fs_lst:
                 pp = os.path.join(self.mntdir, p, fn)
                 if os.access(pp, os.R_OK):
                     yield pp, p
-        self.do_umount()
+        if opt_mount:
+            self.do_umount()
 
 @register.server_handler('long')
 def pkgarr_probe(mia, operid, hdpartlist):
@@ -190,10 +213,11 @@ def probe_all_disc(mia, operid, device, devfstype, bootiso_relpath, pkgarr_reldi
             iso_fn = CONF_ISOFN_FMT % (CONF_DISTNAME, CONF_DISTVER, disc_no + 1)
             iso_relpath = os.path.join(os.path.dirname(bootiso_relpath), iso_fn)
             pkgs = [ os.path.join(p, disc_first_pkgs[disc_no]) for p in pkg_probe_path ]
-            for f, reldir in midev.iter_searchfiles([iso_relpath], ['']):
+            for f, reldir in midev.iter_searchfiles([iso_relpath], ['']): # from disk
                 midev_iso = MiDevice(f, 'iso9660')
-                for pkgpath, relative_dir in midev_iso.iter_searchfiles(pkgs, [pkgarr_reldir]):
-                    probe_ret = ( iso_fn, os.path.join(relative_dir, os.path.basename(pkgpath)) )
+                for pkgpath, relative_dir in midev_iso.iter_searchfiles(pkgs, [pkgarr_reldir]): # from iso
+                    probe_ret = ( os.path.join(os.path.dirname(bootiso_relpath), iso_fn), 
+                        os.path.join(relative_dir, os.path.basename(pkgpath)) )
         else:
             # deal with harddisk case
             pkgs = [ os.path.join(p, disc_first_pkgs[disc_no]) for p in pkg_probe_path ]
@@ -204,36 +228,106 @@ def probe_all_disc(mia, operid, device, devfstype, bootiso_relpath, pkgarr_reldi
 
     dolog('probe_all_disc return result is : %s\n' % str(result))
     return  result
-
+    
+class MiDevice_TgtSys(object):
+    def __init__(self, tgtsys_devinfo):
+        self.mounted_devs = []
+        self.tgtsys_devinfo = tgtsys_devinfo
+        
+    def mount_tgt_device(self):
+        tgt_root_dev, tgt_root_type = self.tgtsys_devinfo['/']
+        tgt_boot_dev, tgt_boot_type = self.tgtsys_devinfo['/boot']
+        tgt_swap_dev = self.tgtsys_devinfo['swap'][0]
+        if tgt_swap_dev:
+            #### swap on or not
+            pass
+        #### mount root device
+        mnt_point = CONF_TGTSYS_ROOT
+        dev_tgt_root = MiDevice(tgt_root_dev, tgt_root_type, mnt_point)
+        if not dev_tgt_root.do_mount(): #### NOTE: carefully handled this device's mount.
+            Log.e('Mount device %s Failed, install operate can not countinue' % dev_tgt_root.get_dev())
+            return False
+        else:
+            self.mounted_devs.append(dev_tgt_root)
+        
+        if tgt_boot_dev and (tgt_boot_dev != tgt_root_dev):
+            #### mount boot device
+            mnt_point = os.path.join(CONF_TGTSYS_ROOT, 'boot')
+            dev_tgt_boot = MiDevice(tgt_boot_dev, tgt_boot_type, mnt_point)
+            if not dev_tgt_boot.do_mount(): #### NOTE: carefully handled this device's mount.
+                Log.e('Mount device %s Failed, install operate can not countinue' % dev_tgt_boot.get_dev())
+                self.umount_tgt_device()
+                return False
+            else:
+                self.mounted_devs.append(dev_tgt_boot)
+        return True
+                
+    def umount_tgt_device(self):
+        self.mounted_devs.reverse()
+        for dev in self.mounted_devs:
+            if not dev.do_umount():
+                Log.w('Umount device %s Failed, but we continue')
+            
 @register.server_handler('long')
-def instpkg_prep(mia, operid, dev, fstype, bootiso_relpath, reldir, instmode):
+def instpkg_prep(mia, operid, pkgsrc_devinfo, instmode, tgtsys_devinfo):
+    '''
+        Install all package prepare work.
+        We should mount target system device, to prepare install packages.
+        and mount disk which packages source is saved on.
+    '''
     ######### TODO: !!! there to get get get
     # Set the package install mode.
     global installmode
     global current_dev
     global current_iso
     
+    global dev_hd # the harddisk device where save packages.
+    global dev_iso # the iso where save pkgs.
+    global dev_tgt # the target system devices.
+    
+    dev, fstype, bootiso_relpath, reldir = pkgsrc_devinfo
+    
     installmode = instmode
     if CONF_PKGTYPE == 'rpm': dolog('InstallMode: Rpm Packages %s\n' % installmode)
     elif CONF_PKGTYPE == 'tar': dolog('InstallMode: Tar Packages\n')
     dolog('instpkg_prep(%s, %s, %s, %s)\n' % (dev, fstype, bootiso_relpath, reldir))
+    
+    ############################## Mount Start #####################################
+    dev_hd = MiDevice(dev, fstype)
+    if not dev_hd.do_mount(): #### NOTE: carefully handled this device's mount.
+        Log.e('Mount device %s Failed, install operate can not countinue' % dev_hd.get_dev())
+        return False
+    if bootiso_relpath:
+        # an iso file on harddisk
+        dev_iso = MiDevice(dev_hd.get_file_path(bootiso_relpath), 'iso9660')
+        if not dev_iso.do_mount(): #### NOTE: carefully handled this device's mount.
+            dev_hd.do_umount(); dev_hd = None
+            Log.e('Mount device %s Failed, install operate can not countinue!!!' % dev_iso.get_dev())
+            dev_iso = None
+            return False
+            
+    dev_tgt = MiDevice_TgtSys(tgtsys_devinfo)
+    if not dev_tgt.mount_tgt_device(): #### NOTE: carefully handled this device's mount.
+        dev_iso.do_umount(); dev_iso = None
+        dev_hd.do_umount(); dev_hd = None
+        Log.e('Mount target system devices Failed, install operate can not countinue!!!')
+        dev_tgt = None
+        return False
+    ############################## Mount Finished #####################################
     #--- This code is according to rpm.spec in rpm-4.2-0.69.src.rpm. ---
     # This code is specific to rpm.
     var_lib_rpm = os.path.join(CONF_TGTSYS_ROOT, 'var/lib/rpm')
     if not os.path.isdir(var_lib_rpm):
         os.makedirs(var_lib_rpm)
         
-    current_dev = MiDevice(dev, fstype)
-    if bootiso_relpath:
-        # an iso file on harddisk
-        current_iso = MiDevice(current_dev.get_file_path())
-
-    if not ret:
-        return  str(errmsg)
     return  0
 
 @register.server_handler('long')
 def instpkg_disc_prep(mia, operid, dev, reldir, fstype, iso_fn):
+    '''
+        Install each disc prepare work.
+        We should mount iso to prepare packages source(for disc).
+    '''
     dolog('instpkg_disc_prep(%s, %s, %s, %s)\n' % \
           (dev, reldir, fstype, iso_fn))
     if mntpoint != 0:
@@ -259,159 +353,6 @@ def instpkg_disc_prep(mia, operid, dev, reldir, fstype, iso_fn):
                            'iso9660', str(errmsg)))
             return  str(errmsg)
     return  0
-
-# Now package_install support rpm only.
-@register.server_handler('long')
-def rpm_installcb(what, bytes, total, h, data):
-    global  cur_rpm_fd
-    (mia, operid) = data
-    if what == rpm.RPMCALLBACK_INST_OPEN_FILE:
-        cur_rpm_fd = os.open(h, os.O_RDONLY)
-        return  cur_rpm_fd
-    elif what == rpm.RPMCALLBACK_INST_CLOSE_FILE:
-        os.close(cur_rpm_fd)
-    elif what == rpm.RPMCALLBACK_INST_PROGRESS:
-        mia.set_step(operid, bytes, total)
-        
-class CBFileObj(file):
-    def __init__(self, filepath, data):
-        self.mia, self.operid, self.total_size = data
-        file.__init__(self, filepath)
-    def read(self, size):
-        self.mia.set_step(self.operid, self.tell(), self.total_size)
-        return file.read(self, size)
-
-@register.server_handler('long')
-def package_install(mia, operid, pkgname, firstpkg, noscripts):
-    use_ts = False
-    pkgpath = os.path.join(os.path.dirname(firstpkg), pkgname)
-    #dolog('pkg_install(%s, %s)\n' % (pkgname, str(pkgpath)))
-    
-    def do_ts_install():
-        global ts
-        if ts is None:
-            dolog('Create TransactionSet\n')
-            ts = rpm.TransactionSet(CONF_TGTSYS_ROOT)
-            ts.setProbFilter(rpm.RPMPROB_FILTER_OLDPACKAGE |
-                             rpm.RPMPROB_FILTER_REPLACENEWFILES |
-                             rpm.RPMPROB_FILTER_REPLACEOLDFILES |
-                             rpm.RPMPROB_FILTER_REPLACEPKG)
-            ts.setVSFlags(~(rpm.RPMVSF_NORSA | rpm.RPMVSF_NODSA))
-            
-            # have been removed from last rpm version
-            #ts.setFlags(rpm.RPMTRANS_FLAG_ANACONDA)
-        try:
-            rpmfd = os.open(pkgpath, os.O_RDONLY)
-            hdr = ts.hdrFromFdno(rpmfd)
-            ts.addInstall(hdr, pkgpath, 'i')
-            os.close(rpmfd)
-            # Sign the installing pkg name in stderr.
-            print >>sys.stderr, '%s ERROR :\n' % pkgname
-            problems = ts.run(rpm_installcb, (mia, operid))
-            if problems:
-                dolog('PROBLEMS: %s\n' % str(problems))
-                # problems is a list that each elements is a tuple.
-                # The first element of the tuple is a human-readable string
-                # and the second is another tuple such as:
-                #    (rpm.RPMPROB_FILE_CONFLICT, conflict_filename, 0L)
-                return  problems
-        except Exception, errmsg:
-            dolog('FAILED: %s\n' % str(errmsg))
-            return str(errmsg)
-            
-    def do_bash_rpm_install():
-        global noscripts_pkg_list
-        global use_noscripts
-        mia.set_step(operid, 1, 1)
-            
-        try:
-            cmd = '/bin/rpm'
-            argv = ['-i', '--noorder','--nosuggest',
-                    '--force','--nodeps',
-                    '--ignorearch',
-                    '--root', CONF_TGTSYS_ROOT,
-                    pkgpath,
-                ]
-            if use_noscripts or noscripts:
-                argv.append('--noscripts')
-                noscripts_pkg_list.append(pkgpath)
-
-            #cmd_res = {'err':[], 'std': [], 'ret':0}   # DEBUG
-            cmd_res = run_bash(cmd, argv)
-            # Sign the installing pkg name in stderr
-            if cmd_res['err']:
-                # Ok the stderr will dup2 a log file, so we just out it on err screen
-                print >>sys.stderr, '***INSTALLING %s:\n**STDERR:\n%s\n' \
-                        %(pkgname, ''.join(cmd_res['err']))
-            problems = cmd_res['ret']
-            if problems:
-                errormsg = ''.join(cmd_res['err'])
-                message = 'PROBLEMS on %s: \n return code is %s error message is\n[%s]' \
-                          % (pkgname, str(problems), errormsg)
-                dolog(message)
-                return  message
-        except Exception, errmsg:
-            dolog('FAILED on %s: %s\n' % (pkgname, str(errmsg)))
-            return str(errmsg)
-            
-    def do_copy_install():
-        mia.set_step(operid, 1, 1)
-        try:
-            cmd = 'cd %s && /usr/bin/rpm2cpio %s | /bin/cpio -dui --quiet' % (CONF_TGTSYS_ROOT, pkgpath)
-            problems = os.system(cmd)
-            if problems:
-                errormsg = ''.join(cmd_res['err'])
-                message = 'PROBLEMS on %s: \n return code is %s error message is\n[%s]' \
-                          % (pkgname, str(problems), errormsg)
-                dolog(message)
-                return  message
-        except Exception, errmsg:
-            dolog('FAILED on %s: %s\n' % (pkgname, str(errmsg)))
-            return str(errmsg)
-            
-    def do_tar_extract_install():
-        tar_size = os.path.getsize(pkgpath)
-        try:
-            tarobj = tarfile.open(fileobj=CBFileObj(pkgpath, (mia, operid, tar_size)))
-        except:
-            errstr = 'Faild on create tarfile object on file "%s" size"%d"\n' % (pkgpath, tar_size)
-            dolog(errstr)
-            return errstr
-        try:
-            tarobj.extractall(path=CONF_TGTSYS_ROOT)
-        except:
-            if tarobj:
-                tarobj.close()
-            errstr = 'Faild on extract file "%s" size"%d" to directory "%s"\n' % (pkgpath, tar_size, CONF_TGTSYS_ROOT)
-            dolog(errstr)
-            return errstr
-        try:
-            tarobj.close()
-        except:
-            pass
-        
-    # Decide using which mode to install.
-    ret = 'Nothing'
-    if CONF_PKGTYPE == 'rpm':     # In the mipublic.py
-        if installmode == 'rpminstallmode':
-            if use_ts:
-                # Use rpm-python module to install rpm pkg, but at this version it is very slowly.
-                ret = do_ts_install()
-            else:
-                # Because I can not use rpm-python module to install quickly.
-                # So use the bash mode to install the pkg, it is very fast.
-                # If you can use rpm-python module install pkg quickly, you can remove it.
-                ret = do_bash_rpm_install()
-        elif installmode == 'copyinstallmode':
-            # Use rpm2cpio name-ver-release.rpm | cpio -diu to uncompress the rpm files to target system.
-            # Then we will do some configuration in instpkg_post.
-            ret = do_copy_install()
-    elif CONF_PKGTYPE == 'tar':
-        ret = do_tar_extract_install()
-    if ret:
-        return ret
-    else:
-        return 0
 
 @register.server_handler('long')
 def instpkg_disc_post(mia, operid, dev, reldir, fstype, iso_fn, first_pkg):
@@ -586,6 +527,160 @@ def instpkg_post(mia, operid, dev, reldir, fstype):
         syslog.syslog(syslog.LOG_ERR, 'sync failed: %s' % str(errmsg))
         return str(errmsg)
     return  0
+    
+######################   Install package below code    #########################
+# Now package_install support rpm only.
+@register.server_handler('long')
+def rpm_installcb(what, bytes, total, h, data):
+    global  cur_rpm_fd
+    (mia, operid) = data
+    if what == rpm.RPMCALLBACK_INST_OPEN_FILE:
+        cur_rpm_fd = os.open(h, os.O_RDONLY)
+        return  cur_rpm_fd
+    elif what == rpm.RPMCALLBACK_INST_CLOSE_FILE:
+        os.close(cur_rpm_fd)
+    elif what == rpm.RPMCALLBACK_INST_PROGRESS:
+        mia.set_step(operid, bytes, total)
+        
+class CBFileObj(file):
+    def __init__(self, filepath, data):
+        self.mia, self.operid, self.total_size = data
+        file.__init__(self, filepath)
+    def read(self, size):
+        self.mia.set_step(self.operid, self.tell(), self.total_size)
+        return file.read(self, size)
+
+@register.server_handler('long')
+def package_install(mia, operid, pkgname, firstpkg, noscripts):
+    use_ts = False
+    pkgpath = os.path.join(os.path.dirname(firstpkg), pkgname)
+    #dolog('pkg_install(%s, %s)\n' % (pkgname, str(pkgpath)))
+    
+    def do_ts_install():
+        global ts
+        if ts is None:
+            dolog('Create TransactionSet\n')
+            ts = rpm.TransactionSet(CONF_TGTSYS_ROOT)
+            ts.setProbFilter(rpm.RPMPROB_FILTER_OLDPACKAGE |
+                             rpm.RPMPROB_FILTER_REPLACENEWFILES |
+                             rpm.RPMPROB_FILTER_REPLACEOLDFILES |
+                             rpm.RPMPROB_FILTER_REPLACEPKG)
+            ts.setVSFlags(~(rpm.RPMVSF_NORSA | rpm.RPMVSF_NODSA))
+            
+            # have been removed from last rpm version
+            #ts.setFlags(rpm.RPMTRANS_FLAG_ANACONDA)
+        try:
+            rpmfd = os.open(pkgpath, os.O_RDONLY)
+            hdr = ts.hdrFromFdno(rpmfd)
+            ts.addInstall(hdr, pkgpath, 'i')
+            os.close(rpmfd)
+            # Sign the installing pkg name in stderr.
+            print >>sys.stderr, '%s ERROR :\n' % pkgname
+            problems = ts.run(rpm_installcb, (mia, operid))
+            if problems:
+                dolog('PROBLEMS: %s\n' % str(problems))
+                # problems is a list that each elements is a tuple.
+                # The first element of the tuple is a human-readable string
+                # and the second is another tuple such as:
+                #    (rpm.RPMPROB_FILE_CONFLICT, conflict_filename, 0L)
+                return  problems
+        except Exception, errmsg:
+            dolog('FAILED: %s\n' % str(errmsg))
+            return str(errmsg)
+            
+    def do_bash_rpm_install():
+        global noscripts_pkg_list
+        global use_noscripts
+        mia.set_step(operid, 1, 1)
+            
+        try:
+            cmd = '/bin/rpm'
+            argv = ['-i', '--noorder','--nosuggest',
+                    '--force','--nodeps',
+                    '--ignorearch',
+                    '--root', CONF_TGTSYS_ROOT,
+                    pkgpath,
+                ]
+            if use_noscripts or noscripts:
+                argv.append('--noscripts')
+                noscripts_pkg_list.append(pkgpath)
+
+            #cmd_res = {'err':[], 'std': [], 'ret':0}   # DEBUG
+            cmd_res = run_bash(cmd, argv)
+            # Sign the installing pkg name in stderr
+            if cmd_res['err']:
+                # Ok the stderr will dup2 a log file, so we just out it on err screen
+                print >>sys.stderr, '***INSTALLING %s:\n**STDERR:\n%s\n' \
+                        %(pkgname, ''.join(cmd_res['err']))
+            problems = cmd_res['ret']
+            if problems:
+                errormsg = ''.join(cmd_res['err'])
+                message = 'PROBLEMS on %s: \n return code is %s error message is\n[%s]' \
+                          % (pkgname, str(problems), errormsg)
+                dolog(message)
+                return  message
+        except Exception, errmsg:
+            dolog('FAILED on %s: %s\n' % (pkgname, str(errmsg)))
+            return str(errmsg)
+            
+    def do_copy_install():
+        mia.set_step(operid, 1, 1)
+        try:
+            cmd = 'cd %s && /usr/bin/rpm2cpio %s | /bin/cpio -dui --quiet' % (CONF_TGTSYS_ROOT, pkgpath)
+            problems = os.system(cmd)
+            if problems:
+                errormsg = ''.join(cmd_res['err'])
+                message = 'PROBLEMS on %s: \n return code is %s error message is\n[%s]' \
+                          % (pkgname, str(problems), errormsg)
+                dolog(message)
+                return  message
+        except Exception, errmsg:
+            dolog('FAILED on %s: %s\n' % (pkgname, str(errmsg)))
+            return str(errmsg)
+            
+    def do_tar_extract_install():
+        tar_size = os.path.getsize(pkgpath)
+        try:
+            tarobj = tarfile.open(fileobj=CBFileObj(pkgpath, (mia, operid, tar_size)))
+        except:
+            errstr = 'Faild on create tarfile object on file "%s" size"%d"\n' % (pkgpath, tar_size)
+            dolog(errstr)
+            return errstr
+        try:
+            tarobj.extractall(path=CONF_TGTSYS_ROOT)
+        except:
+            if tarobj:
+                tarobj.close()
+            errstr = 'Faild on extract file "%s" size"%d" to directory "%s"\n' % (pkgpath, tar_size, CONF_TGTSYS_ROOT)
+            dolog(errstr)
+            return errstr
+        try:
+            tarobj.close()
+        except:
+            pass
+        
+    # Decide using which mode to install.
+    ret = 'Nothing'
+    if CONF_PKGTYPE == 'rpm':     # In the mipublic.py
+        if installmode == 'rpminstallmode':
+            if use_ts:
+                # Use rpm-python module to install rpm pkg, but at this version it is very slowly.
+                ret = do_ts_install()
+            else:
+                # Because I can not use rpm-python module to install quickly.
+                # So use the bash mode to install the pkg, it is very fast.
+                # If you can use rpm-python module install pkg quickly, you can remove it.
+                ret = do_bash_rpm_install()
+        elif installmode == 'copyinstallmode':
+            # Use rpm2cpio name-ver-release.rpm | cpio -diu to uncompress the rpm files to target system.
+            # Then we will do some configuration in instpkg_post.
+            ret = do_copy_install()
+    elif CONF_PKGTYPE == 'tar':
+        ret = do_tar_extract_install()
+    if ret:
+        return ret
+    else:
+        return 0
 
 class MiaTest(object):
     def __init__(self):

@@ -70,7 +70,8 @@ if mia.pid > 0:
     server = ReuseXMLRPCServer(  #SimpleXMLRPCServer.SimpleXMLRPCServer( \
         ('127.0.0.1', 1325),
         SimpleXMLRPCServer.SimpleXMLRPCRequestHandler,
-        None)
+        None,
+        allow_none=True)
     server.register_instance(MIAction())
     while 1:
         server.handle_request()

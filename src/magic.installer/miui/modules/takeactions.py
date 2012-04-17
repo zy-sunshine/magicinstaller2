@@ -384,7 +384,6 @@ class MIStep_takeactions(magicstep.magicstepgroup):
         return '%02d:%02d:%02d' % (h, m, s)
 
     def act_instpkg_prepare(self, tdata, data):
-        import pdb;pdb.set_trace()
         self.probe_all_disc_result = tdata
         dolog('probe_all_disc_result: %s\n' % str(self.probe_all_disc_result))
         (pafile, dev, fstype, reldir, bootiso_relpath) = CONF.RUN.g_choosed_patuple
@@ -404,9 +403,16 @@ class MIStep_takeactions(magicstep.magicstepgroup):
 
         self.add_action(None,
                         self.act_instpkg_disc_start, 0,
-                        'instpkg_prep', dev, fstype, bootiso_relpath, reldir, self.installmode)
+                        'instpkg_prep', (dev, fstype, bootiso_relpath, reldir), 
+                                        self.installmode, 
+                                        { '/': (CONF.RUN.g_root_device, get_devinfo(CONF.RUN.g_root_device, CONF.RUN.g_all_part_infor).fstype),
+                                          '/boot': (CONF.RUN.g_boot_device, get_devinfo(CONF.RUN.g_boot_device, CONF.RUN.g_all_part_infor).fstype),
+                                          'swap': (CONF.RUN.g_swap_device, get_devinfo(CONF.RUN.g_swap_device, CONF.RUN.g_all_part_infor).fstype),
+                                          },
+                        )
 
     def act_instpkg_disc_start(self, tdata, disc_no):
+        import pdb; pdb.set_trace()
         if self.discdlg_open_time > 0:
             # Do adjustment to omit the influence of replace disc.
             self.starttime = self.starttime + \
@@ -628,7 +634,7 @@ class MIStep_takeactions(magicstep.magicstepgroup):
         (pafile, dev, fstype, reldir, isofn) = CONF.RUN.g_choosed_patuple
         msg = _('Umount the target filesystem(s).')
         self.add_action(msg, None, None,
-                        'instpkg_post', dev, mntpoint, dir, fstype)
+                        'instpkg_post', dev, mntpoint, reldir, fstype)                         #### TODO: mntpoint
         #### TODO Add an clean server operator
         #self.add_action(msg, self.reboot_0, None,
                         #'umount_all_tgtpart', CONF.RUN.g_mount_all_list, 'y')

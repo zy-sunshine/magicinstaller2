@@ -331,6 +331,7 @@ class Status:
 STAT = Status()
 
 def get_devinfo(devfn, all_part_infor):
+    if not devfn: return AttrDict()
     from miutils.miconfig import MiConfig
     CONF = MiConfig.get_instance()
     CONF_FSTYPE_MAP = CONF.LOAD.CONF_FSTYPE_MAP
@@ -338,6 +339,7 @@ def get_devinfo(devfn, all_part_infor):
         for tup in all_part_infor[dev]:
             if '%s%s' % (dev, tup[0]) == devfn:
                 r = AttrDict()
+                r['dev'] = devfn
                 r['parted_fstype'] = tup[6]
                 r['mountpoint'] = tup[7]
                 r['not_touched'] = tup[8]

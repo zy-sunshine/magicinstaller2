@@ -13,7 +13,7 @@ dolog = Log.i
 class MiTaskman :
     def __init__(self, port, action_prog, aplabel):
         #--- object status ---
-        self.actserver = xmlrpclib.ServerProxy('http://127.0.0.1:%d' % port)
+        self.actserver = xmlrpclib.ServerProxy('http://127.0.0.1:%d' % port, allow_none=True)
         # action_prog: The progress bar widget to show the action.
         self.action_prog = action_prog
         self.aplabel = aplabel
