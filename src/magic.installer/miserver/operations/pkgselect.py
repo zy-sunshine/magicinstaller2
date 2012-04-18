@@ -112,6 +112,9 @@ class MiDevice(object):
     def get_dev(self):
         return self.blk_path
         
+    def get_fstype(self):
+        return self.fstype
+        
     def iter_searchfiles(self, fs_lst, pathes):
         opt_mount = True
         if self.has_mounted:
@@ -212,12 +215,12 @@ def probe_all_disc(mia, operid, device, devfstype, bootiso_relpath, pkgarr_reldi
             # deal with iso case
             iso_fn = CONF_ISOFN_FMT % (CONF_DISTNAME, CONF_DISTVER, disc_no + 1)
             iso_relpath = os.path.join(os.path.dirname(bootiso_relpath), iso_fn)
-            pkgs = [ os.path.join(p, disc_first_pkgs[disc_no]) for p in pkg_probe_path ]
+            pkgarr_reldirs = [ os.path.join(pkgarr_reldir, p) for p in pkg_probe_path ]
             for f, reldir in midev.iter_searchfiles([iso_relpath], ['']): # from disk
                 midev_iso = MiDevice(f, 'iso9660')
-                for pkgpath, relative_dir in midev_iso.iter_searchfiles(pkgs, [pkgarr_reldir]): # from iso
+                for pkgpath, relative_dir in midev_iso.iter_searchfiles([disc_first_pkgs[disc_no]], pkgarr_reldirs): # from iso
                     probe_ret = ( os.path.join(os.path.dirname(bootiso_relpath), iso_fn), 
-                        os.path.join(relative_dir, os.path.basename(pkgpath)) )
+                        os.path.normpath(os.path.join(relative_dir, os.path.basename(pkgpath))) )
         else:
             # deal with harddisk case
             pkgs = [ os.path.join(p, disc_first_pkgs[disc_no]) for p in pkg_probe_path ]
@@ -244,8 +247,8 @@ class MiDevice_TgtSys(object):
         #### mount root device
         mnt_point = CONF_TGTSYS_ROOT
         dev_tgt_root = MiDevice(tgt_root_dev, tgt_root_type, mnt_point)
-        if not dev_tgt_root.do_mount(): #### NOTE: carefully handled this device's mount.
-            Log.e('Mount device %s Failed, install operate can not countinue' % dev_tgt_root.get_dev())
+        if not dev_tgt_root.do_mount(): #### NOTE: carefully handle this device's mount.
+            Log.e('Mount device %s Failed, install operate can not continue' % dev_tgt_root.get_dev())
             return False
         else:
             self.mounted_devs.append(dev_tgt_root)
@@ -254,8 +257,8 @@ class MiDevice_TgtSys(object):
             #### mount boot device
             mnt_point = os.path.join(CONF_TGTSYS_ROOT, 'boot')
             dev_tgt_boot = MiDevice(tgt_boot_dev, tgt_boot_type, mnt_point)
-            if not dev_tgt_boot.do_mount(): #### NOTE: carefully handled this device's mount.
-                Log.e('Mount device %s Failed, install operate can not countinue' % dev_tgt_boot.get_dev())
+            if not dev_tgt_boot.do_mount(): #### NOTE: carefully handle this device's mount.
+                Log.e('Mount device %s Failed, install operate can not continue' % dev_tgt_boot.get_dev())
                 self.umount_tgt_device()
                 return False
             else:
@@ -278,8 +281,6 @@ def instpkg_prep(mia, operid, pkgsrc_devinfo, instmode, tgtsys_devinfo):
     ######### TODO: !!! there to get get get
     # Set the package install mode.
     global installmode
-    global current_dev
-    global current_iso
     
     global dev_hd # the harddisk device where save packages.
     global dev_iso # the iso where save pkgs.
@@ -292,30 +293,17 @@ def instpkg_prep(mia, operid, pkgsrc_devinfo, instmode, tgtsys_devinfo):
     elif CONF_PKGTYPE == 'tar': dolog('InstallMode: Tar Packages\n')
     dolog('instpkg_prep(%s, %s, %s, %s)\n' % (dev, fstype, bootiso_relpath, reldir))
     
-    ############################## Mount Start #####################################
-    dev_hd = MiDevice(dev, fstype)
-    if not dev_hd.do_mount(): #### NOTE: carefully handled this device's mount.
-        Log.e('Mount device %s Failed, install operate can not countinue' % dev_hd.get_dev())
-        return False
-    if bootiso_relpath:
-        # an iso file on harddisk
-        dev_iso = MiDevice(dev_hd.get_file_path(bootiso_relpath), 'iso9660')
-        if not dev_iso.do_mount(): #### NOTE: carefully handled this device's mount.
-            dev_hd.do_umount(); dev_hd = None
-            Log.e('Mount device %s Failed, install operate can not countinue!!!' % dev_iso.get_dev())
-            dev_iso = None
-            return False
-            
+    ############################## Mount Start #####################################            
     dev_tgt = MiDevice_TgtSys(tgtsys_devinfo)
-    if not dev_tgt.mount_tgt_device(): #### NOTE: carefully handled this device's mount.
-        dev_iso.do_umount(); dev_iso = None
-        dev_hd.do_umount(); dev_hd = None
-        Log.e('Mount target system devices Failed, install operate can not countinue!!!')
+    if not dev_tgt.mount_tgt_device(): #### NOTE: carefully handle this device's mount.
+        msg = 'Mount target system devices Failed, install operate can not continue!!!'
+        Log.e(msg)
         dev_tgt = None
-        return False
+        return msg
     ############################## Mount Finished #####################################
     #--- This code is according to rpm.spec in rpm-4.2-0.69.src.rpm. ---
     # This code is specific to rpm.
+    import pdb; pdb.set_trace()
     var_lib_rpm = os.path.join(CONF_TGTSYS_ROOT, 'var/lib/rpm')
     if not os.path.isdir(var_lib_rpm):
         os.makedirs(var_lib_rpm)
@@ -323,97 +311,96 @@ def instpkg_prep(mia, operid, pkgsrc_devinfo, instmode, tgtsys_devinfo):
     return  0
 
 @register.server_handler('long')
-def instpkg_disc_prep(mia, operid, dev, reldir, fstype, iso_fn):
+def instpkg_disc_prep(mia, operid, dev, reldir, fstype, bootiso_relpath):
     '''
         Install each disc prepare work.
-        We should mount iso to prepare packages source(for disc).
+        We should mount each iso to prepare packages source(for disc).
     '''
+    global dev_hd # the harddisk device where save packages.
+    global dev_iso # the iso where save pkgs.
     dolog('instpkg_disc_prep(%s, %s, %s, %s)\n' % \
-          (dev, reldir, fstype, iso_fn))
-    if mntpoint != 0:
-        mntdir = os.path.join(CONF_TGTSYS_ROOT, mntxxxpoint) #### TODO mount use device
-    else:
-        mntdir = os.path.join(CONF_MNT_ROOT, os.path.basename(dev))
-    if fstype == 'iso9660':
-        # It is CDROM installation.
-        # assert(mntxxxpoint == 0) because CDROM can't be mount as part  #### TODO
-        #    of target system.
-        ret, errmsg = mount_dev(CONF_FSTYPE_MAP[fstype][0], dev, mntdir)
-        if not ret:
-            return  str(errmsg)
-    elif iso_fn:
-        # iso file is placed in mntdir.
-        isopath = os.path.join(mntdir, dir, iso_fn)
-        loopmntdir = os.path.join('/tmpfs/mnt/', CONF_ISOLOOP)
-        ret, errmsg = mount_dev('iso9660', isopath, mntdir=loopmntdir, flags='loop')
-        if not ret:
-            syslog.syslog(syslog.LOG_ERR,
-                          "LoMount %s on %s as %s failed: %s" % \
-                          (isopath, loopmntdir,
-                           'iso9660', str(errmsg)))
-            return  str(errmsg)
+          (dev, reldir, fstype, bootiso_relpath))
+    ############################## Mount Start #####################################
+    dev_hd = MiDevice(dev, fstype)
+    if not dev_hd.do_mount(): #### NOTE: carefully handle this device's mount.
+        msg = 'Mount device %s Failed, install operate can not continue' % dev_hd.get_dev()
+        Log.e(msg)
+        return msg
+        
+    if bootiso_relpath:
+        # an iso file on harddisk
+        dev_iso = MiDevice(dev_hd.get_file_path(bootiso_relpath), 'iso9660')
+        if not dev_iso.do_mount(): #### NOTE: carefully handle this device's mount.
+            dev_hd.do_umount(); dev_hd = None
+            msg = 'Mount device %s Failed, install operate can not continue!!!' % dev_iso.get_dev()
+            Log.e(msg)
+            dev_iso = None
+            return msg
+            
+    ############################## Mount Finished #####################################
     return  0
 
 @register.server_handler('long')
-def instpkg_disc_post(mia, operid, dev, reldir, fstype, iso_fn, first_pkg):
-    # determine the rpmdb.tar.bz2 and etc.tar.bz2. If exist copy it to tmp_config_dir in target system.
-    rpmpkgdir = os.path.dirname(first_pkg)
-    rpmdb_abs = os.path.join(rpmpkgdir, rpmdb)
-    etctar_abs = os.path.join(rpmpkgdir, etctar)
-    tgt_tmp_config_dir = os.path.join(CONF_TGTSYS_ROOT, tmp_config_dir)
-    if not os.path.exists(tgt_tmp_config_dir):
-        os.makedirs(tgt_tmp_config_dir)
-    if os.path.exists(rpmdb_abs):
-        ret = os.system('cp %s %s' % (rpmdb_abs, os.path.join(tgt_tmp_config_dir, rpmdb)))
-        if ret != 0:
-            dolog('copy %s to target system failed.\n' % rpmdb)
-        else:
-            dolog('copy %s to target system successfully.\n' % rpmdb)
-    if os.path.exists(etctar_abs):
-        ret = os.system('cp %s %s' % (etctar_abs, os.path.join(tgt_tmp_config_dir, etctar)))
-        if ret != 0:
-            dolog('copy %s to target system failed.\n' % rpmdb)
-        else:
-            dolog('copy %s to target system successfully.\n' % rpmdb)
+def instpkg_disc_post(mia, operid, dev, fstype, reldir, bootiso_relpath, first_pkg):
+    global dev_hd # the harddisk device where save packages.
+    global dev_iso # the iso where save pkgs.
+    if installmode == 'copyinstallmode':
+        # determine the rpmdb.tar.bz2 and etc.tar.bz2. If exist copy it to tmp_config_dir in target system.
+        rpmpkgdir = os.path.dirname(first_pkg)
+        rpmdb_abs = os.path.join(rpmpkgdir, rpmdb)
+        etctar_abs = os.path.join(rpmpkgdir, etctar)
+        tgt_tmp_config_dir = os.path.join(CONF_TGTSYS_ROOT, tmp_config_dir)
+        if not os.path.exists(tgt_tmp_config_dir):
+            os.makedirs(tgt_tmp_config_dir)
+        if os.path.exists(rpmdb_abs):
+            ret = os.system('cp %s %s' % (rpmdb_abs, os.path.join(tgt_tmp_config_dir, rpmdb)))
+            if ret != 0:
+                dolog('copy %s to target system failed.\n' % rpmdb)
+            else:
+                dolog('copy %s to target system successfully.\n' % rpmdb)
+        if os.path.exists(etctar_abs):
+            ret = os.system('cp %s %s' % (etctar_abs, os.path.join(tgt_tmp_config_dir, etctar)))
+            if ret != 0:
+                dolog('copy %s to target system failed.\n' % rpmdb)
+            else:
+                dolog('copy %s to target system successfully.\n' % rpmdb)
             
-    dolog('instpkg_disc_post(%s, %s, %s, %s)\n' % \
-          (dev, reldir, fstype, iso_fn))
+    dolog('instpkg_disc_post(%s, %s, %s, %s, %s)\n' % \
+          (dev, fstype, reldir, bootiso_relpath, first_pkg))
     # We don't know which package start the minilogd but it
     # will lock the disk, so it must be killed.
     if os.system('/usr/bin/killall minilogd') == 0:
         time.sleep(2)
-    if mntxxxpoint != 0: #### TODO
-        mntdir = os.path.join(CONF_TGTSYS_ROOT, mntxxxpoint)
-    else:
-        mntdir = os.path.join(CONF_MNT_ROOT, os.path.basename(dev))
-    if fstype == 'iso9660':
-        # It is CDROM installation.
-        # assert(mntxxxpoint == 0) because CDROM can't be mount as part ### TODO
-        #    of target system.
-        ret, errmsg = umount_dev(mntdir)
-        if not ret:
-            syslog.syslog(syslog.LOG_ERR, 'UMount(%s) failed: %s' % \
-                          (mntdir, str(errmsg)))
-            return str(errmsg)
-        # Eject the cdrom after used.
-        try:
-            cdfd = os.open(dev, os.O_RDONLY | os.O_NONBLOCK)
-            isys.ejectcdrom(cdfd)
-            os.close(cdfd)
-        except Exception, errmsg:
-            syslog.syslog(syslog.LOG_ERR, 'Eject(%s) failed: %s' % \
-                          (dev, str(errmsg)))
-            return str(errmsg)
-    elif iso_fn:
-        # iso file is placed in mntdir.
-        loopmntdir = os.path.join('/tmpfs/mnt/', CONF_ISOLOOP)
-        ret, errmsg = umount_dev(loopmntdir)
-        if not ret:
-            syslog.syslog(syslog.LOG_ERR, 'LoUMount %s from %s failed: %s' % \
-                          (iso_fn,
-                           loopmntdir,
-                           str(errmsg)))
-            return str(errmsg)
+        
+    ################################ Umount Start #####################################
+    if dev != dev_hd.get_dev():
+        msg = 'Error: previous use device %s, this time umount device %s, both should be equal, the install operate can not continue!!!' % (dev_hd.get_dev(), dev)
+        Log.e(msg)
+        return msg
+    if dev_iso:
+        if not dev_iso.do_umount():
+            msg = 'Umount previous iso %s Failed, install operate can not continue!!!' % dev_iso.get_dev()
+            Log.e(msg)
+            return msg
+        dev_iso = None
+    if dev_hd:
+        if not dev_hd.do_umount():
+            msg = 'Umount previous iso %s Failed, install operate can not continue!!!' % dev_hd.get_dev()
+            Log.e(msg)
+            return msg
+        if dev_hd.get_fstype() == 'iso9660':
+            # Eject the cdrom after used.
+            try:
+                cdfd = os.open(dev, os.O_RDONLY | os.O_NONBLOCK)
+                isys.ejectcdrom(cdfd)
+                os.close(cdfd)
+            except Exception, errmsg:
+                syslog.syslog(syslog.LOG_ERR, 'Eject(%s) failed: %s' % \
+                            (dev, str(errmsg)))
+                return str(errmsg)
+        dev_hd = None
+    
+    ################################ Umount Finished #####################################
     return  0
 
 @register.server_handler('long')
@@ -553,7 +540,10 @@ class CBFileObj(file):
 @register.server_handler('long')
 def package_install(mia, operid, pkgname, firstpkg, noscripts):
     use_ts = False
+    global dev_hd
+    global dev_iso
     pkgpath = os.path.join(os.path.dirname(firstpkg), pkgname)
+    pkgpath = dev_iso and dev_iso.get_file_path(pkgpath) or dev_hd.get_file_path(pkgpath)
     #dolog('pkg_install(%s, %s)\n' % (pkgname, str(pkgpath)))
     
     def do_ts_install():

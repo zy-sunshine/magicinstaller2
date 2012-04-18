@@ -14,7 +14,7 @@ CONF_FULL_HEIGHT = CONF.LOAD.CONF_FULL_HEIGHT
 Log = Logger.get_instance(__name__)
 dolog = Log.i
 
-class tadialog(xmlgtk.xmlgtk):
+class TaDialog(xmlgtk.xmlgtk):
     def __init__(self, upobj, uixml, uirootname=None):
         self.upobj = upobj
         xmlgtk.xmlgtk.__init__(self, uixml, uirootname)
@@ -46,7 +46,7 @@ class tadialog(xmlgtk.xmlgtk):
         self.gamebox.topwin.destroy()
         del self.gameobj
         
-class discdialog(magicpopup.magicpopup):
+class DiscDialog(magicpopup.magicpopup):
     def __init__(self, upobj, uixml, msg, uirootname=None):
         if upobj:
             self.upobj = upobj
@@ -58,6 +58,7 @@ class discdialog(magicpopup.magicpopup):
         self.name_map['msg'].set_text(msg)
 
     def retry_clicked(self, widget, data):
+        ####??? data from whrere
         self.upobj.retry_clicked(widget, data)
         self.topwin.destroy()
 
@@ -69,7 +70,7 @@ class discdialog(magicpopup.magicpopup):
         self.upobj.reboot_clicked(widget, data)
         self.topwin.destroy()
 
-class rpmerrdialog(magicpopup.magicpopup):
+class RpmErrDialog(magicpopup.magicpopup):
     """Rpm install error dialog."""
     def __init__(self, upobj, uixml, msg, uirootname, data):
         if upobj:
@@ -116,10 +117,10 @@ class MIStep_takeactions(magicstep.magicstepgroup):
         self.discdlg_open_time = -1
         self.installmode = 'rpminstallmode'   # Default
         self.minorarch_pkgs = []
-        self.minorarch_later = True     # push back minor arch packages
+        self.minorarch_later = False     # push back minor arch packages ### current close this feature.
         self.add_action = self.rootobj.tm.add_action
         
-        self.tadlg = tadialog(self, self.uixmldoc, 'actions.dialog')
+        self.tadlg = TaDialog(self, self.uixmldoc, 'actions.dialog')
         self.statusarr = []
         width = 3
         height = (len(self.actlist) + width - 1) / width
@@ -412,13 +413,14 @@ class MIStep_takeactions(magicstep.magicstepgroup):
                         )
 
     def act_instpkg_disc_start(self, tdata, disc_no):
-        import pdb; pdb.set_trace()
+        if tdata != 0:
+            pass #### occur error, tdata is the error msg
         if self.discdlg_open_time > 0:
             # Do adjustment to omit the influence of replace disc.
             self.starttime = self.starttime + \
                              (time.time() - self.discdlg_open_time)
             self.discdlg_open_time = -1
-        (pafile, dev, fstype, reldir, isofn) =  CONF.RUN.g_choosed_patuple
+        (pafile, dev, fstype, reldir, bootiso_relpath) =  CONF.RUN.g_choosed_patuple
         while disc_no < len(CONF.RUN.g_arrangement):
             if not self.install_allpkg and not self.disk_map.has_key(disc_no):
                 # Skip the disc which is not needed.
@@ -427,23 +429,25 @@ class MIStep_takeactions(magicstep.magicstepgroup):
             dolog("probe_all_disc_result: %s" % self.probe_all_disc_result)
             if disc_no >= len(self.probe_all_disc_result) \
                    or not self.probe_all_disc_result[disc_no]:
+                #### multi disc, whether it can get here???
                 self.cur_disc_no = disc_no
-                import pdb; pdb.set_trace()
                 msgtxt = _("Can't find packages in disc %d.\nIf you are using CDROM to install system, it is the chance to eject the original disc and insert the %d disc.")
                 msgtxt = msgtxt % (disc_no + 1, disc_no + 1)
                 self.discdlg_open_time = time.time()
-                self.discdialog(self, self.uixmldoc, msgtxt, 'disc.dialog')
+                DiscDialog(self, self.uixmldoc, msgtxt, 'disc.dialog')
                 return
-            iso_fn = self.probe_all_disc_result[disc_no][0]
+            bootiso_relpath = self.probe_all_disc_result[disc_no][0]
             self.add_action(None,
                             self.act_instpkg_pkg_start, (disc_no, 0),
-                            'instpkg_disc_prep', dev, reldir, fstype, iso_fn)
+                            'instpkg_disc_prep', dev, reldir, fstype, bootiso_relpath)
             return
         self.add_action(_('Last operations for package installation'),
                         self.nextop, None,
                         'instpkg_post', dev, reldir, fstype)
                         
     def act_instpkg_pkg_start(self, tdata, data):
+        if tdata != 0:
+            pass #### TODO: handle the result error msg.
         (disc_no, pkg_no) = data
         while pkg_no < len(CONF.RUN.g_arrangement[disc_no]):
             pkgtuple = CONF.RUN.g_arrangement[disc_no][pkg_no]
@@ -460,7 +464,7 @@ class MIStep_takeactions(magicstep.magicstepgroup):
                 if not archpkg:
                     data = (disc_no, pkg_no, 0, False)
                     msg = _("Target System Arch %s is not Compatible with package arch %s" % (self.arch, pkgtuple[1]))
-                    self.rpmerrdialog(self, self.uixmldoc, msg, 'rpmerr.dialog', data)
+                    RpmErrDialog(self, self.uixmldoc, msg, 'rpmerr.dialog', data)
                     return
                 (apkg, aarch, asize) = archpkg
                 if self.minorarch_later and aarch != "noarch" and aarch != self.arch:
@@ -481,10 +485,10 @@ class MIStep_takeactions(magicstep.magicstepgroup):
                             'package_install', apkg, self.probe_all_disc_result[disc_no][1],
                             noscripts)
             return
-        (pafile, dev, fstype, reldir, isofn) = CONF.RUN.g_choosed_patuple
+        (pafile, dev, fstype, reldir, bootiso_relpath) = CONF.RUN.g_choosed_patuple
         self.add_action(None,
                         self.act_instpkg_disc_start, disc_no + 1,
-                        'instpkg_disc_post', dev, reldir, fstype, isofn, self.probe_all_disc_result[disc_no][1])
+                        'instpkg_disc_post', dev, fstype, reldir, bootiso_relpath, self.probe_all_disc_result[disc_no][1])
 
     def act_instpkg_pkg_end(self, tdata, data):
         #--- FIXME ---
@@ -496,7 +500,7 @@ class MIStep_takeactions(magicstep.magicstepgroup):
         if not is_skip:
             res = tdata
             if res != 0:
-                self.rpmerrdialog(self, self.uixmldoc, res, 'rpmerr.dialog', data)
+                RpmErrDialog(self, self.uixmldoc, res, 'rpmerr.dialog', data)
                 return
 
         self.donepkg = self.donepkg + 1
@@ -605,13 +609,13 @@ class MIStep_takeactions(magicstep.magicstepgroup):
 ############################ Ghraphic Button Action ###################################
 
     def retry_clicked(self, widget, data):
-        (pafile, dev, fstype, reldir, isofn) = CONF.RUN.g_choosed_patuple
+        (pafile, dev, fstype, reldir, bootiso_relpath) = CONF.RUN.g_choosed_patuple
         self.add_action(_('Researching packages...'),
                         self.reprobe_all_disc_0, None,
                         'instpkg_post', dev, reldir, fstype)
         
     def reprobe_all_disc_0(self, tdata, data):
-        (pafile, dev, fstype, reldir, isofn) = CONF.RUN.g_choosed_patuple
+        (pafile, dev, fstype, reldir, bootiso_relpath) = CONF.RUN.g_choosed_patuple
         self.add_action(_('Researching packages...'),
                         self.reprobe_all_disc_1, None,
                         'probe_all_disc', dev, reldir, fstype, self.disc_first_pkgs)
@@ -619,19 +623,19 @@ class MIStep_takeactions(magicstep.magicstepgroup):
     def reprobe_all_disc_1(self, tdata, data):
         (errmsg, self.probe_all_disc_result) = tdata
         dolog('probe_all_disc_result: %s\n' % str(self.probe_all_disc_result))
-        (pafile, dev, fstype, reldir, isofn) = CONF.RUN.g_choosed_patuple
+        (pafile, dev, fstype, reldir, bootiso_relpath) = CONF.RUN.g_choosed_patuple
         self.add_action(_('Researching packages...'),
                         self.act_instpkg_disc_start, self.cur_disc_no,
                         'instpkg_prep', dev, reldir, fstype, self.installmode)
 
     def abort_clicked(self, widget, data):
-        (pafile, dev, fstype, reldir, isofn) = CONF.RUN.g_choosed_patuple
+        (pafile, dev, fstype, reldir, bootiso_relpath) = CONF.RUN.g_choosed_patuple
         self.add_action(_('Aborting...'),
                         self.nextop, None,
                         'instpkg_post', dev, reldir, fstype)
 
     def reboot_clicked(self, widget, data):
-        (pafile, dev, fstype, reldir, isofn) = CONF.RUN.g_choosed_patuple
+        (pafile, dev, fstype, reldir, bootiso_relpath) = CONF.RUN.g_choosed_patuple
         msg = _('Umount the target filesystem(s).')
         self.add_action(msg, None, None,
                         'instpkg_post', dev, mntpoint, reldir, fstype)                         #### TODO: mntpoint
@@ -661,7 +665,7 @@ def TestTaDialog():
                               [CONF.LOAD.CONF_HOTFIXDIR, '.'],
                               postfix = 'UIxml')
     uixmldoc = parse(uixml_path)
-    tadlg = tadialog(None, uixmldoc, 'actions.dialog')
+    tadlg = TaDialog(None, uixmldoc, 'actions.dialog')
     tadlg.name_map['otname'].set_text('')
     tadlg.name_map['otprog'].set_fraction(1)
     tadlg.name_map['frame_other'].set_sensitive(False)
