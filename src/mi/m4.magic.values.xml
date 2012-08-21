@@ -1,0 +1,99 @@
+/--<?xml version="1.0"?>
+<!-- Copyright (C) 2003, Charles Wang <charles@linux.net.cn> -->
+<!-- Author:  Charles Wang -->
+<magic.values>
+  <welcome>
+    <license>disagree</license>
+    <nowarranty>disagree</nowarranty>
+  </welcome>
+  <network>
+    <hostname></hostname>
+  </network>
+  <accounts>
+    <root>
+      <password/>
+      <passwordconfirm/>
+    </root>
+    <userlist/>
+  </accounts>
+  <scsi>
+    <modules/>
+  </scsi>
+  <parted>
+    <profile/>
+  </parted>
+  <autopart>--/autopart_profile/--  </autopart>
+  <bootloader>
+    <bltype>grub</bltype>
+    <timeout>10</timeout>
+    <instpos>mbr</instpos>
+    <usepassword>false</usepassword>
+    <password/>
+    <lba>false</lba>
+    <options>vga=791 splash=silent,fadein,theme:default console=tty1</options>
+    <entrylist/>
+    <default>linux</default>
+    <doslabel>Windows</doslabel>
+    <linuxlabel></linuxlabel>
+    <boot_device></boot_device>
+    <mbr_device></mbr_device>
+    <win_device></win_device>
+  </bootloader>
+  <package>
+    <choosedgroup><select id="ALL"/></choosedgroup>
+  </package>
+  <takeactions>
+    <installmode>rpminstallmode</installmode>
+  </takeactions>
+  <startsetup>
+    <skipXsetting>1</skipXsetting>
+  </startsetup>
+  <Xwindow>
+    <monitor>
+      <name>Unknown</name>
+      <horiz_sync>31.5-37.9</horiz_sync>
+      <vert_refresh>50-70</vert_refresh>
+    </monitor>
+    <videocard>
+      <name>Unknown</name>
+      <driver>vga</driver>
+      <videoram>1024</videoram>
+    </videocard>
+    <mouse>
+      <name>Unknown</name>
+      <protocol>none</protocol>
+      <device>none</device>
+      <xemu3>false</xemu3>
+      <shortname>unknown</shortname>
+    </mouse>
+    <modes>
+      <m640x8>false</m640x8>
+      <m800x8>false</m800x8>
+      <m1024x8>false</m1024x8>
+      <m1280x8>false</m1280x8>
+      <m640x15>false</m640x15>
+      <m800x15>false</m800x15>
+      <m1024x15>false</m1024x15>
+      <m1280x15>false</m1280x15>
+      <m640x16>false</m640x16>
+      <m800x16>false</m800x16>
+      <m1024x16>false</m1024x16>
+      <m1280x16>false</m1280x16>
+      <m640x24>false</m640x24>
+      <m800x24>false</m800x24>
+      <m1024x24>false</m1024x24>
+      <m1280x24>false</m1280x24>
+      <widemode_res></widemode_res>
+      <widemode_x></widemode_x>
+      <widemode_y></widemode_y>
+      <widemode_depth>24</widemode_depth>
+      <widemode_refresh>60</widemode_refresh>
+    </modes>
+    <init>gra</init>
+  </Xwindow>
+  <lists>
+    <vender_list>--/vender_list/--    </vender_list>
+    <card_list>--/card_list/--    </card_list>
+    <mouse_list>--/mouse_list/--    </mouse_list>
+  </lists>
+</magic.values>--/

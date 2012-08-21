@@ -39,10 +39,10 @@ class miSrcMaker(PkgMaker.StepMaker):
         return inst_file, cmds
 
     def install_configfiles(self):
-        configfiles = [('src/magic.installer/mipublic.py',
+        configfiles = [('src/mi/mipublic.py',
                         '$ROOT/$pythondir/site-packages/'),
 
-                       ('src/magic.installer/magic.autopart.xml',
+                       ('src/mi/magic.autopart.xml',
                         '$ROOT/usr/share/MagicInstaller/')]
         slist = []
         cmds = []
@@ -56,7 +56,7 @@ class miSrcMaker(PkgMaker.StepMaker):
         slist = []
         cmds = []
         for lang in mi_config.all_linguas:
-            inst_file = 'src/magic.installer/po/%s.mo' % lang
+            inst_file = 'src/mi/po/%s.mo' % lang
             dest_file = '$ROOT/usr/share/locale/%s/LC_MESSAGES/${textdomain}.mo' % lang
             slist.append(inst_file)
             cmds.extend(['mkdir -p %s' % os.path.dirname(dest_file),
@@ -77,7 +77,7 @@ class miSrcMaker(PkgMaker.StepMaker):
         slist = []
         cmds = []
         if use_cp_mode:
-            inst_file = 'src/magic.installer/UIxml/takeactions.xml.cpinstmode'
+            inst_file = 'src/mi/UIxml/takeactions.xml.cpinstmode'
             dest_file = '$ROOT$root_datadir/UIxml/takeactions.xml'
             slist.append(inst_file)
             cmds.extend['mkdir -p %s' % os.path.dirname(dest_file),
@@ -93,7 +93,7 @@ misrc = miSrcMaker(env)
 misrc.make()
 
 if mi_config.develmode:
-    # Pack src/magic.installer and src/etc into root.src.step1.tar.gz
+    # Pack src/mi and src/etc into root.src.step1.tar.gz
     env.Command('bindir/root.src.step1.tar.gz', [env.Alias('root_src'), env.Alias('root.src.etc')],
                 #['tar c -C $destdir . | gzip -9 > $TARGET'])
                 ['tar czf $TARGET -C $destdir .'])

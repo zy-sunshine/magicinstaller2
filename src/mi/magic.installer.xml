@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<!-- Copyright (C) 2003, Charles Wang <charles@linux.net.cn> -->
+<!-- Author:  Charles Wang -->
+<magic.installer>
+  <group name="install">
+    <module file="welcome.py"/>
+    <module file="scsi.py"/>
+    <!--<module file="testops.py"/>-->
+    <module file="parted.py"/>
+    <module file="bootloader.py"/>
+    <module file="pkgselect.py"/>
+    <module file="takeactions.py"/>
+  </group>
+  <group name="setup">
+    <module file="startsetup.py"/>
+    <module file="accounts.py"/>
+    <module file="Xwindow.py"/>
+    <module file="dosetup.py"/>
+  </group>
+  <group name="finish">
+    <module file="finish.py"/>
+  </group>
+</magic.installer>

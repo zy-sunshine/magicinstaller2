@@ -21,7 +21,7 @@ Import('mi_config')
 # We will deal with m4 of mipublic.py magic.autopart.xml 
 # and po/ files at non-develmode.
 # If at develmode we will pack up all the src files.
-SConscript('magic.installer/SConscript')
+SConscript('mi/SConscript')
 # Install magicinstaller's config file.
 SConscript('etc/SConscript')
 
