@@ -87,23 +87,23 @@ class magicstepgroup (magicstep):
         self.substep = substep_list[0]
 
     def subswitch(self, substep):
-        Log.d('subswitch substep: %s, self.substep: %s' % (substep, self.substep))
+        logger.d('subswitch substep: %s, self.substep: %s' % (substep, self.substep))
         if substep != self.substep:
             if not self.name_map.has_key(substep):
-                Log.w("%s step is not in UIxml, please fill it yourself, and check it work" % substep)
+                logger.w("%s step is not in UIxml, please fill it yourself, and check it work" % substep)
                 self.substep = substep
                 return
             if self.name_map.has_key(self.substep):
-                Log.d('hide %s' % self.substep)
+                logger.d('hide %s' % self.substep)
                 self.name_map[self.substep].hide()
             self.name_map[substep].show()
-            Log.d('show %s' % substep)
+            logger.d('show %s' % substep)
             if hasattr(self, 'switch_%s_%s' % (self.substep, substep)):
                 eval('self.switch_%s_%s()' % (self.substep, substep))
             self.substep = substep
 
     def enter(self):
-        Log.d('enter')
+        logger.d('enter in magicstep substep %s' % self.substep)
         if hasattr(self, 'check_enter_%s' % self.substep):
             return eval('self.check_enter_%s()' % self.substep)
         # Always switch to substep_list.
@@ -111,16 +111,19 @@ class magicstepgroup (magicstep):
         return 1
 
     def leave(self):
+        logger.d('leave in magicstep substep %s' % self.substep)
         if hasattr(self, 'check_leave_%s' % self.substep):
             return eval('self.check_leave_%s()' % self.substep)
         return 1
 
     def btnback_clicked(self, widget, data):
+        logger.d('btnback_clicked in magicstep widget %s data %s substep %s' % (widget, data, self.substep))
+        if self.substep == self.substep_list[0]:
+            # if at first step, and click btnback this stepgroup will leave, so check_leave_step0 will be checked in stepgroup.leave method
+            return 1
         if hasattr(self, 'check_leave_%s' % self.substep):
             if not eval('self.check_leave_%s()' % self.substep):
                 return 0
-        if self.substep == self.substep_list[0]:
-            return 1
         prevstep = ''
         for curstep in self.substep_list:
             if curstep == self.substep:
@@ -133,12 +136,14 @@ class magicstepgroup (magicstep):
         return 0
 
     def btnnext_clicked(self, widget, data):
+        logger.d('btnnext_clicked in magicstep widget %s data %s substep %s' % (widget, data, self.substep))
         nextstep = ''
+        if self.substep == self.substep_list[-1]:
+            # if at end step, and click btnnext this stepgroup will leave, so check_leave_step-1 will be checked in stepgroup.leave method
+            return 1
         if hasattr(self, 'check_leave_%s' % self.substep):
             if not eval('self.check_leave_%s()' % self.substep):
                 return 0
-        if self.substep == self.substep_list[-1]:
-            return 1
         if hasattr(self, 'get_%s_next' % self.substep):
             nextstep = eval('self.get_%s_next()' % self.substep)
             if not nextstep:

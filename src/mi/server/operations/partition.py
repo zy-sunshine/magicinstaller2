@@ -2,10 +2,10 @@
 #encoding=utf8
 
 from mi.client.utils import _
-import sys, iconv
-import getdev, isys
-import parted, _ped
-from mi.utils.common import mount_dev, umount_dev
+import sys, os, time, string
+from mi import getdev, isys, iconv #@UnresolvedImport
+import parted, _ped #@UnresolvedImport
+from mi.utils.common import mount_dev, umount_dev, run_bash
 # Because the short operation and long operation are run in different process,
 # they can't share the parted results. So all operations except status-free
 # operation have to be 'long' even if it can terminate immediately.
@@ -90,7 +90,7 @@ def device_probe_all(mia, operid, dummy):
             model = iconv.iconv('gb2312', 'utf8', dev.model).encode('utf8')
             result.append((dev.path, dev.length, model))
             CONF.RUN.g_all_harddisks[dev.path] = (dev, disk, newdisklabel)
-    #dolog('operations.parted.device_probe_all: %s\n' % str(result))
+    dolog('operations.parted.device_probe_all: %s\n' % str(result))
     return  result
 
 @register.server_handler('long')

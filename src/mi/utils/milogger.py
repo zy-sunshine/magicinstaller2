@@ -8,7 +8,12 @@ class MiLogger(object):
         logging.config.fileConfig('logging.conf')
         self.logger = logging.getLogger(name)
         self.usecolor = False
-
+        self.TAG = name
+        self.info = self.i
+        self.debug = self.d
+        self.error = self.e
+        self.warning = self.w
+        
     def print_msg(self, msg, *args, **kw):
         msg = '[%s][%s][%s]%s\n' % ( datetime.now(), 
                                     kw.has_key('mtype') and kw['mtype'] or 'NORM',

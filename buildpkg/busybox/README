@@ -1,7 +1,7 @@
-·Ç¾²Ì¬Á¬½Ó
+éžé™æ€è¿žæŽ¥
 
-Ó¦¸Ã¼ÓÈëµÄ³ÌÐò
-* ¿ªÍ·µÄÊÇ±ØÒªµÄ³ÌÐò
+åº”è¯¥åŠ å…¥çš„ç¨‹åº
+* å¼€å¤´çš„æ˜¯å¿…è¦çš„ç¨‹åº
 
 /bin
 cat
@@ -59,7 +59,7 @@ zcat
 arp
 blkid
 depmod
-fbsplash        # Èç¹ûÏëÒªÊ¹ÓÃÕâ¸ö¹¦ÄÜµÄ»°
+fbsplash        # å¦‚æžœæƒ³è¦ä½¿ç”¨è¿™ä¸ªåŠŸèƒ½çš„è¯
 *fdisk
 *getty          @
 *halt           @
@@ -71,7 +71,7 @@ insmod
 *klogd          @
 loadkmap
 lsmod
-mkfs.*          # ¸ù¾ÝÐèÒª
+mkfs.*          # æ ¹æ®éœ€è¦
 *modprobe       @
 pivot_root
 *poweroff
@@ -147,10 +147,10 @@ setfont
 *telnetd        @
 udhcpd
 
-ÒÔÉÏ±ê¼Ç * ºÅµÄÓÐÐ©ÊÇ bootscript ÖÐ±ØÒªµÄ, ÓÐµÄÊÇMIÖÐÐèÒªµÄ, »¹ÓÐ³£ÓÃµÄ.
-¼¸¸öÔÚ bootscript ÖÐÐèÒªµÄÃüÁî±ØÐë´ò¿ª³¤Ñ¡Ïî, ¼´ÃüÁî¿ÉÒÔÊ¹ÓÃ¶à¸ö²ÎÊýÀ´Ö´ÐÐÃüÁî,
-ÔÚÆäºó±ê¼Ç @
+ä»¥ä¸Šæ ‡è®° * å·çš„æœ‰äº›æ˜¯ bootscript ä¸­å¿…è¦çš„, æœ‰çš„æ˜¯MIä¸­éœ€è¦çš„, è¿˜æœ‰å¸¸ç”¨çš„.
+å‡ ä¸ªåœ¨ bootscript ä¸­éœ€è¦çš„å‘½ä»¤å¿…é¡»æ‰“å¼€é•¿é€‰é¡¹, å³å‘½ä»¤å¯ä»¥ä½¿ç”¨å¤šä¸ªå‚æ•°æ¥æ‰§è¡Œå‘½ä»¤,
+åœ¨å…¶åŽæ ‡è®° @
 
-²¹³ä:
-*inetd          @  # ÓÃÓÚÆô¶¯ tftpd
+è¡¥å……:
+*inetd          @  # ç”¨äºŽå¯åŠ¨ tftpd
 

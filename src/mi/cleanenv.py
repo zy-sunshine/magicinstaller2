@@ -3,8 +3,7 @@
 
 import os
 import sys
-#from mipublic import *
-from mi.utils.common import mount_dev, umount_dev, remove_empty_dir
+from mipublic import *
 import isys
 #from miutil import *
 ALL_FREE_LOOP = ['/dev/loop0', '/dev/loop1', '/dev/loop2', '/dev/loop3',

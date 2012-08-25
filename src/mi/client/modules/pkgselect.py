@@ -36,8 +36,8 @@ class MIStep_pkgselect (magicstep.magicstepgroup):
         self.srcpos_dialog = magicpopup.magicpopup( \
             self, self.uixmldoc, _('You want fetch packages from...'),
             magicpopup.magicpopup.MB_OK, 'srcpos.dialog', 'srcpos_')
-        self.srcpos_dialog.topwin.set_size_request(480, 320)
-        self.srcpos_dialog.fill_values(topele)
+        self.srcpos_dialogger.topwin.set_size_request(480, 320)
+        self.srcpos_dialogger.fill_values(topele)
 
     def tryload_file(self, patuple):
         (pafile, dev, fstype, reldir, isofn) = patuple
@@ -81,14 +81,14 @@ class MIStep_pkgselect (magicstep.magicstepgroup):
 
     def srcpos_ok_clicked(self, widget, data):
         (model, iter) = \
-                self.srcpos_dialog.name_map['srcposlist_treeview'].get_selection().get_selected()
+                self.srcpos_dialogger.name_map['srcposlist_treeview'].get_selection().get_selected()
         if iter:
             pafile = model.get_value(iter, 0)
             for patuple in CONF.RUN.g_pkgarr_probe_result:
                 if patuple[0] == pafile:
                     break
             if self.tryload_file(patuple):
-                self.srcpos_dialog.topwin.destroy()
+                self.srcpos_dialogger.topwin.destroy()
             else:
                 magicpopup.magicmsgbox(None,
                                        _('Load the choosed package arrangement failed!'),

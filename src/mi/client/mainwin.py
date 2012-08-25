@@ -29,7 +29,7 @@ from mi.utils.mitaskman import MiTaskman
 from mi.client.utils import magicpopup
 
 from mi.client.utils import logger
-dolog = logger.info
+dolog = logger.i
 
 class Step(object):
     def __init__(self, s_id, name, obj, title, valid):
@@ -74,6 +74,7 @@ class Steps(object):
         #### Init startup action
         for step in self.step_lst:
             if hasattr(step.obj, 'startup_action'):
+                logger.d('init %s' % step.obj.startup_action)
                 step.obj.startup_action()
     
     def has_key(self, key):
@@ -144,8 +145,8 @@ class MIMainWindow(gtk.Window):
         step = self.steps.get_step_by_id(start_stepid)
         dolog('Start step: %s' % step)
         self.load_env(step.id)
-        #self.switch_to_page(step.name)
-        self.switch_to_page('welcome')
+        self.switch_to_page(step.name)
+        #self.switch_to_page('welcome')
         
     def load_env(self, stepid):
         if stepid > 0:
@@ -266,15 +267,19 @@ class MIMainWindow(gtk.Window):
                 #gobject.timeout_add(10, self.page_restore)
 
     def cb_push_leftpanel(self, widget):
+        logger.d('cb_push_leftpanel')
         self.leftpanel.push(widget)
         
     def cb_pop_leftpanel(self):
+        logger.d('cb_pop_leftpanel')
         return self.leftpanel.pop()
         
     def cb_push_rightpanel(self, widget):
+        logger.d('cb_push_rightpanel rightpanel.stash_stack.len %s' % len(self.rightpanel.stash_stack))
         self.rightpanel.push(widget)
         
     def cb_pop_rightpanel(self):
+        logger.d('cb_pop_rightpanel')
         return self.rightpanel.pop()
 #-------------------------- TODO ---------------------------------------
 

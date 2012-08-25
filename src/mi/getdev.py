@@ -153,51 +153,44 @@ def get_hd_ata_usb(devices):
     disk_size_map = {}
     for devname in devices.keys():
         device = devices[devname]
-        if 1:
-            if 'ID_TYPE' in device.keys() and device['ID_TYPE'] == 'disk':
-                if device['DEVTYPE'] == 'partition':
-                    part_info_mm[devname] = device
-                elif device['DEVTYPE'] == 'disk':
-                    disk_info_mm[devname] = device
+        if 'ID_TYPE' in device.keys() and device['ID_TYPE'] == 'disk':
+            if device['DEVTYPE'] == 'partition':
+                part_info_mm[devname] = device
+            elif device['DEVTYPE'] == 'disk':
+                disk_info_mm[devname] = device
 
     usb_hd_map = {}
     ata_hd_map = {}
     oth_hd_map = {}
-    for key in disk_info_mm.keys():
-        for k in disk_info_mm[key].keys():
+    for key, value in disk_info_mm.items():
+        for k, v in value.items():
             if k == 'ID_BUS':
-                if disk_info_mm[key][k] == 'usb':
+                if v == 'usb':
                     usb_hd_map[key] = []
-                elif disk_info_mm[key][k] == 'ata':
+                elif v == 'ata':
                     ata_hd_map[key] = []
                 else:
                     oth_hd_map[key] = []
 
-    for key in part_info_mm.keys():
-        devpath = part_info_mm[key]['DEVPATH']
+    for key, value in part_info_mm.items():
+        devpath = value['DEVPATH']
         disk_name = 'None'
         try:
             disk_name = devpath[:devpath.rfind('/')]
         except:
             pass
-        if disk_name:
-            if usb_hd_map.has_key(disk_name):
-                usb_hd_map[disk_name].append(key)
-            elif ata_hd_map.has_key(disk_name):
-                ata_hd_map[disk_name].append(key)
-            elif oth_hd_map.has_key(disk_name):
-                oth_hd_map[disk_name].append(key)
+        else:
+            if disk_name:
+                if usb_hd_map.has_key(disk_name):
+                    usb_hd_map[disk_name].append(key)
+                elif ata_hd_map.has_key(disk_name):
+                    ata_hd_map[disk_name].append(key)
+                elif oth_hd_map.has_key(disk_name):
+                    oth_hd_map[disk_name].append(key)
     return ata_hd_map, usb_hd_map, oth_hd_map
 
 def p_c(clist):
-    pass
-if 0:
-    print '['
-    for s in range(len(clist)):
-        if s:
-            print ','
-        print clist[s]
-    print ']'
+    print clist
 if 1:
     def get_usb_part( usb_map, all_part_info, disk_size_map):
         usb_part_info = {}

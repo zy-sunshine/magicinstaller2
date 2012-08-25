@@ -26,9 +26,9 @@ class Base:
                              #gtk.RESPONSE_OK))
         #label = gtk.Label("title test")
         #label.show()
-        #dialog.vbox.pack_start(label)
-        #dialog.action_area.pack_start(label)
-        #res = dialog.run()
+        #dialogger.vbox.pack_start(label)
+        #dialogger.action_area.pack_start(label)
+        #res = dialogger.run()
         #if res == gtk.RESPONSE_OK:
             #print "get the ok button"
         #elif res == gtk.RESPONSE_CANCEL:

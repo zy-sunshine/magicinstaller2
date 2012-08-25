@@ -1,7 +1,7 @@
 #!/usr/bin/python
 import os, glob, sys, syslog
 import rpm, tarfile, time
-import isys, tftpc, getdev
+from mi import isys, getdev #@UnresolvedImport
 from mi.utils.common import mount_dev, umount_dev, run_bash, cdrom_available
 from mi.utils.miconfig import MiConfig
 CONF = MiConfig.get_instance()
@@ -59,18 +59,18 @@ class MiDevice(object):
         
     def do_mount(self):
         if self.has_mounted: return True
-        if not self.blk_path: Log.e('MiDevice.do_mount block path is "%s" ' % self.blk_path); return False
+        if not self.blk_path: logger.e('MiDevice.do_mount block path is "%s" ' % self.blk_path); return False
         # Priority to treat iso virtual device
         if self.fstype == 'iso9660':
             if not cdrom_available(self.blk_path):
-                Log.w('MiDevice.do_mount %s type device "%s" cannot be used\n' % (self.fstype, self.blk_path))
+                logger.w('MiDevice.do_mount %s type device "%s" cannot be used\n' % (self.fstype, self.blk_path))
                 return False
             else:
                 isopath = self.blk_path
                 mountdir = self.mntdir_fixed and self.mntdir or self.loopmntdir
                 ret, errmsg = mount_dev('iso9660', isopath, mountdir, flags='loop')
                 if not ret:
-                    Log.e("LoMount %s on %s as %s failed: %s" %  (isopath, mountdir, 'iso9660', str(errmsg)))
+                    logger.e("LoMount %s on %s as %s failed: %s" %  (isopath, mountdir, 'iso9660', str(errmsg)))
                     return False
                 else:
                     if not self.mntdir_fixed: self.mntdir = self.loopmntdir
@@ -83,7 +83,7 @@ class MiDevice(object):
         else:
             ret, mntdir = mount_dev(self.fstype, self.blk_path, self.mntdir)
         if not ret:
-            Log.e("MiDevice.do_mount Mount %s on %s as %s failed: %s" % \
+            logger.e("MiDevice.do_mount Mount %s on %s as %s failed: %s" % \
                           (self.blk_path, mntdir, self.fstype, str(mntdir)))
             return False
         else:
@@ -102,7 +102,7 @@ class MiDevice(object):
         if not self.has_mounted: return True
         ret, errmsg = umount_dev(self.mntdir)
         if not ret:
-            Log.e("MiDevice.do_umount UMount(%s) failed: %s" % (self.mntdir, str(errmsg))); return False
+            logger.e("MiDevice.do_umount UMount(%s) failed: %s" % (self.mntdir, str(errmsg))); return False
         else:
             self.has_mounted = False
             if not self.mntdir_fixed: self.mntdir = ''
@@ -131,25 +131,25 @@ class MiDevice(object):
 @register.server_handler('long')
 def pkgarr_probe(mia, operid, hdpartlist):
     dolog("pkgarr_probe starting...")
-    def probe_position(localfn, pos_id, cli, device, new_device, fstype, reldir, isofn):
-        dolog('probe_position: %s, %s, %s, %s, %s, %s, %s, %s' % (localfn, pos_id, cli, device, new_device, fstype, reldir, isofn))
+    def probe_position(localfn, pos_id, device, new_device, fstype, reldir, isofn):
+        dolog('probe_position: %s, %s, %s, %s, %s, %s, %s' % (localfn, pos_id, device, new_device, fstype, reldir, isofn))
         if not os.path.exists(localfn):
             return None
         try:
             execfile(localfn)
         except Exception, errmsg:
-            syslog.syslog(syslog.LOG_ERR,
-                          "Load %s failed(%s)." % (localfn, str(errmsg)))
+            logger.e("Load %s failed(%s)." % (localfn, str(errmsg)))
             return None
         remotefn = 'allpa/%s.%d.%s' % (os.path.basename(new_device), pos_id, os.path.basename(localfn))
         dolog('tftpc update %s to remote %s...' % (localfn, remotefn))
-        cli.put(localfn, remotefn)
+#        cli.put(localfn, remotefn)
+        os.system('tftp 127.0.0.1 69 -p -l %s -r %s' % (localfn, remotefn))
         return [remotefn, new_device, fstype, reldir, isofn]
         # The format like ('allpa/hdc.1.pkgarr.py', '/dev/hdc', 'iso9660', 'MagicLinux/base', '')
         # ['allpa/sda6.100.pkgarr.py', '/dev/sda6', 'ext3', 'MagicLinux/base', 'MagicLinux-3.0-1.iso']
     mia.set_step(operid, 0, -1)
-    cli = tftpc.TFtpClient()
-    cli.connect('127.0.0.1')
+    #cli = tftpc.TFtpClient()
+    #cli.connect('127.0.0.1')
     result = []
     all_drives = hdpartlist
     cdlist = getdev.probe(getdev.CLASS_CDROM)
@@ -170,19 +170,19 @@ def pkgarr_probe(mia, operid, hdpartlist):
                 midev_iso = MiDevice(f, 'iso9660')
                 for pkgarr, relative_dir in midev_iso.iter_searchfiles([CONF_PKGARR_FILE], CONF_PKGARR_SER_CDPATH):
                     pos_id += 1
-                    r = probe_position(pkgarr, 100 + pos_id, cli,
+                    r = probe_position(pkgarr, 100 + pos_id,
                         device, new_device, CONF_FSTYPE_MAP[fstype][0], relative_dir, CONF_BOOTCDFN)
                     if r:
                         r[-1] = os.path.join(reldir, r[-1]) #### revise iso relative path
                         result.append(r)
             else:
                 pos_id += 1
-                r = probe_position(pkgarr, pos_id, cli,
+                r = probe_position(pkgarr, pos_id,
                     device, new_device, fstype, reldir, '')
                 if r: result.append(r)
     
-    del(cli)
-    Log.w("_____________%s" % result)
+#    del(cli)
+    logger.w("_____________%s" % result)
     return result
 
 @register.server_handler('long')
@@ -200,7 +200,7 @@ def probe_all_disc(mia, operid, device, devfstype, bootiso_relpath, pkgarr_reldi
     bootiso_fn = CONF_ISOFN_FMT % (CONF_DISTNAME, CONF_DISTVER, 1)
     # If probe in iso ,but bootiso_fn is not match error occur
     if bootiso_relpath and not os.path.basename(bootiso_relpath) == bootiso_fn:
-        Log.e('probe_all_disc iso format is wrong: bootiso_relpath: %s bootiso_fn: %s', (bootiso_relpath, bootiso_relpath))
+        logger.e('probe_all_disc iso format is wrong: bootiso_relpath: %s bootiso_fn: %s', (bootiso_relpath, bootiso_relpath))
         return None
         
     probe_ret = None
@@ -247,7 +247,7 @@ class MiDevice_TgtSys(object):
         mnt_point = CONF_TGTSYS_ROOT
         dev_tgt_root = MiDevice(tgt_root_dev, tgt_root_type, mnt_point)
         if not dev_tgt_root.do_mount(): #### NOTE: carefully handle this device's mount.
-            Log.e('Mount device %s Failed, install operate can not continue' % dev_tgt_root.get_dev())
+            logger.e('Mount device %s Failed, install operate can not continue' % dev_tgt_root.get_dev())
             return False
         else:
             self.mounted_devs.append(dev_tgt_root)
@@ -257,7 +257,7 @@ class MiDevice_TgtSys(object):
             mnt_point = os.path.join(CONF_TGTSYS_ROOT, 'boot')
             dev_tgt_boot = MiDevice(tgt_boot_dev, tgt_boot_type, mnt_point)
             if not dev_tgt_boot.do_mount(): #### NOTE: carefully handle this device's mount.
-                Log.e('Mount device %s Failed, install operate can not continue' % dev_tgt_boot.get_dev())
+                logger.e('Mount device %s Failed, install operate can not continue' % dev_tgt_boot.get_dev())
                 self.umount_tgt_device()
                 return False
             else:
@@ -268,7 +268,7 @@ class MiDevice_TgtSys(object):
         self.mounted_devs.reverse()
         for dev in self.mounted_devs:
             if not dev.do_umount():
-                Log.w('Umount device %s Failed, but we continue')
+                logger.w('Umount device %s Failed, but we continue')
             
 @register.server_handler('long')
 def instpkg_prep(mia, operid, pkgsrc_devinfo, instmode, tgtsys_devinfo):
@@ -296,7 +296,7 @@ def instpkg_prep(mia, operid, pkgsrc_devinfo, instmode, tgtsys_devinfo):
     dev_tgt = MiDevice_TgtSys(tgtsys_devinfo)
     if not dev_tgt.mount_tgt_device(): #### NOTE: carefully handle this device's mount.
         msg = 'Mount target system devices Failed, install operate can not continue!!!'
-        Log.e(msg)
+        logger.e(msg)
         dev_tgt = None
         return msg
     ############################## Mount Finished #####################################
@@ -323,7 +323,7 @@ def instpkg_disc_prep(mia, operid, dev, reldir, fstype, bootiso_relpath):
     dev_hd = MiDevice(dev, fstype)
     if not dev_hd.do_mount(): #### NOTE: carefully handle this device's mount.
         msg = 'Mount device %s Failed, install operate can not continue' % dev_hd.get_dev()
-        Log.e(msg)
+        logger.e(msg)
         return msg
         
     if bootiso_relpath:
@@ -332,7 +332,7 @@ def instpkg_disc_prep(mia, operid, dev, reldir, fstype, bootiso_relpath):
         if not dev_iso.do_mount(): #### NOTE: carefully handle this device's mount.
             dev_hd.do_umount(); dev_hd = None
             msg = 'Mount device %s Failed, install operate can not continue!!!' % dev_iso.get_dev()
-            Log.e(msg)
+            logger.e(msg)
             dev_iso = None
             return msg
             
@@ -374,27 +374,27 @@ def instpkg_disc_post(mia, operid, dev, fstype, reldir, bootiso_relpath, first_p
     ################################ Umount Start #####################################
     if dev != dev_hd.get_dev():
         msg = 'Error: previous use device %s, this time umount device %s, both should be equal, the install operate can not continue!!!' % (dev_hd.get_dev(), dev)
-        Log.e(msg)
+        logger.e(msg)
         return msg
     if dev_iso:
         if not dev_iso.do_umount():
             msg = 'Umount previous iso %s Failed, install operate can not continue!!!' % dev_iso.get_dev()
-            Log.e(msg)
+            logger.e(msg)
             return msg
         dev_iso = None
     if dev_hd:
         if not dev_hd.do_umount():
             msg = 'Umount previous iso %s Failed, install operate can not continue!!!' % dev_hd.get_dev()
-            Log.e(msg)
+            logger.e(msg)
             return msg
         if dev_hd.get_fstype() == 'iso9660':
             # Eject the cdrom after used.
             try:
                 cdfd = os.open(dev, os.O_RDONLY | os.O_NONBLOCK)
-                isys.ejectcdrom(cdfd)
+                isys.ejectcdrom(cdfd) # TODO: ejectcdrom use other method
                 os.close(cdfd)
             except Exception, errmsg:
-                syslog.syslog(syslog.LOG_ERR, 'Eject(%s) failed: %s' % \
+                logger.e('Eject(%s) failed: %s' % \
                             (dev, str(errmsg)))
                 return str(errmsg)
         dev_hd = None
@@ -427,15 +427,15 @@ def instpkg_post(mia, operid, dev, reldir, fstype):
                 pkgnvr = "%s-%s-%s" % (h['name'],h['version'],h['release'])
                 script_dir = os.path.join(CONF_TGTSYS_ROOT, tmp_noscripts_dir)
                 scripts = []
-                if h[rpm.RPMTAG_PREIN]:
+                if h[rpm.RPMTAG_PREIN]: #@UndefinedVariable
                     script_name = "%s.preinstall.sh" % pkgnvr
                     script_path = os.path.join(script_dir, script_name)
-                    write_script(h[rpm.RPMTAG_PREIN], script_path)
+                    write_script(h[rpm.RPMTAG_PREIN], script_path) #@UndefinedVariable
                     scripts.append(script_name)
-                if h[rpm.RPMTAG_POSTIN]:
+                if h[rpm.RPMTAG_POSTIN]: #@UndefinedVariable
                     script_name = "%s.postinstall.sh" % pkgnvr
                     script_path = os.path.join(script_dir, script_name)
-                    write_script(h[rpm.RPMTAG_POSTIN], script_path)
+                    write_script(h[rpm.RPMTAG_POSTIN], script_path) #@UndefinedVariable
                     scripts.append(script_name)
                 for script_name in scripts:
                     spath = os.path.join('/', tmp_noscripts_dir, script_name)
@@ -498,19 +498,19 @@ def instpkg_post(mia, operid, dev, reldir, fstype):
     if fstype == 'iso9660':
         return  0  # It is ok for CDROM installation.
     mia.set_step(operid, 0, -1) # Sync is the long operation.
-    if mntxxxpoint != 0: #### TODO;
-        mntdir = os.path.join(CONF_TGTSYS_ROOT, mntxxxpoint)     ####TODO
-    else:
-        mntdir = os.path.join(CONF_MNT_ROOT, os.path.basename(dev))
-        ret, errmsg = umount_dev(mntdir)
-        if not ret:
-            syslog.syslog(syslog.LOG_ERR, 'UMount(%s) failed: %s' % \
-                          (mntdir, str(errmsg)))
-            return str(errmsg)
+#    if mntxxxpoint != 0: #### TODO; !!!!!UNKNOWN!!!!!!
+#        mntdir = os.path.join(CONF_TGTSYS_ROOT, mntxxxpoint)     ####TODO
+#    else:
+#        mntdir = os.path.join(CONF_MNT_ROOT, os.path.basename(dev))
+#        ret, errmsg = umount_dev(mntdir)
+#        if not ret:
+#            logger.e('UMount(%s) failed: %s' % \
+#                          (mntdir, str(errmsg)))
+#            return str(errmsg)
     try:
         isys.sync()
-    except Expection, errmsg:
-        syslog.syslog(syslog.LOG_ERR, 'sync failed: %s' % str(errmsg))
+    except Exception, errmsg:
+        logger.e('sync failed: %s' % str(errmsg))
         return str(errmsg)
     return  0
     
@@ -520,12 +520,12 @@ def instpkg_post(mia, operid, dev, reldir, fstype):
 def rpm_installcb(what, bytes, total, h, data):
     global  cur_rpm_fd
     (mia, operid) = data
-    if what == rpm.RPMCALLBACK_INST_OPEN_FILE:
+    if what == rpm.RPMCALLBACK_INST_OPEN_FILE: #@UndefinedVariable
         cur_rpm_fd = os.open(h, os.O_RDONLY)
         return  cur_rpm_fd
-    elif what == rpm.RPMCALLBACK_INST_CLOSE_FILE:
+    elif what == rpm.RPMCALLBACK_INST_CLOSE_FILE: #@UndefinedVariable
         os.close(cur_rpm_fd)
-    elif what == rpm.RPMCALLBACK_INST_PROGRESS:
+    elif what == rpm.RPMCALLBACK_INST_PROGRESS: #@UndefinedVariable
         mia.set_step(operid, bytes, total)
         
 class CBFileObj(file):
@@ -550,11 +550,11 @@ def package_install(mia, operid, pkgname, firstpkg, noscripts):
         if ts is None:
             dolog('Create TransactionSet\n')
             ts = rpm.TransactionSet(CONF_TGTSYS_ROOT)
-            ts.setProbFilter(rpm.RPMPROB_FILTER_OLDPACKAGE |
-                             rpm.RPMPROB_FILTER_REPLACENEWFILES |
-                             rpm.RPMPROB_FILTER_REPLACEOLDFILES |
-                             rpm.RPMPROB_FILTER_REPLACEPKG)
-            ts.setVSFlags(~(rpm.RPMVSF_NORSA | rpm.RPMVSF_NODSA))
+            ts.setProbFilter(rpm.RPMPROB_FILTER_OLDPACKAGE | #@UndefinedVariable
+                             rpm.RPMPROB_FILTER_REPLACENEWFILES | #@UndefinedVariable
+                             rpm.RPMPROB_FILTER_REPLACEOLDFILES | #@UndefinedVariable
+                             rpm.RPMPROB_FILTER_REPLACEPKG) #@UndefinedVariable
+            ts.setVSFlags(~(rpm.RPMVSF_NORSA | rpm.RPMVSF_NODSA)) #@UndefinedVariable
             
             # have been removed from last rpm version
             #ts.setFlags(rpm.RPMTRANS_FLAG_ANACONDA)
@@ -583,8 +583,8 @@ def package_install(mia, operid, pkgname, firstpkg, noscripts):
         mia.set_step(operid, 1, 1)
             
         try:
-            cmd = '/bin/rpm'
-            argv = ['-i', '--noorder','--nosuggest',
+            cmd = 'rpm'
+            argv = ['-i', '--noorder', # '--nosuggest', # on ubuntu platform rpm do not have --nosuggest parameter
                     '--force','--nodeps',
                     '--ignorearch',
                     '--root', CONF_TGTSYS_ROOT,
@@ -618,9 +618,8 @@ def package_install(mia, operid, pkgname, firstpkg, noscripts):
             cmd = 'cd %s && /usr/bin/rpm2cpio %s | /bin/cpio -dui --quiet' % (CONF_TGTSYS_ROOT, pkgpath)
             problems = os.system(cmd)
             if problems:
-                errormsg = ''.join(cmd_res['err'])
-                message = 'PROBLEMS on %s: \n return code is %s error message is\n[%s]' \
-                          % (pkgname, str(problems), errormsg)
+                message = 'PROBLEMS on %s: \n return code is %s command is\n[%s]' \
+                          % (pkgname, str(problems), cmd)
                 dolog(message)
                 return  message
         except Exception, errmsg:
@@ -692,7 +691,7 @@ class Test(MiaTest):
         pkgarr_probe(self.mia, self.operid, hdpartlist)
     
     def test_probe_all_disc(self):
-        probe_all_disc(self.mia, self.operid, '/dev/sda6', 'ext3', 'MagicLinux-3.0-1.iso', 'MagicLinux/base', ['nss-softokn-freebl-3.13.3-1mgc30.i686.rpm'])
+        probe_all_disc(self.mia, self.operid, '/dev/sda10', 'ext4', 'MagicLinux-3.0-1.iso', 'MagicLinux/base', ['nss-softokn-freebl-3.13.3-1mgc30.i686.rpm'])
         ### RESULT: probe_all_disc return result is : [('MagicLinux-3.0-1.iso', 'MagicLinux/base/nss-softokn-freebl-3.13.3-1mgc30.i686.rpm')]
         
 if __name__ == '__main__':

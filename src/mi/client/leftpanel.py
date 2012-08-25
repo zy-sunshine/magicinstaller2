@@ -40,7 +40,7 @@ class MILeftPanel(gtk.Frame):
         self.add(self.stash_stack[-1])
         
     def addstep(self, name):
-        logger.debug('addstep %s' % name)
+        logger.d('addstep %s' % name)
         step = self.sself.steps.get_step_by_name(name)
 
         btn = StepButton('images/applet-blank.png', step.title)
@@ -57,7 +57,7 @@ class MILeftPanel(gtk.Frame):
         self.sself.switch_to_page(name)
         
     def switch(self, from_id, to_id):
-        logger.debug('leftpanel.switch: %s, %s', (from_id, to_id))
+        logger.d('leftpanel.switch: %s, %s' % (from_id, to_id))
         if from_id > 0: self.btn_lst[from_id].change_image('images/applet-okay.png')
         self.btn_lst[to_id].change_image('images/applet-busy.png')
         

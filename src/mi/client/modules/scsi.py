@@ -1,7 +1,8 @@
 #!/usr/bin/python
-from mi.client.utils import _
+from mi.client.utils import _, magicpopup
 from mi.client.utils import magicstep
 from mi.utils.miconfig import MiConfig
+import os
 CONF = MiConfig.get_instance()
 
 class MIStep_scsi (magicstep.magicstep):

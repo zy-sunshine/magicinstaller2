@@ -4,7 +4,7 @@ from mi.client.utils import _
 from mi.client.utils import magicstep, magicpopup, xmlgtk
 from mi.utils.miconfig import MiConfig
 from mi.utils.common import get_devinfo
-from games.xglines import xglines
+from mi.games.xglines import xglines
 from xml.dom.minidom import parse, parseString
 CONF = MiConfig.get_instance()
 CONF_DEBUG_MODE = CONF.LOAD.CONF_DEBUG_MODE
@@ -71,7 +71,7 @@ class DiscDialog(magicpopup.magicpopup):
         self.topwin.destroy()
 
 class RpmErrDialog(magicpopup.magicpopup):
-    """Rpm install error dialog."""
+    """Rpm install error dialogger."""
     def __init__(self, upobj, uixml, msg, uirootname, data):
         if upobj:
             self.upobj = upobj
@@ -139,9 +139,11 @@ class MIStep_takeactions(magicstep.magicstepgroup):
                          0, 0)
                          
         self.left_panel = self.tadlg.name_map['leftpanel']
+        # remove leftpanel from its parent
         parent = self.left_panel.parent
         parent.remove(self.left_panel)
         self.right_panel = self.tadlg.name_map['rightpanel']
+        # remove leftpanel from its parent
         parent = self.right_panel.parent
         parent.remove(self.right_panel)
         
@@ -177,6 +179,7 @@ class MIStep_takeactions(magicstep.magicstepgroup):
         return 1
         
     def check_leave_doactions(self):
+        logger.d('check_leave_doactions')
         self.rootobj.cb_pop_leftpanel()
         self.rootobj.cb_pop_rightpanel()
         return 1
@@ -200,8 +203,7 @@ class MIStep_takeactions(magicstep.magicstepgroup):
         self.tadlg.name_map['otname'].set_text('')
         self.tadlg.name_map['otprog'].set_fraction(1)
         self.tadlg.name_map['frame_other'].set_sensitive(False)
-        self.tadlg.topwin.destroy()
-
+        # self.tadlg.topwin.destroy()
 
     def act_start_parted(self):
         self.tadlg.name_map['pfprog'].set_fraction(0)
@@ -584,7 +586,7 @@ class MIStep_takeactions(magicstep.magicstepgroup):
 
     def bl_umount(self, tdata, data):
         res = tdata
-        if type(res) == types.IntType:
+        if type(res) == int:
             self.add_action(None, self.nextop, None, 'sleep', 0)
             return
         self.add_action(_('Umount all target partitions before bootloader setup.'),
@@ -638,11 +640,11 @@ class MIStep_takeactions(magicstep.magicstepgroup):
         (pafile, dev, fstype, reldir, bootiso_relpath) = CONF.RUN.g_choosed_patuple
         msg = _('Umount the target filesystem(s).')
         self.add_action(msg, None, None,
-                        'instpkg_post', dev, mntpoint, reldir, fstype)                         #### TODO: mntpoint
+                        'instpkg_post', dev, reldir, fstype)                         #### TODO: mntpoint
         #### TODO Add an clean server operator
         #self.add_action(msg, self.reboot_0, None,
                         #'umount_all_tgtpart', CONF.RUN.g_mount_all_list, 'y')
-        reboot_0(None, None)
+        self.reboot_0(None, None)
 
     def reboot_0(self, tdata, data):
         self.rebootdlg = \
@@ -659,7 +661,6 @@ class MIStep_takeactions(magicstep.magicstepgroup):
 def TestTaDialog():
     import gtk
     from mi.utils.common import search_file
-    import gtk
     uixml_file = 'takeactions.xml'
     uixml_path = search_file( uixml_file,
                               [CONF.LOAD.CONF_HOTFIXDIR, '.'],
@@ -675,7 +676,7 @@ def TestTaDialog():
         
 def TestMIStep_takeactions():
     import gtk
-    from mitest import TestMIStep
+    from mi.test import TestMIStep
     win = TestMIStep(gtk.WINDOW_TOPLEVEL)
     h = MIStep_takeactions(win)
     win.add_mistep(h)

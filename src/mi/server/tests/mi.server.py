@@ -30,7 +30,7 @@ if mia.pid > 0:
     def dolog(msg):
         log_short.i(msg)
     dolog('test short log')
-    #print log.get_logpath(ServerLogger_Short)
+    #print logger.get_logpath(ServerLogger_Short)
     import short_operations
 
     server_quit = 0
@@ -80,16 +80,15 @@ if mia.pid > 0:
             break
     # Block until the action process terminate.
     mia.wait_action_exit()
-    log.del_instances()
 
 elif mia.pid == 0:
     # Action process. For long operation only.
     from mi.utils.milogger import MiLogger
     from mi.utils.milogger import ServerLogger_Long
     log = ServerLogger_Long.get_instance(ServerLogger_Long, __name__)
-    #print log.get_logpath(ServerLogger_Long)
+    #print logger.get_logpath(ServerLogger_Long)
     def dolog(msg):
-        log.w(msg)
+        logger.w(msg)
     dolog('test long log')
     import long_operations
 
@@ -110,4 +109,3 @@ elif mia.pid == 0:
                 if CONF_EXPERT_MODE:
                     dolog('ERROR: NOT SUPPORTED method %s().\n' % method, color_c.blue)
                 mia.put_result(xmlrpclib.dumps((id, 'NOT_SUPPORT'), methodname=method, allow_none = 1))
-    log.del_instances()

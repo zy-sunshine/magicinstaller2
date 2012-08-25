@@ -31,7 +31,7 @@ class MiConfig_SubCategory(object):
         return confobj[section].items()
         
 class MiConfig(object):
-    def __init__():
+    def __init__(): #@NoSelf
         "disable the __init__ method, and this config class current not thread safely"
     
     __inst = None # make it so-called private

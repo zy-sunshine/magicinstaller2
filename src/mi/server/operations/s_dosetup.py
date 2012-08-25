@@ -52,3 +52,14 @@ def run_post_install(mia, operid, dummy):
         if os.path.exists(os.path.join(CONF_TGTSYS_ROOT, script[1:])):
             os.remove(os.path.join(CONF_TGTSYS_ROOT, script[1:]))
     return 0
+
+@register.server_handler('long')
+def clean_server_env(mia, operid, dummy):
+    logger.i('clean_server_env')
+    return 0
+
+@register.server_handler('long')
+def finish(mia, operid, dummy):
+    logger.i('finish install')
+    return 0
+

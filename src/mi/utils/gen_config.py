@@ -9,13 +9,13 @@ def fill_config(config):
     CONF.CONF_HELP_WIDTH = 480.0
     CONF.CONF_HELP_HEIGHT = 540.0
 
-    CONF.CONF_INITRD_FN = 'initrd-3.3.0-0.rc3.git6.2mgc30.i686.PAE.img'
+    CONF.CONF_INITRD_FN = 'initrd-3.4.4-1mgc30.i686.PAE.img'
 
     CONF.CONF_FULL_WIDTH = 800
     CONF.CONF_FULL_HEIGHT = 600
 
-    CONF.CONF_KERNEL_FN = 'vmlinuz-3.3.0-0.rc3.git6.2mgc30.i686.PAE'
-    CONF.CONF_DISTKERNELVER = '3.3.0-0.rc3.git6.2mgc30.i686.PAE'
+    CONF.CONF_KERNEL_FN = 'vmlinuz-3.4.4-1mgc30.i686.PAE'
+    CONF.CONF_DISTKERNELVER = '3.4.4-1mgc30.i686.PAE'
     CONF.CONF_KERNELVER = '2.6.35.4'
     CONF.CONF_DISTVER = '3.0'
 
@@ -23,7 +23,7 @@ def fill_config(config):
     CONF.CONF_RESCUE_MODE = 0
     CONF.CONF_LIBDIR = '/usr/lib/python2.6/site-packages'
     #CONF.CONF_DATADIR = '/usr/share/MagicInstaller'
-    CONF.CONF_DATADIR = '/home/sunshine/workspace/magicinstaller2/src/magic.installer'
+    CONF.CONF_DATADIR = '/home/zhangyang09/work/magicinstaller2/src/mi'
     CONF.CONF_USEUDEV = True
     CONF.CONF_TEXT_MODE = 0
     CONF.CONF_FSTYPE_MAP = {'iso9660': ('iso9660', '', -1, -1, ''), 'fat32': ('vfat', 'internal', 1, -1, 'b'), 'linux-swap': ('', 'internal', -1, -1, ''), 'ntfs': ('ntfs-3g', '/sbin/mkfs.ntfs -Q', 1, -1, ''), 'reiserfs': ('reiserfs', '/sbin/mkreiserfs -f -f', 33, -1, 'b'), 'xfs': ('xfs', '/sbin/mkfs.xfs -q -f', 5, -1, 'b'), 'ext4': ('ext4', '/sbin/mkfs.ext4', 1, -1, 'b'), 'ext3': ('ext3', '/sbin/mkfs.ext3 -I 128', 1, -1, 'b'), 'ext2': ('ext2', 'internal', 1, -1, 'b'), 'fat16': ('vfat', 'internal', 1, 2048, 'b'), 'jfs': ('jfs', '/sbin/mkfs.jfs -q', 16, -1, 'b')}

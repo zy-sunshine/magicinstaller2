@@ -6,7 +6,7 @@ import time
 from xml.dom.minidom import parseString
 
 from mi.client.utils import logger
-dolog = logger.info
+dolog = logger.i
 
 # The task manager: It only manage the long operation.
 class MiTaskman :
@@ -131,7 +131,7 @@ class MiTaskman :
             result = res_tuple[0][1]
             method = res_tuple[1]  # Not used yet.
             if id != self.run_id:
-                dolog('WARNING: id != self.run_id in magic.installer.py:get_results().\n')
+                dolog('WARNING: id(%s) != self.run_id(%s) in magic.installer.py:get_results().\n' % (id, self.run_id))
                 # Weird encountered.
                 continue
             if self.run_show and len(self.apstack) == 1:

@@ -1,10 +1,4 @@
-import logging, logging.config
-
-logging.config.fileConfig("logging.conf")
-
-#create logger
-logger = logging.getLogger("mi_server")
-
+from mi.utils import logger
 
 from gettext import gettext as _
 

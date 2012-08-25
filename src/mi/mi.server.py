@@ -24,13 +24,12 @@ if mia.pid > 0:
     # Control process.
     # Run short operation and transfer long operation to action process.
     #from mi.utils.milogger import ServerLogger_Short, ServerLogger_Long
-    import logging, logging.config
-    logging.config.fileConfig("logging.conf")
-    log_short = logging.getLogger("mi_short")
-    log_long = logging.getLogger("mi_long")
+    from mi.utils import MiLogger
+    log_short = MiLogger("mi_short")
+    log_long = MiLogger("mi_long")
     from mi.server import handlers_short
     def dolog(msg):
-        log_short.info(msg)
+        log_short.w(msg)
     dolog('test short logger')
     server_quit = 0
 
@@ -56,12 +55,12 @@ if mia.pid > 0:
             else: # This is a long operation.
                 # Return the operation identifier to the caller.
                 if CONF_EXPERT_MODE:
-                    log_long.debug('Put long.%s() with %s' % (method, params))
+                    log_long.w('Put long.%s() with %s' % (method, params))
                     t = xmlrpclib.dumps(params, methodname=method, allow_none = 1)
                     #log_long.debug('%s' % t)
                 id = mia.put_operation(t)
                 if CONF_EXPERT_MODE:
-                    log_long.debug(', and get id %d.\n' % (id))
+                    log_long.w(', and get id %d.\n' % (id))
                 return id
 
     class ReuseXMLRPCServer(SimpleXMLRPCServer.SimpleXMLRPCServer):
@@ -83,12 +82,11 @@ if mia.pid > 0:
 
 elif mia.pid == 0:
     # Action process. For long operation only.
-    import logging, logging.config
-    logging.config.fileConfig("logging.conf")
-    log_long = logging.getLogger('mi_long')
+    from mi.utils import MiLogger
+    log_long = MiLogger('mi_long')
     from mi.server import handlers_long
     def dolog(msg):
-        log_long.warn(msg)
+        log_long.w(msg)
     dolog('test long logger')
     while 1:
         (id, opera) = mia.get_operation()

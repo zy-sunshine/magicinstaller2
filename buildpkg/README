@@ -1,24 +1,24 @@
 
-# kernel ×¼±¸.
-kernel_build    ±àÒë kernel ²¢½«±àÒëºÃµÄ kernel ¿½±´µ½ #bindir/mi-vmlinuz-$kernelver ;
-                ½«±àÒëºÃµÄÄÚºËÄ£¿é´ò°üÖÁ #bindir/kmodules-$kernelver.tar.bz2 .
-kernel_copy     ´Ó #bindir/root/ ÖĞÌáÈ¡ÄÚºËÏà¹Ø¶ş½øÖÆ°ü, ¿½±´ÆäÖĞµÄÄÚºËÖÁ #bindir/mi-vmlinuz-$kernelver ;
-                ½«°üÖĞµÄÄÚºËÄ£¿é´ò°üÖÁ #bindir/kmodules-$kernelver.tar.bz2 .
-* kernel_build kernel_copy ¶şÕßÊ¹ÓÃÆäÒ»¼´¿É.
+# kernel å‡†å¤‡.
+kernel_build    ç¼–è¯‘ kernel å¹¶å°†ç¼–è¯‘å¥½çš„ kernel æ‹·è´åˆ° #bindir/mi-vmlinuz-$kernelver ;
+                å°†ç¼–è¯‘å¥½çš„å†…æ ¸æ¨¡å—æ‰“åŒ…è‡³ #bindir/kmodules-$kernelver.tar.bz2 .
+kernel_copy     ä» #bindir/root/ ä¸­æå–å†…æ ¸ç›¸å…³äºŒè¿›åˆ¶åŒ…, æ‹·è´å…¶ä¸­çš„å†…æ ¸è‡³ #bindir/mi-vmlinuz-$kernelver ;
+                å°†åŒ…ä¸­çš„å†…æ ¸æ¨¡å—æ‰“åŒ…è‡³ #bindir/kmodules-$kernelver.tar.bz2 .
+* kernel_build kernel_copy äºŒè€…ä½¿ç”¨å…¶ä¸€å³å¯.
 
-# root.step1 ×¼±¸.
-busybox         ±àÒë rootfs ÖĞĞèÒªµÄ busybox ´ò°üÖÁ #bindir/root/busybox-$busybox_version.tar.bz2 .
-parted          ±àÒëÌØ¶¨ parted Îª magicinstaller Ö÷³ÌĞòÌá¹©Ö§³Ö, ´ò°üÖÁ #bindir/root/parted-$ver.bin.tar.gz .
-root.step1      ´ÓÄ³Ò»·¢ĞĞ°æµÄ¶ş½øÖÆ°üÖĞÌáÈ¡ÎÄ¼ş, Óë busybox parted ¹²Í¬¹¹½¨ MI ÔËĞĞµÄ rootfs .
+# root.step1 å‡†å¤‡.
+busybox         ç¼–è¯‘ rootfs ä¸­éœ€è¦çš„ busybox æ‰“åŒ…è‡³ #bindir/root/busybox-$busybox_version.tar.bz2 .
+parted          ç¼–è¯‘ç‰¹å®š parted ä¸º magicinstaller ä¸»ç¨‹åºæä¾›æ”¯æŒ, æ‰“åŒ…è‡³ #bindir/root/parted-$ver.bin.tar.gz .
+root.step1      ä»æŸä¸€å‘è¡Œç‰ˆçš„äºŒè¿›åˆ¶åŒ…ä¸­æå–æ–‡ä»¶, ä¸ busybox parted å…±åŒæ„å»º MI è¿è¡Œçš„ rootfs .
 
-# rootfs µÄ etc Ä¿Â¼ÎÄ¼ş.
-etc             rootfs ÖĞĞèÒªµÄ etc Ä¿Â¼ÎÄ¼ş.
+# rootfs çš„ etc ç›®å½•æ–‡ä»¶.
+etc             rootfs ä¸­éœ€è¦çš„ etc ç›®å½•æ–‡ä»¶.
 
-# ½Å±¾¿ØÖÆ
-SConscript          ¿ØÖÆ rootfs µÄ¸÷¸öÄ£¿éµÄ×¼±¸¹ı³Ì.
+# è„šæœ¬æ§åˆ¶
+SConscript          æ§åˆ¶ rootfs çš„å„ä¸ªæ¨¡å—çš„å‡†å¤‡è¿‡ç¨‹.
 
-# ÖÆ×÷ rootfs µÄ post ½Å±¾
+# åˆ¶ä½œ rootfs çš„ post è„šæœ¬
 post_scripts
-    commands.sh             ÔÚËŞÖ÷ÏµÍ³ÖĞÖ´ĞĞµÄÃüÁî. $1 ²ÎÊıÎªÄ¿±êÏµÍ³Ä¿Â¼.
-    commands_chroot.sh      chroot ½øÈëÄ¿±êÏµÍ³ÖĞÖ´ĞĞµÄÃüÁî.
+    commands.sh             åœ¨å®¿ä¸»ç³»ç»Ÿä¸­æ‰§è¡Œçš„å‘½ä»¤. $1 å‚æ•°ä¸ºç›®æ ‡ç³»ç»Ÿç›®å½•.
+    commands_chroot.sh      chroot è¿›å…¥ç›®æ ‡ç³»ç»Ÿä¸­æ‰§è¡Œçš„å‘½ä»¤.
 

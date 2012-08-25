@@ -1,6 +1,8 @@
 #!/usr/bin/python
-from mi.client.utils import _
+from mi.client.utils import _, magicpopup
 from mi.client.utils import magicstep
+from mi.utils.miconfig import MiConfig
+CONF = MiConfig.get_instance()
 from mi.server.utils import logger
 dolog = logger.info
 
@@ -209,14 +211,19 @@ class MIStep_dosetup (magicstep.magicstep):
         hostname = self.get_data(self.values, 'network.hostname')
         ret = self.rootobj.tm.actserver.config_network_short(hostname)
         ret = self.rootobj.tm.actserver.config_keyboard()
+        self.dolong_run_post_install()
         
-        self.rootobj.tm.add_action(_('Run post install script'), None, None,
+    def dolong_run_post_install(self):
+        self.rootobj.tm.add_action(_('Run post install script'), self.dolong_clean_server_env, None,
                                    'run_post_install', 0)
-        #### TODO: add operation clean server
-
-    #def do_umount_all(self, tdata, data):
-        #self.rootobj.tm.add_action(_('Umount all target partition(s)'), self.done, None,
-                                   #'umount_all_tgtpart', CONF.RUN.g_mount_all_list, 'y')
+        
+    def dolong_clean_server_env(self, tdata, data):
+        self.rootobj.tm.add_action(_('Run post install script'), self.dolong_finish, None,
+                                   'clean_server_env', 0)
+        
+    def dolong_finish(self, tdata, data):
+        self.rootobj.tm.add_action(_('Run post install script'), self.done, None,
+                                   'finish', 0)
 
     def done(self, tdata, data):
         self.doing = None
