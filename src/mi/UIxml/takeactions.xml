@@ -50,16 +50,6 @@ text="((NOTE: All required information have been collected. Click 'Next' to take
         </frame>
       </vbox>
       <vbox margin="4" spacing="4" expand="true" fill="true" name="rightpanel">
-        <frame name="frame_parted" label="((Partition/Format Progress))"
-               fill="true" sensitive="false">
-          <table margin="4" columns="2" rows="2" colspacings="4" rowspacings="4">
-            <label text="((Operation:))" xalign="0" xoptions="none"/>
-        <label name="pfname" xalign="0" expand="true"/>
-        <label text="((Progress:))" xalign="0" xoptions="none"/>
-        <progressbar name="pfprog"/>
-          </table>
-        </frame>
-        <label text="" expand="true"/>
             <frame name="frame_packages" label="((Installation Progress))"
                fill="true" sensitive="false">
               <vbox margin="4" spacing="4">

@@ -83,5 +83,5 @@ TEXT_MODE = 0
 #except Exception, errmsg:
 #    print str(errmsg)
 
-from miutil import *
+from mi.util.common import *
 --/
