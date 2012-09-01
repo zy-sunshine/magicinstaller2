@@ -8,8 +8,18 @@ from mi.utils import logger
 ## Setup constants and working directory.
 logger.info('change current working directory to %s' % CONF.LOAD.CONF_DATADIR)
 os.chdir(CONF.LOAD.CONF_DATADIR)
-
-win = MIMainWindow(gtk.WINDOW_TOPLEVEL)
+step_name_list = ('welcome',
+    #'scsi',
+    'partition',
+    'bootloader',
+    'pkgselect',
+    'takeactions',
+    'startsetup',
+    'accounts',
+    'Xwindow',
+    'dosetup',
+    'finish')
+win = MIMainWindow(gtk.WINDOW_TOPLEVEL, step_name_list)
 win.init()
 #win.show_all()
 win.show()
