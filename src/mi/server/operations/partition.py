@@ -11,10 +11,7 @@ from mi.utils.common import mount_dev, umount_dev, run_bash
 # operation have to be 'long' even if it can terminate immediately.
 
 from mi.utils.miconfig import MiConfig
-CONF = MiConfig.get_instance()
-CONF_USEUDEV = CONF.LOAD.CONF_USEUDEV
-CONF_FSTYPE_MAP = CONF.LOAD.CONF_FSTYPE_MAP
-CONF_TGTSYS_ROOT = CONF.LOAD.CONF_TGTSYS_ROOT
+CF = MiConfig.get_instance()
 
 from mi.utils.miregister import MiRegister
 register = MiRegister()
@@ -89,7 +86,7 @@ def device_probe_all(mia, operid, dummy):
             # Model might contain GB2312, it must be convert to Unicode.
             model = iconv.iconv('gb2312', 'utf8', dev.model).encode('utf8')
             result.append((dev.path, dev.length, model))
-            CONF.RUN.g_all_harddisks[dev.path] = (dev, disk, newdisklabel)
+            CF.G.all_harddisks[dev.path] = (dev, disk, newdisklabel)
     dolog('operations.parted.device_probe_all: %s\n' % str(result))
     return  result
 
@@ -130,8 +127,8 @@ def get_all_partitions(mia, operid, devpath):
                 fs_type_name, label, part.geometry.start, part.geometry.end, avaflags)
 
     result = []
-    if CONF.RUN.g_all_harddisks.has_key(devpath):
-        disk = CONF.RUN.g_all_harddisks[devpath][1]
+    if CF.G.all_harddisks.has_key(devpath):
+        disk = CF.G.all_harddisks[devpath][1]
         if disk:
             part = disk.getFirstPartition()
             while part:
@@ -152,8 +149,8 @@ def get_all_partitions(mia, operid, devpath):
 
 @register.server_handler('long')
 def get_disk_type(mia, operid, devpath):
-    if CONF.RUN.g_all_harddisks.has_key(devpath):
-        disk = CONF.RUN.g_all_harddisks[devpath][1]
+    if CF.G.all_harddisks.has_key(devpath):
+        disk = CF.G.all_harddisks[devpath][1]
         if disk:
             if disk.supportsFeature(parted.DISK_TYPE_PARTITION_NAME):
                 support_partition_name = 'true'
@@ -231,8 +228,8 @@ def _grow_over_small_freespace(start_in, end_in, disk):
 @register.server_handler('long')
 def add_partition(mia, operid, devpath, parttype, fstype, start, end):
     fstype = revision_fstype(fstype)
-    if CONF.RUN.g_all_harddisks.has_key(devpath):
-        (dev, disk, dirty_or_not) = CONF.RUN.g_all_harddisks[devpath]
+    if CF.G.all_harddisks.has_key(devpath):
+        (dev, disk, dirty_or_not) = CF.G.all_harddisks[devpath]
         if disk:
             #constraint = dev.constraint_any()
             constraint = parted.Constraint(device=dev)#exactGeom=newgeom)
@@ -273,15 +270,15 @@ def add_partition(mia, operid, devpath, parttype, fstype, start, end):
             #    return (-1, str(exc_info[1]))
             except _ped.PartitionException, errmsg:
                 return(-1, str(errmsg))
-            CONF.RUN.g_all_harddisks[devpath] = (dev, disk, 'y')
+            CF.G.all_harddisks[devpath] = (dev, disk, 'y')
             return (newpart.geometry.start, '')
     return (-1, _("Can't find the specified disk."))
 
 @register.server_handler('long')
 def set_flags_and_label(mia, operid, devpath, part_start,
                         true_flags, false_flags, set_label, label):
-    if CONF.RUN.g_all_harddisks.has_key(devpath):
-        disk = CONF.RUN.g_all_harddisks[devpath][1]
+    if CF.G.all_harddisks.has_key(devpath):
+        disk = CF.G.all_harddisks[devpath][1]
         if disk:
             part = disk.getFirstPartition()
             while part:
@@ -306,13 +303,13 @@ def set_flags_and_label(mia, operid, devpath, part_start,
             #            part.set_name(label)
             #        break
             #    part = disk.next_partition(part)
-            CONF.RUN.g_all_harddisks[devpath] = (CONF.RUN.g_all_harddisks[devpath][0], disk, 'y')
+            CF.G.all_harddisks[devpath] = (CF.G.all_harddisks[devpath][0], disk, 'y')
     return  0
 
 @register.server_handler('long')
 def delete_partition(mia, operid, devpath, part_start):
-    if CONF.RUN.g_all_harddisks.has_key(devpath):
-        disk  = CONF.RUN.g_all_harddisks[devpath][1]
+    if CF.G.all_harddisks.has_key(devpath):
+        disk  = CF.G.all_harddisks[devpath][1]
         if disk:
             part = disk.getFirstPartition()
             while part:
@@ -321,7 +318,7 @@ def delete_partition(mia, operid, devpath, part_start):
                     disk.removePartition(part)
                     break
                 part = part.nextPartition()
-            CONF.RUN.g_all_harddisks[devpath] = (CONF.RUN.g_all_harddisks[devpath][0], disk, 'y')
+            CF.G.all_harddisks[devpath] = (CF.G.all_harddisks[devpath][0], disk, 'y')
         #if disk:
         #    part = disk.next_partition()
         #    while part:
@@ -329,53 +326,53 @@ def delete_partition(mia, operid, devpath, part_start):
         #            disk.delete_partition(part)
         #            break
         #        part = disk.next_partition(part)
-        #    CONF.RUN.g_all_harddisks[devpath] = (CONF.RUN.g_all_harddisks[devpath][0], disk, 'y')
+        #    CF.G.all_harddisks[devpath] = (CF.G.all_harddisks[devpath][0], disk, 'y')
     return get_all_partitions(mia, operid, devpath)
 
 @register.server_handler('long')
 def reload_partition_table(mia, operid, devpath):
-    if CONF.RUN.g_all_harddisks.has_key(devpath):
-        dev = CONF.RUN.g_all_harddisks[devpath][0]
+    if CF.G.all_harddisks.has_key(devpath):
+        dev = CF.G.all_harddisks[devpath][0]
         try:
-            CONF.RUN.g_all_harddisks[devpath] = (dev, parted.Disk(dev), None)
+            CF.G.all_harddisks[devpath] = (dev, parted.Disk(dev), None)
         except _ped.DiskLabelException:
             dltype = parted.diskType['msdos']
-            CONF.RUN.g_all_harddisks[devpath] = (dev, parted.freshDisk(device=dev, ty=dltype), 'y')
+            CF.G.all_harddisks[devpath] = (dev, parted.freshDisk(device=dev, ty=dltype), 'y')
         #try:
-        #    CONF.RUN.g_all_harddisks[devpath] = (dev, parted.PedDisk.new(dev), None)
+        #    CF.G.all_harddisks[devpath] = (dev, parted.PedDisk.new(dev), None)
         #except parted.error:
         #    dltype = parted.disk_type_get('msdos')
-        #    CONF.RUN.g_all_harddisks[devpath] = (dev, dev.disk_new_fresh(dltype), 'y')
+        #    CF.G.all_harddisks[devpath] = (dev, dev.disk_new_fresh(dltype), 'y')
     return 0
 
 @register.server_handler('long')
 def disk_new_fresh(mia, operid, devpath, dltype):
     #dltype = parted.disk_type_get(dltype)
     dltype = parted.diskType[dltype]
-    if dltype and CONF.RUN.g_all_harddisks.has_key(devpath):
-        dev = CONF.RUN.g_all_harddisks[devpath][0]
-        #CONF.RUN.g_all_harddisks[devpath] = (dev, dev.disk_new_fresh(dltype), 'y')
-        CONF.RUN.g_all_harddisks[devpath] = (dev, parted.freshDisk(device=dev, ty=dltype), 'y')
+    if dltype and CF.G.all_harddisks.has_key(devpath):
+        dev = CF.G.all_harddisks[devpath][0]
+        #CF.G.all_harddisks[devpath] = (dev, dev.disk_new_fresh(dltype), 'y')
+        CF.G.all_harddisks[devpath] = (dev, parted.freshDisk(device=dev, ty=dltype), 'y')
     return 0
 
 @register.server_handler('long')
 def get_all_dirty_disk(mia, operid, dummy):
     mia.set_step(operid, 0, -1)
     result = []
-    for devpath in CONF.RUN.g_all_harddisks.keys():
-        if CONF.RUN.g_all_harddisks[devpath][2]:
+    for devpath in CF.G.all_harddisks.keys():
+        if CF.G.all_harddisks[devpath][2]:
             result.append(devpath)
     return  result
 
 @register.server_handler('long')
 def commit_devpath(mia, operid, devpath):
     mia.set_step(operid, 0, -1)
-    if CONF.RUN.g_all_harddisks.has_key(devpath):
-        disk  = CONF.RUN.g_all_harddisks[devpath][1]
+    if CF.G.all_harddisks.has_key(devpath):
+        disk  = CF.G.all_harddisks[devpath][1]
         if disk:
             try:
                 disk.commit()
-                CONF.RUN.g_all_harddisks[devpath] = (CONF.RUN.g_all_harddisks[devpath][0], disk, None)
+                CF.G.all_harddisks[devpath] = (CF.G.all_harddisks[devpath][0], disk, None)
             #except parted.error, errmsg:
             except parted.DiskException as errmsg:
                 return  str(errmsg)
@@ -384,15 +381,15 @@ def commit_devpath(mia, operid, devpath):
 @register.server_handler('long')
 def format_partition(mia, operid, devpath, part_start, fstype):
     mia.set_step(operid, 0, -1)
-    if not CONF_FSTYPE_MAP.has_key(fstype):
+    if not CF.D.FSTYPE_MAP.has_key(fstype):
         errmsg = _('Unrecoginzed filesystem %s.')
         return errmsg % fstype
-    if CONF_FSTYPE_MAP[fstype][1] == '':
+    if CF.D.FSTYPE_MAP[fstype][1] == '':
         errmsg = _('Format %s is not supported.')
         return errmsg % fstype
-    if not CONF.RUN.g_all_harddisks.has_key(devpath):
+    if not CF.G.all_harddisks.has_key(devpath):
         return _('No such device: ') + devpath
-    disk = CONF.RUN.g_all_harddisks[devpath][1]
+    disk = CF.G.all_harddisks[devpath][1]
     if not disk:
         return _('Not any partition table found on: ') + devpath
     #part = disk.next_partition()
@@ -402,7 +399,7 @@ def format_partition(mia, operid, devpath, part_start, fstype):
             #part = disk.next_partition(part)
             part = part.nextPartition()
             continue
-        if CONF_FSTYPE_MAP[fstype][1] == 'internal':
+        if CF.D.FSTYPE_MAP[fstype][1] == 'internal':
             parted_fstype = parted.fileSystemType[revision_fstype(fstype)]
             try:
                 part.getPedPartition().set_system(parted_fstype)
@@ -441,7 +438,7 @@ def format_partition(mia, operid, devpath, part_start, fstype):
             if not fblk:
                 return _('Not exists device block on %s: \ntry time: %d\n') % (devpath, trycnt)
                 
-            #cmd = '%s %s%d' % (CONF_FSTYPE_MAP[fstype][1], devpath, part.number)
+            #cmd = '%s %s%d' % (CF.D.FSTYPE_MAP[fstype][1], devpath, part.number)
             #ret = os.system(cmd)
             #if ret != 0:
             #    errmsg = _('Run "%s" failed: %s\n')
@@ -449,7 +446,7 @@ def format_partition(mia, operid, devpath, part_start, fstype):
             #else:
             #    return  0
             # Run command to format partition
-            cmd_format = CONF_FSTYPE_MAP[fstype][1]
+            cmd_format = CF.D.FSTYPE_MAP[fstype][1]
             cmd_f_list = cmd_format.split()
             cmd = cmd_f_list[0]
             argv = cmd_f_list[1:]
@@ -470,13 +467,13 @@ def _gen_fstab(mount_all_list):
     for (mntdir, devfn, fstype) in mount_all_list:
         if fstype == 'linux-swap':  continue
         if fstype in ('fat32', 'fat16'):
-            mountmap[mntdir] = (devfn, CONF_FSTYPE_MAP[fstype][0],
+            mountmap[mntdir] = (devfn, CF.D.FSTYPE_MAP[fstype][0],
                                 'iocharset=cp936,umask=0,defaults', 0, 0)
         elif mntdir == '/':
-            mountmap[mntdir] = (devfn, CONF_FSTYPE_MAP[fstype][0],
+            mountmap[mntdir] = (devfn, CF.D.FSTYPE_MAP[fstype][0],
                                 'defaults', 1, 1)
         else:
-            mountmap[mntdir] = (devfn, CONF_FSTYPE_MAP[fstype][0],
+            mountmap[mntdir] = (devfn, CF.D.FSTYPE_MAP[fstype][0],
                                 'defaults', 0, 0)
     mountmap['/dev/pts'] = ('none', 'devpts', 'gid=5,mode=620', 0, 0)
     mountmap['/proc']    = ('none', 'proc', 'defaults', 0, 0)
@@ -492,7 +489,7 @@ def _gen_fstab(mount_all_list):
         mountmap[mntdir] = (os.path.join('/dev', fd.device),
                             #'auto', 'iocharset=cp936,noauto,user,kudzu,rw,exec,sync', 0, 0)
                             'auto', 'iocharset=cp936,noauto,user,rw,exec,sync', 0, 0)
-        os.system('mkdir -p %s' % os.path.join(CONF_TGTSYS_ROOT, mntdir[1:]))
+        os.system('mkdir -p %s' % os.path.join(CF.D.TGTSYS_ROOT, mntdir[1:]))
     #if cdlist != []:
     if 0: # remove cdrom entries
         cddevlist = map(lambda cd: cd.device, cdlist)
@@ -505,15 +502,15 @@ def _gen_fstab(mount_all_list):
             mountmap[mntdir] = (os.path.join('/dev', cddevlist[cnt]),
                                 #'iso9660,udf', 'iocharset=cp936,noauto,user,kudzu,ro,exec', 0, 0)
                                 'iso9660,udf', 'iocharset=cp936,noauto,user,ro,exec', 0, 0)
-            devdir = os.path.join(CONF_TGTSYS_ROOT, 'dev')
+            devdir = os.path.join(CF.D.TGTSYS_ROOT, 'dev')
             os.system('mkdir -p %s' % devdir)
             os.system('ln -s %s %s' % \
                       (cddevlist[cnt],
                        os.path.join(devdir,
                                     os.path.basename(mntdir))))
-            os.system('mkdir -p %s' % os.path.join(CONF_TGTSYS_ROOT, mntdir[1:]))
+            os.system('mkdir -p %s' % os.path.join(CF.D.TGTSYS_ROOT, mntdir[1:]))
             cnt = cnt + 1
-    etcpath = os.path.join(CONF_TGTSYS_ROOT, 'etc')
+    etcpath = os.path.join(CF.D.TGTSYS_ROOT, 'etc')
     if not os.path.isdir(etcpath):
         os.makedirs(etcpath)
     try:
@@ -569,8 +566,8 @@ def _gen_fstab(mount_all_list):
                 #if not fblk:
                     #return _('Not exists device block on %s: \ntry time: %d\n') % (devfn, trycnt)
 
-                #realpath = os.path.join(CONF_TGTSYS_ROOT, mntpoint[1:])
-                #ret, mntdir = mount_dev(CONF_FSTYPE_MAP[fstype][0], devfn, realpath)
+                #realpath = os.path.join(CF.D.TGTSYS_ROOT, mntpoint[1:])
+                #ret, mntdir = mount_dev(CF.D.FSTYPE_MAP[fstype][0], devfn, realpath)
                 #if not ret:
                     #errmsg = _('Mount %s on %s as %s failed: %s')
                     #errmsg = errmsg % (devfn, realpath, fstype, mntdir)
@@ -578,13 +575,13 @@ def _gen_fstab(mount_all_list):
             #cnt = cnt + 1
             #mia.set_step(operid, cnt, len(mount_all_list))
     ## Mount /proc.
-    #procpath = os.path.join(CONF_TGTSYS_ROOT, 'proc')
+    #procpath = os.path.join(CF.D.TGTSYS_ROOT, 'proc')
     #if not os.path.isdir(procpath):
         #os.makedirs(procpath)
     #if not os.path.exists(os.path.join(procpath, 'cmdline')):
         #ret, msg = mount_dev('proc', 'proc', mntdir=procpath)
     ## Mount /sys
-    #syspath = os.path.join(CONF_TGTSYS_ROOT, 'sys')
+    #syspath = os.path.join(CF.D.TGTSYS_ROOT, 'sys')
     #if not os.path.isdir(syspath):
         #os.makedirs(syspath)
     #if not os.path.exists(os.path.join(syspath, 'block')):
@@ -592,9 +589,9 @@ def _gen_fstab(mount_all_list):
         
     #if firstcall:
         #_gen_fstab(mount_all_list)
-        #if CONF_USEUDEV:
+        #if CF.D.USEUDEV:
             #dolog('Copy device files to target system.')
-            #devdir = os.path.join(CONF_TGTSYS_ROOT, 'dev')
+            #devdir = os.path.join(CF.D.TGTSYS_ROOT, 'dev')
             #if not os.path.isdir(devdir):
                 #os.makedirs(devdir)
             #os.system('cp -a /dev/* %s' % devdir)
@@ -606,12 +603,12 @@ def _gen_fstab(mount_all_list):
 #@register.server_handler('long')
 #def umount_all_tgtpart(mia, operid, mount_all_list, lastcall):
     ## Umount proc.
-    #procdir = os.path.join(CONF_TGTSYS_ROOT, 'proc')
+    #procdir = os.path.join(CF.D.TGTSYS_ROOT, 'proc')
     #ret,msg = umount_dev(procdir, rmdir=False)
     #if not ret:
         #dolog('Umount %s failed: %s\n' % (procdir, str(msg)))
     ## Umount sys.
-    #sysdir = os.path.join(CONF_TGTSYS_ROOT, 'sys')
+    #sysdir = os.path.join(CF.D.TGTSYS_ROOT, 'sys')
     #ret, msg = umount_dev(sysdir, rmdir=False)
     #if not ret:
         #dolog('Umount %s failed: %s\n' % (sysdir, str(msg)))
@@ -622,7 +619,7 @@ def _gen_fstab(mount_all_list):
 
     ## Copy the installation log into the target system.
     #if lastcall:
-        #logdir = os.path.join(CONF_TGTSYS_ROOT, 'var/log/MagicInstaller')
+        #logdir = os.path.join(CF.D.TGTSYS_ROOT, 'var/log/MagicInstaller')
         #os.system('mkdir -p %s' % logdir)
         #os.system('cp /tmpfs/var/log/* %s' % logdir)
         #os.system('cp /tmpfs/grub.* %s' % logdir)
@@ -641,7 +638,7 @@ def _gen_fstab(mount_all_list):
                     #errmsg = errmsg % (devfn, str(em))
                     #return  errmsg
         #else:
-            #realpath = os.path.join(CONF_TGTSYS_ROOT, mntpoint[1:])
+            #realpath = os.path.join(CF.D.TGTSYS_ROOT, mntpoint[1:])
             #ret, msg = umount_dev(realpath, rmdir=False)
             #if not ret:
                 #errmsg = _('UMount %s failed: %s')

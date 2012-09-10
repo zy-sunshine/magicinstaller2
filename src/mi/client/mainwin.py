@@ -24,7 +24,7 @@ from mi.client.modules.Xwindow import MIStep_Xwindow
 from mi.client.modules.dosetup import MIStep_dosetup
 from mi.client.modules.finish import MIStep_finish
 from mi.utils.miconfig import MiConfig
-CONF = MiConfig.get_instance()
+CF = MiConfig.get_instance()
 from mi.utils.mitaskman import MiTaskman
 from mi.client.utils import magicpopup
 
@@ -45,11 +45,11 @@ class Step(object):
 class Steps(object):
     def __init__(self, sself):
         self.sself = sself
-        __step_l = [ ['welcome', MIStep_welcome(sself), _('Welcome'), True],
+        __step_l = [ #['welcome', MIStep_welcome(sself), _('Welcome'), True],
             #['scsi', MIStep_scsi(sself), _('scsi'), True],
+            ['pkgselect', MIStep_pkgselect(sself), _('Select Package'), True],
             ['partition', MIStep_partition(sself), _('Partition'), True],
             ['bootloader', MIStep_bootloader(sself), _('Set Bootloader'), True],
-            ['pkgselect', MIStep_pkgselect(sself), _('Select Package'), True],
             ['takeactions', MIStep_takeactions(sself), _('Install Pacakges'), True],
             ['startsetup', MIStep_startsetup(sself), _('Start Setup'), True],
             ['accounts', MIStep_accounts(sself), _('Set Account'), True],
@@ -76,7 +76,7 @@ class Steps(object):
             if hasattr(step.obj, 'startup_action'):
                 logger.d('init %s' % step.obj.startup_action)
                 step.obj.startup_action()
-    
+
     def has_key(self, key):
         return self.step_map.has_key(key)
         
@@ -107,7 +107,7 @@ class MIMainWindow(gtk.Window):
         self.set_title(_('Magic Installer'))
         self.set_border_width(4)
         self.connect('destroy', lambda x: gtk.main_quit())
-        self.values = parse(search_file('magic.values.xml', [CONF.LOAD.CONF_HOTFIXDIR, '.']))
+        self.values = parse(search_file('magic.values.xml', [CF.D.HOTFIXDIR, '.']))
         self.tm = MiTaskman(1325, self.statusbar.get_progressbar(),
                           self.statusbar.get_progressbar())
         
@@ -158,8 +158,7 @@ class MIMainWindow(gtk.Window):
                     find_it = True
                     break
             if find_it:
-                CONF = MiConfig.get_instance()
-                CONF.load_from_file(conf_file)
+                CF.load_from_file(conf_file)
     def btnnext_sensitive(self, sensitive):
         self.buttonbar.next.set_sensitive(sensitive)
     
@@ -203,7 +202,7 @@ class MIMainWindow(gtk.Window):
         return ret
         
     def save_env(self, stepid):
-        CONF.save_to_file('/tmpfs/step_conf/step_%s.json' % stepid)
+        CF.save_to_file('/tmpfs/step_conf/step_%s.json' % stepid)
         
 ####----------------------------------------------------
 

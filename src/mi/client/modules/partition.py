@@ -6,14 +6,12 @@ from xml.dom.minidom import parse, parseString
 from mi.utils.common import search_file, get_devinfo, convert_str_size
 
 from mi.utils.miconfig import MiConfig
-CONF = MiConfig.get_instance()
+CF = MiConfig.get_instance()
 
 from mi.server.utils import logger
 dolog = logger.info
 
 from mi.utils.common import STAT
-
-CONF_FSTYPE_MAP = CONF.LOAD.CONF_FSTYPE_MAP
 
 class MIStep_partition (magicstep.magicstep):
 
@@ -180,7 +178,7 @@ class MIStep_partition (magicstep.magicstep):
             self.set_widget_value('disklabel', self.disklabel)
 
         def fill_global_and_check(self):
-            CONF.RUN.g_all_part_infor[self.devfn] = []
+            CF.G.all_part_infor[self.devfn] = []
             models = self.list_map.keys()
             model = models[0]
             iter = model.get_iter_first()
@@ -198,7 +196,7 @@ class MIStep_partition (magicstep.magicstep):
                     not_touched = 'false'
                 elif self.added_part_start.has_key(start):
                     not_touched = 'false'
-                CONF.RUN.g_all_part_infor[self.devfn].append((partnum,
+                CF.G.all_part_infor[self.devfn].append((partnum,
                                                    parttype,
                                                    partflags,
                                                    start,
@@ -210,24 +208,24 @@ class MIStep_partition (magicstep.magicstep):
                 if not_touched == 'true' and \
                        filesystem != 'N/A' and \
                        filesystem != 'linux-swap':
-                    CONF.RUN.g_all_orig_part.append((self.orig_partitions[start],
+                    CF.G.all_orig_part.append((self.orig_partitions[start],
                                           filesystem,
                                           self.partdevfn(partnum)))
                 
                 if mountpoint == '/':
-                    if CONF.RUN.g_root_device:
+                    if CF.G.root_device:
                         return  _('More than one partition is mounted on /')
-                    CONF.RUN.g_root_device = '%s%d' % (self.devfn, partnum)
+                    CF.G.root_device = '%s%d' % (self.devfn, partnum)
                 if mountpoint == '/boot':
-                    CONF.RUN.g_boot_device = '%s%d' % (self.devfn, partnum)
-                if CONF_FSTYPE_MAP.has_key(filesystem):
-                    minsize = CONF_FSTYPE_MAP[filesystem][2]
+                    CF.G.boot_device = '%s%d' % (self.devfn, partnum)
+                if CF.D.FSTYPE_MAP.has_key(filesystem):
+                    minsize = CF.D.FSTYPE_MAP[filesystem][2]
                     if minsize != -1:
                         if end - start + 1 < minsize * 2048:
                             errmsg = _('%0.2fM is too small for %s, %dM at least.')
                             errmsg = errmsg % ((end - start + 1.0) / 2048, filesystem, minsize)
                             return  errmsg
-                    maxsize = CONF_FSTYPE_MAP[filesystem][3]
+                    maxsize = CF.D.FSTYPE_MAP[filesystem][3]
                     if maxsize != -1:
                         if end - start + 1 > maxsize * 2048:
                             errmsg = _('%0.2fM is too big for %s, %dM at most.')
@@ -235,8 +233,8 @@ class MIStep_partition (magicstep.magicstep):
                             return  errmsg
                 if filesystem == 'linux-swap' and mountpoint == 'USE':
                     # Choose the maximum swap.
-                    if not CONF.RUN.g_swap_device or CONF.RUN.g_swap_device[2] < end - start + 1:
-                        CONF.RUN.g_swap_device = [self.devfn, partnum, end - start + 1]
+                    if not CF.G.swap_device or CF.G.swap_device[2] < end - start + 1:
+                        CF.G.swap_device = [self.devfn, partnum, end - start + 1]
                 iter = model.iter_next(iter)
             return  None
 
@@ -515,7 +513,7 @@ class MIStep_partition (magicstep.magicstep):
                 self.aedialog.name_map['mountpoint_combo'].hide()
                 self.aedialog.name_map['swapbox'].hide()
             else:
-                if optmenu.get_active() == CONF.RUN.g_fstype_swap_index:
+                if optmenu.get_active() == CF.G.fstype_swap_index:
                     self.aedialog.name_map['mountpoint_label'].hide()
                     self.aedialog.name_map['mountpoint_combo'].hide()
                     self.aedialog.name_map['swapbox'].show()
@@ -764,14 +762,14 @@ class MIStep_partition (magicstep.magicstep):
             all_fs_type = self.rootobj.tm.actserver.all_file_system_type()
             fst_index = 0
             for fst in all_fs_type:
-                if not CONF_FSTYPE_MAP.has_key(fst):
+                if not CF.D.FSTYPE_MAP.has_key(fst):
                     continue
                 
-                if CONF_FSTYPE_MAP[fst][1] == '':
+                if CF.D.FSTYPE_MAP[fst][1] == '':
                         continue
 
                 if fst == 'linux-swap':
-                    CONF.RUN.g_fstype_swap_index = fst_index
+                    CF.G.fstype_swap_index = fst_index
                 newnode = self.uixmldoc.createElement('value')
                 newsubnode = self.uixmldoc.createTextNode(fst)
                 newnode.appendChild(newsubnode)
@@ -800,7 +798,7 @@ class MIStep_partition (magicstep.magicstep):
         self.probeall_status = STAT.OP_STATUS_DONE
 
     def reprobe_all(self):
-        if CONF.RUN.reprobe_all_disks_required:
+        if CF.G.reprobe_all_disks_required:
             self.probeall_status = STAT.OP_STATUS_DOING
             for hdobj in self.hdobj_list:
                 del hdobj
@@ -808,7 +806,7 @@ class MIStep_partition (magicstep.magicstep):
             self.rootobj.tm.add_action(_('Probe all harddisk'),
                                        self.probe_all_ok, None,
                                        'device_probe_all', 0)
-            CONF.reprobe_all_disks_required = 0
+            CF.G.reprobe_all_disks_required = 0
 
 ##### Enter & Leave Check
     def enter(self):
@@ -832,11 +830,11 @@ class MIStep_partition (magicstep.magicstep):
 
     def leave(self):
         # Clean global settings and fill them below
-        CONF.RUN.g_all_part_info = {}
-        CONF.RUN.g_all_orig_part = []
-        CONF.RUN.g_root_device = None
-        CONF.RUN.g_boot_device = None
-        CONF.RUN.g_swap_device = None
+        CF.G.all_part_info = {}
+        CF.G.all_orig_part = []
+        CF.G.root_device = None
+        CF.G.boot_device = None
+        CF.G.swap_device = None
         # Set mbr_device
         devfn_list = [hdobj.devfn for hdobj in self.hdobj_list]
         mbr_device = self.get_data(self.values, 'bootloader.mbr_device')
@@ -863,24 +861,24 @@ class MIStep_partition (magicstep.magicstep):
                                        magicpopup.magicmsgbox.MB_ERROR,
                                        magicpopup.magicpopup.MB_OK)
                 return 0
-        dolog('CONF.RUN.g_all_part_infor = %s\n' % (CONF.RUN.g_all_part_infor, ))
-        dolog('CONF.RUN.g_all_orig_part = %s\n' % (CONF.RUN.g_all_orig_part, ))
+        dolog('CF.G.all_part_infor = %s\n' % (CF.G.all_part_infor, ))
+        dolog('CF.G.all_orig_part = %s\n' % (CF.G.all_orig_part, ))
 
         # The mount point '/' must exists.
-        if not CONF.RUN.g_root_device:
+        if not CF.G.root_device:
             magicpopup.magicmsgbox(None,
                                    _('No partition is mounted on /.'),
                                    magicpopup.magicmsgbox.MB_ERROR,
                                    magicpopup.magicpopup.MB_OK)
             return 0
 
-        if not CONF.RUN.g_boot_device:
-            CONF.RUN.g_boot_device = CONF.RUN.g_root_device
+        if not CF.G.boot_device:
+            CF.G.boot_device = CF.G.root_device
 
         dir_size = {} # { '/usr': ('hda', part_no, size), ... }, for partition size check
         mountpoints = {}
-        for api in CONF.RUN.g_all_part_infor.keys():
-            for p in CONF.RUN.g_all_part_infor[api]:
+        for api in CF.G.all_part_infor.keys():
+            for p in CF.G.all_part_infor[api]:
                 if p[7] == '' or p[7] == 'USE':
                     continue
                 # Mount point must be different.
@@ -907,7 +905,7 @@ class MIStep_partition (magicstep.magicstep):
                     magicpopup.magicmsgbox(None, errstr,
                                            magicpopup.magicmsgbox.MB_ERROR,
                                            magicpopup.magicpopup.MB_OK)
-                    CONF.RUN.g_root_device = ''
+                    CF.G.root_device = ''
                     return 0
 
                 # set mount point
@@ -938,27 +936,21 @@ class MIStep_partition (magicstep.magicstep):
                 if not self.check_dir_size(dir_chk_pt, dir_chk_size, 20 * 1024 ** 2): # 20M
                     return 0
 
-        CONF.RUN.g_pkgarr_probe_status = STAT.OP_STATUS_DOING
-        if not os.path.isdir(CONF.RUN.g_path_allpa):
-            os.makedirs(CONF.RUN.g_path_allpa)
-        self.rootobj.tm.add_action(_('Search package information'),
-                                   self.got_pkgarr_probe_result, None,
-                                   'pkgarr_probe', CONF.RUN.g_all_orig_part)
-        CONF.RUN.g_win_probe_status = STAT.OP_STATUS_DOING
+        CF.G.win_probe_status = STAT.OP_STATUS_DOING
         self.rootobj.tm.add_action(_('Search for Windows partitions'),
                                    self.got_win_probe_result, None,
-                                   'win_probe', CONF.RUN.g_all_orig_part)
+                                   'win_probe', CF.G.all_orig_part)
         bt_instpos = self.get_data(self.values, 'bootloader.instpos')
         if bt_instpos == 'boot' and \
-               string.find(get_devinfo(CONF.RUN.g_boot_device, CONF.RUN.g_all_part_infor).flags, 'b') < 0:
+               string.find(get_devinfo(CF.G.boot_device, CF.G.all_part_infor).flags, 'b') < 0:
             warnmsg = _('Could not install the bootloader into %s as you will because it contain %s which will prevent the bootloader boot your system. Reset to MBR forcely.')
-            warnmsg = warnmsg % (CONF.RUN.g_boot_device, get_devinfo(CONF.RUN.g_boot_device, CONF.RUN.g_all_part_infor).fstype)
+            warnmsg = warnmsg % (CF.G.boot_device, get_devinfo(CF.G.boot_device, CF.G.all_part_infor).fstype)
             magicpopup.magicmsgbox(None, warnmsg,
                                    magicpopup.magicmsgbox.MB_WARNING,
                                    magicpopup.magicpopup.MB_OK)
             self.set_data(self.rootobj.values, 'bootloader.instpos', 'mbr')
 
-        self.set_data(self.rootobj.values, 'bootloader.CONF.RUN.g_boot_device', CONF.RUN.g_boot_device)
+        self.set_data(self.rootobj.values, 'bootloader.CF.G.boot_device', CF.G.boot_device)
         self.set_data(self.rootobj.values, 'bootloader.mbr_device', mbr_device)
 
         return  1
@@ -989,22 +981,22 @@ class MIStep_partition (magicstep.magicstep):
         dlg.topwin.destroy()
         #### TODO: remove this dirty code.
         self.warn_dir_size = False
-        CONF.RUN.g_root_device = ''
+        CF.G.root_device = ''
         # invoke next button again
         self.rootobj.buttonbar.next.clicked()
 
 ##### Probe Result
     def got_pkgarr_probe_result(self, tdata, data):
-        CONF.RUN.g_pkgarr_probe_result = tdata
-        CONF.RUN.g_pkgarr_probe_status = STAT.OP_STATUS_DONE
-        dolog('CONF.RUN.g_pkgarr_probe_result: %s\n' % str(CONF.RUN.g_pkgarr_probe_result))
+        CF.G.pkgarr_probe_result = tdata
+        CF.G.pkgarr_probe_status = STAT.OP_STATUS_DONE
+        dolog('CF.G.pkgarr_probe_result: %s\n' % str(CF.G.pkgarr_probe_result))
 
     def got_win_probe_result(self, tdata, data):
-        CONF.RUN.g_win_probe_result = tdata
-        CONF.RUN.g_win_probe_status = STAT.OP_STATUS_DONE
-        dolog('CONF.RUN.g_win_probe_result: %s\n' % str(CONF.RUN.g_win_probe_result))
+        CF.G.win_probe_result = tdata
+        CF.G.win_probe_status = STAT.OP_STATUS_DONE
+        dolog('CF.G.win_probe_result: %s\n' % str(CF.G.win_probe_result))
 
-        if CONF.RUN.g_win_probe_result:
+        if CF.G.win_probe_result:
             def win_part_cmp(e1, e2):
                 # priority sort
                 d = {'vista/7': 1, 'winnt': 2, 'win98': 3, 'win': 4 }
@@ -1013,8 +1005,8 @@ class MIStep_partition (magicstep.magicstep):
                     return r
                 else:
                     return cmp(e1[0], e2[0])
-            CONF.RUN.g_win_probe_result.sort(win_part_cmp)
-            win_device = CONF.RUN.g_win_probe_result[0][0]
+            CF.G.win_probe_result.sort(win_part_cmp)
+            win_device = CF.G.win_probe_result[0][0]
         else:
             win_device = ''
         self.set_data(self.rootobj.values, 'bootloader.win_device', win_device)
@@ -1051,7 +1043,7 @@ class MIStep_partition (magicstep.magicstep):
                                    magicpopup.magicpopup.MB_OK)
             return
         err = True
-        profile_file = search_file('magic.autopart.xml', [CONF.LOAD.CONF_HOTFIXDIR, '.'], exit_if_not_found = False)
+        profile_file = search_file('magic.autopart.xml', [CF.D.HOTFIXDIR, '.'], exit_if_not_found = False)
         dolog('fname2: %s\n' % profile_file)
         if profile_file:
             dE = parse(profile_file).documentElement
@@ -1090,7 +1082,7 @@ class MIStep_partition (magicstep.magicstep):
                 fs = 'ext3'
             elif fs == 'vfat':
                 fs = 'fat32'
-            if not fs in CONF_FSTYPE_MAP:
+            if not fs in CF.D.FSTYPE_MAP:
                 errtxt = _("Filesystem type '%s' not supported.") % fs
                 magicpopup.magicmsgbox(None, errtxt,
                                        magicpopup.magicmsgbox.MB_INFO,
@@ -1213,7 +1205,7 @@ class MIStep_partition (magicstep.magicstep):
 
     def xgc_autopart_optionmenu(self, node):
         # Fill up auto part profile option menu
-        fname = search_file('magic.autopart.xml', [CONF.LOAD.CONF_HOTFIXDIR, '.'],
+        fname = search_file('magic.autopart.xml', [CF.D.HOTFIXDIR, '.'],
                             exit_if_not_found = False)
         is_empty = True
         if fname:

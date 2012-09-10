@@ -2,7 +2,7 @@
 from mi.client.utils import _
 from mi.client.utils import magicstep
 from mi.utils.miconfig import MiConfig
-CONF = MiConfig.get_instance()
+CF = MiConfig.get_instance()
 
 from mi.server.utils import logger
 dolog = logger.info
@@ -22,7 +22,7 @@ class MIStep_startsetup (magicstep.magicstep):
         skipx = self.get_data(self.values, 'startsetup.skipXsetting')
         if skipx == '1':
             self.skip_stepnames.append('Xwindow')
-            CONF.RUN.g_skipxsetting = 1
+            CF.G.skipxsetting = 1
         else:
-            CONF.RUN.g_skipxsetting = 0
+            CF.G.skipxsetting = 0
         return  1

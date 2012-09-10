@@ -18,3 +18,4 @@ class MIStatusBar(gtk.HBox):
         
     def get_progressbar(self):
         return self.progress
+    

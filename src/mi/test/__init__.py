@@ -2,7 +2,7 @@ import gtk
 from xml.dom.minidom import parse
 from mi.utils.common import search_file
 from mi.utils.miconfig import MiConfig
-CONF = MiConfig.get_instance()
+CF = MiConfig.get_instance()
 class FakeTaskManager():
     def add_action(self, *args, **kw):
         pass
@@ -10,7 +10,7 @@ class FakeTaskManager():
 class TestMIStep(gtk.Window):
     def __init__(self, *args, **kw):
         gtk.Window.__init__(self, *args, **kw)
-        self.values = parse(search_file('magic.values.xml', [CONF.LOAD.CONF_HOTFIXDIR, '.']))
+        self.values = parse(search_file('magic.values.xml', [CF.D.HOTFIXDIR, '.']))
         self.connect('destroy', lambda x: gtk.main_quit())
         self.tm = FakeTaskManager()
         

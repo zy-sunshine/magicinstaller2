@@ -100,14 +100,14 @@ def fill_config(config):
     CONF.g_toplevelgrp_map = {}
 
 def test_getconf():
-    CONF = MiConfig.get_instance()
+    CF = MiConfig.get_instance()
     CONF.load_from_file('config.json')
     import pdb; pdb.set_trace()
     CONF.dump()
     
 if __name__ == '__main__':
     if 1:
-        CONF = MiConfig.get_instance()
+        CF = MiConfig.get_instance()
         fill_config(CONF)
         CONF.save_to_file('config.json')
         #CONF.dump()

@@ -3,8 +3,7 @@
 import time
 from mi.utils.miconfig import MiConfig
 from mi.utils.common import run_bash, mount_dev, umount_dev, search_file
-CONF = MiConfig.get_instance()
-CONF_HOTFIXDIR = CONF.LOAD.CONF_HOTFIXDIR
+CF = MiConfig.get_instance()
 from mi.utils.miregister import MiRegister
 register = MiRegister()
 from mi.server.utils import logger
@@ -70,8 +69,8 @@ def logger_copy_logfiles(mia, operid, param):
 
 def file_path(filename):
     realFile = filename
-    realFile = search_file(filename, [CONF_HOTFIXDIR, '/usr/bin'], exit_if_not_found = False) or realFile
-    realFile = search_file(filename+'.py', [CONF_HOTFIXDIR, '/usr/bin'], exit_if_not_found = False) or realFile
+    realFile = search_file(filename, [CF.D.HOTFIXDIR, '/usr/bin'], exit_if_not_found = False) or realFile
+    realFile = search_file(filename+'.py', [CF.D.HOTFIXDIR, '/usr/bin'], exit_if_not_found = False) or realFile
     return realFile
     
 @register.server_handler('long')

@@ -4,7 +4,7 @@ from mi.client.utils import magicstep, magicpopup
 from mi.utils.common import STAT, get_devinfo
 from mi.utils.miconfig import MiConfig
 from xml.dom.minidom import parseString
-CONF = MiConfig.get_instance()
+CF = MiConfig.get_instance()
 
 class MIStep_bootloader (magicstep.magicstepgroup):
     def __init__(self, rootobj):
@@ -28,7 +28,7 @@ class MIStep_bootloader (magicstep.magicstepgroup):
         self.default_btnhelp_clicked(widget, data, _('helptext/bootloader.help.en.txt'))
 
     def check_leave_choose(self):
-        if CONF.RUN.g_win_probe_status != STAT.OP_STATUS_DONE:
+        if CF.G.win_probe_status != STAT.OP_STATUS_DONE:
             magicpopup.magicmsgbox(None, _('Please wait a while for the search of Windows partition.'),
                                    magicpopup.magicmsgbox.MB_INFO,
                                    magicpopup.magicpopup.MB_OK)
@@ -49,7 +49,7 @@ class MIStep_bootloader (magicstep.magicstepgroup):
             return 'bootlist'
 
     def check_enter_bootlist(self):
-        if 'b' in get_devinfo(CONF.RUN.g_boot_device, CONF.RUN.g_all_part_infor).flags:
+        if 'b' in get_devinfo(CF.G.boot_device, CF.G.all_part_infor).flags:
             f_boot_usable = True
         else:
             f_boot_usable = False
@@ -65,7 +65,7 @@ class MIStep_bootloader (magicstep.magicstepgroup):
         instpos = self.get_data(self.values, 'bootloader.instpos')
         win_device = self.get_data(self.values, 'bootloader.win_device')
         if win_device:
-            for dev, os_type in CONF.RUN.g_win_probe_result:
+            for dev, os_type in CF.G.win_probe_result:
                 if dev == win_device:
                     break
             else:
@@ -99,7 +99,7 @@ class MIStep_bootloader (magicstep.magicstepgroup):
                       'bootloader.default', 'other')
         for r in listnode.getElementsByTagName('row'):
             devfn = r.getAttribute('c2')
-            if devfn == CONF.RUN.g_root_device:
+            if devfn == CF.G.root_device:
                 self.set_data(self.rootobj.values,
                               'bootloader.linuxlabel',
                               r.getAttribute('c1'))
@@ -126,7 +126,7 @@ class MIStep_bootloader (magicstep.magicstepgroup):
         default = self.get_data(self.values, 'bootloader.default')
         if self.restore_dos and win_device:
             try:
-                devinfo = get_devinfo(win_device, CONF.RUN.g_all_part_infor)
+                devinfo = get_devinfo(win_device, CF.G.all_part_infor)
                 if devinfo.fstype in ('ntfs-3g', 'ntfs', 'vfat') \
                        and devinfo.not_touched == 'true':
                     has_dos = 'true'
@@ -148,7 +148,7 @@ class MIStep_bootloader (magicstep.magicstepgroup):
 
         node = self.rootobj.values.createElement('row')
         linuxlabel = self.get_data(self.values, 'bootloader.linuxlabel')
-        linuxdevice = CONF.RUN.g_root_device
+        linuxdevice = CF.G.root_device
         node.setAttribute('c1', linuxlabel)
         node.setAttribute('c2', linuxdevice)
         if not has_dos or default == 'linux':
@@ -188,7 +188,7 @@ class MIStep_bootloader (magicstep.magicstepgroup):
                                                  magicpopup.magicpopup.MB_CANCEL,
                                                  'bootentry.dialog', 'edit_')
         self.edit_dialogger.fill_values(self.edit_values.documentElement)
-        self.edit_dialogger.name_map['CONF.RUN.g_root_device'].set_text(device)
+        self.edit_dialogger.name_map['CF.G.root_device'].set_text(device)
 
     def edit_ok_clicked(self, widget, data):
         self.edit_dialogger.fetch_values(self.edit_values)
@@ -233,7 +233,7 @@ class MIStep_bootloader (magicstep.magicstepgroup):
                                    magicpopup.magicpopup.MB_OK)
             return
         device = model.get_value(iter, 2)
-        if device == CONF.RUN.g_root_device:
+        if device == CF.G.root_device:
             magicpopup.magicmsgbox(None,
                                    _('Please do not remove the entry to boot the installed system.'),
                                    magicpopup.magicmsgbox.MB_ERROR,
@@ -246,7 +246,7 @@ class MIStep_bootloader (magicstep.magicstepgroup):
         iter = model.get_iter_first()
         while iter:
             device = model.get_value(iter, 2)
-            if device == CONF.RUN.g_root_device:
+            if device == CF.G.root_device:
                 model.set_value(iter, 0, self.get_pixbuf_map('images/yes.png'))
                 model.set_value(iter, 3, 'true')
                 break
