@@ -81,16 +81,14 @@ class magicmsgbox (magicpopup):
 class magichelp_popup(magicpopup):
     def __init__(self, helpfile):
         from mi.utils.miconfig import MiConfig
-        CONF = MiConfig.get_instance()
-        CONF_HELP_WIDTH = CONF.LOAD.CONF_HELP_WIDTH
-        CONF_HELP_HEIGHT = CONF.LOAD.CONF_HELP_HEIGHT
+        CF = MiConfig.get_instance()
         
         uixml = parse('UIxml/mi_dialog.xml')
         textnodes = uixml.getElementsByTagName('text')
         for tn in textnodes:
             tn.setAttribute('filename', helpfile)
         magicpopup.__init__(self, self, uixml, _('Help'), magicpopup.MB_OK, 'helpdialog')
-        self.topwin.set_size_request(CONF_HELP_WIDTH, CONF_HELP_HEIGHT)
+        self.topwin.set_size_request(CF.D.HELP_WIDTH, CF.D.HELP_HEIGHT)
         self.topwin.set_resizable(False)
 
     def ok_clicked(self, widget, data):

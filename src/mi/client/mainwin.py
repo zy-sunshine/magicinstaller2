@@ -15,7 +15,7 @@ from mi.utils.common import search_file
 from mi.client.modules import *
 
 from mi.utils.miconfig import MiConfig
-CONF = MiConfig.get_instance()
+CF = MiConfig.get_instance()
 from mi.utils.mitaskman import MiTaskman
 from mi.client.utils import magicpopup
 
@@ -42,7 +42,7 @@ class Steps(object):
             print 
         for sn in step_name_list:
             d
-        __step_l = 
+        __step_l =  ### TODO
         i = -1
         self.step_lst = []
         self.step_map = {}
@@ -62,7 +62,7 @@ class Steps(object):
             if hasattr(step.obj, 'startup_action'):
                 logger.d('init %s' % step.obj.startup_action)
                 step.obj.startup_action()
-    
+
     def has_key(self, key):
         return self.step_map.has_key(key)
         
@@ -93,7 +93,7 @@ class MIMainWindow(gtk.Window):
         self.set_title(_('Magic Installer'))
         self.set_border_width(4)
         self.connect('destroy', lambda x: gtk.main_quit())
-        self.values = parse(search_file('magic.values.xml', [CONF.LOAD.CONF_HOTFIXDIR, '.']))
+        self.values = parse(search_file('magic.values.xml', [CF.D.HOTFIXDIR, '.']))
         self.tm = MiTaskman(1325, self.statusbar.get_progressbar(),
                           self.statusbar.get_progressbar())
         self.step_name_list = step_name_list
@@ -145,8 +145,7 @@ class MIMainWindow(gtk.Window):
                     find_it = True
                     break
             if find_it:
-                CONF = MiConfig.get_instance()
-                CONF.load_from_file(conf_file)
+                CF.load_from_file(conf_file)
     def btnnext_sensitive(self, sensitive):
         self.buttonbar.next.set_sensitive(sensitive)
     
@@ -190,7 +189,7 @@ class MIMainWindow(gtk.Window):
         return ret
         
     def save_env(self, stepid):
-        CONF.save_to_file('/tmpfs/step_conf/step_%s.json' % stepid)
+        CF.save_to_file('/tmpfs/step_conf/step_%s.json' % stepid)
         
 ####----------------------------------------------------
 

@@ -2,10 +2,12 @@
 # Copyright (C) 2003, Charles Wang <charles@linux.net.cn>
 # Author:  Charles Wang.
 import gtk
-import sys
+import sys, os
 from xml.dom.minidom import parse
 
 from mi.client.utils import xmlgtk
+
+CUR_DIR = os.path.dirname(__file__)
 
 def write_xml(*args):
     global xgobj
@@ -20,8 +22,8 @@ window.connect("destroy", write_xml)
 window.set_border_width(10)
 window.set_position(gtk.WIN_POS_CENTER)
 
-xml_interface = parse('test-xmlgtk.xml')
-xml_data = parse('test-xmlgtk-data.xml')
+xml_interface = parse(os.path.join(CUR_DIR, 'test-xmlgtk.xml'))
+xml_data = parse(os.path.join(CUR_DIR, 'test-xmlgtk-data.xml'))
 
 add_count = 0
 
@@ -95,7 +97,7 @@ class test_xmlgtk (xmlgtk.xmlgtk):
     def test_clicked(self, button, data):
         print "It is clicked."
         top = gtk.Window(gtk.WINDOW_TOPLEVEL)
-        pop_interface = parse('test-xmlgtk-pop.xml')
+        pop_interface = parse(os.path.join(CUR_DIR, 'test-xmlgtk-pop.xml'))
         xgobj = test_xmlgtk_pop(pop_interface)
         xgobj.fill_values(xml_data.documentElement)
         top.add(xgobj.widget)

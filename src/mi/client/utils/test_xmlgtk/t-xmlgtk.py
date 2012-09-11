@@ -2,12 +2,12 @@
 # Copyright (C) 2003, Charles Wang
 # Author: Charles Wang <charles@linux.net.cn>
 import gtk
-import sys
+import sys, os
 from xml.dom.minidom import parse
 
 from mi.client.utils import xmlgtk
-
-xml_data = parse('t-xmlgtk-data.xml')
+CUR_DIR=os.path.dirname(__file__)
+xml_data = parse(os.path.join(CUR_DIR, 't-xmlgtk-data.xml'))
 
 class t_xmlgtk(xmlgtk.xmlgtk):
     def __init__(self, uixmldoc, uixml_rootname=None):
@@ -35,7 +35,7 @@ window = gtk.Window(gtk.WINDOW_TOPLEVEL)
 window.set_border_width(4)
 window.set_position(gtk.WIN_POS_CENTER)
 
-xml_interface = parse('t-xmlgtk.xml')
+xml_interface = parse(os.path.join(CUR_DIR, 't-xmlgtk.xml'))
 
 xgobj = t_xmlgtk(xml_interface)
 xgobj.fill_values(xml_data.documentElement)

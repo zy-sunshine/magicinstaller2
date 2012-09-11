@@ -1,8 +1,6 @@
 #!/usr/bin/python
 from mi.utils.miconfig import MiConfig
-CONF = MiConfig.get_instance()
-CONF_KERNELVER = CONF.LOAD.CONF_KERNELVER
-CONF_TGTSYS_ROOT = CONF.LOAD.CONF_TGTSYS_ROOT
+CF = MiConfig.get_instance()
 
 from mi.utils.miregister import MiRegister
 register = MiRegister()
@@ -19,7 +17,7 @@ def get_all_scsi_modules():
                 the_list.append(os.path.splitext(bn)[0])
 
     scsi_module_list = []
-    os.path.walk(os.path.join('/lib/modules', CONF_KERNELVER, 'kernel/drivers/scsi'),
+    os.path.walk(os.path.join('/lib/modules', CF.D.KERNELVER, 'kernel/drivers/scsi'),
                  scan_scsi_module_dir, scsi_module_list)
     return  scsi_module_list
 
@@ -60,8 +58,8 @@ def do_modprobe(mia, operid, module):
 
 @register.server_handler('long')
 def scsi_modprobe_conf(mia, operid, scsi_module_list):
-    mconf = file(os.path.join(CONF_TGTSYS_ROOT, 'etc/modules.conf'), 'a')
-    mpconf = file(os.path.join(CONF_TGTSYS_ROOT, 'etc/modprobe.conf'), 'a')
+    mconf = file(os.path.join(CF.D.TGTSYS_ROOT, 'etc/modules.conf'), 'a')
+    mpconf = file(os.path.join(CF.D.TGTSYS_ROOT, 'etc/modprobe.conf'), 'a')
     for module in string.split(scsi_module_list, '/'):
         mconf.write('alias scsi_hostadapter %s\n' % module)
         mpconf.write('alias scsi_hostadapter %s\n' % module)

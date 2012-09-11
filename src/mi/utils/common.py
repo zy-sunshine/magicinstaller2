@@ -1,7 +1,7 @@
 #!/usr/bin/python
 import os
 import sys
-import isys
+import isys #@UnresolvedImport
 USE_ISYS = False
 
 # only mount dev and umount dev dolog, so we use server Logger
@@ -40,17 +40,19 @@ class NamedTuple(tuple):
         idx = self.attr_order.index(attr)
         return self[idx]
 
-def run_bash(cmd, argv=[], root='/'):
+def run_bash(cmd, argv=[], root='/', env=None):
     import subprocess
     def chroot():
         os.chroot(root)
+    env = env and env or os.environ
     cmd_res = {}
     dolog('runbash: %s %s' % (cmd, ' '.join(argv)))
     res = subprocess.Popen([cmd] + argv, 
                             stdout = subprocess.PIPE, 
                             stderr = subprocess.PIPE, 
                             preexec_fn = chroot, cwd = root,
-                            close_fds = True)
+                            close_fds = True,
+                            env = env)
     res.wait()
     cmd_res['out']=res.stdout.readlines()
     cmd_res['err']=res.stderr.readlines()
@@ -334,8 +336,7 @@ STAT = Status()
 def get_devinfo(devfn, all_part_infor):
     if not devfn: return AttrDict()
     from mi.utils.miconfig import MiConfig
-    CONF = MiConfig.get_instance()
-    CONF_FSTYPE_MAP = CONF.LOAD.CONF_FSTYPE_MAP
+    CF = MiConfig.get_instance()
     for dev in all_part_infor:
         for tup in all_part_infor[dev]:
             if '%s%s' % (dev, tup[0]) == devfn:
@@ -345,8 +346,8 @@ def get_devinfo(devfn, all_part_infor):
                 r['mountpoint'] = tup[7]
                 r['not_touched'] = tup[8]
                 try:
-                    r['fstype'] = CONF_FSTYPE_MAP[tup[6]][0]
-                    r['flags'] = CONF_FSTYPE_MAP[tup[6]][4]
+                    r['fstype'] = CF.D.FSTYPE_MAP[tup[6]][0]
+                    r['flags'] = CF.D.FSTYPE_MAP[tup[6]][4]
                 except KeyError:
                     raise KeyError, 'Unregconized filesystem type %s.' % tup[6]
                 return r

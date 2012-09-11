@@ -6,7 +6,7 @@ from mi.utils.common import search_file
 from mi.client.utils import magicpopup
 from mi.client.utils import _
 from mi.utils.miconfig import MiConfig
-CONF = MiConfig.get_instance()
+CF = MiConfig.get_instance()
 from mi.client.utils import logger
 
 class magicstep (xmlgtk.xmlgtk):
@@ -18,7 +18,7 @@ class magicstep (xmlgtk.xmlgtk):
         
         self.values = rootobj.values.documentElement # Just a short cut.
         self.uixml_path = search_file(uixml_file,
-                                 [CONF.LOAD.CONF_HOTFIXDIR, '.'],
+                                 [CF.D.HOTFIXDIR, '.'],
                                  postfix = 'UIxml')
         uixml = parse(self.uixml_path)
         ### hack to add a debug title

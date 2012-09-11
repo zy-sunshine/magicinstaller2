@@ -17,3 +17,13 @@ class MIStep_finish (magicstep.magicstep):
                                magicpopup.magicmsgbox.MB_ERROR,
                                magicpopup.magicpopup.MB_OK)
         return 0
+
+if __name__ == '__main__':
+    import gtk
+    from mi.client.mainwin import MIMainWindow
+    win = MIMainWindow(gtk.WINDOW_TOPLEVEL)
+    win.init()
+    #win.show_all()
+    win.show()
+    
+    gtk.main()

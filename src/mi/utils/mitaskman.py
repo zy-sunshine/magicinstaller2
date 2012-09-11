@@ -152,3 +152,9 @@ class MiTaskman :
             self.get_results()
         self.put_action()
         return True
+    
+    def wait_all_action(self):
+        return
+        while self.tasks:
+            print self.tasks
+            time.sleep(0.4)

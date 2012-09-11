@@ -4,20 +4,7 @@ import rpm, tarfile, time
 from mi import isys, getdev #@UnresolvedImport
 from mi.utils.common import mount_dev, umount_dev, run_bash, cdrom_available
 from mi.utils.miconfig import MiConfig
-CONF = MiConfig.get_instance()
-CONF_DISTNAME = CONF.LOAD.CONF_DISTNAME
-CONF_DISTVER = CONF.LOAD.CONF_DISTVER
-CONF_FSTYPE_MAP = CONF.LOAD.CONF_FSTYPE_MAP
-CONF_TGTSYS_ROOT = CONF.LOAD.CONF_TGTSYS_ROOT
-CONF_PKGTYPE = CONF.LOAD.CONF_PKGTYPE
-CONF_BOOTCDFN = CONF.LOAD.CONF_BOOTCDFN
-CONF_ISOFN_FMT = CONF.LOAD.CONF_ISOFN_FMT
-CONF_MNT_ROOT = CONF.LOAD.CONF_MNT_ROOT
-
-CONF_PKGARR_FILE = CONF.LOAD.CONF_PKGARR_FILE
-CONF_PKGARR_SER_HDPATH = CONF.LOAD.CONF_PKGARR_SER_HDPATH
-CONF_PKGARR_SER_CDPATH = CONF.LOAD.CONF_PKGARR_SER_CDPATH
-CONF_ISOLOOP = CONF.LOAD.CONF_ISOLOOP
+CF = MiConfig.get_instance()
 
 from mi.utils.miregister import MiRegister
 register = MiRegister()
@@ -55,7 +42,7 @@ class MiDevice(object):
         self.has_mounted = False
         self.mntdir = mntdir
         self.mntdir_fixed = self.mntdir and True or False
-        self.loopmntdir = os.path.join(CONF_MNT_ROOT, CONF_ISOLOOP)
+        self.loopmntdir = os.path.join(CF.D.MNT_ROOT, CF.D.ISOLOOP)
         
     def do_mount(self):
         if self.has_mounted: return True
@@ -129,7 +116,7 @@ class MiDevice(object):
             self.do_umount()
 
 @register.server_handler('long')
-def pkgarr_probe(mia, operid, hdpartlist):
+def pkgarr_probe(mia, operid):
     dolog("pkgarr_probe starting...")
     def probe_position(localfn, pos_id, device, new_device, fstype, reldir, isofn):
         dolog('probe_position: %s, %s, %s, %s, %s, %s, %s' % (localfn, pos_id, device, new_device, fstype, reldir, isofn))
@@ -151,8 +138,8 @@ def pkgarr_probe(mia, operid, hdpartlist):
     #cli = tftpc.TFtpClient()
     #cli.connect('127.0.0.1')
     result = []
-    all_drives = hdpartlist
     cdlist = getdev.probe(getdev.CLASS_CDROM)
+    all_drives = getdev.probe(getdev.CLASS_HD)
     map(lambda cd: all_drives.append((os.path.join('/dev', cd.device),
                                       'iso9660',
                                       os.path.join('/dev', cd.device))),
@@ -160,18 +147,18 @@ def pkgarr_probe(mia, operid, hdpartlist):
     dolog('all_drives: %s' % all_drives)
     pos_id = -1
     for (device, fstype, new_device) in all_drives:
-        if not CONF_FSTYPE_MAP.has_key(fstype):
+        if not CF.D.FSTYPE_MAP.has_key(fstype):
             continue
-        if CONF_FSTYPE_MAP[fstype][0] == '':
+        if CF.D.FSTYPE_MAP[fstype][0] == '':
             continue
-        midev = MiDevice(device, CONF_FSTYPE_MAP[fstype][0])
-        for f, reldir in midev.iter_searchfiles([CONF_PKGARR_FILE, CONF_BOOTCDFN], CONF_PKGARR_SER_HDPATH):
+        midev = MiDevice(device, CF.D.FSTYPE_MAP[fstype][0])
+        for f, reldir in midev.iter_searchfiles([CF.D.PKGARR_FILE, CF.D.BOOTCDFN], CF.D.PKGARR_SER_HDPATH):
             if f.endswith('iso'):
                 midev_iso = MiDevice(f, 'iso9660')
-                for pkgarr, relative_dir in midev_iso.iter_searchfiles([CONF_PKGARR_FILE], CONF_PKGARR_SER_CDPATH):
+                for pkgarr, relative_dir in midev_iso.iter_searchfiles([CF.D.PKGARR_FILE], CF.D.PKGARR_SER_CDPATH):
                     pos_id += 1
                     r = probe_position(pkgarr, 100 + pos_id,
-                        device, new_device, CONF_FSTYPE_MAP[fstype][0], relative_dir, CONF_BOOTCDFN)
+                        device, new_device, CF.D.FSTYPE_MAP[fstype][0], relative_dir, CF.D.BOOTCDFN)
                     if r:
                         r[-1] = os.path.join(reldir, r[-1]) #### revise iso relative path
                         result.append(r)
@@ -197,7 +184,7 @@ def probe_all_disc(mia, operid, device, devfstype, bootiso_relpath, pkgarr_reldi
     
     midev = MiDevice(device, devfstype)
 
-    bootiso_fn = CONF_ISOFN_FMT % (CONF_DISTNAME, CONF_DISTVER, 1)
+    bootiso_fn = CF.D.ISOFN_FMT % (CF.D.DISTNAME, CF.D.DISTVER, 1)
     # If probe in iso ,but bootiso_fn is not match error occur
     if bootiso_relpath and not os.path.basename(bootiso_relpath) == bootiso_fn:
         logger.e('probe_all_disc iso format is wrong: bootiso_relpath: %s bootiso_fn: %s', (bootiso_relpath, bootiso_relpath))
@@ -212,7 +199,7 @@ def probe_all_disc(mia, operid, device, devfstype, bootiso_relpath, pkgarr_reldi
                             'packages-%d' % (disc_no + 1)]
         if bootiso_relpath:
             # deal with iso case
-            iso_fn = CONF_ISOFN_FMT % (CONF_DISTNAME, CONF_DISTVER, disc_no + 1)
+            iso_fn = CF.D.ISOFN_FMT % (CF.D.DISTNAME, CF.D.DISTVER, disc_no + 1)
             iso_relpath = os.path.join(os.path.dirname(bootiso_relpath), iso_fn)
             pkgarr_reldirs = [ os.path.join(pkgarr_reldir, p) for p in pkg_probe_path ]
             for f, reldir in midev.iter_searchfiles([iso_relpath], ['']): # from disk
@@ -244,7 +231,7 @@ class MiDevice_TgtSys(object):
             #### swap on or not
             pass
         #### mount root device
-        mnt_point = CONF_TGTSYS_ROOT
+        mnt_point = CF.D.TGTSYS_ROOT
         dev_tgt_root = MiDevice(tgt_root_dev, tgt_root_type, mnt_point)
         if not dev_tgt_root.do_mount(): #### NOTE: carefully handle this device's mount.
             logger.e('Mount device %s Failed, install operate can not continue' % dev_tgt_root.get_dev())
@@ -254,7 +241,7 @@ class MiDevice_TgtSys(object):
         
         if tgt_boot_dev and (tgt_boot_dev != tgt_root_dev):
             #### mount boot device
-            mnt_point = os.path.join(CONF_TGTSYS_ROOT, 'boot')
+            mnt_point = os.path.join(CF.D.TGTSYS_ROOT, 'boot')
             dev_tgt_boot = MiDevice(tgt_boot_dev, tgt_boot_type, mnt_point)
             if not dev_tgt_boot.do_mount(): #### NOTE: carefully handle this device's mount.
                 logger.e('Mount device %s Failed, install operate can not continue' % dev_tgt_boot.get_dev())
@@ -288,8 +275,8 @@ def instpkg_prep(mia, operid, pkgsrc_devinfo, instmode, tgtsys_devinfo):
     dev, fstype, bootiso_relpath, reldir = pkgsrc_devinfo
     
     installmode = instmode
-    if CONF_PKGTYPE == 'rpm': dolog('InstallMode: Rpm Packages %s\n' % installmode)
-    elif CONF_PKGTYPE == 'tar': dolog('InstallMode: Tar Packages\n')
+    if CF.D.PKGTYPE == 'rpm': dolog('InstallMode: Rpm Packages %s\n' % installmode)
+    elif CF.D.PKGTYPE == 'tar': dolog('InstallMode: Tar Packages\n')
     dolog('instpkg_prep(%s, %s, %s, %s)\n' % (dev, fstype, bootiso_relpath, reldir))
     
     ############################## Mount Start #####################################            
@@ -303,7 +290,7 @@ def instpkg_prep(mia, operid, pkgsrc_devinfo, instmode, tgtsys_devinfo):
     #--- This code is according to rpm.spec in rpm-4.2-0.69.src.rpm. ---
     # This code is specific to rpm.
     import pdb; pdb.set_trace()
-    var_lib_rpm = os.path.join(CONF_TGTSYS_ROOT, 'var/lib/rpm')
+    var_lib_rpm = os.path.join(CF.D.TGTSYS_ROOT, 'var/lib/rpm')
     if not os.path.isdir(var_lib_rpm):
         os.makedirs(var_lib_rpm)
         
@@ -348,7 +335,7 @@ def instpkg_disc_post(mia, operid, dev, fstype, reldir, bootiso_relpath, first_p
         rpmpkgdir = os.path.dirname(first_pkg)
         rpmdb_abs = os.path.join(rpmpkgdir, rpmdb)
         etctar_abs = os.path.join(rpmpkgdir, etctar)
-        tgt_tmp_config_dir = os.path.join(CONF_TGTSYS_ROOT, tmp_config_dir)
+        tgt_tmp_config_dir = os.path.join(CF.D.TGTSYS_ROOT, tmp_config_dir)
         if not os.path.exists(tgt_tmp_config_dir):
             os.makedirs(tgt_tmp_config_dir)
         if os.path.exists(rpmdb_abs):
@@ -409,7 +396,7 @@ def instpkg_post(mia, operid, dev, reldir, fstype):
         # we will execute all the pre_in and post_in scripts there, if we use
         # the --noscripts option during rpm installation
         dolog('Execute Pre Post Scripts:\n\t%s\n' % str(noscripts_pkg_list))
-        def run_pre_post_in_script(CONF_TGTSYS_ROOT):
+        def run_pre_post_in_script(TMP):
             def get_pkg_name(pkgrpm):
                 pkg = os.path.basename(pkgrpm)
                 pkgname = ''
@@ -425,7 +412,7 @@ def instpkg_post(mia, operid, dev, reldir, fstype):
                 tfd.close()
             def excute_pre_post(h):
                 pkgnvr = "%s-%s-%s" % (h['name'],h['version'],h['release'])
-                script_dir = os.path.join(CONF_TGTSYS_ROOT, tmp_noscripts_dir)
+                script_dir = os.path.join(CF.D.TGTSYS_ROOT, tmp_noscripts_dir)
                 scripts = []
                 if h[rpm.RPMTAG_PREIN]: #@UndefinedVariable
                     script_name = "%s.preinstall.sh" % pkgnvr
@@ -440,17 +427,17 @@ def instpkg_post(mia, operid, dev, reldir, fstype):
                 for script_name in scripts:
                     spath = os.path.join('/', tmp_noscripts_dir, script_name)
                     write_script("**%s\n" % script_name, noscripts_log, 'a')  # do log
-                    ret = os.system("/usr/sbin/chroot %s /bin/sh %s  2>&1 >> %s" % (CONF_TGTSYS_ROOT, spath, noscripts_log))
+                    ret = os.system("/usr/sbin/chroot %s /bin/sh %s  2>&1 >> %s" % (CF.D.TGTSYS_ROOT, spath, noscripts_log))
                     if ret != 0:
                         err_msg = 'Error run scripts(noscripts) in %s-%s-%s\n' \
                                 % (h['name'],h['version'],h['release'])
                         dolog(err_msg)
                         write_script(err_msg, noscripts_log, 'a')   # do log
             write_script('Execute Pre Post Scripts:\n\t%s\n' % str(noscripts_pkg_list), noscripts_log, 'a')  # do log            
-            script_dir = os.path.join(CONF_TGTSYS_ROOT, tmp_noscripts_dir)
+            script_dir = os.path.join(CF.D.TGTSYS_ROOT, tmp_noscripts_dir)
             if not os.path.exists(script_dir):
                 os.makedirs(script_dir)
-            ts_m = rpm.TransactionSet(CONF_TGTSYS_ROOT)
+            ts_m = rpm.TransactionSet(CF.D.TGTSYS_ROOT)
             for pkg in noscripts_pkg_list:
                 pkgname = get_pkg_name(pkg)
                 mi = ts_m.dbMatch('name', pkgname)
@@ -459,35 +446,35 @@ def instpkg_post(mia, operid, dev, reldir, fstype):
                         excute_pre_post(h)
             noscripts_pkg_list = []
 
-        run_pre_post_in_script(CONF_TGTSYS_ROOT)
+        run_pre_post_in_script(CF.D.TGTSYS_ROOT)
 
     if installmode == 'copyinstallmode':
-        tgt_tmp_config_dir = os.path.join(CONF_TGTSYS_ROOT, tmp_config_dir)
+        tgt_tmp_config_dir = os.path.join(CF.D.TGTSYS_ROOT, tmp_config_dir)
         rpmdb_abs = os.path.join(tgt_tmp_config_dir, rpmdb)
         etctar_abs = os.path.join(tgt_tmp_config_dir, etctar)
         if os.path.exists(rpmdb_abs):
-            ret = os.system('tar -xjf %s -C %s' % (rpmdb_abs, CONF_TGTSYS_ROOT))
+            ret = os.system('tar -xjf %s -C %s' % (rpmdb_abs, CF.D.TGTSYS_ROOT))
             if ret != 0:
                 dolog('ERROR: Extract %s from target system %s to target system Failed.\n' \
-                %(rpmdb, rpmdb_abs[len(CONF_TGTSYS_ROOT):]))
+                %(rpmdb, rpmdb_abs[len(CF.D.TGTSYS_ROOT):]))
             os.system('rm -r %s' % rpmdb_abs)
         else:
-            dolog('Warning: cannot find the needed file %s.\n' % rpmdb_abs[len(CONF_TGTSYS_ROOT):])
+            dolog('Warning: cannot find the needed file %s.\n' % rpmdb_abs[len(CF.D.TGTSYS_ROOT):])
         if os.path.exists(etctar_abs):
-            ret = os.system('tar -xjf %s -C %s' % (etctar_abs, os.path.join(CONF_TGTSYS_ROOT, tmp_config_dir)))
+            ret = os.system('tar -xjf %s -C %s' % (etctar_abs, os.path.join(CF.D.TGTSYS_ROOT, tmp_config_dir)))
             if ret != 0:
                 dolog('ERROR: Extract %s from target system %s to target system Failed.\n' \
-                %(etctar, etctar_abs[len(CONF_TGTSYS_ROOT):]))
+                %(etctar, etctar_abs[len(CF.D.TGTSYS_ROOT):]))
         else:
-            dolog('Warning: cannot find the needed file %s.\n' % etctar_abs[len(CONF_TGTSYS_ROOT):])
+            dolog('Warning: cannot find the needed file %s.\n' % etctar_abs[len(CF.D.TGTSYS_ROOT):])
         # do chroot and excute the etc_install.sh
         ret = os.system('/usr/sbin/chroot %s /%s %s' \
-                % (CONF_TGTSYS_ROOT, os.path.join(tmp_config_dir, etc_script), tmp_config_dir))
+                % (CF.D.TGTSYS_ROOT, os.path.join(tmp_config_dir, etc_script), tmp_config_dir))
         if ret != 0:
             dolog('ERROR: run %s failed.\n' % os.path.join(tmp_config_dir, etc_script))
         else:
             dolog('Run %s successfully.\n' % os.path.join(tmp_config_dir, etc_script))
-        os.system('rm -r %s' % os.path.join(CONF_TGTSYS_ROOT, tmp_config_dir))
+        os.system('rm -r %s' % os.path.join(CF.D.TGTSYS_ROOT, tmp_config_dir))
         
     global ts
     if ts is not None:
@@ -499,9 +486,9 @@ def instpkg_post(mia, operid, dev, reldir, fstype):
         return  0  # It is ok for CDROM installation.
     mia.set_step(operid, 0, -1) # Sync is the long operation.
 #    if mntxxxpoint != 0: #### TODO; !!!!!UNKNOWN!!!!!!
-#        mntdir = os.path.join(CONF_TGTSYS_ROOT, mntxxxpoint)     ####TODO
+#        mntdir = os.path.join(CF.D.TGTSYS_ROOT, mntxxxpoint)     ####TODO
 #    else:
-#        mntdir = os.path.join(CONF_MNT_ROOT, os.path.basename(dev))
+#        mntdir = os.path.join(CF.D.MNT_ROOT, os.path.basename(dev))
 #        ret, errmsg = umount_dev(mntdir)
 #        if not ret:
 #            logger.e('UMount(%s) failed: %s' % \
@@ -549,7 +536,7 @@ def package_install(mia, operid, pkgname, firstpkg, noscripts):
         global ts
         if ts is None:
             dolog('Create TransactionSet\n')
-            ts = rpm.TransactionSet(CONF_TGTSYS_ROOT)
+            ts = rpm.TransactionSet(CF.D.TGTSYS_ROOT)
             ts.setProbFilter(rpm.RPMPROB_FILTER_OLDPACKAGE | #@UndefinedVariable
                              rpm.RPMPROB_FILTER_REPLACENEWFILES | #@UndefinedVariable
                              rpm.RPMPROB_FILTER_REPLACEOLDFILES | #@UndefinedVariable
@@ -587,7 +574,7 @@ def package_install(mia, operid, pkgname, firstpkg, noscripts):
             argv = ['-i', '--noorder', # '--nosuggest', # on ubuntu platform rpm do not have --nosuggest parameter
                     '--force','--nodeps',
                     '--ignorearch',
-                    '--root', CONF_TGTSYS_ROOT,
+                    '--root', CF.D.TGTSYS_ROOT,
                     pkgpath,
                 ]
             if use_noscripts or noscripts:
@@ -615,7 +602,7 @@ def package_install(mia, operid, pkgname, firstpkg, noscripts):
     def do_copy_install():
         mia.set_step(operid, 1, 1)
         try:
-            cmd = 'cd %s && /usr/bin/rpm2cpio %s | /bin/cpio -dui --quiet' % (CONF_TGTSYS_ROOT, pkgpath)
+            cmd = 'cd %s && /usr/bin/rpm2cpio %s | /bin/cpio -dui --quiet' % (CF.D.TGTSYS_ROOT, pkgpath)
             problems = os.system(cmd)
             if problems:
                 message = 'PROBLEMS on %s: \n return code is %s command is\n[%s]' \
@@ -635,11 +622,11 @@ def package_install(mia, operid, pkgname, firstpkg, noscripts):
             dolog(errstr)
             return errstr
         try:
-            tarobj.extractall(path=CONF_TGTSYS_ROOT)
+            tarobj.extractall(path=CF.D.TGTSYS_ROOT)
         except:
             if tarobj:
                 tarobj.close()
-            errstr = 'Faild on extract file "%s" size"%d" to directory "%s"\n' % (pkgpath, tar_size, CONF_TGTSYS_ROOT)
+            errstr = 'Faild on extract file "%s" size"%d" to directory "%s"\n' % (pkgpath, tar_size, CF.D.TGTSYS_ROOT)
             dolog(errstr)
             return errstr
         try:
@@ -649,7 +636,7 @@ def package_install(mia, operid, pkgname, firstpkg, noscripts):
         
     # Decide using which mode to install.
     ret = 'Nothing'
-    if CONF_PKGTYPE == 'rpm':     # In the mipublic.py
+    if CF.D.PKGTYPE == 'rpm':     # In the mipublic.py
         if installmode == 'rpminstallmode':
             if use_ts:
                 # Use rpm-python module to install rpm pkg, but at this version it is very slowly.
@@ -663,7 +650,7 @@ def package_install(mia, operid, pkgname, firstpkg, noscripts):
             # Use rpm2cpio name-ver-release.rpm | cpio -diu to uncompress the rpm files to target system.
             # Then we will do some configuration in instpkg_post.
             ret = do_copy_install()
-    elif CONF_PKGTYPE == 'tar':
+    elif CF.D.PKGTYPE == 'tar':
         ret = do_tar_extract_install()
     if ret:
         return ret
@@ -688,7 +675,7 @@ class Test(MiaTest):
             ['/dev/sda6', 'ext3', '/dev/sda6'], 
             ['/dev/sda7', 'ext4', '/dev/sda7'], 
             ['/dev/sda8', 'ntfs', '/dev/sda8'], ]
-        pkgarr_probe(self.mia, self.operid, hdpartlist)
+        pkgarr_probe(self.mia, self.operid)
     
     def test_probe_all_disc(self):
         probe_all_disc(self.mia, self.operid, '/dev/sda10', 'ext4', 'MagicLinux-3.0-1.iso', 'MagicLinux/base', ['nss-softokn-freebl-3.13.3-1mgc30.i686.rpm'])
@@ -696,7 +683,7 @@ class Test(MiaTest):
         
 if __name__ == '__main__':
     test = Test()
-    #test.test_pkgarr_probe()
-    test.test_probe_all_disc()
+    test.test_pkgarr_probe()
+    #test.test_probe_all_disc()
     
     

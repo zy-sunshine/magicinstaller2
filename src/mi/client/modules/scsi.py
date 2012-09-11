@@ -3,7 +3,7 @@ from mi.client.utils import _, magicpopup
 from mi.client.utils import magicstep
 from mi.utils.miconfig import MiConfig
 import os
-CONF = MiConfig.get_instance()
+CF = MiConfig.get_instance()
 
 class MIStep_scsi (magicstep.magicstep):
     def __init__(self, rootobj):
@@ -150,7 +150,7 @@ class MIStep_scsi (magicstep.magicstep):
                     mod = fn[:fn.rfind('.')]
                     loaded = mod in loaded_module_list
                     self.modulelist.append([None, loaded, mod, mod])
-        os.path.walk('/lib/modules/%s/kernel/drivers/scsi' % CONF.LOAD.CONF_KERNELVER,
+        os.path.walk('/lib/modules/%s/kernel/drivers/scsi' % CF.D.KERNELVER,
                      find_kmod, None)
         self.modulelist.sort(modcmp)
 

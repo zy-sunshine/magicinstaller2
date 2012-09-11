@@ -7,11 +7,7 @@ import sys
 import miactions
 from mi.utils.milogger import MiLogger
 from mi.utils.miconfig import MiConfig
-CONF = MiConfig.get_instance()
-
-#CONF_DATADIR = CONF.LOAD.CONF_DATADIR
-#os.chdir(CONF_DATADIR)
-CONF_EXPERT_MODE = CONF.LOAD.CONF_EXPERT_MODE
+CF = MiConfig.get_instance()
 
 try:
     miinitrd_pos
@@ -48,20 +44,20 @@ if mia.pid > 0:
             elif method == 'probe_step':
                 return  mia.probe_step()
             if short_operations.__dict__.has_key(method):
-                if CONF_EXPERT_MODE:
+                if CF.D.EXPERT_MODE:
                     dolog('Run short.%s() with %s,\n' % (method, params))
                 result = short_operations.__dict__[method](*params)
-                if CONF_EXPERT_MODE:
+                if CF.D.EXPERT_MODE:
                     dolog('    which returns %r\n' % (result,))
                 return result
             else: # This is a long operation.
                 # Return the operation identifier to the caller.
-                if CONF_EXPERT_MODE:
+                if CF.D.EXPERT_MODE:
                     log_long.d('Put long.%s() with %s' % (method, params))
                     t = xmlrpclib.dumps(params, methodname=method, allow_none = 1)
                     #log_long.d('%s' % t)
                 id = mia.put_operation(t)
-                if CONF_EXPERT_MODE:
+                if CF.D.EXPERT_MODE:
                     log_long.d(', and get id %d.\n' % (id))
                 return id
 
@@ -99,13 +95,13 @@ elif mia.pid == 0:
         else:
             (params, method) = xmlrpclib.loads(opera)
             if long_operations.__dict__.has_key(method):
-                if CONF_EXPERT_MODE:
+                if CF.D.EXPERT_MODE:
                     dolog('Run long.%s() with %s and id %d,\n' % (method, params, id))
                 result = eval('long_operations.%s(mia, id, *params)' % method)
-                if CONF_EXPERT_MODE:
+                if CF.D.EXPERT_MODE:
                     dolog('    which returns %r.\n' % (result,))
                 mia.put_result(xmlrpclib.dumps((id, result), methodname=method, allow_none = 1))
             else:
-                if CONF_EXPERT_MODE:
+                if CF.D.EXPERT_MODE:
                     dolog('ERROR: NOT SUPPORTED method %s().\n' % method, color_c.blue)
                 mia.put_result(xmlrpclib.dumps((id, 'NOT_SUPPORT'), methodname=method, allow_none = 1))

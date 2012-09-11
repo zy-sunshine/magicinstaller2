@@ -6,11 +6,7 @@ import SimpleXMLRPCServer
 import sys
 import miactions
 from mi.utils.miconfig import MiConfig
-CONF = MiConfig.get_instance()
-
-#CONF_DATADIR = CONF.LOAD.CONF_DATADIR
-#os.chdir(CONF_DATADIR)
-CONF_EXPERT_MODE = CONF.LOAD.CONF_EXPERT_MODE
+CF = MiConfig.get_instance()
 
 try:
     miinitrd_pos
@@ -35,6 +31,7 @@ if mia.pid > 0:
 
     class MIAction:
         def _dispatch(self, method, params):
+            print 'dispatch %s %s' % (method, params)
             global  server_quit
             if method == 'quit':
                 mia.put_operation('quit')
@@ -46,20 +43,20 @@ if mia.pid > 0:
             elif method == 'probe_step':
                 return  mia.probe_step()
             if handlers_short.has_key(method):
-                if CONF_EXPERT_MODE:
+                if CF.D.EXPERT_MODE:
                     dolog('Run short.%s() with %s,\n' % (method, params))
                 result = handlers_short[method](*params)
-                if CONF_EXPERT_MODE:
+                if CF.D.EXPERT_MODE:
                     dolog('    which returns %r\n' % (result,))
                 return result
             else: # This is a long operation.
                 # Return the operation identifier to the caller.
-                if CONF_EXPERT_MODE:
+                if CF.D.EXPERT_MODE:
                     log_long.w('Put long.%s() with %s' % (method, params))
                     t = xmlrpclib.dumps(params, methodname=method, allow_none = 1)
                     #log_long.debug('%s' % t)
                 id = mia.put_operation(t)
-                if CONF_EXPERT_MODE:
+                if CF.D.EXPERT_MODE:
                     log_long.w(', and get id %d.\n' % (id))
                 return id
 
@@ -67,12 +64,49 @@ if mia.pid > 0:
         """Reuse server address for handy test."""
         allow_reuse_address = True
 
+    class RequestHandler(SimpleXMLRPCServer.SimpleXMLRPCRequestHandler):
+        def __init__(self, *args, **kwgs):
+            SimpleXMLRPCServer.SimpleXMLRPCRequestHandler.__init__(self, *args, **kwgs)
+#            self.do_OPTIONS = self.do_POST
+#            self.do_GET = self.do_POST
+#        def do_GET(self):
+#            print 'do_GET'
+#            return self.do_POST()
+
+#        def do_OPTIONS(self):
+#            print 'do_OPTIONS'
+#            return self.do_POST()
+##            print 'self.path %s' % self.path 
+##            if self.path in ('*', '/list'):
+##                self.send_response(200)
+##                self.send_header('Allow', 'GET, OPTIONS')
+##                self.send_header('Access-Control-Allow-Origin', '*')
+##                self.send_header('Access-Control-Allow-Headers', 'X-Request, X-Requested-With')
+##            else:
+##                self.send_response(404)
+##            self.send_header('Content-Length', '0')
+##            self.end_headers()
+#        def do_GET(self):
+#            print 'do_GET'
+#            return self.do_POST()
+##            print 'self.path %s' % self.path 
+##            if self.path in ('*', '/list'):
+##                self.send_response(200)
+##                self.send_header('Allow', 'GET, OPTIONS')
+##                self.send_header('Access-Control-Allow-Origin', '*')
+##                self.send_header('Access-Control-Allow-Headers', 'X-Request, X-Requested-With')
+##            else:
+##                self.send_response(404)
+##            self.send_header('Content-Length', '0')
+##            self.end_headers()
+            
     server = ReuseXMLRPCServer(  #SimpleXMLRPCServer.SimpleXMLRPCServer( \
         ('127.0.0.1', 1325),
-        SimpleXMLRPCServer.SimpleXMLRPCRequestHandler,
+        RequestHandler,
         None,
         allow_none=True)
     server.register_instance(MIAction())
+    server.register_introspection_functions()
     while 1:
         server.handle_request()
         if server_quit:
@@ -95,14 +129,18 @@ elif mia.pid == 0:
         else:
             (params, method) = xmlrpclib.loads(opera)
             if handlers_long.has_key(method):
-                if CONF_EXPERT_MODE:
+                if CF.D.EXPERT_MODE:
                     dolog('Run long.%s() with %s and id %d,\n' % (method, params, id))
-                result = handlers_long[method](mia, id, *params)
-                if CONF_EXPERT_MODE:
+                try:
+                    result = handlers_long[method](mia, id, *params)
+                except:
+                    result = 'run method %s raise exception %s' % (method, sys.exc_info()[0])
+                    dolog(result)
+                if CF.D.EXPERT_MODE:
                     dolog('    which returns %r.\n' % (result,))
                 mia.put_result(xmlrpclib.dumps((id, result), methodname=method, allow_none = 1))
             else:
-                if CONF_EXPERT_MODE:
+                if CF.D.EXPERT_MODE:
                     dolog('ERROR: NOT SUPPORTED method %s().\n' % method)
                 log_long.w('method %s NOT_SUPPORT' % method)
                 mia.put_result(xmlrpclib.dumps((id, 'NOT_SUPPORT'), methodname=method, allow_none = 1))
