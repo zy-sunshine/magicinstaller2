@@ -790,7 +790,7 @@ class MIStep_partition (magicstep.magicstep):
         for i in range(self.nb_harddisk.get_n_pages()):
             self.nb_harddisk.remove_page(-1)
         for (devfn, length, model) in tdata:
-            hdobj = self.harddisk(self.rootobj.tm, self.uixmldoc,
+            hdobj = Harddisk(self.rootobj.tm, self.uixmldoc,
                                   devfn, length, model)
             label = gtk.Label(hdobj.devfn)
             self.nb_harddisk.append_page(hdobj.widget, label)
@@ -1236,3 +1236,712 @@ class MIStep_partition (magicstep.magicstep):
         if is_empty:
             dolog("magic.autopart.xml not found or invalid.\n")
         return self.xgc_optionmenu(node)
+
+
+### Harddisk Class
+class  Harddisk(xmlgtk.xmlgtk):
+    COLUMN_NUM        = 0
+    COLUMN_DEVICE     = 1
+    COLUMN_FORMAT     = 2
+    COLUMN_FLAGS      = 3
+    COLUMN_TYPE       = 4
+    COLUMN_CAPACITY   = 5
+    COLUMN_FILESYSTEM = 6
+    COLUMN_MOUNTPOINT = 7
+    COLUMN_LABEL      = 8
+    COLUMN_START      = 9
+    COLUMN_END        = 10
+    COLUMN_FON_VAL    = 11
+    COLUMN_AVA_FLAGS  = 12
+    COLUMN_ORIGFS     = 13
+
+    aeval_xml = """<?xml version="1.0"?>
+    <partition>
+      <parttype>%s</parttype>
+      <ppos>ppbegin</ppos>
+      <size>%d</size>
+      <format_or_not>%s</format_or_not>
+      <filesystem>%s</filesystem>
+      <mountpoint>%s</mountpoint>
+      <swap>%s</swap>
+      <label>%s</label><o_label>%s</o_label>
+      <avaflags>%s</avaflags>
+      %s
+    </partition>"""
+
+    def __init__(self, tm, uixmldoc,
+                 devfn, length, model='N/A'):
+        xmlgtk.xmlgtk.__init__(self, uixmldoc, 'diskpage')
+        
+        # harddisk info
+        self.devfn = devfn
+        self.length = length
+        self.model = model
+        self.disklabel = None
+
+        # partition info
+        self.partlist = []          # partition list
+        # part_addon_infor is indexed by start sector because it can be used to
+        # identify an partition even if the partition number is changed.
+        # The value of the part_addon_infor is
+        #     (format_or_not, format_to_filesystem, mount_point)
+        self.part_addon_infor = {}
+        # added_part_start is indexed by start sector. All value is 'y'.
+        # It distinguish the user added partition from the original exist partition.
+        self.added_part_start = {}
+        # 'true' | 'false', support parition name or not
+        self.support_partition_name = None
+
+        self.orig_partitions = None # { start_sect: 'part devfn' }, original partitions
+
+        # Values for Create/Edit partition.
+        self.aeval_xmldoc = None
+        self.ae_start = None
+        self.ae_end = None
+        self.ae_model = None
+        self.ae_iter = None
+
+        # Values for disk type choice.
+        self.tmpdtval_xmldoc = None
+        self.disktype = None
+
+        # fill ui
+        self.set_widget_value('model', model)
+        self.set_widget_value('capacity', self.sector2str(length))
+        
+        # get all partitions
+        self.tm = tm                # task manager
+        tm.add_action(None, self.got_all_partitions, None, 'get_all_partitions', devfn)
+
+##### Utility
+    def partdevfn(self, partnum):
+        if partnum < 1:
+            return ''
+        return  '%s%d' % (self.devfn, partnum)
+
+    def waitdlg(self):
+        return magicpopup.magicmsgbox(None, _('Please wait......'),
+                                      magicpopup.magicmsgbox.MB_INFO, 0)
+
+    def close_dialog(self, tdata, data):
+        data.topwin.destroy()
+
+##### Value conversion
+    def sector2str(self, sector):
+        if sector > 2 * 1024 * 1024:
+            return '%6.2fGB' % (sector / 2.0 / 1024 / 1024)
+        else:
+            return '%7.2fMB' % (sector / 2.0 / 1024)
+
+    def parttype2str(self, parttype):
+        result = ''
+        if parttype & parted.PARTITION_LOGICAL:
+            result = result + 'L'
+        if parttype & parted.PARTITION_EXTENDED:
+            result = result + 'E'
+        if parttype & parted.PARTITION_FREESPACE:
+            result = result + 'F'
+        if result == '':
+            return  'P'
+        return  result
+
+    def str2parttype(self, str):
+        result = 0
+        if string.find(str, 'L') >= 0:
+            result = result | parted.PARTITION_LOGICAL
+        if string.find(str, 'E') >= 0:
+            result = result | parted.PARTITION_EXTENDED
+        if string.find(str, 'F') >= 0:
+            result = result | parted.PARTITION_FREESPACE
+        return  result
+
+    def partflags2str(self, partflags):
+        result = ''
+        for f in partflags:
+            if f == parted.PARTITION_BOOT:
+                result = result + 'B'
+            elif f == parted.PARTITION_ROOT:
+                result = result + 'R'
+            elif f == parted.PARTITION_SWAP:
+                result = result + 'S'
+            elif f == parted.PARTITION_HIDDEN:
+                result = result + 'H'
+            elif f == parted.PARTITION_RAID:
+                result = result + 'A'
+            elif f == parted.PARTITION_LVM:
+                result = result + 'V'
+            elif f == parted.PARTITION_LBA:
+                result = result + 'L'
+        return  result
+
+    def str2partflags(self, str):
+        result = []
+        for c in str:
+            if c == 'B':
+                result.append(parted.PARTITION_BOOT)
+            elif c == 'R':
+                result.append(parted.PARTITION_ROOT)
+            elif c == 'S':
+                result.append(parted.PARTITION_SWAP)
+            elif c == 'H':
+                result.append(parted.PARTITION_HIDDEN)
+            elif c == 'A':
+                result.append(parted.PARTITION_RAID)
+            elif c == 'V':
+                result.append(parted.PARTITION_LVM)
+            elif c == 'L':
+                result.append(parted.PARTITION_LBA)
+        return  result
+
+
+##### Gather info
+    def refresh_disklabel_label(self, tdata, data):
+        "Callback of op 'get_disk_type'"
+        (self.disklabel, self.support_partition_name) = tdata
+        self.set_widget_value('disklabel', self.disklabel)
+
+    def fill_global_and_check(self):
+        CONF.RUN.g_all_part_infor[self.devfn] = []
+        models = self.list_map.keys()
+        model = models[0]
+        iter = model.get_iter_first()
+        while iter:
+            partnum = int(model.get_value(iter, self.COLUMN_NUM))
+            parttype = self.str2parttype(model.get_value(iter, self.COLUMN_TYPE))
+            partflags = self.str2partflags(model.get_value(iter, self.COLUMN_FLAGS))
+            start = int(model.get_value(iter, self.COLUMN_START))
+            end = int(model.get_value(iter, self.COLUMN_END))
+            format_or_not = model.get_value(iter, self.COLUMN_FON_VAL)
+            filesystem = model.get_value(iter, self.COLUMN_FILESYSTEM)
+            mountpoint = model.get_value(iter, self.COLUMN_MOUNTPOINT)
+            not_touched = 'true'
+            if format_or_not == 'true':
+                not_touched = 'false'
+            elif self.added_part_start.has_key(start):
+                not_touched = 'false'
+            CONF.RUN.g_all_part_infor[self.devfn].append((partnum,
+                                               parttype,
+                                               partflags,
+                                               start,
+                                               end,
+                                               format_or_not,
+                                               filesystem,
+                                               mountpoint,
+                                               not_touched))
+            if not_touched == 'true' and \
+                   filesystem != 'N/A' and \
+                   filesystem != 'linux-swap':
+                CONF.RUN.g_all_orig_part.append((self.orig_partitions[start],
+                                      filesystem,
+                                      self.partdevfn(partnum)))
+            
+            if mountpoint == '/':
+                if CONF.RUN.g_root_device:
+                    return  _('More than one partition is mounted on /')
+                CONF.RUN.g_root_device = '%s%d' % (self.devfn, partnum)
+            if mountpoint == '/boot':
+                CONF.RUN.g_boot_device = '%s%d' % (self.devfn, partnum)
+            if CONF_FSTYPE_MAP.has_key(filesystem):
+                minsize = CONF_FSTYPE_MAP[filesystem][2]
+                if minsize != -1:
+                    if end - start + 1 < minsize * 2048:
+                        errmsg = _('%0.2fM is too small for %s, %dM at least.')
+                        errmsg = errmsg % ((end - start + 1.0) / 2048, filesystem, minsize)
+                        return  errmsg
+                maxsize = CONF_FSTYPE_MAP[filesystem][3]
+                if maxsize != -1:
+                    if end - start + 1 > maxsize * 2048:
+                        errmsg = _('%0.2fM is too big for %s, %dM at most.')
+                        errmsg = errmsg % ((end - start + 1.0) / 2048, filesystem, maxsize)
+                        return  errmsg
+            if filesystem == 'linux-swap' and mountpoint == 'USE':
+                # Choose the maximum swap.
+                if not CONF.RUN.g_swap_device or CONF.RUN.g_swap_device[2] < end - start + 1:
+                    CONF.RUN.g_swap_device = [self.devfn, partnum, end - start + 1]
+            iter = model.iter_next(iter)
+        return  None
+
+    def got_all_partitions(self, tdata, data):
+        "Callback of op 'get_all_partitions'"
+        self.tm.add_action(None, self.refresh_disklabel_label, None,
+                           'get_disk_type', self.devfn)
+        self.partlist = tdata
+        if self.orig_partitions is None:  # save original partitions
+            self.orig_partitions = {}
+            for p in self.partlist:
+                self.orig_partitions[p[6]] = self.partdevfn(p[0])
+
+        for p in self.partlist:
+            if not self.part_addon_infor.has_key(p[6]):
+                if p[4] == 'linux-swap':
+                    self.part_addon_infor[p[6]] = ('false', p[4], 'USE')
+                else:
+                    self.part_addon_infor[p[6]] = ('false', p[4], '')
+        self.fill_parts_view()
+        if data:
+            data.topwin.destroy()
+        else:
+            self.name_map['restore'].set_sensitive(True)
+            self.name_map['newlabel'].set_sensitive(True)
+
+    def reload_all_partitions(self, tdata, data):
+        self.tm.add_action(None, self.got_all_partitions, data,
+                           'get_all_partitions', self.devfn)
+
+    def fill_parts_view(self):
+        tmpval_xmldoc = parseString('<?xml version="1.0"?><data><partitions/></data>')
+        tmpval_root = tmpval_xmldoc.getElementsByTagName('partitions')[0]
+        for part in self.partlist:
+            if part[2] & parted.PARTITION_FREESPACE:
+                if part[7] - part[6] + 1 < 2048:
+                    continue
+                addon_infor = ('false', '', '')
+            else:
+                addon_infor = self.part_addon_infor[part[6]]
+            newnode = tmpval_xmldoc.createElement('row')
+            newnode.setAttribute('c0', str(part[0]))
+            newnode.setAttribute('c1', self.partdevfn(part[0]))
+            if addon_infor[0] == 'true':
+                newnode.setAttribute('c2', 'images/yes.png')
+            elif self.added_part_start.has_key(part[6]) or \
+                 part[2] & parted.PARTITION_FREESPACE or \
+                 part[2] & parted.PARTITION_EXTENDED:
+                newnode.setAttribute('c2', 'images/blank.png')
+            else:
+                newnode.setAttribute('c2', 'images/apple-green.png')
+            newnode.setAttribute('c3', self.partflags2str(part[1]))
+            newnode.setAttribute('c4', self.parttype2str(part[2]))
+            newnode.setAttribute('c5', self.sector2str(part[3]))
+            if addon_infor[0] == 'true':
+                newnode.setAttribute('c6', addon_infor[1])
+            else:
+                newnode.setAttribute('c6', part[4])
+            newnode.setAttribute('c7', addon_infor[2])
+            newnode.setAttribute('c8', part[5])
+            newnode.setAttribute('c9', str(part[6]))
+            newnode.setAttribute('c10', str(part[7]))
+            newnode.setAttribute('c11', addon_infor[0]) # Format or not.
+            newnode.setAttribute('c12', self.partflags2str(part[8])) # avaflags
+            newnode.setAttribute('c13', part[4]) # Original filesystem.
+            tmpval_root.appendChild(newnode)
+        self.fill_values(tmpval_xmldoc.documentElement)
+
+
+    def part_sel_changed(self, treesel, data):
+        (model, iter) = treesel.get_selected()
+        if not iter: # iter is None
+            for btnname in ['create', 'edit', 'remove']:
+                self.name_map[btnname].set_sensitive(False)
+        else:
+            # Get the part type.
+            parttypestr = model.get_value(iter, self.COLUMN_TYPE)
+            if string.find(parttypestr, 'F') >= 0:
+                # This is a free space.
+                self.name_map['create'].set_sensitive(True)
+                self.name_map['edit'].set_sensitive(False)
+                self.name_map['remove'].set_sensitive(False)
+            else:
+                self.name_map['create'].set_sensitive(False)
+                self.name_map['edit'].set_sensitive(True)
+                self.name_map['remove'].set_sensitive(True)
+
+##### Partition create and edit
+    def aevalue_create(self):
+        (model, iter) = \
+                self.name_map['partitions_treeview'].get_selection().get_selected()
+        self.ae_model = model
+        self.ae_iter = iter
+        if iter:
+            extended_or_not = None
+            t = model.get_value(iter, self.COLUMN_TYPE)
+            if string.find(t, 'L') >= 0:
+                t = 'logical'
+            elif string.find(t, 'E') >= 0:
+                t = 'extended'
+                extended_or_not = 1
+            else:
+                t = 'primary'
+            fon = model.get_value(iter, self.COLUMN_FON_VAL)
+            fs = model.get_value(iter, self.COLUMN_FILESYSTEM)
+            must_format_or_not = (fs == 'N/A')
+            mp = model.get_value(iter, self.COLUMN_MOUNTPOINT)
+            swap = 'USE'  # default to use swap
+            if fs == 'linux-swap':
+                #swap = mp
+                mp = ''
+            #else:
+            #    swap = ''
+            l = model.get_value(iter, self.COLUMN_LABEL)
+            flags = model.get_value(iter, self.COLUMN_FLAGS)
+            avaflags = model.get_value(iter, self.COLUMN_AVA_FLAGS)
+            self.ae_start = int(model.get_value(iter, self.COLUMN_START))
+            self.ae_end = int(model.get_value(iter, self.COLUMN_END))
+        else:  # It shouldn't come here.....
+            t = 'primary'
+            fon = 'false'
+            fs = 'reiserfs'
+            must_format_or_not = 1
+            mp = '/'
+            swap = ''
+            l = 'N/A'
+            flags = ''
+            avaflags = ''
+            self.ae_start = 0
+            self.ae_end = 0
+            exnteded_or_not = None
+        self.orig_fs = fs
+        if l == 'N/A':
+            l = ''
+        flagsxml = ''
+        for f in 'BRSHAVL':
+            if string.find(flags, f) >= 0:
+                val = 'true'
+            else:
+                val = 'false'
+            flagsxml = flagsxml + \
+                       '<flag_%s>%s</flag_%s><o_flag_%s>%s</o_flag_%s>' % (f, val, f, f, val, f)
+        self.aeval_xmldoc = parseString(self.aeval_xml % \
+                                        (t, self.ae_end - self.ae_start + 1,
+                                         fon, fs, mp, swap,
+                                         l, l, avaflags, flagsxml))
+        return  (avaflags,
+                 extended_or_not, must_format_or_not, fs == 'linux-swap')
+
+    def aedialog_setup(self,
+                       extended_or_not, must_format_or_not, swap_or_not):
+        if must_format_or_not:
+            self.aedialog.name_map['mountpoint_label'].hide()
+            self.aedialog.name_map['mountpoint_combo'].hide()
+            #self.aedialog.name_map['swapbox'].hide()
+        elif swap_or_not:
+            self.aedialog.name_map['mountpoint_label'].hide()
+            self.aedialog.name_map['mountpoint_combo'].hide()
+            self.aedialog.name_map['swapbox'].show()
+        self.aedialog.fill_values(self.aeval_xmldoc.documentElement)
+        if self.support_partition_name == 'false':
+            self.aedialog.name_map['label_label'].set_sensitive(False)
+            self.aedialog.name_map['label_entry'].set_sensitive(False)
+        if extended_or_not:
+            for widget in self.aedialog.group_map['noextend']:
+                widget.set_sensitive(False)
+
+    def aevalue_fetch_addon_infor(self, dE):
+        fon = self.aedialog.get_data(dE, 'format_or_not')
+        self.ae_model.set_value(self.ae_iter, self.COLUMN_FON_VAL, fon)
+        if fon == 'true':
+            self.ae_model.set_value(self.ae_iter, self.COLUMN_FORMAT,
+                                    self.get_pixbuf_map('images/yes.png'))
+            fs = self.aedialog.get_data(dE, 'filesystem')
+            self.ae_model.set_value(self.ae_iter, self.COLUMN_FILESYSTEM, fs)
+        else:
+            start = int(self.ae_model.get_value(self.ae_iter, self.COLUMN_START))
+            typestr = self.ae_model.get_value(self.ae_iter, self.COLUMN_TYPE)
+            if self.added_part_start.has_key(start) or \
+               string.find(typestr, 'F') >= 0 or \
+               string.find(typestr, 'E') >= 0:
+                self.ae_model.set_value(self.ae_iter, self.COLUMN_FORMAT,
+                                        self.get_pixbuf_map('images/blank.png'))
+            else:
+                self.ae_model.set_value(self.ae_iter, self.COLUMN_FORMAT,
+                                        self.get_pixbuf_map('images/apple-green.png'))
+            fs = self.ae_model.get_value(self.ae_iter, self.COLUMN_ORIGFS)
+            self.ae_model.set_value(self.ae_iter, self.COLUMN_FILESYSTEM, fs)
+        if fs == 'linux-swap':
+            mp = self.aedialog.get_data(dE, 'swap')
+        else:
+            mp = self.aedialog.get_data(dE, 'mountpoint')
+            # Trim the mount point.
+            if mp != '' and mp[0] != '/':
+                mp = '/' + mp
+            while len(mp) > 1 and mp[-1] == '/':
+                mp = mp[:-1]
+        self.ae_model.set_value(self.ae_iter, self.COLUMN_MOUNTPOINT, mp)
+        avaflags = self.aedialog.get_data(dE, 'avaflags')
+        return (fon, fs, mp)
+
+    def update_create_labels(self):
+        size = int(float(self.aedialog.name_map['size_hscale'].get_value()))
+        self.aedialog.name_map['size_entry'].set_text(str(size))
+        self.aedialog.fetch_values(self.aeval_xmldoc)
+        dE = self.aeval_xmldoc.documentElement
+        ppos = self.aedialog.get_data(dE, 'ppos')
+        if ppos == 'ppbegin':
+            self.aedialog.name_map['start_sec'].set_text(str(self.ae_start))
+            self.aedialog.name_map['start_mega'].set_text(self.sector2str(self.ae_start))
+            self.aedialog.name_map['end_sec'].set_text(str(self.ae_start + size - 1))
+            self.aedialog.name_map['end_mega'].set_text(self.sector2str(self.ae_start + size - 1))
+        else:
+            self.aedialog.name_map['start_sec'].set_text(str(self.ae_end - size + 1))
+            self.aedialog.name_map['start_mega'].set_text(self.sector2str(self.ae_end - size + 1))
+            self.aedialog.name_map['end_sec'].set_text(str(self.ae_end))
+            self.aedialog.name_map['end_mega'].set_text(self.sector2str(self.ae_end))
+        self.aedialog.name_map['size_sec'].set_text(str(size))
+        self.aedialog.name_map['size_mega'].set_text(self.sector2str(size))
+
+    class  partcreate (magicpopup.magicpopup):
+        def __init__(self, upobj, uixml, title, buttons,
+                     uirootname=None, prefix=''):
+            self.upobj = upobj
+            magicpopup.magicpopup.__init__(self, upobj, uixml, title,
+                                           buttons, uirootname, prefix)
+
+        def label_change(self, range, data):
+            self.upobj.update_create_labels()
+
+        def parttype_changed(self, optmenu, data):
+            if optmenu.get_active() == 1:
+                # This means the user choose to create an Extended Partition.
+                for widget in self.group_map['noextend']:
+                    widget.set_sensitive(False)
+                self.name_map['filesystem_om'].set_sensitive(False)
+            else:
+                # This means the user choose to create an Primary/Logical Partition.
+                for widget in self.group_map['noextend']:
+                    widget.set_sensitive(True)
+                if self.name_map['format'].get_active():
+                    self.name_map['filesystem_om'].set_sensitive(True)
+                else:
+                    self.name_map['filesystem_om'].set_sensitive(False)
+
+        def format_changed(self, togglebutton, data):
+            self.upobj.format_fstype_changed(togglebutton,
+                                             self.name_map['filesystem_om'],
+                                             data)
+
+        def fstype_changed(self, optmenu, data):
+            self.upobj.format_fstype_changed(self.name_map['format'],
+                                             optmenu,
+                                             data)
+
+    class  partedit (magicpopup.magicpopup):
+        def __init__(self, upobj, uixml, title, buttons,
+                     uirootname=None, prefix=''):
+            self.upobj = upobj
+            magicpopup.magicpopup.__init__(self, upobj, uixml, title,
+                                           buttons, uirootname, prefix)
+
+        def format_changed(self, togglebutton, data):
+            self.upobj.format_fstype_changed(togglebutton,
+                                             self.name_map['filesystem_om'],
+                                             data)
+
+        def fstype_changed(self, optmenu, data):
+            self.upobj.format_fstype_changed(self.name_map['format'],
+                                             optmenu,
+                                             data)
+
+    def format_fstype_changed(self, togglebutton, optmenu, data):
+        if not togglebutton.get_active() and self.must_format_or_not:
+            self.aedialog.name_map['mountpoint_label'].hide()
+            self.aedialog.name_map['mountpoint_combo'].hide()
+            self.aedialog.name_map['swapbox'].hide()
+        else:
+            if optmenu.get_active() == CONF.RUN.g_fstype_swap_index:
+                self.aedialog.name_map['mountpoint_label'].hide()
+                self.aedialog.name_map['mountpoint_combo'].hide()
+                self.aedialog.name_map['swapbox'].show()
+            else:
+                self.aedialog.name_map['swapbox'].hide()
+                self.aedialog.name_map['mountpoint_label'].show()
+                self.aedialog.name_map['mountpoint_combo'].show()
+        if not togglebutton.get_active():
+            omval = self.aedialog.optionmenu_map[optmenu][1]
+            for i in range(len(omval)):
+                if omval[i] == self.orig_fs:
+                    optmenu.set_active(i)
+                    break
+
+    def create_clicked(self, widget, data):
+        (avaflags, extended_or_not, must_format_or_not, swap_or_not) = \
+                   self.aevalue_create()
+        self.must_format_or_not = must_format_or_not
+        hsnode = self.search_hook(self.uixmldoc, 'hscale', 'size_hscale')
+        if hsnode:
+            hsnode.setAttribute('upper', self.ae_end - self.ae_start)
+        self.aedialog = self.partcreate( \
+            self, self.uixmldoc, _('Create a new partition'),
+            magicpopup.magicpopup.MB_OK |
+            magicpopup.magicpopup.MB_CANCEL,
+            'newpart-dlg', 'add_')
+        self.aedialog.name_map['device_label'].set_text(self.model)
+        self.aedialog_setup(extended_or_not, must_format_or_not, swap_or_not)
+        self.aedialog.name_map['size_hscale'].set_value(self.ae_end - self.ae_start + 1)
+
+    def add_ok_clicked(self, widget, data):
+        self.aedialog.fetch_values(self.aeval_xmldoc)
+        self.aedialog.topwin.destroy()
+        dE = self.aeval_xmldoc.documentElement
+        parttype = self.aedialog.get_data(dE, 'parttype')
+        format_or_not = self.aedialog.get_data(dE, 'format_or_not')
+        if parttype == 'extended':
+            fstype = 'N/A'
+            addon_infor = ('false', 'N/A' , '')
+        elif format_or_not == 'false' and self.must_format_or_not:
+            fstype = 'N/A'
+            addon_infor = ('false', 'N/A' , '')
+        else:
+            fstype = self.aedialog.get_data(dE, 'filesystem')
+            addon_infor = self.aevalue_fetch_addon_infor(dE)
+        ppos = self.aedialog.get_data(dE, 'ppos')
+        # Trim size.
+        size = self.aedialog.get_data(dE, 'size')
+        maxsize = self.ae_end - self.ae_start + 1
+        if len(size) > 0:
+            if size[-1] in 'kKmMgG':
+                size = convert_str_size(size)
+                if size is not None:
+                    size /= 512 # to sector num
+            else:
+                size = convert_str_size(size)
+            if size is None:
+                size = maxsize
+        if size <= 0:
+            size = 1
+        if size > maxsize:
+            size = maxsize
+        if ppos == 'ppbegin':
+            start = self.ae_start
+            end = self.ae_start + size - 1
+        else:
+            start = self.ae_end - size + 1
+            end = self.ae_end
+        self.tm.add_action(None, self.partition_added, (self.waitdlg(), addon_infor),
+                           'add_partition', self.devfn, parttype, fstype, start, end)
+
+    def partition_added(self, tdata, data):
+        (start, errstr) = tdata
+        (waitdlg, addon_infor) = data
+        if start >= 0:
+            self.part_addon_infor[start] = addon_infor
+            self.added_part_start[start] = 'y'
+            self.tm.add_action(None, self.got_all_partitions, waitdlg,
+                               'get_all_partitions', self.devfn)
+        else:
+            magicpopup.magicmsgbox(None, errstr,
+                                   magicpopup.magicmsgbox.MB_ERROR,
+                                   magicpopup.magicpopup.MB_OK)
+            waitdlg.topwin.destroy()
+
+    def edit_clicked(self, widget, data):
+        (avaflags, extended_or_not, must_format_or_not, swap_or_not) = \
+                   self.aevalue_create()
+        self.must_format_or_not = must_format_or_not
+        self.aedialog = self.partedit( \
+            self, self.uixmldoc, _('Edit an exist partition'),
+            magicpopup.magicpopup.MB_OK |
+            magicpopup.magicpopup.MB_CANCEL,
+            'editpart-dlg', 'edit_')
+        self.aedialog_setup(extended_or_not, must_format_or_not, swap_or_not)
+        for f in 'BRSHAVL':
+            if string.find(avaflags, f) < 0:
+                self.aedialog.name_map['flag_%s' % f].set_sensitive(False)
+
+    def edit_fstype_changed(self, optmenu, data):
+        self.fstype_changed(optmenu, data)
+
+    def edit_ok_clicked(self, widget, data):
+        self.aedialog.fetch_values(self.aeval_xmldoc)
+        self.aedialog.topwin.destroy()
+        dE = self.aeval_xmldoc.documentElement
+        self.part_addon_infor[self.ae_start] = self.aevalue_fetch_addon_infor(dE)
+        true_flags = ''
+        false_flags = ''
+        cur_flags = ''
+        avaflags = self.aedialog.get_data(dE, 'avaflags')
+        for f in avaflags:
+            flag_orig = self.aedialog.get_data(dE, 'o_flag_%s' % f)
+            flag_cur = self.aedialog.get_data(dE, 'flag_%s' % f)
+            if flag_cur == 'true':
+                cur_flags = cur_flags + f
+            if flag_orig != flag_cur:
+                if flag_cur == 'true':
+                    true_flags = true_flags + f
+                else:
+                    false_flags = false_flags + f
+        if true_flags != '' or false_flags != '':
+            self.ae_model.set_value(self.ae_iter, self.COLUMN_FLAGS, cur_flags)
+        set_label = 'false'
+        if self.support_partition_name:
+            o_label = self.aedialog.get_data(dE, 'o_label')
+            label = self.aedialog.get_data(dE, 'label')
+            if o_label != label:
+                set_label = 'true'
+                self.ae_model.set_value(self.ae_iter, self.COLUMN_LABEL, label)
+        if true_flags != '' or false_flags != '' or set_label:
+            self.tm.add_action(None, self.close_dialog, self.waitdlg(),
+                               'set_flags_and_label', self.devfn, self.ae_start,
+                               self.str2partflags(true_flags),
+                               self.str2partflags(false_flags), set_label, label)
+
+##### Partition Remoe
+    def remove_clicked(self, widget, data):
+        (model, iter) = \
+                self.name_map['partitions_treeview'].get_selection().get_selected()
+        if iter:
+            part_start = model.get_value(iter, self.COLUMN_START)
+            part_start = int(part_start)
+            self.tm.add_action(None, self.reload_all_partitions, self.waitdlg(),
+                               'delete_partition', self.devfn, part_start)
+
+##### Partition Restore
+    def restore_clicked(self, widget, data):
+        magicpopup.magicmsgbox( \
+            self,
+            _('This operation will reload partition table from harddisk. All your custom information will be lost.'),
+            magicpopup.magicmsgbox.MB_WARNING,
+            magicpopup.magicpopup.MB_OK | magicpopup.magicpopup.MB_CANCEL,
+            'restore_confirm_')
+
+    def restore_confirm_ok_clicked(self, button, dlg):
+        self.part_addon_infor = {}
+        self.added_part_start = {}
+        dlg.topwin.destroy()
+        self.orig_partitions = None
+        self.tm.add_action(None, self.reload_all_partitions, self.waitdlg(),
+                           'reload_partition_table', self.devfn)
+
+##### Disk Label 
+    def newlabel_clicked(self, widget, data):
+        cur_disktype = self.disklabel
+        if cur_disktype == 'N/A':
+            default_disktype = 'msdos'
+        else:
+            default_disktype = cur_disktype
+        self.tmpdtval_xmldoc = parseString( \
+            '<?xml version="1.0"?><nld><origdt>%s</origdt><disktype>%s</disktype></nld>' % \
+            (cur_disktype, default_disktype))
+        self.newlabel_dlg_topwin = magicpopup.magicpopup( \
+            self, self.uixmldoc,
+            _('Create an empty new disk label'),
+            magicpopup.magicpopup.MB_OK |
+            magicpopup.magicpopup.MB_CANCEL,
+            'newdisklabel-dlg', 'newlabel_')
+        self.newlabel_dlg_topwin.fill_values(self.tmpdtval_xmldoc.documentElement)
+
+    def newlabel_ok_clicked(self, widget, data):
+        dE = self.tmpdtval_xmldoc.documentElement
+        self.newlabel_dlg_topwin.fetch_values(self.tmpdtval_xmldoc)
+        self.disktype = self.newlabel_dlg_topwin.get_data(dE, 'disktype')
+        self.newlabel_dlg_topwin.topwin.destroy()
+        origdt = self.newlabel_dlg_topwin.get_data(dE, 'origdt')
+        if origdt != self.disktype:
+            if origdt != 'N/A':
+                magicpopup.magicmsgbox( \
+                    self,
+                    _('This operation will erase the whole partition table when apply.'),
+                    magicpopup.magicmsgbox.MB_WARNING,
+                    magicpopup.magicpopup.MB_OK | magicpopup.magicpopup.MB_CANCEL,
+                    'newlabel_confirm_')
+            else:
+                self.newlabel_confirm_ok_clicked(widget, data)
+
+    def newlabel_confirm_ok_clicked(self, widget, dlg):
+        dlg.topwin.destroy()
+        self.part_addon_infor = {} # Clear the addon infor.
+        self.added_part_start = {}
+        self.orig_partitions = None
+        self.tm.add_action(None, self.reload_all_partitions, self.waitdlg(),
+                           'disk_new_fresh', self.devfn, self.disktype)
+
+if __name__ == '__main__':
+    MiStep_Partition()

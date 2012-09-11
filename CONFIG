@@ -1,63 +1,63 @@
-ÅäÖÃ·½·¨:
-    1. ¹Ø±Õ¿ª·¢Ä£Ê½ 
-       "touch .distmode" ÎÒÃÇ´´½¨Õâ¸öÒş²ØÎÄ¼ş, ÒÔ¹Ø±Õ¿ª·¢Ä£Ê½.
+é…ç½®æ–¹æ³•:
+    1. å…³é—­å¼€å‘æ¨¡å¼ 
+       "touch .distmode" æˆ‘ä»¬åˆ›å»ºè¿™ä¸ªéšè—æ–‡ä»¶, ä»¥å…³é—­å¼€å‘æ¨¡å¼.
 
-    2. ÏÂÔØ MagicLinux-2.5-1.iso ²¢½«Æä¹ÒÔØµ½Ä³¸öÄ¿Â¼, ÀıÈç /mnt/magic_iso/
+    2. ä¸‹è½½ MagicLinux-2.5-1.iso å¹¶å°†å…¶æŒ‚è½½åˆ°æŸä¸ªç›®å½•, ä¾‹å¦‚ /mnt/magic_iso/
        wget http://apt.magiclinux.org/iso/MagicLinux-2.5/MagicLinux-2.5-1.iso
        mount -o loop MagicLinux-2.5-1.iso /mnt/magic_iso/
         
-       ×öÁ¬½Ó bindir/root_pkg Ê¹ÆäÖ¸Ïò iso ÖĞµÄ packages Ä¿Â¼.
+       åšè¿æ¥ bindir/root_pkg ä½¿å…¶æŒ‡å‘ iso ä¸­çš„ packages ç›®å½•.
        ln -sv /mnt/magic_iso/MagicLinux/packages/ bindir/root_pkg
 
-    3. ÅäÖÃ spec Ä¿Â¼.
-       °´ÕÕÄ£°å spec/specinfo.py ¸ü¸ÄÅäÖÃ.
-       Ìí¼ÓÁ¬½Ó spec/packages Ê¹ÆäÖ¸ÏòÄúĞèÒª·¢ĞĞµÄ rpm °üÄ¿Â¼.
-       ¿ÉÒÔÌí¼Ó spec/add_files Ä¿Â¼, ÆäÖĞµÄÎÄ¼ş(¸ùÄ¿Â¼)»áÖÃÓÚ iso ÖĞ.(¿ÉÑ¡)
+    3. é…ç½® spec ç›®å½•.
+       æŒ‰ç…§æ¨¡æ¿ spec/specinfo.py æ›´æ”¹é…ç½®.
+       æ·»åŠ è¿æ¥ spec/packages ä½¿å…¶æŒ‡å‘æ‚¨éœ€è¦å‘è¡Œçš„ rpm åŒ…ç›®å½•.
+       å¯ä»¥æ·»åŠ  spec/add_files ç›®å½•, å…¶ä¸­çš„æ–‡ä»¶(æ ¹ç›®å½•)ä¼šç½®äº iso ä¸­.(å¯é€‰)
        
-    4. Ö´ĞĞÃüÁîÖÆ×÷ iso .
-       scons root.step1     # ´Ó bindir/root_pkg ÖĞµÄ rpm °üÖĞÌáÈ¡ÎÄ¼ş¹¹½¨ MI µÄrootfs.
-       scons                # ¹¹½¨ iso.
+    4. æ‰§è¡Œå‘½ä»¤åˆ¶ä½œ iso .
+       scons root.step1     # ä» bindir/root_pkg ä¸­çš„ rpm åŒ…ä¸­æå–æ–‡ä»¶æ„å»º MI çš„rootfs.
+       scons                # æ„å»º iso.
 
-       Ö®ºóÖØ¸´ÖÆ×÷ iso ¿ÉÒÔ²»Ö´ĞĞ scons root.step1 ,Ö»ĞèÖ´ĞĞ scons 
-       , µ« svn update »òÕßÆäËû¸üĞÂºó, ĞèÒªÖ´ĞĞÒ»´Î scons root.step1 ÃüÁîÒÔ¸üĞÂ rootfs
-       Òª±£Ö¤ bindir/root.step1.tar.gz ´æÔÚ(¼´ scons root.step1 ÃüÁîÉú³ÉµÄÎÄ¼ş).
+       ä¹‹åé‡å¤åˆ¶ä½œ iso å¯ä»¥ä¸æ‰§è¡Œ scons root.step1 ,åªéœ€æ‰§è¡Œ scons 
+       , ä½† svn update æˆ–è€…å…¶ä»–æ›´æ–°å, éœ€è¦æ‰§è¡Œä¸€æ¬¡ scons root.step1 å‘½ä»¤ä»¥æ›´æ–° rootfs
+       è¦ä¿è¯ bindir/root.step1.tar.gz å­˜åœ¨(å³ scons root.step1 å‘½ä»¤ç”Ÿæˆçš„æ–‡ä»¶).
 
-    rpm °²×°Ä£Ê½:
-        1. ½«ËùÓĞ rpm °ü·ÅÔÚ spec/packages Ä¿Â¼ÏÂ
-        2. È»ºóĞŞ¸Ä spec/specinfo.py ÖĞµÄ pkgtype Îª "rpm" .
-        3. scons root.step1 && scons ¾Í¿ÉÒÔÉú³ÉÏàÓ¦µÄ iso .
-        ×¢: rpm °üµÄ°²×°Ë³Ğò¿ÉÒÔÊÖ¶¯µ÷½Ú, ĞŞ¸Ä spec/specinfo.py ÖĞµÄ
-            basepkg_list, remove_deps, add_deps ²ÎÊı¼´¿É.
-        Ô­ÀíËµÃ÷:
-            ´«Í³µÄ rpm °²×°Ä£Ê½, ¸ù¾İÒÀÀµÁĞ±íÖğ¸ö°²×°, Ö´ĞĞ rpm ÖĞµÄpre_script
-            and post_script, Í¬Ê±Éú³É rpm Êı¾İ¿â. ×¢Òâ,
-            Èç¹ûÄãµÄ pre_script Ö´ĞĞÊ§°ÜÄÇÕâ¸ö°ü°²×°¾Í²»³É¹¦ÁË.
-            post_script Èç¹û°²×°Ê§°Ü¿ÉÒÔÔÚÏµÍ³°²×°ºóÆÚĞŞÕı spec/post_install.sh (rpm °üÒÑ¾­³É¹¦°²×°½øÈëÏµÍ³ÁË)
-        ¸½¼Ó: »¹Òş²ØÁËÒ»¸ö°²×°Ä£Ê½(rpm copy install mode) ;) , ÓĞĞËÈ¤µÄ¿ÉÒÔÊÔÊÔ, ¿ªÆô²½ÖèÈçÏÂ£º
-            Ìí¼Ó spec/rpmdb Ä¿Â¼(ÓÃÓÚÉú³É rpm Êı¾İ¿âµÄµØ·½, Ìí¼Ó
-            spec/etc_install Ä¿Â¼ (ÓÃÓÚ±£´æÏµÍ³°²×°µÄºóÆÚÅäÖÃ½Å±¾))
-            ½«ºóÆÚ°²×°´¦Àí½Å±¾·ÅÖÃÓÚ spec/etc_install/etc_install.sh
-            (Õâ¸ö½Å±¾ĞèÒªÓÃ»§À´Ğ´ÁË, Ö÷Òª¹¦ÄÜÊÇ°²×°Ò»Ğ©ÅäÖÃÎÄ¼ş,
-            ¶ÔĞÂÏµÍ³½øĞĞÅäÖÃ),
-            etc_install.sh ĞèÒªµ÷ÓÃµÄÎÄ¼ş¿ÉÒÔ·ÅÔÚ Í¬Ä¿Â¼ÏÂ spec/etc_install
-            ×îºóÖ´ĞĞ scons root.step1 && scons
-            Ô­ÀíËµÃ÷: 
-                °²×°¹ı³ÌÓÉ°²×° rpm ±äÎª½âÑ¹ rpm °ü,
-                ½âÑ¹Íê³ÉºóÔòÊÍ·Å rpm Êı¾İ¿â(scons Ê±Éú³ÉµÄ), ×îºóÖ´ĞĞ etc_install.sh ½Å±¾.
+    rpm å®‰è£…æ¨¡å¼:
+        1. å°†æ‰€æœ‰ rpm åŒ…æ”¾åœ¨ spec/packages ç›®å½•ä¸‹
+        2. ç„¶åä¿®æ”¹ spec/specinfo.py ä¸­çš„ pkgtype ä¸º "rpm" .
+        3. scons root.step1 && scons å°±å¯ä»¥ç”Ÿæˆç›¸åº”çš„ iso .
+        æ³¨: rpm åŒ…çš„å®‰è£…é¡ºåºå¯ä»¥æ‰‹åŠ¨è°ƒèŠ‚, ä¿®æ”¹ spec/specinfo.py ä¸­çš„
+            basepkg_list, remove_deps, add_deps å‚æ•°å³å¯.
+        åŸç†è¯´æ˜:
+            ä¼ ç»Ÿçš„ rpm å®‰è£…æ¨¡å¼, æ ¹æ®ä¾èµ–åˆ—è¡¨é€ä¸ªå®‰è£…, æ‰§è¡Œ rpm ä¸­çš„pre_script
+            and post_script, åŒæ—¶ç”Ÿæˆ rpm æ•°æ®åº“. æ³¨æ„,
+            å¦‚æœä½ çš„ pre_script æ‰§è¡Œå¤±è´¥é‚£è¿™ä¸ªåŒ…å®‰è£…å°±ä¸æˆåŠŸäº†.
+            post_script å¦‚æœå®‰è£…å¤±è´¥å¯ä»¥åœ¨ç³»ç»Ÿå®‰è£…åæœŸä¿®æ­£ spec/post_install.sh (rpm åŒ…å·²ç»æˆåŠŸå®‰è£…è¿›å…¥ç³»ç»Ÿäº†)
+        é™„åŠ : è¿˜éšè—äº†ä¸€ä¸ªå®‰è£…æ¨¡å¼(rpm copy install mode) ;) , æœ‰å…´è¶£çš„å¯ä»¥è¯•è¯•, å¼€å¯æ­¥éª¤å¦‚ä¸‹ï¼š
+            æ·»åŠ  spec/rpmdb ç›®å½•(ç”¨äºç”Ÿæˆ rpm æ•°æ®åº“çš„åœ°æ–¹, æ·»åŠ 
+            spec/etc_install ç›®å½• (ç”¨äºä¿å­˜ç³»ç»Ÿå®‰è£…çš„åæœŸé…ç½®è„šæœ¬))
+            å°†åæœŸå®‰è£…å¤„ç†è„šæœ¬æ”¾ç½®äº spec/etc_install/etc_install.sh
+            (è¿™ä¸ªè„šæœ¬éœ€è¦ç”¨æˆ·æ¥å†™äº†, ä¸»è¦åŠŸèƒ½æ˜¯å®‰è£…ä¸€äº›é…ç½®æ–‡ä»¶,
+            å¯¹æ–°ç³»ç»Ÿè¿›è¡Œé…ç½®),
+            etc_install.sh éœ€è¦è°ƒç”¨çš„æ–‡ä»¶å¯ä»¥æ”¾åœ¨ åŒç›®å½•ä¸‹ spec/etc_install
+            æœ€åæ‰§è¡Œ scons root.step1 && scons
+            åŸç†è¯´æ˜: 
+                å®‰è£…è¿‡ç¨‹ç”±å®‰è£… rpm å˜ä¸ºè§£å‹ rpm åŒ…,
+                è§£å‹å®Œæˆååˆ™é‡Šæ”¾ rpm æ•°æ®åº“(scons æ—¶ç”Ÿæˆçš„), æœ€åæ‰§è¡Œ etc_install.sh è„šæœ¬.
             
 
-    tar °²×°Ä£Ê½:
-        1. ½«ËùÓĞÒª½âÑ¹µÄ tar °ü·ÅÔÚ spec/tarpackages Ä¿Â¼ÏÂ(Ò»¶¨²»ÒªÓĞ¶àÓàÎÄ¼ş, tar °ü×îºÃÎª tar.bz2 »ò tar.gz ±ê×¼Ä£Ê½)£¬
-           tar°üÖĞµÄÎÄ¼şÄ¿Â¼½á¹¹ÊÇÒÔ¸ùÄ¿Â¼Îªµ×²ãÄ¿Â¼µÄ, tar ´ò°ü²Î¿¼ÃüÁî:
+    tar å®‰è£…æ¨¡å¼:
+        1. å°†æ‰€æœ‰è¦è§£å‹çš„ tar åŒ…æ”¾åœ¨ spec/tarpackages ç›®å½•ä¸‹(ä¸€å®šä¸è¦æœ‰å¤šä½™æ–‡ä»¶, tar åŒ…æœ€å¥½ä¸º tar.bz2 æˆ– tar.gz æ ‡å‡†æ¨¡å¼)ï¼Œ
+           taråŒ…ä¸­çš„æ–‡ä»¶ç›®å½•ç»“æ„æ˜¯ä»¥æ ¹ç›®å½•ä¸ºåº•å±‚ç›®å½•çš„, tar æ‰“åŒ…å‚è€ƒå‘½ä»¤:
                 tar -czvf tarpkg.tar.gz -C /home/user/pkgfiledir .
                 tar -cjvf tarpkg.tar.bz2 -C /home/user/pkgfiledir .
-           tar ×îºÃ×ñÑ­¹Ì¶¨¸ñÊ½: <tarpkgname>.<arch>.<tartype> ÀıÈç
-           foo.i686.tar.bz2 ¡£µ±È»Èç¹ûÃ»ÓĞ arch £¬MI »á½«ÆäÊÓÎª noarch¡£
-           ¿ÉÓÃ¸ñÊ½ÓĞ i386 i486 i586 i686 athlon noarch
-        2. È»ºóĞŞ¸Ä spec/specinfo.py ÖĞµÄ pkgtype Îª "tar" .
-        3. scons root.step1 && scons ¾Í¿ÉÒÔÉú³ÉÏàÓ¦µÄ iso .
-        ×¢:  tar °üµÄ°²×°Ë³Ğò¿ÉÒÔÖ¸¶¨, ĞŞ¸Ä spec/specinfo.py ÖĞµÄ basepkg_list ÁĞ±í¼´¿É.
-        Ô­ÀíËµÃ÷:
-            Äú¿ÉÒÔ½«ÄúµÄÏµÍ³´ò°ü³É tar °ü, ÕâÑùÔÚ°²×°µÄÊ±ºò¾Í»á½âÑ¹ÕâĞ© tar °üµ½Ä¿µÄÏµÍ³, È»ºó MI »á¼ÌĞøÅäÖÃĞÂÏµÍ³.
+           tar æœ€å¥½éµå¾ªå›ºå®šæ ¼å¼: <tarpkgname>.<arch>.<tartype> ä¾‹å¦‚
+           foo.i686.tar.bz2 ã€‚å½“ç„¶å¦‚æœæ²¡æœ‰ arch ï¼ŒMI ä¼šå°†å…¶è§†ä¸º noarchã€‚
+           å¯ç”¨æ ¼å¼æœ‰ i386 i486 i586 i686 athlon noarch
+        2. ç„¶åä¿®æ”¹ spec/specinfo.py ä¸­çš„ pkgtype ä¸º "tar" .
+        3. scons root.step1 && scons å°±å¯ä»¥ç”Ÿæˆç›¸åº”çš„ iso .
+        æ³¨:  tar åŒ…çš„å®‰è£…é¡ºåºå¯ä»¥æŒ‡å®š, ä¿®æ”¹ spec/specinfo.py ä¸­çš„ basepkg_list åˆ—è¡¨å³å¯.
+        åŸç†è¯´æ˜:
+            æ‚¨å¯ä»¥å°†æ‚¨çš„ç³»ç»Ÿæ‰“åŒ…æˆ tar åŒ…, è¿™æ ·åœ¨å®‰è£…çš„æ—¶å€™å°±ä¼šè§£å‹è¿™äº› tar åŒ…åˆ°ç›®çš„ç³»ç»Ÿ, ç„¶å MI ä¼šç»§ç»­é…ç½®æ–°ç³»ç»Ÿ.
 
 

@@ -111,7 +111,7 @@ def xgc_get_gobject_type(str):
     elif str == 'string':
         return gobject.TYPE_STRING
     elif str == 'pixmap':
-        return gobject.type_from_name('GdkPixbuf')
+        return gobject.type_from_name('GdkPixbuf') #@UndefinedVariable
     else:
         return str
 
@@ -182,7 +182,7 @@ class xmlgtk:
         if self.pixbuf_map.has_key(pixbuf_name):
             pixbuf = self.pixbuf_map[pixbuf_name]
         else:
-            pixbuf = gtk.gdk.pixbuf_new_from_file(pixbuf_name)
+            pixbuf = gtk.gdk.pixbuf_new_from_file(pixbuf_name) #@UndefinedVariable
             self.pixbuf_map[pixbuf_name] = pixbuf
             self.pixbuf_revmap[id(pixbuf)] = pixbuf_name
         return  pixbuf
@@ -286,11 +286,11 @@ class xmlgtk:
         if tips:
             tipsgroup = node.getAttribute('tipsgroup')
             if tipsgroup:
-                if self.tooltips_map.has_key(tipgroup):
+                if self.tooltips_map.has_key(tipsgroup):
                     tooltips = self.tooltips_map[tipsgroup]
                 else:
                     tooltips = gtk.Tooltips()
-                    self.tooltips_map[tipsgroup] = tooltip
+                    self.tooltips_map[tipsgroup] = tooltips
             else:
                 tooltips = gtk.Tooltips()
                 # Keep the tooltips alive, it will be destroied otherwise.
@@ -886,7 +886,7 @@ class xmlgtk:
                     collist.append(value)
                 else:
                     collist.append('')
-            elif storelist[i] == gobject.type_from_name('GdkPixbuf'):
+            elif storelist[i] == gobject.type_from_name('GdkPixbuf'): #@UndefinedVariable
                 if type(value) == types.StringType or type(value) == types.UnicodeType:
                     pixbuf = self.get_pixbuf_map(value)
                 else:
@@ -898,7 +898,7 @@ class xmlgtk:
 
     def setup_node_from_iter(self, node, model, iter, storelist):
         for i in range(len(storelist)):
-            if storelist[i] == gobject.type_from_name('GdkPixbuf'):
+            if storelist[i] == gobject.type_from_name('GdkPixbuf'): #@UndefinedVariable
                 node.setAttribute('c' + str(i), self.pixbuf_revmap[id(model.get_value(iter, i))])
             elif type(storelist[i]) is not types.UnicodeType:
                 # XXX use pixbuf_revmap to revert ti
@@ -992,7 +992,7 @@ class xmlgtk:
         if w_type is gtk.Entry:
             return w.get_text()
         elif w_type is gtk.Label:
-            w.get_text(value)
+            return w.get_text()
         elif w_type is gtk.OptionMenu:
             return self.optionmenu_map[w][1][w.get_active()]
         elif w_type is gtk.CheckButton:
@@ -1021,7 +1021,7 @@ class xmlgtk:
         elif w_type is gtk.Label:
             w.set_text(value)
         elif w_type is gtk.OptionMenu:
-            for i, v in enumerate(self.optionmenu_map[widget][1]):
+            for i, v in enumerate(self.optionmenu_map[widget_name][1]):
                 if v == value:
                     w.set_active(i)
                     break

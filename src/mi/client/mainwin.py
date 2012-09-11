@@ -12,17 +12,8 @@ from mi.client.buttonbar import MIButtonBar
 from xml.dom.minidom import parse
 from mi.utils.common import search_file
 # This can import MIStem_* from modules.* automatically
-#from mi.client.modules import *
-from mi.client.modules.welcome import MIStep_welcome
-from mi.client.modules.partition import MIStep_partition
-from mi.client.modules.bootloader import MIStep_bootloader
-from mi.client.modules.pkgselect import MIStep_pkgselect
-from mi.client.modules.takeactions import MIStep_takeactions
-from mi.client.modules.startsetup import MIStep_startsetup
-from mi.client.modules.accounts import MIStep_accounts
-from mi.client.modules.Xwindow import MIStep_Xwindow
-from mi.client.modules.dosetup import MIStep_dosetup
-from mi.client.modules.finish import MIStep_finish
+from mi.client.modules import *
+
 from mi.utils.miconfig import MiConfig
 CF = MiConfig.get_instance()
 from mi.utils.mitaskman import MiTaskman
@@ -43,20 +34,15 @@ class Step(object):
         return "Step id: %s, name: %s, title: %s, valid: %s" % (self.id, self.name, self.title, self.valid)
         
 class Steps(object):
-    def __init__(self, sself):
+    def __init__(self, sself, step_name_list):
         self.sself = sself
-        __step_l = [ #['welcome', MIStep_welcome(sself), _('Welcome'), True],
-            #['scsi', MIStep_scsi(sself), _('scsi'), True],
-            ['pkgselect', MIStep_pkgselect(sself), _('Select Package'), True],
-            ['partition', MIStep_partition(sself), _('Partition'), True],
-            ['bootloader', MIStep_bootloader(sself), _('Set Bootloader'), True],
-            ['takeactions', MIStep_takeactions(sself), _('Install Pacakges'), True],
-            ['startsetup', MIStep_startsetup(sself), _('Start Setup'), True],
-            ['accounts', MIStep_accounts(sself), _('Set Account'), True],
-            ['Xwindow', MIStep_Xwindow(sself), _('Xwindow Configuration'), True],
-            ['dosetup', MIStep_dosetup(sself), _('Make Setup Effect'), True],
-            ['finish', MIStep_finish(sself), _('Install Finished'), True],
-        ]
+        __step_l = []
+        from mi.client.modules import module_list
+        for mod in module_list:
+            print 
+        for sn in step_name_list:
+            d
+        __step_l =  ### TODO
         i = -1
         self.step_lst = []
         self.step_map = {}
@@ -67,7 +53,7 @@ class Steps(object):
             self.step_map[step.name] = step
             step.obj.widget.hide()
             
-    def init(self):
+    def init(self, step_id_list):
         for step in self.step_lst:
             self.sself.leftpanel.addstep(step.name)
         
@@ -96,7 +82,7 @@ class Steps(object):
         return len(self.step_lst)
 
 class MIMainWindow(gtk.Window):
-    def __init__(self, *args, **kw):
+    def __init__(self, step_name_list, *args, **kw):
         gtk.Window.__init__(self, *args, **kw)
         self.set_name(self.__class__.__name__)
         self.top = MITop(self)
@@ -110,11 +96,12 @@ class MIMainWindow(gtk.Window):
         self.values = parse(search_file('magic.values.xml', [CF.D.HOTFIXDIR, '.']))
         self.tm = MiTaskman(1325, self.statusbar.get_progressbar(),
                           self.statusbar.get_progressbar())
+        self.step_name_list = step_name_list
         
     def init(self):
         self.curstep = -1
 
-        self.steps = Steps(self)
+        self.steps = Steps(self, self.step_name_list)
         self.steps.init()
         
         vbox = gtk.VBox()

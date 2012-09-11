@@ -2,13 +2,12 @@
 import os, gtk, time
 from mi.client.utils import _
 from mi.client.utils import magicstep, magicpopup, xmlgtk
-from mi.utils.miconfig import MiConfig
 from mi.utils.common import get_devinfo
 from mi.games.xglines import xglines
 from xml.dom.minidom import parse, parseString
 CF = MiConfig.get_instance()
 
-from mi.server.utils import logger
+from mi.client.utils import logger
 dolog = logger.info
 
 class TaDialog(xmlgtk.xmlgtk):
@@ -201,115 +200,6 @@ class MIStep_takeactions(magicstep.magicstepgroup):
         self.tadlg.name_map['otprog'].set_fraction(1)
         self.tadlg.name_map['frame_other'].set_sensitive(False)
         # self.tadlg.topwin.destroy()
-
-    def act_start_parted(self):
-        self.tadlg.name_map['pfprog'].set_fraction(0)
-        self.tadlg.name_map['pkgprog'].set_fraction(0)
-        self.tadlg.name_map['otprog'].set_fraction(0)
-
-        self.tadlg.name_map['frame_parted'].set_sensitive(True)
-        self.rootobj.tm.push_progress(self.tadlg.name_map['pfprog'],
-                                      self.tadlg.name_map['pfname'])
-        self.add_action(_('Get all dirty disk'),
-                        self.act_parted_get_dirty_result, None,
-                        'get_all_dirty_disk', 0)
-
-    def act_parted_get_dirty_result(self, tdata, data):
-        self.dirty_disks = tdata
-        self.format_list = []
-        for devpath in CF.G.all_part_infor.keys():
-            for part_tuple in CF.G.all_part_infor[devpath]:
-                if part_tuple[5] == 'true':
-                    self.format_list.append((devpath,
-                                             part_tuple[3],
-                                             part_tuple[6],
-                                             part_tuple[0]))
-        dolog('self.dirty_disks: %s\n' % str(self.dirty_disks))
-        dolog('self.format_list: %s\n' % str(self.format_list))
-        self.act_parted_commit_start(0)
-
-    def act_parted_commit_start(self, pos):
-        if pos < len(self.dirty_disks):
-            actinfor = _('Write the partition table of %s.')
-            actinfor = actinfor % self.dirty_disks[pos]
-            self.add_action(actinfor, self.act_parted_commit_result, pos,
-                            'commit_devpath', self.dirty_disks[pos])
-        else:
-            self.act_parted_format_start(0)
-
-    def act_parted_commit_result(self, tdata, data):
-        result = tdata
-        if result:
-            # Error occurred. Stop it?
-            dolog('commit_result ERROR: %s\n' % str(result))
-        self.act_parted_commit_start(data + 1)
-
-    def malcmp(self, c0, c1):
-        if c0[0] < c1[0]:    return -1
-        elif c0[0] > c1[0]:  return 1
-        return 0
-
-    def act_parted_format_start(self, pos):
-        if pos < len(self.format_list):
-            actinfor = 'Formating %s on %s%d.'
-            actinfor = actinfor % (self.format_list[pos][2],
-                                   self.format_list[pos][0],
-                                   self.format_list[pos][3])
-            dolog('format_start: %s\n' % str(actinfor))
-            self.add_action(actinfor, self.act_parted_format_result, pos,
-                            'format_partition',
-                            self.format_list[pos][0], # devpath.
-                            self.format_list[pos][1], # part_start.
-                            self.format_list[pos][2]) # fstype
-        else:
-            CF.G.mount_all_list = []
-            for devpath in CF.G.all_part_infor.keys():
-                for part_tuple in CF.G.all_part_infor[devpath]:
-                    if part_tuple[7] == '':  # mountpoint ### TODO
-                        continue
-                    mntpoint = part_tuple[7]
-                    devfn = '%s%d' % (devpath, part_tuple[0])
-                    fstype = part_tuple[6]
-                    CF.G.mount_all_list.append((mntpoint, devfn, fstype))
-            CF.G.mount_all_list.sort(self.malcmp)
-            dolog('CF.G.mount_all_list: %s\n' % str(CF.G.mount_all_list))
-            #self.add_action(_('Mount all target partitions.'),
-                            #self.nextop, None,
-                            #'mount_all_tgtpart', CF.G.mount_all_list, 'y')
-            self.nextop(None, None)
-                            
-            #### Because we can mount device many times, so we not check below
-            ## Check whether the packages are stored in mounted partitions.
-            #pkgmntpoint = 0
-            #(pafile, dev, fstype, dir, isofn) = CF.G.choosed_patuple
-            #for (mntpoint, devfn, fstype) in CF.G.mount_all_list:
-                #if dev == devfn:
-                    #pkgmntpoint = mntpoint
-                    #if len(pkgmntpoint) > 0 and pkgmntpoint[0] == '/':
-                        #pkgmntpoint = pkgmntpoint[1:]
-                    #CF.G.choosed_patuple = (pafile, dev, pkgmntpoint,
-                                       #fstype, dir, isofn)
-                    #dolog('The packages is placed in the mounted partition(%s)\n' %\
-                          #pkgmntpoint)
-                    #break
-
-    def act_parted_format_result(self, tdata, data):
-        result = tdata
-        if result:
-            # Error occurred. Stop it?
-            # Yes, we should stop it, and we should stop at mount failed place too.
-            dolog('format_result ERROR: %s\n' % str(result))
-            magicpopup.magicmsgbox(None, _('Format Partition Error: %s' % result),
-                       magicpopup.magicmsgbox.MB_ERROR,
-                       magicpopup.magicpopup.MB_OK)
-            #self.rootobj.btnback_do()
-        self.act_parted_format_start(data + 1)
-
-    def act_end_parted(self):
-        self.rootobj.tm.pop_progress()
-        self.tadlg.name_map['pfname'].set_text('')
-        self.tadlg.name_map['pfprog'].set_fraction(1)
-        self.tadlg.name_map['frame_parted'].set_sensitive(False)
 
     def pkg2archpkg(self, pkg):
         (disc_no, pkg_no) = CF.G.pkgpos_map[pkg]
