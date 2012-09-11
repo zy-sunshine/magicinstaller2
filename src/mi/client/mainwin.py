@@ -37,12 +37,13 @@ class Steps(object):
     def __init__(self, sself, step_name_list):
         self.sself = sself
         __step_l = []
-        from mi.client.modules import module_list
-        for mod in module_list:
-            print 
-        for sn in step_name_list:
-            d
-        __step_l =  ### TODO
+        
+        for name in step_name_list:
+            cls = self.get_step_class(name)
+            if cls:
+                __step_l.append([cls.NAME, cls(sself), cls.LABEL, True])
+            else:
+                raise Exception('Can not find class by name %s' % name)
         i = -1
         self.step_lst = []
         self.step_map = {}
@@ -53,7 +54,15 @@ class Steps(object):
             self.step_map[step.name] = step
             step.obj.widget.hide()
             
-    def init(self, step_id_list):
+    def get_step_class(self, name):
+        from mi.client.modules import module_list
+        for mod in module_list:
+#            import pdb; pdb.set_trace()
+            if mod.NAME == name:
+                return mod
+        return None
+    
+    def init(self):
         for step in self.step_lst:
             self.sself.leftpanel.addstep(step.name)
         

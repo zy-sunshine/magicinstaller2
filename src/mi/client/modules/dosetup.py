@@ -7,6 +7,8 @@ from mi.server.utils import logger
 dolog = logger.info
 
 class MIStep_dosetup (magicstep.magicstep):
+    NAME = 'dosetup'
+    LABEL = _("Do Setup")
     def __init__(self, rootobj):
         magicstep.magicstep.__init__(self, rootobj, 'dosetup.xml', 'dosetup')
         self.doing = 1
@@ -28,7 +30,7 @@ class MIStep_dosetup (magicstep.magicstep):
         self.mouse_shortname = ''
 
     def get_label(self):
-        return  _("Do Setup")
+        return self.LABEL
 
     def probe_monitor_ok(self, tdata, data):
         (m_name, m_horiz, m_vert) = tdata

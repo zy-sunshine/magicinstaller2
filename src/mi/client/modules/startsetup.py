@@ -8,11 +8,13 @@ from mi.server.utils import logger
 dolog = logger.info
 
 class MIStep_startsetup (magicstep.magicstep):
+    NAME = 'startsetup'
+    LABEL = _("Start to setup")
     def __init__(self, rootobj):
         magicstep.magicstep.__init__(self, rootobj, 'startsetup.xml', 'startsetup')
 
     def get_label(self):
-        return _("Start to setup")
+        return self.LABEL
         
     def btnnext_clicked(self, widget, data):
         # We add a skip step name to current class, 

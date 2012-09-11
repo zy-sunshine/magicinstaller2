@@ -25,7 +25,6 @@ for importer, modname, ispkg in pkgutil.iter_modules([CURDIR]):
     fpath = os.path.join(CURDIR, modname) + '.py'
     # It will import mi.client.modules by needed.
     #mod = imp.load_source('mi.client.modules.'+modname, fpath)
-    
     mod = imp.load_source(modname, fpath)
     for k in dir(mod):
         m = getattr(mod, k)
@@ -33,7 +32,6 @@ for importer, modname, ispkg in pkgutil.iter_modules([CURDIR]):
                     m is not magicstep and \
                     m is not magicstepgroup:
             if issubclass(m, magicstep):
-                import pdb; pdb.set_trace()
                 module_list.append(m)
                 break # Only get first class matched
 

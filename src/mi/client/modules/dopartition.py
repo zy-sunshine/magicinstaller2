@@ -10,6 +10,8 @@ class DoPartition(magicstep):
     '''
     commit the partiton info to change partiton on disk really
     '''
+    NAME = 'partition'
+    LABEL = _('Do Partition')
     def __init__(self, sself):
         magicstep.__init__(self, sself, 'dopartition.xml', 'dopartition')
         if sself is None:
@@ -125,9 +127,8 @@ class DoPartition(magicstep):
         self.name_map['frame_parted'].set_sensitive(False)
 
 if __name__ == '__main__':
-    from mi.client.tests import TestRootObject
-    rootobj = TestRootObject(DoPartition)
-    rootobj.init()
-    rootobj.main()
-    
-    
+    pass
+    #from mi.client.tests import TestRootObject
+    #rootobj = TestRootObject(DoPartition)
+    #rootobj.init()
+    #rootobj.main()

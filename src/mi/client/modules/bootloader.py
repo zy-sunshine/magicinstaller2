@@ -7,6 +7,8 @@ from xml.dom.minidom import parseString
 CF = MiConfig.get_instance()
 
 class MIStep_bootloader (magicstep.magicstepgroup):
+    NAME = 'bootloader'
+    LABEL = _("Bootloader")
     def __init__(self, rootobj):
         magicstep.magicstepgroup.__init__(self, rootobj, 'bootloader.xml',
                                           ['choose', 'bootlist'],
@@ -19,7 +21,7 @@ class MIStep_bootloader (magicstep.magicstepgroup):
                                                     self.check_winpartition_change, self)
 
     def get_label(self):
-        return  _("Bootloader")
+        return self.LABEL
 
     def btnhelp_clicked(self, widget, data):
         # TO TRANSLATOR: Let helptext/bootloader.help.en.txt to be i18n string,

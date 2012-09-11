@@ -5,6 +5,7 @@ from mi.client.utils import magicstep, magicpopup, xmlgtk
 from mi.utils.common import get_devinfo
 from mi.games.xglines import xglines
 from xml.dom.minidom import parse, parseString
+from mi.utils.miconfig import MiConfig
 CF = MiConfig.get_instance()
 
 from mi.client.utils import logger
@@ -94,6 +95,8 @@ class RpmErrDialog(magicpopup.magicpopup):
         self.topwin.destroy()
 
 class MIStep_takeactions(magicstep.magicstepgroup):
+    NAME = 'takeactions'
+    LABEL = _('Take Actions')
     def __init__(self, rootobj):
         self.rootobj = rootobj
         magicstep.magicstepgroup.__init__(self, rootobj, 'takeactions.xml',
@@ -144,7 +147,7 @@ class MIStep_takeactions(magicstep.magicstepgroup):
         parent.remove(self.right_panel)
         
     def get_label(self):
-        return  _('Take Actions')
+        return self.LABEL
         
     def get_left_panel(self):
         return self.left_panel

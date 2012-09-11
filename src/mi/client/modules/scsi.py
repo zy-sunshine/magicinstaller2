@@ -6,18 +6,20 @@ import os
 CF = MiConfig.get_instance()
 
 class MIStep_scsi (magicstep.magicstep):
+    NAME = 'scsi'
+    LABEL = _("SCSI Driver")
     def __init__(self, rootobj):
         self.first_fill = None
         magicstep.magicstep.__init__(self, rootobj, 'scsi.xml', 'scsi')
 
     def get_label(self):
-        return  _("SCSI Driver")
+        return self.LABEL
 
     def enter(self):
-        CONF.RUN.reprobe_all_disks_required
+        CF.G.reprobe_all_disks_required
         if not self.first_fill:
             self.do_first_fill()
-        CONF.reprobe_all_disks_required = 0
+        CF.G.reprobe_all_disks_required = 0
         return  1
 
     def leave(self):
@@ -54,7 +56,7 @@ class MIStep_scsi (magicstep.magicstep):
                                               magicpopup.magicmsgbox.MB_INFO, 0)
 
     def get_modprobe_result(self, tdata, data):
-        CONF.reprobe_all_disks_required
+        CF.G.reprobe_all_disks_required
         success = tdata
         self.waitdlg.topwin.destroy()
         if not success:
@@ -62,7 +64,7 @@ class MIStep_scsi (magicstep.magicstep):
                                    magicpopup.magicmsgbox.MB_ERROR,
                                    magicpopup.magicpopup.MB_OK)
         else:
-            CONF.reprobe_all_disks_required = 1
+            CF.G.reprobe_all_disks_required = 1
             stepobj = self.rootobj.stepobj_list[self.rootobj.curstep + 1] # reprobe disk
             stepobj.reprobe_all()
 

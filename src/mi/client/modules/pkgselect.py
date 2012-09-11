@@ -10,23 +10,28 @@ from mi.server.utils import logger
 dolog = logger.info
 
 class MIStep_pkgselect (magicstep.magicstepgroup):
+    NAME = 'pkgselect'
+    LABEL = _("Package Select")
     def __init__(self, rootobj):
         magicstep.magicstepgroup.__init__(self, rootobj, 'pkgselect.xml',
                                           ['toplevel', 'pkgchoose'], 'steps')
         self.pa_choose = None
 
     def get_label(self):
-        return  _("Package Select")
+        return self.LABEL
 
     def startup_action(self):
-        self.rootobj.tm.add_action(_('Probe windows partition', None, None, 'pkgarr_probe', ''))
-        
+        def resp_pkgarr_probe(tdata):
+            print tdata
         CF.G.pkgarr_probe_status = STAT.OP_STATUS_DOING
         if not os.path.isdir(CF.G.path_allpa):
             os.makedirs(CF.G.path_allpa)
-        self.rootobj.tm.add_action(_('Search package information'),
-                                   self.got_pkgarr_probe_result, None,
-                                   'pkgarr_probe', CF.G.all_orig_part)
+        self.rootobj.tm.add_action(_('Search package information'), 
+                                   resp_pkgarr_probe, None, 
+                                   'pkgarr_probe', '')
+#        self.rootobj.tm.add_action(_('Search package information'),
+#                                   self.got_pkgarr_probe_result, None,
+#                                   'pkgarr_probe', CF.G.all_orig_part)
         
         
     def popup_srcpos_dialog(self):

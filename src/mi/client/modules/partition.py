@@ -13,8 +13,9 @@ dolog = logger.info
 
 from mi.utils.common import STAT
 
-class MIStep_partition (magicstep.magicstep):
-
+class MIStep_Partition (magicstep.magicstep):
+    NAME = 'partition'
+    LABEL = _("Partition")
 ### Harddisk Class
     class  harddisk(xmlgtk.xmlgtk):
         COLUMN_NUM        = 0
@@ -783,7 +784,7 @@ class MIStep_partition (magicstep.magicstep):
                 fst_index = fst_index + 1
 
     def get_label(self):
-        return  _("Partition")
+        return self.LABEL
 
     def probe_all_ok(self, tdata, data):
         # remove pages in harddisk notebook first
@@ -1401,7 +1402,7 @@ class  Harddisk(xmlgtk.xmlgtk):
         self.set_widget_value('disklabel', self.disklabel)
 
     def fill_global_and_check(self):
-        CONF.RUN.g_all_part_infor[self.devfn] = []
+        CF.G.all_part_infor[self.devfn] = []
         models = self.list_map.keys()
         model = models[0]
         iter = model.get_iter_first()
@@ -1419,7 +1420,7 @@ class  Harddisk(xmlgtk.xmlgtk):
                 not_touched = 'false'
             elif self.added_part_start.has_key(start):
                 not_touched = 'false'
-            CONF.RUN.g_all_part_infor[self.devfn].append((partnum,
+            CF.G.all_part_infor[self.devfn].append((partnum,
                                                parttype,
                                                partflags,
                                                start,
@@ -1431,24 +1432,24 @@ class  Harddisk(xmlgtk.xmlgtk):
             if not_touched == 'true' and \
                    filesystem != 'N/A' and \
                    filesystem != 'linux-swap':
-                CONF.RUN.g_all_orig_part.append((self.orig_partitions[start],
+                CF.G.all_orig_part.append((self.orig_partitions[start],
                                       filesystem,
                                       self.partdevfn(partnum)))
             
             if mountpoint == '/':
-                if CONF.RUN.g_root_device:
+                if CF.G.root_device:
                     return  _('More than one partition is mounted on /')
-                CONF.RUN.g_root_device = '%s%d' % (self.devfn, partnum)
+                CF.G.root_device = '%s%d' % (self.devfn, partnum)
             if mountpoint == '/boot':
-                CONF.RUN.g_boot_device = '%s%d' % (self.devfn, partnum)
-            if CONF_FSTYPE_MAP.has_key(filesystem):
-                minsize = CONF_FSTYPE_MAP[filesystem][2]
+                CF.G.boot_device = '%s%d' % (self.devfn, partnum)
+            if CF.D.FSTYPE_MAP.has_key(filesystem):
+                minsize = CF.D.FSTYPE_MAP[filesystem][2]
                 if minsize != -1:
                     if end - start + 1 < minsize * 2048:
                         errmsg = _('%0.2fM is too small for %s, %dM at least.')
                         errmsg = errmsg % ((end - start + 1.0) / 2048, filesystem, minsize)
                         return  errmsg
-                maxsize = CONF_FSTYPE_MAP[filesystem][3]
+                maxsize = CF.D.FSTYPE_MAP[filesystem][3]
                 if maxsize != -1:
                     if end - start + 1 > maxsize * 2048:
                         errmsg = _('%0.2fM is too big for %s, %dM at most.')
@@ -1456,8 +1457,8 @@ class  Harddisk(xmlgtk.xmlgtk):
                         return  errmsg
             if filesystem == 'linux-swap' and mountpoint == 'USE':
                 # Choose the maximum swap.
-                if not CONF.RUN.g_swap_device or CONF.RUN.g_swap_device[2] < end - start + 1:
-                    CONF.RUN.g_swap_device = [self.devfn, partnum, end - start + 1]
+                if not CF.G.swap_device or CF.G.swap_device[2] < end - start + 1:
+                    CF.G.swap_device = [self.devfn, partnum, end - start + 1]
             iter = model.iter_next(iter)
         return  None
 
@@ -1736,7 +1737,7 @@ class  Harddisk(xmlgtk.xmlgtk):
             self.aedialog.name_map['mountpoint_combo'].hide()
             self.aedialog.name_map['swapbox'].hide()
         else:
-            if optmenu.get_active() == CONF.RUN.g_fstype_swap_index:
+            if optmenu.get_active() == CF.G.fstype_swap_index:
                 self.aedialog.name_map['mountpoint_label'].hide()
                 self.aedialog.name_map['mountpoint_combo'].hide()
                 self.aedialog.name_map['swapbox'].show()
@@ -1944,4 +1945,4 @@ class  Harddisk(xmlgtk.xmlgtk):
                            'disk_new_fresh', self.devfn, self.disktype)
 
 if __name__ == '__main__':
-    MiStep_Partition()
+    MIStep_Partition()
