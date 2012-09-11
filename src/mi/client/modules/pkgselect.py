@@ -21,14 +21,15 @@ class MIStep_pkgselect (magicstep.magicstepgroup):
         return self.LABEL
 
     def startup_action(self):
-        def resp_pkgarr_probe(tdata):
+        def resp_pkgarr_probe(tdata, data):
             print tdata
+            CF.G.pkgarr_probe_status = STAT.OP_STATUS_DONE
         CF.G.pkgarr_probe_status = STAT.OP_STATUS_DOING
         if not os.path.isdir(CF.G.path_allpa):
             os.makedirs(CF.G.path_allpa)
         self.rootobj.tm.add_action(_('Search package information'), 
                                    resp_pkgarr_probe, None, 
-                                   'pkgarr_probe', '')
+                                   'pkgarr_probe')
 #        self.rootobj.tm.add_action(_('Search package information'),
 #                                   self.got_pkgarr_probe_result, None,
 #                                   'pkgarr_probe', CF.G.all_orig_part)

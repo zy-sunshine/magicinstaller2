@@ -1,6 +1,6 @@
 import pyudev
 
-KUDZU_FLAG = True
+KUDZU_FLAG = False
 ALL_DEVICE_INFO = 0x1
 
 CLASS_HD = 0x10
@@ -10,7 +10,12 @@ CLASS_OTH = 0x10000
 
 CLASS_CDROM = 0x100000
 CLASS_FLOPPY = 0x1000000
-
+TYPE_LIST = (CLASS_HD,
+        CLASS_ATA,
+        CLASS_USB,
+        CLASS_OTH,
+        CLASS_CDROM,
+        CLASS_FLOPPY)
 class KudzuDevice:
     def __init__(self, desc, driver, device):
         self.desc = desc
@@ -191,39 +196,49 @@ def get_hd_ata_usb(devices):
 
 def p_c(clist):
     print clist
-if 1:
-    def get_usb_part( usb_map, all_part_info, disk_size_map):
-        usb_part_info = {}
-        def get_attr(tmap, attr):
-            if not tmap.has_key(attr):
-                return None
-            else:
-                return tmap[attr]
+    
+def get_part_info(dev_class):
+    devices_info, devices_size = probe(ALL_DEVICE_INFO)
+    dev_map = {}
+    for t in TYPE_LIST:    
+        if dev_class & t:
+            dev_map.update(probe(t))
 
-        for disk in usb_map.keys():
-            for part in [disk] + usb_map[disk]:
-                if all_part_info[part].has_key('ID_FS_TYPE'):
-                #if all_part_info[part].has_key('DEVTYPE') and all_part_info[part]['DEVTYPE'] == 'partition':
-                    # Disk maybe a partition... , so we check the disk too.
-                    # disk:     partition belong to this disk.
-                    # devpath:  the partition's dev path.
-                    # vendor:   the vendor of the usb.
-                    # model:    the flash model of the usb.
-                    # model_id: the flash model's id of the usb.
-                    # fstype:   the filesystem type of this partition.
-                    # fsver:    the filesystem's version of this partition.
-                    # size:     the size of this partition.
-                    part_info = {}
-                    part_info['disk'] = get_attr(all_part_info[disk], 'DEVNAME')
-                    part_info['devpath'] = get_attr(all_part_info[part],'DEVNAME')
-                    part_info['vendor'] = get_attr(all_part_info[part],'ID_VENDOR')
-                    part_info['model'] = get_attr(all_part_info[part],'ID_MODEL')
-                    part_info['model_id'] = get_attr(all_part_info[part],'ID_MODEL_ID')
-                    part_info['fstype'] = get_attr(all_part_info[part],'ID_FS_TYPE')
-                    part_info['fsver'] = get_attr(all_part_info[part],'ID_FS_VERSION')
-                    part_info['size'] = '%.2f MB' % (float(disk_size_map[part])/1024/1024)
-                    usb_part_info[part_info['devpath']] = part_info
-        return usb_part_info
+    return _get_part_info(dev_map, devices_info, devices_size)
+    
+def _get_part_info(usb_map, all_part_info, disk_size_map):
+    dev_part_info = {}
+    def get_attr(tmap, attr):
+        if not tmap.has_key(attr):
+            return None
+        else:
+            return tmap[attr]
+
+    for disk in usb_map.keys():
+        for part in [disk] + usb_map[disk]:
+            if all_part_info[part].has_key('ID_FS_TYPE'):
+            #if all_part_info[part].has_key('DEVTYPE') and all_part_info[part]['DEVTYPE'] == 'partition':
+                # Disk maybe a partition... , so we check the disk too.
+                # disk:     partition belong to this disk.
+                # devpath:  the partition's dev path.
+                # vendor:   the vendor of the usb.
+                # model:    the flash model of the usb.
+                # model_id: the flash model's id of the usb.
+                # fstype:   the filesystem type of this partition.
+                # fsver:    the filesystem's version of this partition.
+                # size:     the size of this partition.
+                part_info = {}
+                part_info['disk'] = all_part_info[disk].get('DEVNAME', None)
+                part_info['devpath'] = all_part_info[part].get('DEVNAME', None)
+                part_info['vendor'] = all_part_info[part].get('ID_VENDOR',None)
+                part_info['model'] = all_part_info[part].get('ID_MODEL', None)
+                part_info['model_id'] = all_part_info[part].get('ID_MODEL_ID', None)
+                part_info['fstype'] = all_part_info[part].get('ID_FS_TYPE', None)
+                part_info['fsver'] = all_part_info[part].get('ID_FS_VERSION', None)
+                part_info['size'] = disk_size_map[part]
+                part_info['size_ex'] = '%.2f MB' % (float(disk_size_map[part])/1024/1024)
+                dev_part_info[part_info['devpath']] = part_info
+    return dev_part_info
 
 if __name__ == '__main__':
     KUDZU_FLAG = False
@@ -242,17 +257,18 @@ if __name__ == '__main__':
     print 'The floppy devices:'
     p_c(probe(CLASS_FLOPPY))
     #print probe(ALL_DEVICE_INFO)
-    devices_info, devices_size = probe(ALL_DEVICE_INFO)
+    #devices_info, devices_size = probe(ALL_DEVICE_INFO)
     #for devices in devices_info.keys():
     #    if devices_info[devices].has_key('DEVNAME'):
     #        if devices_info[devices]['DEVNAME'] == "/dev/hda1":
     #            print devices_info[devices]
-
-    usb_map = probe(CLASS_HD)
+    print get_part_info(CLASS_HD)
+    print get_part_info(CLASS_CDROM | CLASS_HD)
+    #usb_map = probe(CLASS_HD)
     #for device in devices:
     #    print device
     #    print devices_info[device]
-    print get_usb_part( usb_map, devices_info, devices_size)
+    #print get_part_info(usb_map, devices_info, devices_size)
     #print 'Disk Size:'
     #devices_info, devices_size = probe(ALL_DEVICE_INFO)#get_all_devices()
     #print devices_size

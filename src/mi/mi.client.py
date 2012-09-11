@@ -10,9 +10,9 @@ logger.info('change current working directory to %s' % CF.D.DATADIR)
 os.chdir(CF.D.DATADIR)
 step_name_list = ('welcome',
     #'scsi',
+    'pkgselect',
     'partition',
     'bootloader',
-    'pkgselect',
     'takeactions',
     'startsetup',
     'accounts',

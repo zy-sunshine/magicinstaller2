@@ -118,8 +118,8 @@ class MiDevice(object):
 @register.server_handler('long')
 def pkgarr_probe(mia, operid):
     dolog("pkgarr_probe starting...")
-    def probe_position(localfn, pos_id, device, new_device, fstype, reldir, isofn):
-        dolog('probe_position: %s, %s, %s, %s, %s, %s, %s' % (localfn, pos_id, device, new_device, fstype, reldir, isofn))
+    def probe_position(localfn, pos_id, new_device, fstype, reldir, isofn):
+        dolog('probe_position: %s, %s, %s, %s, %s, %s' % (localfn, pos_id, new_device, fstype, reldir, isofn))
         if not os.path.exists(localfn):
             return None
         try:
@@ -138,34 +138,36 @@ def pkgarr_probe(mia, operid):
     #cli = tftpc.TFtpClient()
     #cli.connect('127.0.0.1')
     result = []
-    cdlist = getdev.probe(getdev.CLASS_CDROM)
-    all_drives = getdev.probe(getdev.CLASS_HD)
-    map(lambda cd: all_drives.append((os.path.join('/dev', cd.device),
-                                      'iso9660',
-                                      os.path.join('/dev', cd.device))),
-                                      cdlist)
+    
+    all_drives = getdev.get_part_info(getdev.CLASS_CDROM | getdev.CLASS_HD)
+    #map(lambda cd: all_drives.append((os.path.join('/dev', cd.device),
+    #                                  'iso9660',
+    #                                  os.path.join('/dev', cd.device))),
+    #                                  cdlist)
     dolog('all_drives: %s' % all_drives)
     pos_id = -1
-    for (device, fstype, new_device) in all_drives:
+    for k, value in all_drives.items():
+        devpath = value['devpath']
+        fstype = value['fstype']
         if not CF.D.FSTYPE_MAP.has_key(fstype):
             continue
         if CF.D.FSTYPE_MAP[fstype][0] == '':
             continue
-        midev = MiDevice(device, CF.D.FSTYPE_MAP[fstype][0])
+        midev = MiDevice(devpath, CF.D.FSTYPE_MAP[fstype][0])
         for f, reldir in midev.iter_searchfiles([CF.D.PKGARR_FILE, CF.D.BOOTCDFN], CF.D.PKGARR_SER_HDPATH):
             if f.endswith('iso'):
                 midev_iso = MiDevice(f, 'iso9660')
                 for pkgarr, relative_dir in midev_iso.iter_searchfiles([CF.D.PKGARR_FILE], CF.D.PKGARR_SER_CDPATH):
                     pos_id += 1
                     r = probe_position(pkgarr, 100 + pos_id,
-                        device, new_device, CF.D.FSTYPE_MAP[fstype][0], relative_dir, CF.D.BOOTCDFN)
+                        devpath, CF.D.FSTYPE_MAP[fstype][0], relative_dir, CF.D.BOOTCDFN)
                     if r:
                         r[-1] = os.path.join(reldir, r[-1]) #### revise iso relative path
                         result.append(r)
             else:
                 pos_id += 1
                 r = probe_position(pkgarr, pos_id,
-                    device, new_device, fstype, reldir, '')
+                    devpath, fstype, reldir, '')
                 if r: result.append(r)
     
 #    del(cli)

@@ -3,7 +3,7 @@ from mi.client.utils import _
 from mi.client.utils.magicstep import magicstep
 from mi.client.utils import logger, magicpopup
 from mi.utils.miconfig import MiConfig
-CONF = MiConfig.get_instance()
+CF = MiConfig.get_instance()
 
 
 class DoPartition(magicstep):
@@ -17,8 +17,10 @@ class DoPartition(magicstep):
         if sself is None:
             return
         self.add_action = self.rootobj.tm.add_action
-        self.act_start_parted()
 
+    def enter(self):
+        self.act_start_parted()
+        
     def act_start_parted(self):
         self.name_map['pfprog'].set_fraction(0)
 
@@ -32,8 +34,8 @@ class DoPartition(magicstep):
     def act_parted_get_dirty_result(self, tdata, data):
         self.dirty_disks = tdata
         self.format_list = []
-        for devpath in CONF.RUN.g_all_part_infor.keys():
-            for part_tuple in CONF.RUN.g_all_part_infor[devpath]:
+        for devpath in CF.G.all_part_infor.keys():
+            for part_tuple in CF.G.all_part_infor[devpath]:
                 if part_tuple[5] == 'true':
                     self.format_list.append((devpath,
                                              part_tuple[3],
@@ -77,17 +79,17 @@ class DoPartition(magicstep):
                             self.format_list[pos][1], # part_start.
                             self.format_list[pos][2]) # fstype
         else:
-            CONF.RUN.g_mount_all_list = []
-            for devpath in CONF.RUN.g_all_part_infor.keys():
-                for part_tuple in CONF.RUN.g_all_part_infor[devpath]:
+            CF.G.mount_all_list = []
+            for devpath in CF.G.all_part_infor.keys():
+                for part_tuple in CF.G.all_part_infor[devpath]:
                     if part_tuple[7] == '':  # mountpoint ### TODO
                         continue
                     mntpoint = part_tuple[7]
                     devfn = '%s%d' % (devpath, part_tuple[0])
                     fstype = part_tuple[6]
-                    CONF.RUN.g_mount_all_list.append((mntpoint, devfn, fstype))
-            CONF.RUN.g_mount_all_list.sort(self.malcmp)
-            logger.info('CONF.RUN.g_mount_all_list: %s\n' % str(CONF.RUN.g_mount_all_list))
+                    CF.G.mount_all_list.append((mntpoint, devfn, fstype))
+            CF.G.mount_all_list.sort(self.malcmp)
+            logger.info('CONF.RUN.g_mount_all_list: %s\n' % str(CF.G.mount_all_list))
             #self.add_action(_('Mount all target partitions.'),
                             #self.nextop, None,
                             #'mount_all_tgtpart', CONF.RUN.g_mount_all_list, 'y')
