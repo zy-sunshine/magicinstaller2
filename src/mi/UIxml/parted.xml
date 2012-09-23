@@ -3,12 +3,12 @@
 <!-- Author:  Charles Wang -->
 <parted>
   <step>
-    <vbox name="realwork" show="false" margin="4" spacing="4">
+    <vbox name="realwork" visible="false" margin="4" spacing="4">
       <frame type="none" expand="true" fill="true">
         <miparted_notebook/>
       </frame>
       <frame name="autopart_frame" label="((Auto-partition))">
-        <hbox margin="4" spacing="4" homogenous="true" show="true" expand="false" fill="false">
+        <hbox margin="4" spacing="4" homogenous="true" visible="true" expand="false" fill="false">
             <label expand="true" fill="true"/>
         <autopart_optionmenu name="autopart_om" value="parted.profile"/>
         <button name="autopart_button" label="((_Apply))" clicked="auto1_clicked"
@@ -92,7 +92,7 @@
         <value>/usr</value>
         <value>/var</value>
       </combo>
-      <hbox group="noextend" name="swapbox" homogenous="true" span="3" show="false">
+      <hbox group="noextend" name="swapbox" homogenous="true" span="3" visible="false">
         <radiobutton label="((_Use))" value="swap" valuedata="USE" expand="true"/>
 	<radiobutton label="((_Don't use))" value="swap" valuedata="" expand="true"/>
       </hbox>
@@ -141,7 +141,7 @@
         <value>/usr</value>
         <value>/var</value>
       </combo>
-      <hbox group="noextend" name="swapbox" homogenous="true" span="3" show="false">
+      <hbox group="noextend" name="swapbox" homogenous="true" span="3" visible="false">
         <radiobutton label="((_Use))" value="swap" valuedata="USE" expand="true"/>
         <radiobutton label="((_Don't use))" value="swap" valuedata="" expand="true"/>
       </hbox>

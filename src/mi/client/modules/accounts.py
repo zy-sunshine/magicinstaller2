@@ -5,7 +5,7 @@ from xml.dom.minidom import parseString
 
 class MIStep_accounts (magicstep.magicstepgroup):
     NAME = 'accounts'
-    LABEL = _("Accounts & hostname")
+    LABEL = _("Accounts")
     class account_dialog (magicpopup.magicpopup):
         def __init__(self, uixml, stepobj):
             magicpopup.magicpopup.__init__(self, stepobj, uixml, _('Add/Edit a user'),

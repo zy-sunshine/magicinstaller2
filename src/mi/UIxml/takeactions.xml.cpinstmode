@@ -15,7 +15,7 @@
 	</hbox>
       </frame>
     </vbox>
-    <vbox name="ensure" show="false" spacing="4" expand="true" fill="true">
+    <vbox name="ensure" visible="false" spacing="4" expand="true" fill="true">
       <label text="" expand="true"/>
       <label line_wrap="true" fill="true"
 text="((NOTE: All required information have been collected. Click 'Next' to take the real action (partition, format, packages installation and other setup) and there is no chance to revert... Are you sure?))"/>

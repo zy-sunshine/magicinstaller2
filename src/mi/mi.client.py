@@ -12,6 +12,7 @@ step_name_list = ('welcome',
     #'scsi',
     'pkgselect',
     'partition',
+    'dopartition',
     'bootloader',
     'takeactions',
     'startsetup',
@@ -21,7 +22,7 @@ step_name_list = ('welcome',
     'finish')
 win = MIMainWindow(step_name_list, gtk.WINDOW_TOPLEVEL)
 win.init()
-#win.show_all()
+
 win.show()
 
 gtk.main()

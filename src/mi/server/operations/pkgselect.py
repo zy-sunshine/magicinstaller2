@@ -3,6 +3,7 @@ import os, glob, sys, syslog
 import rpm, tarfile, time
 from mi import isys, getdev #@UnresolvedImport
 from mi.utils.common import mount_dev, umount_dev, run_bash, cdrom_available
+from mi.server.utils.decorators import probe_cache
 from mi.utils.miconfig import MiConfig
 CF = MiConfig.get_instance()
 
@@ -115,9 +116,10 @@ class MiDevice(object):
         if opt_mount:
             self.do_umount()
 
-@register.server_handler('long')
+@register.server_handler('long', 'pkgarr_probe')
+@probe_cache('pkgarr')
 def pkgarr_probe(mia, operid):
-    dolog("pkgarr_probe starting...")
+    logger.i("pkgarr_probe starting...")
     def probe_position(localfn, pos_id, new_device, fstype, reldir, isofn):
         dolog('probe_position: %s, %s, %s, %s, %s, %s' % (localfn, pos_id, new_device, fstype, reldir, isofn))
         if not os.path.exists(localfn):
@@ -171,7 +173,7 @@ def pkgarr_probe(mia, operid):
                 if r: result.append(r)
     
 #    del(cli)
-    logger.w("_____________%s" % result)
+    logger.w("pkgarr_probe %s" % result)
     return result
 
 @register.server_handler('long')

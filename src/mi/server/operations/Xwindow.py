@@ -2,14 +2,10 @@
 from mi.server.utils import _
 import os, string
 import rhpxl.monitor, rhpxl.videocard, rhpxl.mouse
-
+from mi.server.utils.decorators import probe_cache
+from mi.server.utils import logger, CF
 from mi.utils.miregister import MiRegister
 register = MiRegister()
-from mi.server.utils import logger
-dolog = logger.info
-
-from mi.utils.miconfig import MiConfig
-CF = MiConfig.get_instance()
 
 @register.server_handler('long')
 def avoid_none(val, default):
@@ -18,14 +14,16 @@ def avoid_none(val, default):
     else:
         return val
     
-@register.server_handler('long')
+@register.server_handler('long', 'probe_monitor')
+@probe_cache("monitor")
 def probe_monitor(mia, operid, dummy):
     mon = rhpxl.monitor.MonitorInfo()
     return (avoid_none(mon.monName, ''),
             avoid_none(mon.monHoriz, ''),
             avoid_none(mon.monVert, ''))
 
-@register.server_handler('long')
+@register.server_handler('long', 'probe_videocard')
+@probe_cache("videocard")
 def probe_videocard(mia, operid, dummy):
     vci = rhpxl.videocard.VideoCardInfo()
     vclist = []
@@ -34,7 +32,8 @@ def probe_videocard(mia, operid, dummy):
         vclist.append((vc.getDescription(), vc.getDriver(), vidram))
     return vclist
 
-@register.server_handler('long')
+@register.server_handler('long', 'probe_mouse')
+@probe_cache("mouse")
 def probe_mouse(mia, operid, dummy):
     # Call rhpxl.mouse.Mouse will affect the action of mouse, so do not use it.
     mouse = rhpxl.mouse.Mouse()

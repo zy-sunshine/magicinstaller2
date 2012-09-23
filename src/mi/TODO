@@ -1,0 +1,7 @@
+Make cache things smartly
+
+We just complete format operation, and should add a unique installl task queue,
+do installation background parallelly.
+
+Make a beautiful document for xmlgtk and magicinstaller2
+

@@ -4,7 +4,7 @@
             "MagicLinux/base"
         ],
         "LOG_FILE": "/var/log/mi/mi.log",
-        "HELP_HEIGHT": 540.0,
+        "HELP_HEIGHT": 540,
         "DISTVER": "3.0",
         "USEUDEV": true,
         "PKGARR_FILE": "pkgarr.py",
@@ -17,7 +17,7 @@
         "ISOLOOP": "loop3",
         "KERNELVER": "2.6.35.4",
         "LIBDIR": "/usr/lib/python2.6/site-packages",
-        "HELP_WIDTH": 480.0,
+        "HELP_WIDTH": 480,
         "RESCUE_MODE": 0,
         "FSTYPE_MAP": {
             "iso9660": [
@@ -104,6 +104,7 @@
         "TEXT_MODE": 0,
         "DOLOG": true,
         "DEBUG": 1,
+        "DEBUG_GUI": false,
         "FULL_WIDTH": 800,
         "OPERATIONDIR": "/usr/share/MagicInstaller/operations",
         "DISTKERNELVER": "3.4.4-1mgc30.i686.PAE",
@@ -146,5 +147,16 @@
         "archsize_map": {},
         "path_tftproot": "/tmpfs/tftpboot",
         "choosed_patuple": []
+    },
+    "S": {
+        "had_probe_pkgarr": true,
+        "pkgarr": [["allpa/sda10.100.pkgarr.py", "/dev/sda10", "ext4", "MagicLinux/base", "MagicLinux-3.0-1.iso"], ["allpa/sda10.101.pkgarr.py", "/dev/sda11", "ext4", "MagicLinux/base", "MagicLinux-4.0-1.iso"]],
+        "had_probe_monitor": false,
+        "monitor": [],
+        "had_probe_videocard": false,
+        "videocard": [],
+        "had_probe_mouse": false,
+        "mouse": [],
+        "all_harddisks": []
     }
 }

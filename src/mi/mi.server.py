@@ -31,7 +31,6 @@ if mia.pid > 0:
 
     class MIAction:
         def _dispatch(self, method, params):
-            print 'dispatch %s %s' % (method, params)
             global  server_quit
             if method == 'quit':
                 mia.put_operation('quit')
@@ -134,8 +133,8 @@ elif mia.pid == 0:
                 try:
                     result = handlers_long[method](mia, id, *params)
                 except:
-                    result = 'run method %s raise exception %s' % (method, sys.exc_info()[0])
-                    dolog(result)
+                    result = 'run method %s raise exception %s' % (method, str(sys.exc_info()[0:2]))
+                    log_long.e(result)
                 if CF.D.EXPERT_MODE:
                     dolog('    which returns %r.\n' % (result,))
                 mia.put_result(xmlrpclib.dumps((id, result), methodname=method, allow_none = 1))

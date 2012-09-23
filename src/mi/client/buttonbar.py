@@ -27,11 +27,11 @@ class MIButtonBar(gtk.HBox):
         self.pack_end(self.next, False, True)
         self.pack_end(self.back, False, True)
         
-        self.logger.connect('clicked', self.on_logger_clicked, None)
-        self.theme.connect('clicked', self.on_theme_clicked, None)
-        self.help.connect('clicked', self.on_help_clicked, None)
-        self.back.connect('clicked', self.on_back_clicked, None)
-        self.next.connect('clicked', self.on_next_clicked, None)
+        self.logger.connect('clicked', self.logger_btn_clicked, None)
+        self.theme.connect('clicked', self.theme_btn_clicked, None)
+        self.help.connect('clicked', self.help_btn_clicked, None)
+        self.back.connect('clicked', self.back_btn_clicked, None)
+        self.next.connect('clicked', self.next_btn_clicked, None)
     
     def img_label_box(self, img_path, label_text):
         hbox = gtk.HBox(False, 0)
@@ -45,13 +45,17 @@ class MIButtonBar(gtk.HBox):
         label.show()
         return hbox
         
-    def on_logger_clicked(self, widget, data):
-        pass
-    def on_theme_clicked(self, widget, data):
-        pass
-    def on_help_clicked(self, widget, data):
-        pass
-    def on_back_clicked(self, widget, data):
+    def logger_btn_clicked(self, widget, data):
+        self.sself.btnlogger_clicked(widget, data)
+    
+    def theme_btn_clicked(self, widget, data):
+        self.sself.btntheme_clicked(widget, data)
+        
+    def help_btn_clicked(self, widget, data):
+        self.sself.btnhelp_clicked(widget, data)
+    
+    def back_btn_clicked(self, widget, data):
         self.sself.btnback_clicked(self, data)
-    def on_next_clicked(self, widget, data):
+        
+    def next_btn_clicked(self, widget, data):
         self.sself.btnnext_clicked(self, data)

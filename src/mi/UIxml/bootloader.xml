@@ -11,14 +11,14 @@
                     <label expand="true"/>
                     <vbox fill="true" spacing="4">
                         <radiobutton label="((_Grub(Recommended)))" value="bootloader.bltype" valuedata="grub"/>
-                        <radiobutton show="false" label="((_Lilo))" value="bootloader.bltype" valuedata="lilo"/>
+                        <radiobutton visible="false" label="((_Lilo))" value="bootloader.bltype" valuedata="lilo"/>
                         <radiobutton name="bltype_none_radiobutton" label="((_Do not use boot loader))" value="bootloader.bltype" valuedata="none"/>
                     </vbox>
                     <label expand="true"/>
                 </hbox>
                 <label expand="true"/>
             </vbox>
-            <vbox name="bootlist" spacing="4" expand="true" fill="true" show="false">
+            <vbox name="bootlist" spacing="4" expand="true" fill="true" visible="false">
                 <frame label="((Install Position))" expand="true" fill="true">
                     <table columns="2" rows="3" colspaings="2" rowspacings="2">
                         <radiobutton name="mbr" label="((_Master Boot Record(MBR)))" value="bootloader.instpos" valuedata="mbr"/>
@@ -36,8 +36,8 @@
                                 lower="1" upper="120" stepinc="1" pagesize="0" pageinc="0"/>
                         <checkbutton label="((_Force enable LBA32))" value="bootloader.lba"/>
                         <label/>
-                        <checkbutton show="false" name="useblpassword" label="((Use bootloader pass_word:))" value="bootloader.usepassword"/>
-                        <entry show="false" value="bootloader.password" visible="false" enable="useblpassword" expand="true" fill="true"/>
+                        <checkbutton visible="false" name="useblpassword" label="((Use bootloader pass_word:))" value="bootloader.usepassword"/>
+                        <entry type="password" value="bootloader.password" visible="false" enable="useblpassword" expand="true" fill="true"/>
                         <label text="((Other bootloader _options:))" mnemonic="bt-options"/>
                         <entry name="bt-options" value="bootloader.options" expand="true" fill="true"/>
                     </table>

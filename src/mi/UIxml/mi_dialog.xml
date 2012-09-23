@@ -18,48 +18,48 @@
         <frame name="buttonframe" type="etched_in" fill="true">
           <hbox margin="4" expand="true" fill="true">
             <label expand="true" fill="true"/>
-            <button name="yes" show="false">
+            <button name="yes" visible="false">
               <hbox>
                 <image file="images/stock_yes_20.png" fill="true"/>
                 <label text="((_Yes))" use_underline="true" expand="true" fill="true"/>
               </hbox>
             </button>
-            <label name="yes_space" expand="true" fill="true" show="false"/>
-            <button name="ok" show="false">
+            <label name="yes_space" expand="true" fill="true" visible="false"/>
+            <button name="ok" visible="false">
               <hbox>
                 <image file="images/stock_ok_20.png" fill="true"/>
                 <label text="((_OK))" use_underline="true" expand="true" fill="true"/>
               </hbox>
             </button>
-            <label name="ok_space" expand="true" fill="true" show="false"/>
-            <button name="apply" show="false">
+            <label name="ok_space" expand="true" fill="true" visible="false"/>
+            <button name="apply" visible="false">
               <hbox>
                 <image file="images/stock_apply_20.png" fill="true"/>
                 <label text="((_Apply))" use_underline="true" expand="true" fill="true"/>
               </hbox>
             </button>
-            <label name="apply_space" expand="true" fill="true" show="false"/>
-            <button name="cancel" show="false">
+            <label name="apply_space" expand="true" fill="true" visible="false"/>
+            <button name="cancel" visible="false">
               <hbox>
                 <image file="images/stock_cancel_20.png" fill="true"/>
                 <label text="((_Cancel))" use_underline="true" expand="true" fill="true"/>
               </hbox>
             </button>
-            <label name="cancel_space" expand="true" fill="true" show="false"/>
-            <button name="no" show="false">
+            <label name="cancel_space" expand="true" fill="true" visible="false"/>
+            <button name="no" visible="false">
               <hbox>
                 <image file="images/stock_no_20.png" fill="true"/>
                 <label text="((_No))" use_underline="true" expand="true" fill="true"/>
               </hbox>
             </button>
-            <label name="no_space" expand="true" fill="true" show="false"/>
-            <button name="ignore" show="false">
+            <label name="no_space" expand="true" fill="true" visible="false"/>
+            <button name="ignore" visible="false">
               <hbox>
                 <image file="images/stock_cancel_20.png" fill="true"/>
                 <label text="((_Ignore))" use_underline="true" expand="true" fill="true"/>
               </hbox>
             </button>
-            <label name="ignore_space" expand="true" fill="true" show="false"/>
+            <label name="ignore_space" expand="true" fill="true" visible="false"/>
           </hbox>
         </frame>
       </vbox>
@@ -72,6 +72,6 @@
     </hbox>
   </messagedialog>
   <helpdialog>
-    <text expand="true" fill="true"/>
+    <text id="msg" expand="true" fill="true"/>
   </helpdialog>
 </dialogs>

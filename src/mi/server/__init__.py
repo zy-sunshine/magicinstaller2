@@ -27,6 +27,9 @@ for v in registers_map.values():
     merge_handlers(v['long'], handlers_long)
     merge_handlers(v['short'], handlers_short)
 
+from mi.utils.miconfig import MiConfig
+CF = MiConfig.get_instance()
+
 if __name__ == '__main__':
     print '\nregister_map:\n'
     print registers_map

@@ -1,8 +1,10 @@
 #!/usr/bin/python
 from mi.client.utils import _
 from mi.client.utils.magicstep import magicstep
-from mi.client.utils import logger, magicpopup
+from mi.client.utils import logger, magicpopup, xmlgtk
 from mi.utils.miconfig import MiConfig
+from xml.dom.minidom import parseString
+import os
 CF = MiConfig.get_instance()
 
 
@@ -10,18 +12,19 @@ class DoPartition(magicstep):
     '''
     commit the partiton info to change partiton on disk really
     '''
-    NAME = 'partition'
+    NAME = 'dopartition'
     LABEL = _('Do Partition')
     def __init__(self, sself):
         magicstep.__init__(self, sself, 'dopartition.xml', 'dopartition')
         if sself is None:
             return
+        self.sself = sself
+        self.doparted = False
         self.add_action = self.rootobj.tm.add_action
 
     def enter(self):
-        self.act_start_parted()
-        
-    def act_start_parted(self):
+        self.sself.btnback_sensitive(False)
+        self.sself.btnnext_sensitive(False)
         self.name_map['pfprog'].set_fraction(0)
 
         self.name_map['frame_parted'].set_sensitive(True)
@@ -30,19 +33,81 @@ class DoPartition(magicstep):
         self.add_action(_('Get all dirty disk'),
                         self.act_parted_get_dirty_result, None,
                         'get_all_dirty_disk', 0)
+        return 1
+    
+    def leave(self):
+        if not self.doparted:
+            self.act_start_parted()
+            self.doparted = True
+            return 0
+        else:
+            ### ### TODO: mount these partition before install system.
+            #self.add_action(_('Mount all target partitions.'),
+                            #self.nextop, None,
+                            #'mount_all_tgtpart', CONF.RUN.g_mount_all_list, 'y')
+            ### TODO: make a unique task queue, to make install operation run background.
+            #self.add_action(_('Start Install System'), None, None)
+            return 1
 
     def act_parted_get_dirty_result(self, tdata, data):
         self.dirty_disks = tdata
         self.format_list = []
         for devpath in CF.G.all_part_infor.keys():
             for part_tuple in CF.G.all_part_infor[devpath]:
-                if part_tuple[5] == 'true':
+                if part_tuple[5] == 'true': # format_or_not
                     self.format_list.append((devpath,
-                                             part_tuple[3],
-                                             part_tuple[6],
-                                             part_tuple[0]))
+                                             part_tuple[3], # start
+                                             part_tuple[6], # ftype
+                                             part_tuple[0])) # partnum
+        self.fill_all_info()
+        self.name_map['pfprog'].set_fraction(1)
+        # We get all information, and commit dirty partition and format can be do.
+        self.sself.btnnext_sensitive(True)
         logger.info('self.dirty_disks: %s\n' % str(self.dirty_disks))
         logger.info('self.format_list: %s\n' % str(self.format_list))
+        
+    def fill_all_info(self):
+        pkg_frame = self.id_map['pkg_frame']
+        dirty_frame = self.id_map['dirty_frame']
+        format_frame = self.id_map['format_frame']
+        
+        def gen_table(info_list):
+            table_doc = parseString('<?xml version="1.0"?><tableV2></tableV2>')
+            root0 = table_doc.getElementsByTagName('tableV2')[0]
+            for k, v in info_list:
+                trnode = table_doc.createElement('tr')
+                label0 = table_doc.createElement('label')
+                label0.setAttribute('text', k+'\t:\t')
+                root0.appendChild(trnode)
+                trnode.appendChild(label0)
+                label1 = table_doc.createElement('label')
+                label1.setAttribute('text', v)
+                trnode.appendChild(label1)
+            return table_doc
+        
+        # Package Information
+        info_list = []
+        for (pafile, dev, fstype, reldir, isofn) in [CF.G.choosed_patuple, ]:
+            info_list.append((isofn, os.path.join(dev, reldir, isofn)))
+        pkg_table = gen_table(info_list)
+        
+        # Dirty Disk
+        info_list = []
+        for disk in self.dirty_disks: # ['/dev/sda']
+            info_list.append((disk, ""))
+        dirty_table = gen_table(info_list)
+        
+        # Format Partition
+        info_list = []
+        for (devpath, start, ftype, partnum) in self.format_list: # [('/dev/sda', 935649280, 'ext3', 3)]
+            info_list.append(('%s%s' % (devpath, partnum), "filesystem type is %s" % ftype))
+        format_table = gen_table(info_list)
+        
+        for table, frame in ((pkg_table, pkg_frame), (dirty_table, dirty_frame), (format_table, format_frame)):
+            widget = xmlgtk.xmlgtk(table).widget
+            frame.add(widget)
+        
+    def act_start_parted(self):
         self.act_parted_commit_start(0)
 
     def act_parted_commit_start(self, pos):
@@ -90,25 +155,8 @@ class DoPartition(magicstep):
                     CF.G.mount_all_list.append((mntpoint, devfn, fstype))
             CF.G.mount_all_list.sort(self.malcmp)
             logger.info('CONF.RUN.g_mount_all_list: %s\n' % str(CF.G.mount_all_list))
-            #self.add_action(_('Mount all target partitions.'),
-                            #self.nextop, None,
-                            #'mount_all_tgtpart', CONF.RUN.g_mount_all_list, 'y')
-            self.nextop(None, None)
                             
-            #### Because we can mount device many times, so we not check below
-            ## Check whether the packages are stored in mounted partitions.
-            #pkgmntpoint = 0
-            #(pafile, dev, fstype, dir, isofn) = CONF.RUN.g_choosed_patuple
-            #for (mntpoint, devfn, fstype) in CONF.RUN.g_mount_all_list:
-                #if dev == devfn:
-                    #pkgmntpoint = mntpoint
-                    #if len(pkgmntpoint) > 0 and pkgmntpoint[0] == '/':
-                        #pkgmntpoint = pkgmntpoint[1:]
-                    #CONF.RUN.g_choosed_patuple = (pafile, dev, pkgmntpoint,
-                                       #fstype, dir, isofn)
-                    #dolog('The packages is placed in the mounted partition(%s)\n' %\
-                          #pkgmntpoint)
-                    #break
+            self.act_end_parted()
 
     def act_parted_format_result(self, tdata, data):
         result = tdata
@@ -127,10 +175,21 @@ class DoPartition(magicstep):
         self.name_map['pfname'].set_text('')
         self.name_map['pfprog'].set_fraction(1)
         self.name_map['frame_parted'].set_sensitive(False)
+        
+        self.sself.btnnext_clicked(None, None)
 
 if __name__ == '__main__':
-    pass
     #from mi.client.tests import TestRootObject
     #rootobj = TestRootObject(DoPartition)
     #rootobj.init()
     #rootobj.main()
+    import gtk
+    class Ui(xmlgtk.xmlgtk):
+        def __init__(self, sself):
+            xmlgtk.xmlgtk.__init__(self, 'UIxml/dopartition.xml', 'dopartition')
+    ui = Ui(None)
+    win = gtk.Window(gtk.WINDOW_TOPLEVEL)
+    win.add(ui.widget)
+    win.show()
+    gtk.main()
+    
