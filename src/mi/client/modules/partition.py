@@ -112,7 +112,7 @@ class MIStep_Partition (magicstep.magicstep):
             for row in rows:
                 devfn = row.model.get_value(row.iter, hdobj.COLUMN_DEVICE)
                 if devfn and devfn in dev_list:
-                    pixbuf = gtk.gdk.pixbuf_new_from_file('no.png') #@UndefinedVariable
+                    pixbuf = gtk.gdk.pixbuf_new_from_file('images/no.png') #@UndefinedVariable
                     row.model.set_value(row.iter, hdobj.COLUMN_FORMAT, pixbuf)
 
     def enter(self):

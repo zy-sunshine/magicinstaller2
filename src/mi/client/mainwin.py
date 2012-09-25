@@ -15,7 +15,7 @@ from mi.utils.common import search_file
 from mi.client.modules import *
 
 from mi.utils.miconfig import MiConfig
-from magicpopup import magicmsgbox, magichelp_popup
+from mi.client.utils.magicpopup import magicmsgbox, magichelp_popup
 CF = MiConfig.get_instance()
 from mi.utils.mitaskman import MiTaskman
 from mi.client.utils import magicpopup

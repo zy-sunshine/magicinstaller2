@@ -10,7 +10,7 @@
         "PKGARR_FILE": "pkgarr.py",
         "TEXTDOMAIN": "magic.installer",
         "PKGTYPE": "rpm",
-        "DATADIR": "/home/zhangyang09/work/magicinstaller2/src/mi",
+        "DATADIR": "/home/netsec/work/magicinstaller2/src/mi",
         "EXPERT_MODE": 1,
         "KERNEL_FN": "vmlinuz-3.4.4-1mgc30.i686.PAE",
         "TGTSYS_ROOT": "/tmpfs/tgtsys",
@@ -150,13 +150,13 @@
     },
     "S": {
         "had_probe_pkgarr": true,
-        "pkgarr": [["allpa/sda10.100.pkgarr.py", "/dev/sda10", "ext4", "MagicLinux/base", "MagicLinux-3.0-1.iso"], ["allpa/sda10.101.pkgarr.py", "/dev/sda11", "ext4", "MagicLinux/base", "MagicLinux-4.0-1.iso"]],
+        "pkgarr": [["allpa/sda7.100.pkgarr.py", "/dev/sda7", "ext4", "MagicLinux/base", "MagicLinux-3.0-1.iso"]],
         "had_probe_monitor": false,
         "monitor": [],
         "had_probe_videocard": false,
         "videocard": [],
         "had_probe_mouse": false,
         "mouse": [],
-        "all_harddisks": []
+        "all_harddisks": {}
     }
 }

@@ -7,3 +7,5 @@ logger.i = logger.info
 logger.e = logger.error
 logger.w = logger.warn
 logger.d = logger.debug
+
+from gettext import gettext as _
