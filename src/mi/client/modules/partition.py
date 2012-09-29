@@ -750,7 +750,7 @@ class  Harddisk(xmlgtk.xmlgtk):
                                                not_touched))
             if not_touched == 'true' and \
                    filesystem != 'N/A' and \
-                   filesystem != 'linux-swap':
+                   filesystem not in ('linux-swap', 'linux-swap(v1)'):
                 CF.G.all_orig_part.append((self.orig_partitions[start],
                                       filesystem,
                                       self.partdevfn(partnum)))

@@ -438,3 +438,118 @@ def _gen_fstab(mount_all_list):
     except Exception, errmsg:
         dolog('Generate fstab failed: %s\n' % str(errmsg))
 
+@register.server_handler('long')
+def mount_all_tgtpart(mia, operid, mount_all_list, firstcall):
+    errmsg = ''
+    if os.path.exists('/tmpfs/debug/nomnttgt'):
+        dolog('TURN ON: nomnttgt\n')
+    else:
+        # Mount all target partition as the user will.
+        cnt = 0
+        mia.set_step(operid, cnt, len(mount_all_list))
+        for (mntpoint, devfn, fstype) in mount_all_list:
+            if fstype in ('linux-swap', 'linux-swap(v1)'):
+                if firstcall:
+                    try:
+                        isys.swapon(devfn)
+                    except SystemError, em:
+                        errmsg = _('swapon(%s) failed: %s')
+                        errmsg = errmsg % (devfn, str(em))
+                        # If reach there, we donnot return, continue remaining operations, to avoid cannot generate fstab case.
+                        #return  errmsg
+            else:
+                # Wait for device block appear.
+                fblk = False
+                trycnt = 0
+                for t in range(5):
+                    if os.system('ls %s' % devfn) == 0:
+                        fblk = True
+                        break
+                    else:
+                        trycnt += 1
+                        time.sleep(1)
+                    
+                if not fblk:
+                    return _('Not exists device block on %s: \ntry time: %d\n') % (devfn, trycnt)
+
+                realpath = os.path.join(CF.D.TGTSYS_ROOT, mntpoint[1:])
+                ret, mntdir = mount_dev(CF.D.FSTYPE_MAP[fstype][0], devfn, realpath)
+                if not ret:
+                    errmsg = _('Mount %s on %s as %s failed: %s')
+                    errmsg = errmsg % (devfn, realpath, fstype, mntdir)
+                    return  errmsg
+            cnt = cnt + 1
+            mia.set_step(operid, cnt, len(mount_all_list))
+    # Mount /proc.
+    procpath = os.path.join(CF.D.TGTSYS_ROOT, 'proc')
+    if not os.path.isdir(procpath):
+        os.makedirs(procpath)
+    if not os.path.exists(os.path.join(procpath, 'cmdline')):
+        ret, msg = mount_dev('proc', 'proc', mntdir=procpath)
+    # Mount /sys
+    syspath = os.path.join(CF.D.TGTSYS_ROOT, 'sys')
+    if not os.path.isdir(syspath):
+        os.makedirs(syspath)
+    if not os.path.exists(os.path.join(syspath, 'block')):
+        ret, msg = mount_dev('sysfs', 'sys', mntdir=syspath)
+        
+    if firstcall:
+        _gen_fstab(mount_all_list)
+        if CF.D.USEUDEV:
+            dolog('Copy device files to target system.')
+            devdir = os.path.join(CF.D.TGTSYS_ROOT, 'dev')
+            if not os.path.isdir(devdir):
+                os.makedirs(devdir)
+            os.system('cp -a /dev/* %s' % devdir)
+    if errmsg:
+        return errmsg
+    else:
+        return  0
+
+@register.server_handler('long')
+def umount_all_tgtpart(mia, operid, mount_all_list, lastcall):
+    # Umount proc.
+    procdir = os.path.join(CF.D.TGTSYS_ROOT, 'proc')
+    ret,msg = umount_dev(procdir, rmdir=False)
+    if not ret:
+        dolog('Umount %s failed: %s\n' % (procdir, str(msg)))
+    # Umount sys.
+    sysdir = os.path.join(CF.D.TGTSYS_ROOT, 'sys')
+    ret, msg = umount_dev(sysdir, rmdir=False)
+    if not ret:
+        dolog('Umount %s failed: %s\n' % (sysdir, str(msg)))
+
+    if os.path.exists('/tmpfs/debug/nomnttgt'):
+        dolog('TURN ON: nomnttgt\n')
+        return 0
+
+    # Copy the installation log into the target system.
+    if lastcall:
+        logdir = os.path.join(CF.D.TGTSYS_ROOT, 'var/log/MagicInstaller')
+        os.system('mkdir -p %s' % logdir)
+        os.system('cp /tmpfs/var/log/* %s' % logdir)
+        os.system('cp /tmpfs/grub.* %s' % logdir)
+
+    # Umount all filesystems and swapoff all swaps.
+    cnt = 0
+    mount_all_list.reverse()
+    mia.set_step(operid, cnt, len(mount_all_list))
+    for (mntpoint, devfn, fstype) in mount_all_list:
+        if fstype in ('linux-swap', 'linux-swap(v1)'):
+            if lastcall:
+                try:
+                    isys.swapoff(devfn)
+                except SystemError, em:
+                    errmsg = _('swapoff(%s) failed: %s')
+                    errmsg = errmsg % (devfn, str(em))
+                    #return  errmsg
+        else:
+            realpath = os.path.join(CF.D.TGTSYS_ROOT, mntpoint[1:])
+            ret, msg = umount_dev(realpath, rmdir=False)
+            if not ret:
+                errmsg = _('UMount %s failed: %s')
+                errmsg = errmsg % (realpath, str(msg))
+                #return  errmsg
+        cnt = cnt + 1
+        mia.set_step(operid, cnt, len(mount_all_list))
+    return  0

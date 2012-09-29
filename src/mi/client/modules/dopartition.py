@@ -21,7 +21,7 @@ class DoPartition(magicstep):
         self.sself = sself
         self.doparted = False
         self.add_action = self.rootobj.tm.add_action
-
+        self.takeactions = TakeActions()
     def enter(self):
         self.sself.btnback_sensitive(False)
         self.sself.btnnext_sensitive(False)
@@ -37,14 +37,18 @@ class DoPartition(magicstep):
     
     def leave(self):
         if not self.doparted:
+            self.sself.btnnext_sensitive(False)
             self.act_start_parted()
             self.doparted = True
             return 0
         else:
+            self.sself.btnnext_sensitive(True)
             ### ### TODO: mount these partition before install system.
-            #self.add_action(_('Mount all target partitions.'),
-                            #self.nextop, None,
-                            #'mount_all_tgtpart', CONF.RUN.g_mount_all_list, 'y')
+            
+            self.add_action(_('Mount all target partitions.'),
+                            None, None,
+                            'mount_all_tgtpart', CF.G.mount_all_list, 'y')
+            self.add_
             ### TODO: make a unique task queue, to make install operation run background.
             #self.add_action(_('Start Install System'), None, None)
             return 1
@@ -147,7 +151,10 @@ class DoPartition(magicstep):
             CF.G.mount_all_list = []
             for devpath in CF.G.all_part_infor.keys():
                 for part_tuple in CF.G.all_part_infor[devpath]:
-                    if part_tuple[7] == '':  # mountpoint ### TODO
+                    if part_tuple[7] == '':
+                        # :) This mountpoint is not the obsolete "mountpoint", 
+                        # which was used by mount every device, removed already, please view the source in magicinstaller1
+                        # Note: this mountpoint is point by user at create partition step, / /usr /home and so on.
                         continue
                     mntpoint = part_tuple[7]
                     devfn = '%s%d' % (devpath, part_tuple[0])

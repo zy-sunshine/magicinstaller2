@@ -422,7 +422,9 @@ class xmlgtk:
             rows = max(cell_list, key=lambda s: s[6])[6] + 1
             columns = max(cell_list, key=lambda s: s[4])[4] + 1
         else:
-            raise Exception('Error', 'Cannot create zero table')
+            rows = 1
+            columns = 1
+            #raise Exception('Error', 'Cannot create zero table')
         
         homogeneous = xgc_get_bool(self._xgc_attr(node, 'homogeneous', 'false'))
         widget = gtk.Table(rows, columns, homogeneous)
