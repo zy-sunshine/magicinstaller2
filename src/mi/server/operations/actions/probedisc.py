@@ -8,7 +8,6 @@ register = MiRegister()
 cur_rpm_fd = 0
 ts = None
 
-installmode = 'rpminstallmode'
 rpmdb = 'rpmdb.tar.bz2'
 etctar = 'etc.tar.bz2'
 etc_script = 'etc_install.sh'
@@ -105,25 +104,19 @@ class MiDevice_TgtSys(object):
                 logger.w('Umount device %s Failed, but we continue')
 
 @register.server_handler('long')
-def instpkg_prep(mia, operid, pkgsrc_devinfo, instmode, tgtsys_devinfo):
+def instpkg_prep(mia, operid, pkgsrc_devinfo, tgtsys_devinfo):
     '''
         Install all package prepare work.
         We should mount target system device, to prepare install packages.
         and mount disk which packages source is saved on.
     '''
-    ######### TODO: !!! there to get get get
-    # Set the package install mode.
-    global installmode
-    
+
     global dev_hd # the harddisk device where save packages.
     global dev_iso # the iso where save pkgs.
     global dev_tgt # the target system devices.
     
     dev, fstype, bootiso_relpath, reldir = pkgsrc_devinfo
-    
-    installmode = instmode
-    if CF.D.PKGTYPE == 'rpm': logger.i('InstallMode: Rpm Packages %s\n' % installmode)
-    elif CF.D.PKGTYPE == 'tar': logger.i('InstallMode: Tar Packages\n')
+
     logger.i('instpkg_prep(%s, %s, %s, %s)\n' % (dev, fstype, bootiso_relpath, reldir))
     
     ############################## Mount Start #####################################            

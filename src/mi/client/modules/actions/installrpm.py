@@ -60,7 +60,7 @@ class InstallRpmActions(object):
         #(_('Setup Keyboard'), self.act_start_keyboard, None)]
         self.actpos = 0
         self.discdlg_open_time = -1
-        self.installmode = 'rpminstallmode'   # Default
+
         self.minorarch_pkgs = []
         self.minorarch_later = False     # push back minor arch packages ### current close this feature.
         self.add_action = self.rootobj.tm.add_action
@@ -98,7 +98,6 @@ class InstallRpmActions(object):
         self.add_action(None,
                         self.act_instpkg_disc_start, 0,
                         'instpkg_prep', (dev, fstype, bootiso_relpath, reldir), 
-                                        self.installmode, 
                                         { '/': (CF.G.root_device, get_devinfo(CF.G.root_device, CF.G.all_part_infor).fstype),
                                           '/boot': (CF.G.boot_device, get_devinfo(CF.G.boot_device, CF.G.all_part_infor).fstype),
                                           'swap': (CF.G.swap_device, get_devinfo(CF.G.swap_device, CF.G.all_part_infor).fstype),
@@ -144,13 +143,6 @@ class InstallRpmActions(object):
         (disc_no, pkg_no) = data
         while pkg_no < len(CF.G.arrangement[disc_no]):
             pkgtuple = CF.G.arrangement[disc_no][pkg_no]
-            #noscripts = pkgtuple[6]     # pkgpublic.noscripts == 6.
-            noscripts = False   #### noscripts get out of range
-            #-> noscripts = pkgtuple[6]     # pkgpublic.noscripts == 6.
-            #(Pdb) print pkgtuple
-            #[118253L, 'nss-softokn-freebl-3.13.3-1mgc30.i686.rpm', ['System Environment', 'Base'], ['glibc-2.15-1mgc30.i686.rpm'], [['./nss-softokn-freebl-3.13.3-1mgc30.i686.rpm', 'i686', 118253L]]]
-            #(Pdb) print len(pkgtuple)
-            #5
 
             if self.install_allpkg or self.instpkg_map.has_key(pkgtuple[1]):
                 archpkg = self.pkg2archpkg(pkgtuple[1])
@@ -167,16 +159,14 @@ class InstallRpmActions(object):
                 apkg = os.path.basename(apkg)
                 self.add_action(apkg,
                                 self.act_instpkg_pkg_end, (disc_no, pkg_no, asize, False),
-                                'package_install', apkg, self.probe_all_disc_result[disc_no][1],
-                                noscripts)
+                                'package_install', apkg, self.probe_all_disc_result[disc_no][1])
                 return
             pkg_no = pkg_no + 1
         if self.minorarch_later and self.minorarch_pkgs:
             (apkg, aarch, asize) = self.minorarch_pkgs.pop(0)
             self.add_action(apkg,
                             self.act_instpkg_pkg_end, (disc_no, pkg_no, asize, False),
-                            'package_install', apkg, self.probe_all_disc_result[disc_no][1],
-                            noscripts)
+                            'package_install', apkg, self.probe_all_disc_result[disc_no][1])
             return
         (pafile, dev, fstype, reldir, bootiso_relpath) = CF.G.choosed_patuple
         self.add_action(None,
@@ -295,7 +285,7 @@ class InstallRpmActions(object):
         (pafile, dev, fstype, reldir, bootiso_relpath) = CF.G.choosed_patuple
         self.add_action(_('Researching packages...'),
                         self.act_instpkg_disc_start, self.cur_disc_no,
-                        'instpkg_prep', dev, reldir, fstype, self.installmode)
+                        'instpkg_prep', dev, reldir, fstype)
 
     def abort_clicked(self, widget, data):
         (pafile, dev, fstype, reldir, bootiso_relpath) = CF.G.choosed_patuple

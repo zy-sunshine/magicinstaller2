@@ -77,21 +77,16 @@ class MIStep_takeactions(magicstep.magicstepgroup):
         parent = self.right_panel.parent
         parent.remove(self.right_panel)
 
+    def start_install(self):
+        if CF.D.PKGTYPE == 'rpm':     # In the mipublic.py
+            # install rpm
+        elif CF.D.PKGTYPE == 'tar':
+            # install tar
+            
     def check_enter_doactions(self):
         #### TODO: set the next back button sensitive
         # self.rootobj.btnback_sensitive(False)
         # self.rootobj.btnnext_sensitive(False)
-        # Get the Install Mode
-        self.fetch_values(self.rootobj.values,
-                    valuename_list = ['takeactions.installmode']) 
-        instmode = self.get_data(self.values, 'takeactions.installmode')
-        
-        if instmode == 'copyinstallmode':
-            # Copy Install Mode
-            self.installmode = 'copyinstallmode'
-        elif instmode == 'rpminstallmode':
-            # Rpm Install Mode
-            self.installmode = 'rpminstallmode'
         
         self.rootobj.cb_push_leftpanel(self.get_left_panel())
         self.rootobj.cb_push_rightpanel(self.get_right_panel())

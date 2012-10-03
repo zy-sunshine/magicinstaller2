@@ -1,6 +1,6 @@
 #!/usr/bin/python
 import os, glob, sys, syslog
-import rpm, tarfile, time
+import rpm, time
 from mi import isys, getdev #@UnresolvedImport
 from mi.server.utils.decorators import probe_cache
 from mi.server.utils.device import MiDevice

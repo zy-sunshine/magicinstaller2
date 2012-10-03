@@ -4,11 +4,11 @@ from mi.server.utils import logger, CF
 from mi.server.utils.rpm.version import get_pkg_name
 
 class InstallRpm():
-    def __init__(self):
+    def __init__(self, tgtsys_root):
         self.noscripts_pkg_list = []
         self.use_noscripts = True
         self.tmp_noscripts_dir = 'tmp/MI_noscripts'
-        
+
         # If we use use_noscripts we should open the option --noscripts in rpm command,
         # and then we will do some configuration in instpkg_post.
         self.use_noscripts = False
@@ -20,10 +20,10 @@ class InstallRpm():
         self.noscripts_log = '/var/log/mi/run_noscripts.log'
         if not os.path.exists(os.path.dirname(self.noscripts_log)):
             os.mkdir(os.path.dirname(self.noscripts_log))
-            
-        self.tgtsys_root = CF.D.TGTSYS_ROOT
-        
-    def _install(self, pkgpath, noscripts, not_pre_post_script):
+
+        self.tgtsys_root = tgtsys_root
+
+    def _install(self, pkgpath, noscripts, not_pre_post_script, progress_cb):
         pkgname = get_pkg_name(pkgpath)
         try:
             cmd = 'rpm'
@@ -36,7 +36,7 @@ class InstallRpm():
             if self.use_noscripts or noscripts:
                 argv.append('--noscripts')
                 self.noscripts_pkg_list.append(pkgpath)
-    
+
             #cmd_res = {'err':[], 'std': [], 'ret':0}   # DEBUG
             cmd_res = run_bash(cmd, argv)
             # Sign the installing pkg name in stderr
@@ -55,22 +55,33 @@ class InstallRpm():
             logger.i('FAILED on %s: %s\n' % (pkgname, str(errmsg)))
             return str(errmsg)
         return 0
-    
-    def _pre_pkg(self, pkgpath, noscripts, not_pre_post_script):
+
+    def _pre_pkg(self, pkgpath, noscripts, not_pre_post_script, progress_cb):
+        if progress_cb:
+            progress_cb.set_step(0, 1)
+        return 0
+  
+    def install_pre(self):
+        return 0
+
+    def install_post(self):
         return 0
     
-    def _post_pkg(self, pkgpath, noscripts, not_pre_post_script):
+    def _post_pkg(self, pkgpath, noscripts, not_pre_post_script, progress_cb):
+        if progress_cb:
+            progress_cb.set_step(0.5, 1)
         ### TODO Because this method to dump post script is not a valid bash script, it is like:
         # posix.symlink("../run", "/var/run")
         # posix.symlink("../run/lock", "/var/lock")
         # I do not know, may be it is the rpm inter language to create a link.
         # It happend in filesystem-3-3mgc30.i686.rpm please check.
         
-        return -1
+        #return 'Not support this _post_pkg method'
+    
         # we will execute all the pre_in and post_in scripts there, if we use
         # the --noscripts option during rpm installation
         logger.i('Execute Pre Post Scripts:\n\t%s\n' % str(self.noscripts_pkg_list))
-        
+
         if not self.noscripts_pkg_list:
             return 0
         if self.not_pre_post_script or not_pre_post_script:
@@ -104,7 +115,8 @@ class InstallRpm():
                     write_script(err_msg, self.noscripts_log, 'a')   # do log
                     return ret
             return 1
-        write_script('Execute Pre Post Scripts:\n\t%s\n' % str(self.noscripts_pkg_list), self.noscripts_log, 'a')  # do log            
+        
+        write_script('Execute Pre Post Scripts:\n\t%s\n' % str(self.noscripts_pkg_list), self.noscripts_log, 'a')  # do log
         script_dir = os.path.join(self.tgtsys_root, self.tmp_noscripts_dir)
         if not os.path.exists(script_dir):
             os.makedirs(script_dir)
@@ -118,37 +130,54 @@ class InstallRpm():
                     if ret != 0:
                         # Error
                         return ret
-                    
+
         self.noscripts_pkg_list = []
+        if progress_cb:
+            progress_cb.set_step(1, 1)
         return 0
-    
-    def install(self, pkgpath, noscripts=False, not_pre_post_script=False):
-        ret = self._pre_pkg(pkgpath, noscripts, not_pre_post_script)
+
+    def install(self, pkgpath, noscripts=False, not_pre_post_script=False, progress_cb=None):
+        ret = self._pre_pkg(pkgpath, noscripts, not_pre_post_script, progress_cb)
         if ret != 0:
             return 'PRE_PKG Failed %s' % ret
-        ret = self._install(pkgpath, noscripts, not_pre_post_script)
+        ret = self._install(pkgpath, noscripts, not_pre_post_script, progress_cb)
         if ret != 0:
             return 'INSTALL Failed %s' % ret
-        ret = self._post_pkg(pkgpath, noscripts, not_pre_post_script)
+        ret = self._post_pkg(pkgpath, noscripts, not_pre_post_script, progress_cb)
         if ret != 0:
             return 'POST_PKG Failed %s' % ret
         return 0
-    
+
 if __name__ == '__main__':
-    inst_h = InstallRpm()
-    pkglist = [(False, '/home/netsec/work/dist/rpm_core/glibc-2.15-32mgc30.i686.rpm', True, True),
-               (False, '/home/netsec/work/dist/rpm_core/bash-4.2.29-2mgc30.i686.rpm', True, False),
-               (False, '/home/netsec/work/dist/rpm_core/libgcc-4.6.2-2mgc30.1.i686.rpm', True, True),
-               (True, '/home/netsec/work/dist/rpm_core/filesystem-3-3mgc30.i686.rpm', True, False),
+    pkglist = [(False, '/home/zhangyang09/work/dist/RPMS.base/glibc-2.15-32mgc30.i686.rpm', True, True),
+               (False, '/home/zhangyang09/work/dist/RPMS.base/bash-4.2.29-2mgc30.i686.rpm', True, False),
+               (True, '/home/zhangyang09/work/dist/RPMS.base/libgcc-4.6.2-2mgc30.1.i686.rpm', True, True),
+               (False, '/home/zhangyang09/work/dist/RPMS.base/filesystem-3-3mgc30.i686.rpm', True, False),
                ]
+    class Mia(object):
+        def set_step(self, stepid, step, total):
+            print 'stepid %s step %s total %s' % (stepid, step, total)
+            
+    class Progress_CB(object):
+        def __init__(self, mia, operid):
+            self.mia = mia
+            self.operid = operid
+            
+        def set_step(self, step, total):
+            self.mia.set_step(self.operid, step, total)
+    
+    mia = Mia()
+    operid = 0
+    progress_cb = Progress_CB(mia, operid)
+    
+    inst_h = InstallRpm(CF.D.TGTSYS_ROOT)
+    
+    inst_h.install_pre()
     for pkg in pkglist:
         if pkg[0]:
-            ret = inst_h.install(*pkg[1:])
+            ret = inst_h.install(pkg[1], pkg[2], pkg[3], progress_cb)
             if ret != 0:
-                print 'install failed pkg %s' % str(pkg)
+                print 'install failed pkg %s %s' % (str(pkg), ret)
             else:
-                print 'install success pkg %s' % str(pkg)
-                
-                
-        
-    
+                print 'install success pkg %s %s' % (str(pkg), ret)
+    inst_h.install_post()

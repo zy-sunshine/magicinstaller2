@@ -1,60 +1,34 @@
 import os
+from mi.utils.miregister import MiRegister
+register = MiRegister()
 
-def pre_install():
+@register.server_handler('long', 'tar_pre_install')
+def pre_install(mia, operid):
     '''
         all packages install operation previous action.
     '''
-
-def pre_pkg():
+@register.server_handler('long', 'tar_pre_pkg')
+def pre_pkg(mia, operid):
     '''
         each package install operation previous action.
     '''
-
-class CBFileObj(file):
-    def __init__(self, filepath, data):
-        self.mia, self.operid, self.total_size = data
-        file.__init__(self, filepath)
-    def read(self, size):
-        self.mia.set_step(self.operid, self.tell(), self.total_size)
-        return file.read(self, size)
-
-def do_tar_extract_install():
-    tar_size = os.path.getsize(pkgpath)
-    try:
-        tarobj = tarfile.open(fileobj=CBFileObj(pkgpath, (mia, operid, tar_size)))
-    except:
-        errstr = 'Faild on create tarfile object on file "%s" size"%d"\n' % (pkgpath, tar_size)
-        dolog(errstr)
-        return errstr
-    try:
-        tarobj.extractall(path=CF.D.TGTSYS_ROOT)
-    except:
-        if tarobj:
-            tarobj.close()
-        errstr = 'Faild on extract file "%s" size"%d" to directory "%s"\n' % (pkgpath, tar_size, CF.D.TGTSYS_ROOT)
-        dolog(errstr)
-        return errstr
-    try:
-        tarobj.close()
-    except:
-        pass
     
-def install_pkg():
+@register.server_handler('long', 'tar_install_pkg')
+def install_pkg(mia, operid):
     '''
         each package install operation.
     '''
     ret = do_tar_extract_install()
-    if ret:
-        return ret
-    else:
-        return 0
-
-def post_pkg():
+    return ret
+    
+@register.server_handler('long', 'tar_post_pkg')
+def post_pkg(mia, operid):
     '''
         each package install operation post action.
     '''
-
-def post_install():
+    
+@register.server_handler('long', 'tar_post_install')
+def post_install(mia, operid):
     '''
         all packages install finish post action.
     '''

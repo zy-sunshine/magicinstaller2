@@ -157,6 +157,8 @@
         "videocard": [],
         "had_probe_mouse": false,
         "mouse": [],
-        "all_harddisks": {}
+        "all_harddisks": {}, 
+        "BASE_REPO_NAME": "",
+        "BASE_REPO_URL": ""
     }
 }

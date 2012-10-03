@@ -43,7 +43,6 @@
     <choosedgroup><select id="ALL"/></choosedgroup>
   </package>
   <takeactions>
-    <installmode>rpminstallmode</installmode>
   </takeactions>
   <startsetup>
     <skipXsetting>1</skipXsetting>
