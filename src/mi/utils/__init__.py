@@ -16,5 +16,4 @@ logger.d = logger.debug
 from mi.utils.miconfig import MiConfig
 CF = MiConfig.get_instance()
 
-
 from gettext import gettext as _

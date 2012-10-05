@@ -1,25 +1,31 @@
+#!/usr/bin/python
 import os, gtk
 from mi.client.mainwin import MIMainWindow
-from mi.utils.miconfig import MiConfig
-CF = MiConfig.get_instance()
-
-from mi.utils import logger
+from mi.client.utils import _, CF, logger
 
 ## Setup constants and working directory.
 logger.info('change current working directory to %s' % CF.D.DATADIR)
 os.chdir(CF.D.DATADIR)
-step_name_list = ('welcome',
+
+settings = gtk.settings_get_default()
+#settings.set_string_property('gtk-theme-name', 'Default', '')
+gtk.rc_parse_string(open('style.rc', 'rt').read())
+print gtk.rc_get_theme_dir()
+
+step_name_list = (
+    (_('Welcome'), 'welcome'),
     #'scsi',
-    'pkgselect',
-    'partition',
-    'dopartition',
-    #'takeactions',
-    'startsetup',
-    'accounts',
+    (_('Package'), 'pkgselect'),
+    (_('Partition'), 'partition'),
+    (_('Partition'), 'dopartition'),
+    #(_('Setup'), 'startsetup'),
+    (_('Setup'), 'accounts'),
     #'Xwindow',
-    'bootloader',
-    'dosetup',
-    'finish')
+    (_('Setup'), 'bootloader'),
+    (_('Setup'), 'takeactions'),
+    #(_('Setup'), 'dosetup'),
+    (_('Finish'), 'finish')
+    )
 win = MIMainWindow(step_name_list, gtk.WINDOW_TOPLEVEL)
 win.init()
 

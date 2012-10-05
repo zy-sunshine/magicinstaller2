@@ -85,12 +85,9 @@ if mi_config.develmode:
     #env.M4Builder('magic.actions.server.py', 'm4.magic.actions.server.py')
 
     bin_programs = ['mi.client',        # MagicInstaller Toplevel Controller.
-                    #'magic.installer',       # MagicInstaller GUI.
                     'mi.server',  # MagicInstaller Actions Sevrer.
-                    #'magic.actions.quit',    # Just a test script. It force the Actions Server quit.
                     'mi.logging',
-                    #'magic.actions.logger.quit',
-                    #'magic.logger']
+                    'mi.toplevel'
                     ]
 
     for bp in bin_programs:

@@ -13,5 +13,6 @@
     <frame id="pkg_frame" label="((Package Source Information))" fill="true" expand="true" />
     <frame id="dirty_frame" label="((Dirty Partition))" fill="true" expand="true" visible="false" />
     <frame id="format_frame" label="((Format Partition))" fill="true" expand="true" />
+    <frame id="tgtsys_frame" label="((Target Partition))" fill="true" expand="true" />
   </vbox>
 </dopartition>

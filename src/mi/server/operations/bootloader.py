@@ -3,6 +3,7 @@ import os, sys, time, string
 from mi import getdev
 from mi.utils.common import mount_dev, umount_dev
 from mi.utils.miconfig import MiConfig
+from mi.server.utils.device import MiDevice
 CF = MiConfig.get_instance()
 
 from mi.utils.miregister import MiRegister
@@ -260,7 +261,7 @@ def prepare_grub(mia, operid, timeout, usepassword, password,
                    os.path.join(CF.D.TGTSYS_ROOT, 'boot/grub')))
         os.system('sync')
                    
-        return (grubdev, grubsetupdev, grubopt)
+        #return (grubdev, grubsetupdev, grubopt)
 
 # Setup grub with all of the partitions mounted as readonly.
 # grub makes use of raw devices instead of filesystems that the operation
@@ -365,15 +366,17 @@ def win_probe(mia, operid, hdpartlist):
         if fstype not in CF.D.FSTYPE_MAP or \
                CF.D.FSTYPE_MAP[fstype][0] not in ('vfat', 'ntfs', 'ntfs-3g'):
             continue
-        ret, mntdir = mount_dev(CF.D.FSTYPE_MAP[fstype][0], device)
-        if ret:
-            if os.path.exists(os.path.join(mntdir, 'bootmgr')):
+        dev = MiDevice(device, fstype)
+        notfind = True
+        for absolute_path, reltive_dir in dev.iter_searchfiles(['bootmgr', 'ntldr', 'io.sys'], ['']):
+            if os.path.basename(absolute_path) == 'bootmgr':
                 result.append((new_device, 'vista/7'))
-            elif os.path.exists(os.path.join(mntdir, 'ntldr')):
+            elif os.path.basename(absolute_path) == 'ntldr':
                 result.append((new_device, 'winnt'))
-            elif os.path.exists(os.path.join(mntdir, 'io.sys')):
+            elif os.path.basename(absolute_path) == 'io.sys':
                 result.append((new_device, 'win98'))
-            else:
-                 result.append((new_device, 'win'))
-            umount_dev(mntdir)
+            notfind = False
+            
+        if notfind:
+            result.append((new_device, 'win'))
     return result

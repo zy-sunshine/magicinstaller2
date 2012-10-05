@@ -1,6 +1,7 @@
 import os, sys, rpm
 from mi.server.utils import logger, CF
 from mi.server.utils.rpm.version import get_pkg_name
+import glob
 def _rpm_installcb(what, bytes, total, h, data):
     global  cur_rpm_fd
     (progress_cb, ) = data
@@ -34,6 +35,9 @@ class InstallRpm(object):
 
         # have been removed from last rpm version
         #self.ts.setFlags(rpm.RPMTRANS_FLAG_ANACONDA)
+        rpm.addMacro("__dbi_htconfig", #@UndefinedVariable
+             "hash nofsync %{__dbi_other} %{__dbi_perms}")
+        rpm.addMacro("__file_context_path", "%{nil}") #@UndefinedVariable
         return 0
     
     def install_post(self):
@@ -83,10 +87,14 @@ if __name__ == '__main__':
                (True, '/home/zhangyang09/work/dist/RPMS.base/libgcc-4.6.2-2mgc30.1.i686.rpm', True, True),
                (False, '/home/zhangyang09/work/dist/RPMS.base/filesystem-3-3mgc30.i686.rpm', True, False),
                ]
-
+    pkglist = []
+    for pkg in glob.glob('/home/zhangyang09/work/dist/RPMS.base/*.rpm'):
+        pkglist.append((True, pkg, True, True))
+    print len(pkglist)
     class Mia(object):
         def set_step(self, stepid, step, total):
-            print 'stepid %s step %s total %s' % (stepid, step, total)
+            pass
+            #print 'stepid %s step %s total %s' % (stepid, step, total)
             
     class Progress_CB(object):
         def __init__(self, mia, operid):

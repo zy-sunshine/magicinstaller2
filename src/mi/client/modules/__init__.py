@@ -22,7 +22,7 @@ import imp, pkgutil
 for importer, modname, ispkg in pkgutil.iter_modules([CURDIR]):
     if ispkg:
         continue
-    fpath = os.path.join(CURDIR, modname) + '.py'
+    fpath = os.path.join(importer.path, modname) + '.py'
     # It will import mi.client.modules by needed.
     #mod = imp.load_source('mi.client.modules.'+modname, fpath)
     mod = imp.load_source(modname, fpath)

@@ -39,20 +39,22 @@ class Steps(object):
         self.sself = sself
         __step_l = []
         
-        for name in step_name_list:
+        for group, name in step_name_list:
             cls = self.get_step_class(name)
             if cls:
-                __step_l.append([cls.NAME, cls(sself), cls.LABEL, True])
+                __step_l.append([group, cls.NAME, cls(sself), cls.LABEL, True])
             else:
                 raise Exception('Can not find class by name %s' % name)
         i = -1
         self.step_lst = []
         self.step_map = {}
+        self.group_step_map = {}
         for s in __step_l:
             i += 1
-            step = Step(*([i]+s))
+            step = Step(i, *s[1:])
             self.step_lst.append(step)
             self.step_map[step.name] = step
+            self.group_step_map.setdefault(s[0], []).append(step)
             step.obj.widget.hide()
             
     def get_step_class(self, name):
@@ -63,9 +65,16 @@ class Steps(object):
                 return mod
         return None
     
+    def get_step_group(self, step):
+        for k, v in self.group_step_map.items():
+            if step in v:
+                return k
+        return None
+    
     def init(self):
+        
         for step in self.step_lst:
-            self.sself.leftpanel.addstep(step.name)
+            self.sself.leftpanel.addstep(self.get_step_group(step), step.name)
         
         #### Init startup action
         if not CF.D.DEBUG_GUI:
@@ -95,10 +104,15 @@ class Steps(object):
 XML_DATA = '''
 <frame width="800" height="600">
 <vbox>
-<header logo="images/banner.png.800x600" />
+<hbox>
+<label text="MagicInstaller" />
+<label expand="true" />
+<leftpanel />
+</hbox>
+<!-- <header logo="images/banner.png.800x600" /> -->
 <tableV2 expand="true" fill="true">
 <tr>
-  <leftpanel yoptions="expandfill" /> <rightpanel expandfill="true" />
+   <rightpanel expandfill="true" />
 </tr>
 </tableV2>
 <statusbar />
@@ -399,3 +413,13 @@ class MIMainWindow(gtk.Window):
     def btnlogger_clicked(self, widget, data):
         pass
         #self.tm.add_action(None, None, None, 'start_magiclogger', 0)
+
+    def start_install(self):
+        '''
+            hard code,
+            because we collect all information for install package to target system, so we start this action in backend.
+            The install action is in tackactions.py
+        '''
+        step = self.steps.get_step_by_name('takeactions')
+        step.obj.start_install()
+        

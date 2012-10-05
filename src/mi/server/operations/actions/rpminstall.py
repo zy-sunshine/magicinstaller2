@@ -3,14 +3,15 @@ from mi.server.utils import logger, CF
 from mi.utils.miregister import MiRegister
 register = MiRegister()
 
-USE_TS = False
+USE_TS = True
 inst_h = None
 
 @register.server_handler('long', 'rpm_pre_install')
-def pre_install(mia, operid):
+def pre_install(mia, operid, dummy):
     '''
         all packages install operation previous action.
     '''
+    logger.i('rpm_pre_install')
     global inst_h
     if USE_TS:
         # Use rpm-python module to install rpm pkg, but at this version it is very slowly.
@@ -25,13 +26,6 @@ def pre_install(mia, operid):
         inst_h = InstallRpm(CF.D.TGTSYS_ROOT)
         inst_h.install_pre()
 
-@register.server_handler('long', 'rpm_pre_pkg')
-def pre_pkg(mia, operid):
-    '''
-        each package install operation previous action.
-    '''
-    mia.set_step(operid, 0, 1)
-    
 @register.server_handler('long', 'rpm_install_pkg')
 def install_pkg(mia, operid, pkgname, firstpkg):
     '''
@@ -41,6 +35,7 @@ def install_pkg(mia, operid, pkgname, firstpkg):
     
     dev_hd = CF.S.pkg_res_dev_hd
     dev_iso = CF.S.pkg_res_dev_iso
+    mia.set_step(operid, 0, 1)
     if not (dev_hd or dev_iso):
         return _('Can not get the mounted resource device (iso or harddisk both None), ERROR!!!')
     
@@ -55,29 +50,22 @@ def install_pkg(mia, operid, pkgname, firstpkg):
             self.operid = operid
             
         def set_step(self, step, total):
-            self.mia.set_step(self.operid, step, total)
+            self.mia.set_step(self.operid, step/total, 1)
             
     ret = 'Nothing'
     if USE_TS:
         # Use rpm-python module to install rpm pkg, but at this version it is very slowly.
-        ret = inst_h.install(pkgpath, , Progress_CB(mia, operid))
+        ret = inst_h.install(pkgpath, progress_cb = Progress_CB(mia, operid))
     else:
         # Because I can not use rpm-python module to install quickly.
         # So use the bash mode to install the pkg, it is very fast.
         # If you can use rpm-python module install pkg quickly, you can remove it.
-        ret = inst_h.install(pkgpath, Progress_CB(mia, operid))
-
+        ret = inst_h.install(pkgpath, progress_cb = Progress_CB(mia, operid))
+    mia.set_step(operid, 1, 1)
     return ret
 
-@register.server_handler('long', 'rpm_post_pkg')
-def post_pkg(mia, operid):
-    '''
-        each package install operation post action.
-    '''
-    mia.set_step(operid, 1, 1)
-    
 @register.server_handler('long', 'rpm_post_install')
-def post_install(mia, operid):
+def post_install(mia, operid, dummy):
     '''
         all packages install finish post action.
     '''

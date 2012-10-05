@@ -41,7 +41,8 @@ class magicpopup (xmlgtk.xmlgtk):
 
         self.topwin = gtk.Window(gtk.WINDOW_POPUP)
         self.topwin.set_modal(True)
-        self.topwin.set_position(gtk.WIN_POS_CENTER_ALWAYS)
+        #self.topwin.set_position(gtk.WIN_POS_CENTER_ALWAYS)
+        self.topwin.set_position(gtk.WIN_POS_CENTER)
         self.topwin.add(self.dialogframe.widget)
         self.topwin.show()
 

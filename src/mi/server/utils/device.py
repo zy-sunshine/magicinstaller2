@@ -1,6 +1,7 @@
 import os
 from mi.utils.common import mount_dev, umount_dev, run_bash, cdrom_available
 from mi.server.utils import logger, CF
+import time
 class MiDevice(object):
     def __init__(self, blk_path, fstype, mntdir = ''):
         self.blk_path = blk_path
@@ -53,7 +54,12 @@ class MiDevice(object):
     
     def do_umount(self):
         if not self.has_mounted: return True
-        ret, errmsg = umount_dev(self.mntdir)
+        for t in range(3): # try 3 time, because some udisk program will hold on disk, when disk mount. umount action can not so quickly.
+            ret, errmsg = umount_dev(self.mntdir)
+            if ret:
+                break
+            else:
+                time.sleep(1)
         if not ret:
             logger.e("MiDevice.do_umount UMount(%s) failed: %s" % (self.mntdir, str(errmsg))); return False
         else:
@@ -67,13 +73,20 @@ class MiDevice(object):
     def get_fstype(self):
         return self.fstype
         
-    def iter_searchfiles(self, fs_lst, pathes):
+    def iter_searchfiles(self, fs_lst, paths):
+        '''
+            auto mount deivce, and search file list (fs_lst) in these paths (paths)
+            RETURN:
+                (absolute_path, reltive_dir)
+                file absolute path(p) and which path find it(pp)
+        '''
         opt_mount = True
         if self.has_mounted:
             opt_mount = False
         if opt_mount:
             if not self.do_mount(): return
-        for p in pathes:
+        for p in paths:
+            p = p.strip('/')
             for fn in fs_lst:
                 pp = os.path.join(self.mntdir, p, fn)
                 if os.access(pp, os.R_OK):

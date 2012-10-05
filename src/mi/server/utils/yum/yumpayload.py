@@ -1064,7 +1064,7 @@ class RPMCallback(object):
             progress_package = txmbr.name
             if txmbr.arch not in ["noarch", self.base_arch]:
                 progress_package = "%s.%s" % (txmbr.name, txmbr.arch)
-            self.progress.send_message('%s (%s/%s)' % (progress_package, amount, total))
+            #self.progress.send_message('%s (%s/%s)' % (progress_package, amount, total))
         elif event == rpm.RPMCALLBACK_INST_CLOSE_FILE: #@UndefinedVariable
             # close and remove the last opened file
             # update count of installed/upgraded packages
@@ -1126,10 +1126,11 @@ def show_groups(payload):
 
 
 if __name__ == '__main__':
-    TEST_INSTALL = False
+    TEST_INSTALL = True
     payload = YumPayload()
     CF.S.BASE_REPO_NAME = 'magiclinux'
-    CF.S.BASE_REPO_URL = '/mnt/fedora_iso'
+    #CF.S.BASE_REPO_URL = '/mnt/fedora_iso'
+    CF.S.BASE_REPO_URL = '/home/zhangyang09/work/magicbin/packages_magiclinux3.0'
     
     payload.setup()
     

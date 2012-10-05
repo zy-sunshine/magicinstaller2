@@ -21,7 +21,7 @@ class DoPartition(magicstep):
         self.sself = sself
         self.doparted = False
         self.add_action = self.rootobj.tm.add_action
-        self.takeactions = TakeActions()
+
     def enter(self):
         self.sself.btnback_sensitive(False)
         self.sself.btnnext_sensitive(False)
@@ -30,6 +30,22 @@ class DoPartition(magicstep):
         self.name_map['frame_parted'].set_sensitive(True)
         self.rootobj.tm.push_progress(self.name_map['pfprog'],
                                       self.name_map['pfname'])
+        
+        CF.G.mount_all_list = []
+        for devpath in CF.G.all_part_infor.keys():
+            for part_tuple in CF.G.all_part_infor[devpath]:
+                if part_tuple[7] == '':
+                    # :) This mountpoint is not the obsolete "mountpoint", 
+                    # which was used by mount every device, removed already, please view the source in magicinstaller1
+                    # Note: this mountpoint is point by user at create partition step, / /usr /home and so on.
+                    continue
+                mntpoint = part_tuple[7]
+                devfn = '%s%d' % (devpath, part_tuple[0])
+                fstype = part_tuple[6]
+                CF.G.mount_all_list.append((mntpoint, devfn, fstype))
+        CF.G.mount_all_list.sort(self.malcmp)
+        logger.info('CONF.RUN.g_mount_all_list: %s\n' % str(CF.G.mount_all_list))
+            
         self.add_action(_('Get all dirty disk'),
                         self.act_parted_get_dirty_result, None,
                         'get_all_dirty_disk', 0)
@@ -37,20 +53,20 @@ class DoPartition(magicstep):
     
     def leave(self):
         if not self.doparted:
+            self.doparted = True
             self.sself.btnnext_sensitive(False)
             self.act_start_parted()
-            self.doparted = True
             return 0
         else:
             self.sself.btnnext_sensitive(True)
             ### ### TODO: mount these partition before install system.
-            
-            self.add_action(_('Mount all target partitions.'),
-                            None, None,
-                            'mount_all_tgtpart', CF.G.mount_all_list, 'y')
-            self.add_
+#            self.add_action(_('Mount all target partitions.'),
+#                            None, None,
+#                            'mount_all_tgtpart', CF.G.mount_all_list, 'y')
+            #self.add_action()
             ### TODO: make a unique task queue, to make install operation run background.
             #self.add_action(_('Start Install System'), None, None)
+            self.sself.start_install()
             return 1
 
     def act_parted_get_dirty_result(self, tdata, data):
@@ -74,6 +90,7 @@ class DoPartition(magicstep):
         pkg_frame = self.id_map['pkg_frame']
         dirty_frame = self.id_map['dirty_frame']
         format_frame = self.id_map['format_frame']
+        tgtsys_frame = self.id_map['tgtsys_frame']
         
         def gen_table(info_list):
             table_doc = parseString('<?xml version="1.0"?><tableV2></tableV2>')
@@ -107,7 +124,15 @@ class DoPartition(magicstep):
             info_list.append(('%s%s' % (devpath, partnum), "filesystem type is %s" % ftype))
         format_table = gen_table(info_list)
         
-        for table, frame in ((pkg_table, pkg_frame), (dirty_table, dirty_frame), (format_table, format_frame)):
+        # target system partition
+        info_list = []
+        print CF.G.mount_all_list
+        for mntpoint, devfn, fstype in CF.G.mount_all_list:
+            info_list.append( ('Mount point: %s' % mntpoint, 'Device info: %s %s' %(devfn, fstype)) )
+        tgtsys_table = gen_table(info_list)
+        
+        for table, frame in ((pkg_table, pkg_frame), (dirty_table, dirty_frame), 
+                             (format_table, format_frame), (tgtsys_table, tgtsys_frame)):
             widget = xmlgtk.xmlgtk(table).widget
             frame.add(widget)
         
@@ -148,21 +173,6 @@ class DoPartition(magicstep):
                             self.format_list[pos][1], # part_start.
                             self.format_list[pos][2]) # fstype
         else:
-            CF.G.mount_all_list = []
-            for devpath in CF.G.all_part_infor.keys():
-                for part_tuple in CF.G.all_part_infor[devpath]:
-                    if part_tuple[7] == '':
-                        # :) This mountpoint is not the obsolete "mountpoint", 
-                        # which was used by mount every device, removed already, please view the source in magicinstaller1
-                        # Note: this mountpoint is point by user at create partition step, / /usr /home and so on.
-                        continue
-                    mntpoint = part_tuple[7]
-                    devfn = '%s%d' % (devpath, part_tuple[0])
-                    fstype = part_tuple[6]
-                    CF.G.mount_all_list.append((mntpoint, devfn, fstype))
-            CF.G.mount_all_list.sort(self.malcmp)
-            logger.info('CONF.RUN.g_mount_all_list: %s\n' % str(CF.G.mount_all_list))
-                            
             self.act_end_parted()
 
     def act_parted_format_result(self, tdata, data):

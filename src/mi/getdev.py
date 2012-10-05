@@ -54,11 +54,6 @@ def get_all_devices():
 
 def probe(dev_class):
     def kudzu_format(dev_map, devices_info):
-        def get_attr(map, attr):
-            if map.has_key(attr):
-                return map[attr]
-            else:
-                return None
         desc_list = []
         driver_list = []
         device_list = []
@@ -66,11 +61,11 @@ def probe(dev_class):
             desc = None
             driver = None
             device = None
-            desc = '%s %s' % (get_attr(devices_info[dev], 'ID_VENDOR') or \
-                       get_attr(devices_info[dev], 'ID_BUS'),
-                       get_attr(devices_info[dev], 'ID_MODEL'))
-            driver = get_attr(devices_info[dev], 'DRIVER')
-            device = get_attr(devices_info[dev], 'DEVNAME')
+            desc = '%s %s' % (getattr(devices_info[dev], 'ID_VENDOR') or \
+                       getattr(devices_info[dev], 'ID_BUS'),
+                       getattr(devices_info[dev], 'ID_MODEL'))
+            driver = getattr(devices_info[dev], 'DRIVER')
+            device = getattr(devices_info[dev], 'DEVNAME')
             if device and device.startswith('/dev/'):
                 device=device[5:]
             else:
@@ -200,24 +195,22 @@ def p_c(clist):
 def get_part_info(dev_class):
     devices_info, devices_size = probe(ALL_DEVICE_INFO)
     dev_map = {}
-    for t in TYPE_LIST:    
+    for t in TYPE_LIST:
         if dev_class & t:
             dev_map.update(probe(t))
 
-    return _get_part_info(dev_map, devices_info, devices_size)
+    return _get_part_info(dev_map, devices_info, devices_size, must_have=['ID_FS_TYPE'])
     
-def _get_part_info(usb_map, all_part_info, disk_size_map):
+def _get_part_info(usb_map, all_part_info, disk_size_map, must_have = []):
     dev_part_info = {}
-    def get_attr(tmap, attr):
-        if not tmap.has_key(attr):
-            return None
-        else:
-            return tmap[attr]
-
     for disk in usb_map.keys():
         for part in [disk] + usb_map[disk]:
-            if all_part_info[part].has_key('ID_FS_TYPE'):
-            #if all_part_info[part].has_key('DEVTYPE') and all_part_info[part]['DEVTYPE'] == 'partition':
+            valid = True
+            for k in must_have:
+                if k not in all_part_info[part].keys():
+                    valid = False
+
+            if valid:
                 # Disk maybe a partition... , so we check the disk too.
                 # disk:     partition belong to this disk.
                 # devpath:  the partition's dev path.
@@ -239,6 +232,16 @@ def _get_part_info(usb_map, all_part_info, disk_size_map):
                 part_info['size_ex'] = '%.2f MB' % (float(disk_size_map[part])/1024/1024)
                 dev_part_info[part_info['devpath']] = part_info
     return dev_part_info
+
+def get_dev_info(dev_class):
+    devices_info, devices_size = probe(ALL_DEVICE_INFO)
+    dev_map = {}
+    for t in TYPE_LIST:
+        if dev_class & t:
+            dev_map.update(probe(t))
+
+    return _get_part_info(dev_map, devices_info, devices_size)
+
 
 if __name__ == '__main__':
     KUDZU_FLAG = False
@@ -264,6 +267,10 @@ if __name__ == '__main__':
     #            print devices_info[devices]
     print get_part_info(CLASS_HD)
     print get_part_info(CLASS_CDROM | CLASS_HD)
+
+    print 'Get device info not think about partition type, just device exists'
+    print get_dev_info(CLASS_CDROM | CLASS_HD)
+
     #usb_map = probe(CLASS_HD)
     #for device in devices:
     #    print device

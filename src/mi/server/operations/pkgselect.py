@@ -89,15 +89,10 @@ class Test(MiaTest):
             ['/dev/sda7', 'ext4', '/dev/sda7'], 
             ['/dev/sda8', 'ntfs', '/dev/sda8'], ]
         pkgarr_probe(self.mia, self.operid)
-    
-    def test_probe_all_disc(self):
-        from mi.server.operations.actions.probedisc import probe_all_disc
-        probe_all_disc(self.mia, self.operid, '/dev/sda10', 'ext4', 'MagicLinux-3.0-1.iso', 'MagicLinux/base', ['nss-softokn-freebl-3.13.3-1mgc30.i686.rpm'])
-        ### RESULT: probe_all_disc return result is : [('MagicLinux-3.0-1.iso', 'MagicLinux/base/nss-softokn-freebl-3.13.3-1mgc30.i686.rpm')]
         
 if __name__ == '__main__':
     test = Test()
     test.test_pkgarr_probe()
-    #test.test_probe_all_disc()
+
     
     

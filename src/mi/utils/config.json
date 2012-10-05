@@ -10,7 +10,7 @@
         "PKGARR_FILE": "pkgarr.py",
         "TEXTDOMAIN": "magic.installer",
         "PKGTYPE": "rpm",
-        "DATADIR": "/home/netsec/work/magicinstaller2/src/mi",
+        "DATADIR": "/home/zhangyang09/workspace/magicinstaller2/src/mi",
         "EXPERT_MODE": 1,
         "KERNEL_FN": "vmlinuz-3.4.4-1mgc30.i686.PAE",
         "TGTSYS_ROOT": "/tmpfs/tgtsys",
@@ -103,7 +103,7 @@
         "FULL_HEIGHT": 600,
         "TEXT_MODE": 0,
         "DOLOG": true,
-        "DEBUG": 1,
+        "DEBUG": true,
         "DEBUG_GUI": false,
         "FULL_WIDTH": 800,
         "OPERATIONDIR": "/usr/share/MagicInstaller/operations",
@@ -149,8 +149,8 @@
         "choosed_patuple": []
     },
     "S": {
-        "had_probe_pkgarr": true,
-        "pkgarr": [["allpa/sda7.100.pkgarr.py", "/dev/sda7", "ext4", "MagicLinux/base", "MagicLinux-3.0-1.iso"]],
+        "had_probe_pkgarr": false,
+        "pkgarr": [],
         "had_probe_monitor": false,
         "monitor": [],
         "had_probe_videocard": false,
@@ -160,5 +160,24 @@
         "all_harddisks": {}, 
         "BASE_REPO_NAME": "",
         "BASE_REPO_URL": ""
+    },
+    "BOOTLDR": {
+    	"bltype": "",
+    	"instpos": "",
+		"timeout": "",
+		"usepassword": "", 
+		"password": "",
+		"lba": "",
+		"options": "", 
+		"entries": [],
+		"default": "",
+		"bootdev": "", 
+		"mbr_device": "", 
+		"win_device": "",
+		"win_fs": ""
+    },
+    "ACCOUNT": {
+    	"rootpasswd": "",
+    	"acclist": []
     }
 }

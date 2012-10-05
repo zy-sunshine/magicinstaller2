@@ -2,43 +2,11 @@
 <!-- Copyright (C) 2003, Charles Wang -->
 <!-- Author: Charles Wang <charles@linux.net.cn> -->
 <takeactions>
-  <step><hbox margin="4">
-    <vbox name="notes" spacing="4" expand="true" fill="true">
-      <frame label="((Release Notes))" expand="true" fill="true">
-        <hbox margin="4">
-      <text filename="((helptext/release.en.txt))" expand="true" fill="true"/>
-        </hbox>
-      </frame>
-      <frame label="((Authors))" expand="true" fill="true">
-        <hbox margin="4">
-      <text filename="((helptext/authors.en.txt))" expand="true" fill="true"/>
-    </hbox>
-      </frame>
-    </vbox>
-    <vbox name="ensure" visible="false" spacing="4" expand="true" fill="true">
-      <label text="" expand="true"/>
-      <label line_wrap="true" fill="true"
-text="((NOTE: All required information have been collected. Click 'Next' to take the real action (partition, format, packages installation and other setup) and there is no chance to revert... Are you sure?))"/>
-      <label text="" expand="true"/>
-      <label text="" expand="true"/>
-    </vbox>
-  </hbox></step>
-  <actions.dialog>
+  <actions>
     <vbox>
       <!-- <image file="images/banner.png" fill="true"/> -->
       <frame type="out" expand="true" fill="true"><frame type="in"><frame type="out">
         <hbox margin="4" spacing="4">
-      <vbox name="leftpanel">
-        <table name="stepsshow" columns="2" margin="4" colspacings="4" rowspacings="4" />
-        <label expand="true"/>
-        <frame margin="4">
-          <hbox margin="4">
-            <button tips="((xglines))" clicked="popup_xglines" pack="end">
-              <image file="games/xglines.png" fill="true"/>
-            </button>
-          </hbox>
-        </frame>
-      </vbox>
       <vbox margin="4" spacing="4" expand="true" fill="true" name="rightpanel">
             <frame name="frame_packages" label="((Installation Progress))"
                fill="true" sensitive="false">
@@ -91,20 +59,25 @@ text="((NOTE: All required information have been collected. Click 'Next' to take
             </table>
           </frame>
         </hbox>
-          </vbox>
-        </frame>
+      	</vbox>
+    	  </frame>
         <label text="" expand="true"/>
-        <frame name="frame_other" fill="true" sensitive="false">
-              <vbox margin="4" spacing="4">
-            <label name="otname" fill="true"/>
-            <progressbar name="otprog" fill="true"/>
-          </vbox>
-        </frame>
+        <hbox spacing="4">
+          <button tips="((xglines))" clicked="popup_xglines">
+            <image file="games/xglines.png" fill="true"/>
+          </button>
+	      <frame name="frame_other" fill="true" expand="true" sensitive="false">
+	        <vbox margin="4" spacing="4">
+	        <label name="otname" fill="true"/>
+	        <progressbar name="otprog" fill="true"/>
+	       	</vbox>
+	      </frame>
+        </hbox>
       </vbox>
     </hbox>
       </frame></frame></frame>
     </vbox>
-  </actions.dialog>
+  </actions>
   <disc.dialog>
     <vbox spacing="4">
       <hbox expand="true" fill="true" spacing="4">

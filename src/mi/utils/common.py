@@ -172,13 +172,14 @@ def mount_dev(fstype, devfn, mntdir=None,flags=None):
         else:
             return False, msg
     else:
-        ret, msg = remove_empty_dir(mntdir)
-        if not ret:
-            return False, msg
-        try:
-            os.makedirs(mntdir)
-        except OSError, e:
-            return False, str(e)
+        #ret, msg = remove_empty_dir(mntdir)
+        #if not ret:
+        #    return False, msg
+        if not os.path.exists(mntdir):
+            try:
+                os.makedirs(mntdir)
+            except OSError, e:
+                return False, str(e)
 
     logger.i("mount_dev: Device = %s Mount = %s Fstype = %s\n" % \
         (devfn, mntdir, fstype))

@@ -896,6 +896,7 @@ class xmlgtk:
             return None
         name = node.getAttribute('name')
         if name:
+            widget.set_name(name)
             self.name_map[name] = widget
             
         id_ = node.getAttribute('id')

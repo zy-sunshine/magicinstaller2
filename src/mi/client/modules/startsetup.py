@@ -22,9 +22,5 @@ class MIStep_startsetup (magicstep.magicstep):
         self.fetch_values(self.rootobj.values,
                 valuename_list = ['startsetup.skipXsetting'])
         skipx = self.get_data(self.values, 'startsetup.skipXsetting')
-        if skipx == '1':
-            self.skip_stepnames.append('Xwindow')
-            CF.G.skipxsetting = 1
-        else:
-            CF.G.skipxsetting = 0
+        
         return  1
