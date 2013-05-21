@@ -19,13 +19,6 @@ pkginfor_script = 'scripts/%s%sPkgInfor.py' % \
                   (string.upper(mi_config.pkgtype[0]), mi_config.pkgtype[1:])
 createiso_script = 'scripts/CreateISO.py'
 
-use_cp_mode = mi_config.use_copy_install_mode
-cleanpkgdir = 'clean'
-if use_cp_mode:
-    # If use copy install mode, we will clean package dir first and install some
-    # file, so we won't make the Createiso.py clean the package directory.
-    cleanpkgdir = 'notclean'
-
 # packages_value - the full file info of all software packages.
 packages_value = DirValue(mi_config.pkgdirs.split(':'))
 
@@ -40,7 +33,6 @@ class BootIsoMaker(PkgMaker.StepMaker):
     steps = ['init_dir',
              'install_miimages',
              'install_mlbasefiles',
-             'install_rpmdb_etctar',
              'add_extra_files',
              'install_bootload',
              'make_iso',
@@ -67,17 +59,6 @@ class BootIsoMaker(PkgMaker.StepMaker):
         cmds = ['mkdir -p $mlbase_dir',
                 'cp -u %s $mlbase_dir' % ' '.join(mlbase_files)]
         return mlbase_files, cmds
-    
-    def install_rpmdb_etctar(self):
-        inst_file = []
-        cmds = []
-        if use_cp_mode:
-            cmds = ['rm -r $bootcd_dir/$distname/packages/*',
-                    'cp %s $bootcd_dir/$distname/packages/' % rpmdbtar,
-                    'cp %s $bootcd_dir/$distname/packages/' % etctar,
-            ]
-            inst_file = [rpmdbtar, etctar]
-        return inst_file, cmds
 
     def add_extra_files(self):
         if os.path.isdir('$addfiles_dir'):
@@ -107,7 +88,7 @@ class BootIsoMaker(PkgMaker.StepMaker):
     def make_iso(self):
         cmds =['$pythonbin %s $TARGET' % createiso_script + \
                ' $pkgarr $pkgdirs $bootcd_dir' + \
-               ' $distname $distver 1 %s $bootload $miimages_cddir' % cleanpkgdir]
+               ' $distname $distver 1 $bootload $miimages_cddir']
         return [createiso_script], cmds
 
 bootiso = BootIsoMaker(env)
@@ -143,7 +124,7 @@ for iso_cnt in range(2, mi_config.max_cd_no + 1):
 
                  '$pythonbin %s $TARGET' % createiso_script + \
                  ' result/pkgarr.py $pkgdirs $iso_dir' + \
-                 ' $distname $distver $iso_cnt %s' % cleanpkgdir
+                 ' $distname $distver $iso_cnt'
                  ],
                 iso_dir = iso_dir,
                 iso_cnt = iso_cnt)
@@ -162,21 +143,6 @@ env.Command(['result/pkgarr.py'],
                         mi_config.remove_deps)),
             ],
             ['$pythonbin scripts/PkgArrange.py -o $TARGET -l tmp/pkgarr.log'])
-
-if use_cp_mode:
-    env.Command([os.path.join(mi_config.rpmdb_dir, '.prepared')],
-            ['result/pkgarr.py', 'scripts/GenRpmdb.py'],
-            [getSudoSh("$pythonbin scripts/GenRpmdb.py  -t $rpmdb_dir/tgtsys_root " + \
-                        "-s $pkgdirs -p result/pkgarr.py -l $tmpdir/GenRpmdb.out.log " + \
-                        "-e $tmpdir/GenRpmdb.err.log"),
-             '/bin/date > $TARGET'])
-    env.Command([rpmdbtar],
-            [os.path.join(mi_config.rpmdb_dir,'.prepared')],
-            ['tar -cjf $TARGET -C $rpmdb_dir/tgtsys_root .'])
-
-    env.Command([etctar],
-            ['$etctar_dir','$etctar_script'],
-            ['chmod +x $etctar_script','tar -cjf $TARGET -C $etctar_dir .'])
 
 # packages_md5sum <- packages_value
 env.Command(packages_md5sum, packages_value,

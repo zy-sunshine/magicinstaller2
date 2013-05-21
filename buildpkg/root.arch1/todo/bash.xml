@@ -1,0 +1,16 @@
+<packages>
+
+<package>
+<files>bash-4.0-1mgc25.i686.rpm</files>
+<pre_action>
+# replace it in busybox.
+rm $ROOT/bin/bash
+rm $ROOT/bin/sh
+</pre_action>
+<install>
+bin/bash
+bin/sh
+</install>
+</package>
+
+</packages>

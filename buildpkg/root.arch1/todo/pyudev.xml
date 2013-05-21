@@ -1,0 +1,11 @@
+<packages>
+
+<package>
+<files>pyudev-0.5.tar.gz</files>
+<pre_action>
+cp -a $BUILD/pyudev-0.5/pyudev $ROOT/usr/lib/python2.6/site-packages/
+cp -a $BUILD/pyudev-0.5/apipkg.py $ROOT/usr/lib/python2.6/site-packages/
+</pre_action>
+</package>
+
+</packages>

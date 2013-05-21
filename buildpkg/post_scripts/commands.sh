@@ -4,7 +4,7 @@
 # Remove the backslash at the end of ROOT.
 ROOT=$(echo "$1" |sed 's/\/*$//')
 
-# We have the root directory already, 
+# We have the root directory already,
 # so we just create the directory secondary and above there.
 
 mkdir -pv $ROOT/media/{floppy,cdrom}
@@ -16,11 +16,11 @@ mkdir -pv $ROOT/usr/{,local/}share/man/man{1..8}
 
 mkdir -pv $ROOT/etc/opt
 
-for dir in $ROOT/usr $ROOT/usr/local; do 
-    ln -sv share/{man,doc,info} $dir 
-done 
+for dir in $ROOT/usr $ROOT/usr/local; do
+    ln -sv share/{man,doc,info} $dir
+done
 
-mkdir -pv $ROOT/var/{lock,log,mail,run,spool} 
+mkdir -pv $ROOT/var/{lock,log,mail,run,spool}
 mkdir -pv $ROOT/var/{opt,cache,lib/{misc,locate},local}
 
 ## Important directory and files.

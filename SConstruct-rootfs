@@ -53,9 +53,10 @@ class MirootfsMaker(PkgMaker.StepMaker):
 
     def extract_bins(self):
         toextract = ['bindir/root.step1.tar.gz',
-                     'bindir/root.src.tar.gz',
                      'bindir/root.bootscripts.tar.gz',
                      'bindir/kmodules-${mikernelver}.tar.bz2']
+        if WITH_MI:
+            toextract.append('bindir/root.src.tar.gz')
 
         #if mi_config.useudev:
         #    toextract.append('bindir/udev-${udev_version}.tar.bz2')

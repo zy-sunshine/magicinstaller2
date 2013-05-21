@@ -1,0 +1,10 @@
+<packages>
+
+<package>
+<files>busybox-${busybox_version}.bin.tar.bz2</files>
+<install>
+@*
+</install>
+</package>
+
+</packages>

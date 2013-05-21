@@ -19,12 +19,19 @@
 
 if 'root.step1' in COMMAND_LINE_TARGETS:
     SConscript('root.step1/SConscript')
+
+if 'root.arch1' in COMMAND_LINE_TARGETS:
+    SConscript('root.arch1/SConscript')
+
 elif 'busybox.bin' in COMMAND_LINE_TARGETS:
     SConscript('busybox/SConscript')
+
 elif 'parted.bin' in COMMAND_LINE_TARGETS:
     SConscript('parted/SConscript')
+
 elif 'kernel.copy' in COMMAND_LINE_TARGETS:
     SConscript('kernel_copy/SConscript')
+
 elif 'kernel.build' in COMMAND_LINE_TARGETS:
     SConscript('kernel_build/SConscript')
 else:

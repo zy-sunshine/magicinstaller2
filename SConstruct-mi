@@ -4,8 +4,6 @@ Import('*')
 import os
 import glob
 
-use_cp_mode = mi_config.use_copy_install_mode
-
 ##### Construct the root.src.tar.gz
 ##       and something to fix(like copy install mode files fix)
 class miSrcMaker(PkgMaker.StepMaker):
@@ -17,7 +15,6 @@ class miSrcMaker(PkgMaker.StepMaker):
              'install_configfiles',
              'install_tranlatefiles',
              'install_post',
-             'install_fix',
              'mkmisrc',
             ]
 
@@ -72,17 +69,6 @@ class miSrcMaker(PkgMaker.StepMaker):
             return [post_script], cmds
         else:
             return [], []
-
-    def install_fix(self):
-        slist = []
-        cmds = []
-        if use_cp_mode:
-            inst_file = 'src/mi/UIxml/takeactions.xml.cpinstmode'
-            dest_file = '$ROOT$root_datadir/UIxml/takeactions.xml'
-            slist.append(inst_file)
-            cmds.extend['mkdir -p %s' % os.path.dirname(dest_file),
-                        'cp -a %s %s' % (inst_file, dest_file)]
-        return slist, cmds
 
     def mkmisrc(self):
         #cmds = ['tar c -C $ROOT . | gzip -9 > $TARGET']

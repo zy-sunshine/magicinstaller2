@@ -145,15 +145,24 @@ Export('getSudoSh')
 #       #bindir/root.src.tar.gz         (source file)
 #       #bindir/root.src.etc.tar.gz     (config file)
 #       needed by rootfs .
-SConscript('SConstruct-mi')
+WITH_MI = os.path.exists('.with_mi')
+WITH_FS = os.path.exists('.with_fs')
+WITH_ISO = os.path.exists('.with_iso')
+
+Export('WITH_MI', 'WITH_FS', 'WITH_ISO')
+
+if WITH_MI:
+    SConscript('SConstruct-mi')
 
 ##### Construct the mirootfs, tar into :
 #       #bindir/mirootfs.gz
 #       #bindir/mi-vmlinuz-x.xx.xx
-SConscript('SConstruct-rootfs')
+if WITH_FS:
+    SConscript('SConstruct-rootfs')
 
 ##### Construct the target iso file, need :
 #       #bindir/mi-vmlinuz-x.xx.xx      (kernel file)
 #       #bindir/mirootfs.gz             (initrd file)
-SConscript('SConstruct-iso')
+if WITH_ISO:
+    SConscript('SConstruct-iso')
 

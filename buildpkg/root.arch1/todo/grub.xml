@@ -1,0 +1,10 @@
+<packages>
+
+<package>
+<files>grub-0.97-15mgc25.i686.rpm</files>
+<install>
+usr/sbin/grub
+</install>
+</package>
+
+</packages>

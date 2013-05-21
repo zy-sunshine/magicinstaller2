@@ -46,15 +46,6 @@ pkgdirs = specdir + '/packages'
 hotfixfiles_dir = specdir + '/hotfix'
 addfiles_dir = specdir + '/addfiles'
 
-rpmdb_dir = specdir + '/rpmdb'
-etctar_dir = specdir + '/etc_install'
-
-etctar_script = os.path.join(etctar_dir, 'etc_install.sh')
-use_copy_install_mode = False
-if os.path.exists(rpmdb_dir) and \
-   os.path.exists(etctar_dir):
-    use_copy_install_mode = True
-
 dolog = True                           # Log message or not
 nonewt = False                          # Without newt or not
 useudev = True                         # Use udev or not
