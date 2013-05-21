@@ -7,7 +7,7 @@ touch /var/run/utmp
 for f in btmp lastlog wtmp;do
     touch /var/log/$f
 done
-chgrp -v utmp /var/run/utmp /var/log/lastlog 
-chmod -v 664 /var/run/utmp /var/log/lastlog
+chgrp utmp /var/run/utmp /var/log/lastlog
+chmod 664 /var/run/utmp /var/log/lastlog
 
-/sbin/ldconfig
+if [ -x /sbin/ldconfig ] ;then /sbin/ldconfig; fi

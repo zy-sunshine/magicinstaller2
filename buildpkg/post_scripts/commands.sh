@@ -61,8 +61,76 @@ mknod -m 666 $static_dev/null c 1 3
 mknod -m 666 $static_dev/zero c 1 5
 
 # check all the file to root privilege.
-chown -Rv root $ROOT/*
-chgrp -Rv root $ROOT/*
+chown -R root:root $ROOT/*
 
 # If will create a directory or file, do it like this better.
 #install --directory --mode=0755 --owner=root --group=root /etc/profile.d
+
+# Create some neccessary shortcut
+for cmd in \
+addgroup  date           fgrep     linux64     mv         rmdir         true \
+adduser   dd             fsync     ln          netstat    scriptreplay  umount \
+ash       delgroup       getopt    login       nice       sed           uname \
+bash      deluser        grep      ls          pidof      setarch       vi \
+busybox   df             gunzip    lzop        ping       sh            zcat \
+cat       dmesg          gzip      makemime    printenv   sleep \
+chgrp     dnsdomainname  hostname  mkdir       ps         stat \
+chmod     dumpkmap       ionice    mknod       pwd        stty \
+chown     echo           ip        more        reformime  sync \
+cp        egrep          kill      mount       rev        tar \
+cpio      false          linux32   mountpoint  rm         touch \
+    ; do
+    if [ ! -f $ROOT/bin/$cmd ]; then
+        ln -s busybox $ROOT/bin/$cmd
+    fi
+done
+
+for cmd in \
+[         dumpleases  install   nc         rtcwake    tftp        volname \
+[[        eject       kbd_mode  nohup      script     tftpd       wall \
+arping    env         killall   nslookup   seq        time        wc \
+awk       expand      last      od         setsid     timeout     wget \
+basename  expr        less      openvt     sha256sum  top         which \
+beep      fgconsole   logger    passwd     sha512sum  tr          who \
+bunzip2   find        lpq       patch      showkey    traceroute  whoami \
+bzcat     flock       lpr       pgrep      smemcap    tty         xargs \
+bzip2     free        lspci     pkill      sort       ttysize     xz \
+chat      ftpget      lsusb     printf     split      udpsvd      xzcat \
+chvt      ftpput      lzcat     pscan      sum        unexpand    yes \
+clear     fuser       lzma      readahead  tac        uniq \
+cmp       hd          lzopcat   readlink   tail       unlzma \
+cut       head        md5sum    realpath   tcpsvd     unlzop \
+diff      hexdump     mesg      reset      tee        unxz \
+dirname   id          microcom  resize     telnet     unzip \
+du        ifplugd     mkfifo    rpm2cpio   test       uptime \
+    ; do
+    if [ ! -f $ROOT/usr/bin/$cmd ]; then
+        ln -s ../../bin/busybox $ROOT/usr/bin/$cmd
+    fi
+done
+
+
+for cmd in \
+brctl     dhcprelay  inetd     ntpd        readprofile  telnetd \
+chpasswd  dnsd       loadfont  popmaildir  sendmail     udhcpd \
+chroot    ftpd       lpd       rdev        setfont \
+    ; do
+    if [ ! -f $ROOT/usr/sbin/$cmd ]; then
+        ln -s ../../bin/busybox $ROOT/usr/sbin/$cmd
+    fi
+done
+
+for cmd in \
+cpid       findfs       init      mkdosfs      pivot_root  swapon \
+arp         freeramdisk  insmod    mke2fs       poweroff    switch_root \
+blkid       getty        klogd     mkfs.ext2    reboot      sysctl \
+bootchartd  halt         loadkmap  mkfs.reiser  rmmod       syslogd \
+depmod      hdparm       losetup   mkfs.vfat    route       tunctl \
+devmem      hwclock      lsmod     mkswap       setconsole  udhcpc \
+fbsplash    ifconfig     man       modinfo      slattach \
+fdisk       ifenslave    mdev      modprobe     swapoff \
+    ; do
+    if [ ! -f $ROOT/sbin/$cmd ]; then
+        ln -s ../bin/busybox $ROOT/sbin/$cmd
+    fi
+done

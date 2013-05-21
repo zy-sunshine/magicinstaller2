@@ -6,8 +6,9 @@
 mkdir -m 0755 -p "$ROOT"/{dev,run,etc}
 mkdir -m 0555 -p "$ROOT"/{sys,proc}
 
-mkdir -m 0755 -p $ROOT/{bin,boot,usr,home,lib,mnt,opt}
+mkdir -m 0755 -p $ROOT/{bin,boot,usr,home,mnt,opt}
 mkdir -m 0755 -p $ROOT/{media,sbin,srv}
+ln -s usr/lib $ROOT
 install -dv -m 0750 $ROOT/root
 
 ## Create the /tmp /var/tmp link into /tmpfs

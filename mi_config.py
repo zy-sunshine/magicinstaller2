@@ -119,7 +119,7 @@ mlbase_dir = os.path.join(bootcd_dir, distname, 'base')     # Linux dist base di
 
 # Python
 pythonbin = '/usr/bin/python'
-pythondir = 'usr/lib/python2.6'
+pythondir = 'usr/lib/python2.7'
 #}}}
 
 #{{ build rootfs environment

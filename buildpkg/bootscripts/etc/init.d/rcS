@@ -1,6 +1,6 @@
 #!/bin/sh
 # Copyright (C) 2003, Charles Wang.
-# Author:  Charles Wang <charles@linux.net.cn>
+# Author:  Charles Wang <charles@linux.net.cn>, Yang Zhang <zy.netsec@gmail.com>
 # All rights reserved.
 # License: GPL
 
@@ -50,7 +50,11 @@ ${rc_base}/init.d/sysklogd start
 
 ##### Attempt to run magicinstaller services below.
 
-$mi_start_services
+if [ -f $mi_start_services ]; then
+    $mi_start_services
+else
+    boot_mesg "Can not start MagicInstaller services!!"
+fi
 
 ##### We will start magicinstaller in inittab, not there.
 #$mi_start_script

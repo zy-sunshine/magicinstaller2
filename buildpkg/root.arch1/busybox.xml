@@ -1,9 +1,9 @@
 <packages>
 
 <package>
-<files>busybox-${busybox_version}.bin.tar.bz2</files>
+<files>community/busybox-*.xz</files>
 <install>
-@*
+bin/busybox
 </install>
 </package>
 

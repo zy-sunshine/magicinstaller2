@@ -1,0 +1,17 @@
+<packages>
+
+<package>
+<files>core/bash-*.xz</files>
+<pre_action>
+# replace it in busybox.
+if [ -f $ROOT/bin/bash ]; then rm $ROOT/bin/bash; fi
+if [ -f $ROOT/bin/sh ]; then rm $ROOT/bin/sh; fi
+</pre_action>
+<install>
+usr/bin/bash
+bin/bash
+bin/sh
+</install>
+</package>
+
+</packages>

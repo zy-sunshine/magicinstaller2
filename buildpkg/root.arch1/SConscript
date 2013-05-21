@@ -125,8 +125,10 @@ class RootBuildNode(PkgMaker.BaseMaker):
     def search_file(self, filename, pathes):
         for p in pathes:
             f = os.path.join(p, filename)
-            if os.access(self.env.subst(f), os.R_OK):
-                return f
+            f = self.env.subst(f)
+            files = glob.glob(f)
+            if files and os.access(files[0], os.R_OK):
+                return files[0]
 
 class RootPkgMaker(MiPkgMaker):
     source_prefix = '#bindir/root_ext'
@@ -185,9 +187,30 @@ class RootArch1Maker(RootPkgMaker):
 
     def parse_def_mods(self):
         mods = self.mods
-        mod_srcs = glob.glob("*.xml")
-        mod_srcs = [ os.path.splitext(x)[0] for x in mod_srcs ]
-        for mod_src in mod_srcs:
+        #mod_srcs = glob.glob("*.xml")
+        #mod_srcs = [ os.path.splitext(x)[0] for x in mod_srcs ]
+        #for mod_src in mod_srcs:
+        #    mods.append(RootBuildNode(mod_src, self.env))
+        for mod_src in ['filesystem',
+                        'glibc',
+                        'syslib',
+                        'busybox',
+                        'bash',
+                        'python',
+                        'xorg',
+                        'gtk2',
+                        'parted',
+                        #'rhpl',
+                        'rpm',
+                        #'debug',
+                        #'mkfs',
+                        #'udev',
+                        #'kudzu',
+                        #'pyudev',
+                        #'grub',
+                        #'trace',
+                        #'post_scripts',
+                        ]:
             mods.append(RootBuildNode(mod_src, self.env))
         # theme is special
         #mods.append(RootBuildTheme('themes', self.env))

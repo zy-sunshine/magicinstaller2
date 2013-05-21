@@ -27,6 +27,7 @@ class BaseMaker(object):
                    '.tar.bz2'   : 'tar -jxf %(srcfile)s -C %(destdir)s',
                    '.tbz2'      : 'tar -jxf %(srcfile)s -C %(destdir)s',
                    '.tar'       : 'tar -xf %(srcfile)s -C %(destdir)s',
+                   '.xz'       : 'tar -xf %(srcfile)s -C %(destdir)s',
                    '.zip'       : 'unzip -q %(srcfile)s -d %(destdir)s',
                    '.rpm'       : 'rpm2cpio %(srcfile)s' + \
                         ' | (cd %(destdir)s; cpio -i --make-directories)',

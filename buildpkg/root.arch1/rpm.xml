@@ -1,75 +1,68 @@
 <packages>
 
 <package>
-<files>rpm-4.7.0-2mgc25.i686.rpm</files>
+<files>aur/rpm-*.xz</files>
 <pre_action>
 # replace it in busybox.
-rm $ROOT/usr/bin/rpm2cpio
+if [ -f $ROOT/usr/bin/rpm2cpio ]; then rm $ROOT/usr/bin/rpm2cpio; fi
 </pre_action>
 <install>
 bin/rpm
 usr/bin/rpm2cpio
 usr/lib/rpm/macros
-usr/lib/rpm/rpmrc
-@usr/lib/rpm/platform/*-linux
+#usr/lib/rpm/rpmrc
+#@usr/lib/rpm/platform/*-linux
+usr/lib/librpm*.so*
 </install>
 </package>
 
 <package>
-<files>cpio-2.9.90-3mgc25.i686.rpm</files>
+<files>extra/cpio-*.xz</files>
 <pre_action>
 # replace it in busybox.
-rm $ROOT/bin/cpio
+if [ -f $ROOT/bin/cpio ]; then rm $ROOT/bin/cpio; fi
 </pre_action>
 <install>
 bin/cpio
 </install>
 </package>
 
-<package>
-<files>rpm-libs-4.7.0-2mgc25.i686.rpm</files>
-<install>
-usr/lib/librpm.so.0*
-usr/lib/librpmio.so.0*
-usr/lib/librpmbuild.so.0*
-</install>
-</package>
-
+<!--
+TODO: add rpm-python for MI
 <package>
 <files>rpm-python-4.7.0-2mgc25.i686.rpm</files>
 <install>
 @$pythondir/site-packages
 </install>
 </package>
+-->
 
 <package>
-<files>compat-db45-4.5.20-1mgc25.i686.rpm</files>
+<files>aur/db5.1-*.xz</files>
 <install>
-lib/libdb-4.5.so
+/usr/lib/libdb-5.1.so
+/usr/lib/libdb-5.so
+/usr/lib/libdb.so
 </install>
 </package>
 
-<package>
-<files>xz-libs-4.999.9beta-0.1mgc25.i686.rpm</files>
-<install>
-usr/lib/liblzma.so.*
-</install>
-</package>
-
+<!--
 <package>
 <files>lua-5.1.4-2mgc25.i686.rpm</files>
 <install>
 usr/lib/liblua-5.1.so
 </install>
 </package>
+-->
 
 <package>
-<files>file-libs-5.00-1mgc25.i686.rpm</files>
+<files>core/file-*.xz</files>
 <install>
-usr/lib/libmagic.so.*
+usr/lib/libmagic.so*
 </install>
 </package>
 
+<!--
 <package>
 <files>nss-3.12.4-1mgc25.i686.rpm </files>
 <install>
@@ -87,8 +80,9 @@ lib/libplds4.so
 lib/libnspr4.so
 </install>
 </package>
+-->
 
-#--------------------------------------------------
+<!--
 # For python-rpm library
 <package>
 <files>xulrunner-1.9.2.3-1.mgc25.i686.rpm</files>
@@ -110,6 +104,6 @@ echo /usr/lib/xulrunner-1.9.2 >> $ROOT/etc/ld.so.conf
 /usr/lib/libsqlite3.so.0.8.6
 </install>
 </package>
-#---------------------------------------------
+-->
 
 </packages>
