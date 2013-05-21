@@ -1,22 +1,22 @@
-bootloader      ·ÅÖÃÒıµ¼Æ÷(ÀıÈçgrub)µÄÅäÖÃÎÄ¼ş¡£
-bindir          ·ÅÖÃµÚÈı·½¶ş½øÖÆ°üºÍÔ´Âë°ü¡£
-buildpkg        ÖÆ×÷ mirootfs.gz °üµÄ´úÂë¡£
-scripts         ¹ı³ÌÖĞµ÷ÓÃµÄ¹¤¾ß½Å±¾¡£
-spec            ÓÃ»§¿É²Ù×÷µÄÅäÖÃÎÄ¼ş¡£
-src             magicinstaller Ö÷³ÌĞòµÄÔ´Âë¡£
-tmp             ¹ı³ÌÖĞµÄÁÙÊ±ÎÄ¼ş¡£
+bootloader      æ”¾ç½®å¼•å¯¼å™¨(ä¾‹å¦‚grub)çš„é…ç½®æ–‡ä»¶ã€‚
+bindir          æ”¾ç½®ç¬¬ä¸‰æ–¹äºŒè¿›åˆ¶åŒ…å’Œæºç åŒ…ã€‚
+buildpkg        åˆ¶ä½œ mirootfs.gz åŒ…çš„ä»£ç ã€‚
+scripts         è¿‡ç¨‹ä¸­è°ƒç”¨çš„å·¥å…·è„šæœ¬ã€‚
+spec            ç”¨æˆ·å¯æ“ä½œçš„é…ç½®æ–‡ä»¶ã€‚
+src             magicinstaller ä¸»ç¨‹åºçš„æºç ã€‚
+tmp             è¿‡ç¨‹ä¸­çš„ä¸´æ—¶æ–‡ä»¶ã€‚
 
-result          ´¢´æÒÑÉú³ÉµÄ¹Ø¼üÎÄ¼ş¡£
-mi_config.py    ´æ´¢È«¾ÖÅäÖÃ±äÁ¿¡£
+result          å‚¨å­˜å·²ç”Ÿæˆçš„å…³é”®æ–‡ä»¶ã€‚
+mi_config.py    å­˜å‚¨å…¨å±€é…ç½®å˜é‡ã€‚
 
-SConstruct          sconsÃüÁîĞĞ·ÖÎö, ÒÔ¼°È«¾Ö env, È«¾Öº¯Êı.
+SConstruct          sconså‘½ä»¤è¡Œåˆ†æ, ä»¥åŠå…¨å±€ env, å…¨å±€å‡½æ•°.
 
-SConstruct-rootfs   ½« root.step1, rootfs µÄ etc Ä¿Â¼ÎÄ¼ş, ÒÔ¼° #src ÖĞÉú³ÉµÄ magicinstaller Ö÷³ÌĞò
-                    (#bindir/root.src.tar.gz)ºÏ²¢ÔÚÒ»Æğ, ´ò°ü³É gz cpio ¸ñÊ½, Éú³É×îÖÕµÄ rootfs ,
-                    ·ÅÖÃÔÚ#result/mirootfs.gz .
+SConstruct-rootfs   å°† root.step1, rootfs çš„ etc ç›®å½•æ–‡ä»¶, ä»¥åŠ #src ä¸­ç”Ÿæˆçš„ magicinstaller ä¸»ç¨‹åº
+                    (#bindir/root.src.tar.gz)åˆå¹¶åœ¨ä¸€èµ·, æ‰“åŒ…æˆ gz cpio æ ¼å¼, ç”Ÿæˆæœ€ç»ˆçš„ rootfs ,
+                    æ”¾ç½®åœ¨#result/mirootfs.gz .
 
-SConstruct-iso      Éú³É iso .
+SConstruct-iso      ç”Ÿæˆ iso .
 
-SConstruct-mi       ´ò°üMIÖ÷³ÌĞò .
+SConstruct-mi       æ‰“åŒ…MIä¸»ç¨‹åº .
 
-ÅäÖÃºÍÊ¹ÓÃËµÃ÷Çë²é¿´ CONFIG ÎÄ¼ş.
+é…ç½®å’Œä½¿ç”¨è¯´æ˜è¯·æŸ¥çœ‹ CONFIG æ–‡ä»¶.
