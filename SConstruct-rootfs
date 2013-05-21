@@ -75,7 +75,7 @@ class MirootfsMaker(PkgMaker.StepMaker):
         os.chmod('buildpkg/post_scripts/commands.sh', 0777)
         cmds = [getSudoSh("buildpkg/post_scripts/commands.sh $ROOT"),
                 getSudoSh("install -m 777 buildpkg/post_scripts/commands_chroot.sh $ROOT"),
-                getSudoSh('/usr/sbin/chroot $ROOT /commands_chroot.sh'),
+                getSudoSh('chroot $ROOT /commands_chroot.sh'),
                 getSudoSh('rm $ROOT/commands_chroot.sh'),
             ]
         return [], cmds

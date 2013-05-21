@@ -373,9 +373,9 @@ usr/bin/mkfontdir
 usr/bin/mkfontscale
 </install>
 <post_action>
-LD_LIBRARY_PATH=/usr/lib sudo /usr/sbin/chroot $ROOT /usr/bin/mkfontdir /usr/lib/X11/fonts/misc
-LD_LIBRARY_PATH=/usr/lib sudo /usr/sbin/chroot $ROOT /usr/bin/mkfontscale /usr/lib/X11/fonts/encodings
-LD_LIBRARY_PATH=/usr/lib sudo /usr/sbin/chroot $ROOT /usr/bin/mkfontscale /usr/lib/X11/fonts/encodings/large
+LD_LIBRARY_PATH=/usr/lib sudo chroot $ROOT /usr/bin/mkfontdir /usr/lib/X11/fonts/misc
+LD_LIBRARY_PATH=/usr/lib sudo chroot $ROOT /usr/bin/mkfontscale /usr/lib/X11/fonts/encodings
+LD_LIBRARY_PATH=/usr/lib sudo chroot $ROOT /usr/bin/mkfontscale /usr/lib/X11/fonts/encodings/large
 rm -f $ROOT/usr/bin/mkfontdir
 rm -f $ROOT/usr/bin/mkfontscale
 rm -f $ROOT/usr/bin/fc-cache

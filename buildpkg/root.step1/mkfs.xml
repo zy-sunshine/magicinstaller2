@@ -90,7 +90,7 @@ lib/libfuse.so*
 lib/libulockmgr.so.*
 </install>
 #<post_action>
-#/usr/sbin/chroot $ROOT /sbin/MAKEDEV fuse
+#chroot $ROOT /sbin/MAKEDEV fuse
 #</post_action>
 </package>
 

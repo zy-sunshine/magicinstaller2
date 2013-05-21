@@ -43,9 +43,9 @@ usr/lib/gconv/GB18030.so
 usr/share/locale/locale.alias
 </install>
 <pre_action>
-sudo /usr/sbin/chroot $BUILD /usr/bin/localedef -i zh_CN -f GB18030 zh_CN.GB18030
-sudo /usr/sbin/chroot $BUILD /usr/bin/localedef -i zh_CN -f GB2312 zh_CN.GB2312
-sudo /usr/sbin/chroot $BUILD /usr/bin/localedef -i zh_CN -f UTF-8 zh_CN.UTF8
+sudo chroot $BUILD /usr/bin/localedef -i zh_CN -f GB18030 zh_CN.GB18030
+sudo chroot $BUILD /usr/bin/localedef -i zh_CN -f GB2312 zh_CN.GB2312
+sudo chroot $BUILD /usr/bin/localedef -i zh_CN -f UTF-8 zh_CN.UTF8
 </pre_action>
 </package>
 

@@ -31,7 +31,7 @@ usr/share/locale/zh_CN/LC_MESSAGES/glib20.mo
 /usr/share/pkgconfig/shared-mime-info.pc
 </install>
 <post_action>
-LD_LIBRARY_PATH=/usr/lib sudo /usr/sbin/chroot $ROOT /usr/bin/update-mime-database /usr/share/mime
+LD_LIBRARY_PATH=/usr/lib sudo chroot $ROOT /usr/bin/update-mime-database /usr/share/mime
 </post_action>
 </package>
 
@@ -85,8 +85,8 @@ usr/share/locale/zh_CN/LC_MESSAGES/gtk20*.mo
 echo "root:x:0:0:root:/root:/bin/sh" &gt; $ROOT/etc/passwd
 echo "root:x:0:root" &gt; $ROOT/etc/group
 #cp $ROOT/usr/lib/gdk-pixbuf/loaders/libpixbufloader-png.so $ROOT/usr/lib/gtk-2.0/2.10.0/loaders/
-LD_LIBRARY_PATH=/usr/lib sudo /usr/sbin/chroot $ROOT gtk-query-immodules-2.0-32 &gt; $ROOT/etc/gtk-2.0/gtk.immodules
-sudo /usr/sbin/chroot $ROOT /usr/bin/gdk-pixbuf-query-loaders-32 &gt; $ROOT/etc/gtk-2.0/gdk-pixbuf.loaders
+LD_LIBRARY_PATH=/usr/lib sudo chroot $ROOT gtk-query-immodules-2.0-32 &gt; $ROOT/etc/gtk-2.0/gtk.immodules
+sudo chroot $ROOT /usr/bin/gdk-pixbuf-query-loaders-32 &gt; $ROOT/etc/gtk-2.0/gdk-pixbuf.loaders
 rm -f $ROOT/etc/passwd
 rm -f $ROOT/etc/group
 </post_action>
@@ -134,7 +134,7 @@ usr/lib/pango/1.6.0/modules/pango-basic-x.so
 <post_action>
 mkdir -p $ROOT/etc/pango/i686-pc-linux-gnu
 /bin/sed 's/song ti/fangsong ti/g' $BUILD/etc/pango/pangox.aliases &gt; $ROOT/etc/pango/pangox.aliases
-LD_LIBRARY_PATH=/usr/lib sudo /usr/sbin/chroot $ROOT /usr/bin/pango-querymodules-32 &gt; $ROOT/etc/pango/pango.modules
+LD_LIBRARY_PATH=/usr/lib sudo chroot $ROOT /usr/bin/pango-querymodules-32 &gt; $ROOT/etc/pango/pango.modules
 cp $ROOT/etc/pango/pango.modules $ROOT/etc/pango/i686-pc-linux-gnu/
 #rm -f $ROOT/usr/bin/pango-querymodules-32
 </post_action>
