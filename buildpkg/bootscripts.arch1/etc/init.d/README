@@ -1,0 +1,7 @@
+这些启动脚本大多从LFS-BOOT-6.6中引入, 经过阅读修改测试, 以适应MI中的busybox.
+对于当前MI没有太大用处的脚本予以修改并保留, 包括:
+(modules swap setclock checkfs mountfs cleanfs console sysctl network等),
+方便以后扩展.
+
+代码版权为原作者所有.
+

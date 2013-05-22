@@ -1,9 +1,9 @@
 <packages>
 
 <package>
-<files>strace-4.5.18-2mgc25.i686.rpm</files>
+<files>extra/strace-*.xz</files>
 <install>
-/usr/bin/strace
+usr/bin/strace
 </install>
 </package>
 

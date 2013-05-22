@@ -15,8 +15,8 @@ usr/sbin/parted
 <install>
 usr/lib/libparted.so*
 usr/lib/libparted-fs-resize.so*
-sbin/parted
-sbin/partprobe
+usr/bin/parted
+usr/bin/partprobe
 </install>
 </package>
 

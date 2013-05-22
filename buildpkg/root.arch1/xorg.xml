@@ -359,6 +359,7 @@ rm -f $ROOT/usr/bin/fc-cache
 </post_action>
 </package>
 
+<!--
 <package>
 <files>
 extra/mesa-*.xz
@@ -380,5 +381,6 @@ usr/lib/libwayland-client.so*
 usr/lib/libwayland-server.so*
 </install>
 </package>
+-->
 
 </packages>
