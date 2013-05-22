@@ -15,7 +15,7 @@ initial_data.json
 /.settings
 .sconsign.dblite
 build
-
+!/build
 
 src/etc/X11/xorg.conf
 src/etc/init.d/apply-dbgopts
