@@ -200,16 +200,12 @@ class RootArch1Maker(RootPkgMaker):
                         'xorg',
                         'gtk2',
                         'parted',
-                        #'rhpl',
                         'rpm',
-                        #'debug',
-                        #'mkfs',
-                        #'udev',
-                        #'kudzu',
-                        #'pyudev',
-                        #'grub',
-                        #'trace',
-                        #'post_scripts',
+                        'mkfs',
+                        'udev',
+                        'grub',
+                        'trace',
+                        'post_scripts',
                         ]:
             mods.append(RootBuildNode(mod_src, self.env))
         # theme is special

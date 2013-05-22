@@ -16,24 +16,17 @@
 # with this program; if not, write to the Free Software Foundation, 59 Temple
 # Place - Suite 330, Boston, MA 02111-1307, USA.
 
+import os
+Import('*')
 
-if 'root.step1' in COMMAND_LINE_TARGETS:
-    SConscript('root.step1/SConscript')
+root_bs = os.path.join(mi_config.tmpdir, 'root.bootscripts')
 
-if 'root.arch1' in COMMAND_LINE_TARGETS:
-    SConscript('root.arch1/SConscript')
+depInstallExcludeSvn(env, 'root.bs', root_bs,
+                    srcdirs=['etc', 
+                             'lib',
+                             'root'])
 
-elif 'busybox.bin' in COMMAND_LINE_TARGETS:
-    SConscript('busybox/SConscript')
-
-elif 'parted.bin' in COMMAND_LINE_TARGETS:
-    SConscript('parted/SConscript')
-
-elif 'kernel.copy' in COMMAND_LINE_TARGETS:
-    SConscript('kernel_copy/SConscript')
-
-elif 'kernel.build' in COMMAND_LINE_TARGETS:
-    SConscript('kernel_build/SConscript')
-else:
-    SConscript('bootscripts.arch1/SConscript')
+##### Construct the #bindir/root.bootscripts.tar.gz
+env.Command('#bindir/root.bootscripts.tar.gz', env.Alias('root.bs'),
+            [ getSudoSh("tar c -C %s . | gzip -9 > $TARGET" % root_bs) ])
 

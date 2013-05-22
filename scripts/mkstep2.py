@@ -21,8 +21,6 @@ import string
 import sys
 
 todir = os.path.abspath(os.getcwd() + '/tmp/mi.rootfs')
-bindir = os.path.abspath(os.getcwd() + '/bindir')
-fromdir =os.path.abspath(os.getcwd() + '/tmp/root.step0')
 
 useudev = False
 for arg in sys.argv:
@@ -53,11 +51,9 @@ for f in sys.argv:
     if f[:2] == '--':
         continue
     if f[-3:] == '.gz':
-        #cmds.append('zcat %s | tar x -C %s' % (f, todir))
-        cmds.append('tar xf %s -C %s' % (f, todir))
+        cmds.append('tar hxf %s -C %s' % (f, todir))
     elif f[-4:] == '.bz2':
-        #cmds.append('bzcat %s | tar x -C %s' % (f, todir))
-        cmds.append('tar xf %s -C %s' % (f, todir))
+        cmds.append('tar hxf %s -C %s' % (f, todir))
 
 for cmd in cmds:
     print cmd

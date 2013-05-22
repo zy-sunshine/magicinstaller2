@@ -1,9 +1,11 @@
 <packages>
 
 <package>
-<files>grub-0.97-15mgc25.i686.rpm</files>
+<files>
+core/grub-common-*.xz
+</files>
 <install>
-usr/sbin/grub
+usr/sbin/grub-install
 </install>
 </package>
 

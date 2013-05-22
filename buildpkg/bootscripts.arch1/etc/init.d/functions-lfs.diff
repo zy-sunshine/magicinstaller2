@@ -1,0 +1,11 @@
+--- /home/sunshine/zybooks/LFS/lfs-bootscripts-20100124/lfs/init.d/functions	2009-08-13 03:55:10.000000000 +0800
++++ functions-lfs	2010-09-01 17:00:13.000000000 +0800
+@@ -464,7 +464,7 @@
+ 		done
+ 
+ 	else
+-		pidlist=`pidof -o $$ -o $PPID -x "$1"`
++		pidlist=`pidof -o $$ -o $PPID "$1"`
+ 		if [ "${silent}" != "1" ]; then
+ 			echo "${pidlist}"
+ 		fi

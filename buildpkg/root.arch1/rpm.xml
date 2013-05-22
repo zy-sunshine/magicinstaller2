@@ -7,7 +7,7 @@
 if [ -f $ROOT/usr/bin/rpm2cpio ]; then rm $ROOT/usr/bin/rpm2cpio; fi
 </pre_action>
 <install>
-bin/rpm
+usr/bin/rpm
 usr/bin/rpm2cpio
 usr/lib/rpm/macros
 #usr/lib/rpm/rpmrc
@@ -23,7 +23,7 @@ usr/lib/librpm*.so*
 if [ -f $ROOT/bin/cpio ]; then rm $ROOT/bin/cpio; fi
 </pre_action>
 <install>
-bin/cpio
+usr/bin/cpio
 </install>
 </package>
 
@@ -40,9 +40,9 @@ TODO: add rpm-python for MI
 <package>
 <files>aur/db5.1-*.xz</files>
 <install>
-/usr/lib/libdb-5.1.so
-/usr/lib/libdb-5.so
-/usr/lib/libdb.so
+usr/lib/libdb-5.1.so
+usr/lib/libdb-5.so
+usr/lib/libdb.so
 </install>
 </package>
 

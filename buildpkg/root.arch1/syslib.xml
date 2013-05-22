@@ -96,11 +96,13 @@ usr/lib/libpcre.so*
 </package>
 
 <!-- TODO: check udev in udev.xml -->
+<!--
 <package>
 <files>extra/systemd-*.xz</files>
 <install>
 usr/lib/libudev.so*
 </install>
 </package>
+-->
 
 </packages>
