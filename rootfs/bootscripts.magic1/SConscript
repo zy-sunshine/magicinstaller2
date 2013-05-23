@@ -28,7 +28,7 @@ depInstallExcludeSvn(env, 'bootscripts.magic1', root_bs,
 
 ##### Construct the #bindir/root.bootscripts.tar.gz
 pkg = 'root.bootscripts.magic1.tar.gz'
-__root_bs = env.Command('#bindir/root.bootscripts.magic1.tar.gz' % pkg, env.Alias('bootscripts.magic1'),
+__root_bs = env.Command('#bindir/%s' % pkg, env.Alias('bootscripts.magic1'),
             [ getSudoSh("tar c -C %s . | gzip -9 > $TARGET" % root_bs) ])
 
 env.Alias('rootfs', env.Command('#bindir/root.bootscripts.tar.gz', __root_bs,
