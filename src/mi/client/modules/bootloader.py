@@ -7,6 +7,8 @@ from xml.dom.minidom import parseString
 CF = MiConfig.get_instance()
 
 class MIStep_bootloader (magicstep.magicstepgroup):
+    NAME = 'bootloader'
+    LABEL = _("Bootloader")
     def __init__(self, rootobj):
         magicstep.magicstepgroup.__init__(self, rootobj, 'bootloader.xml',
                                           ['choose', 'bootlist'],
@@ -19,7 +21,7 @@ class MIStep_bootloader (magicstep.magicstepgroup):
                                                     self.check_winpartition_change, self)
 
     def get_label(self):
-        return  _("Bootloader")
+        return self.LABEL
 
     def btnhelp_clicked(self, widget, data):
         # TO TRANSLATOR: Let helptext/bootloader.help.en.txt to be i18n string,
@@ -187,11 +189,11 @@ class MIStep_bootloader (magicstep.magicstepgroup):
                                                  magicpopup.magicpopup.MB_OK |
                                                  magicpopup.magicpopup.MB_CANCEL,
                                                  'bootentry.dialog', 'edit_')
-        self.edit_dialogger.fill_values(self.edit_values.documentElement)
-        self.edit_dialogger.name_map['CF.G.root_device'].set_text(device)
+        self.edit_dialog.fill_values(self.edit_values.documentElement)
+        self.edit_dialog.name_map['CF.G.root_device'].set_text(device)
 
     def edit_ok_clicked(self, widget, data):
-        self.edit_dialogger.fetch_values(self.edit_values)
+        self.edit_dialog.fetch_values(self.edit_values)
         dE = self.edit_values.documentElement
         device = self.get_data(dE, 'device')
         default = self.get_data(dE, 'default')
@@ -222,7 +224,7 @@ class MIStep_bootloader (magicstep.magicstepgroup):
                 self.model.set_value(iter, 0,
                                      self.get_pixbuf_map('images/yes.png'))
                 self.model.set_value(iter, 3, 'true')
-        self.edit_dialogger.topwin.destroy()
+        self.edit_dialog.topwin.destroy()
 
     def remove_entry(self, widget, data):
         (model, iter) = self.name_map['bootlist_treeview'].get_selection().get_selected()

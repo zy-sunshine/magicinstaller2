@@ -1,19 +1,18 @@
 <?xml version="1.0"?>
 <dopartition>
   <vbox margin="4" spacing="4">
-    <label expand="true"/>
-    <label line_wrap="true" fill="true"
-text="((Commit Target Partiton...))"/>
-    <label expand="true"/>
-    <frame name="frame_parted" label="((Partition/Format Progress))"
-	       fill="true" sensitive="false">
-	  <table margin="4" columns="2" rows="2" colspacings="4" rowspacings="4">
-	    <label text="((Operation:))" xalign="0" xoptions="none"/>
-	<label name="pfname" xalign="0" expand="true"/>
-	<label text="((Progress:))" xalign="0" xoptions="none"/>
-	<progressbar name="pfprog"/>
-	  </table>
-	</frame>
-    <label expand="true"/>
+    <label text="((Note: Please Click Next button to format partition and install system.))" />
+    <frame name="frame_parted" label="((Partition/Format Progress))" fill="true" sensitive="false">
+      <table margin="4" columns="2" rows="2" colspacings="4" rowspacings="4">
+        <label text="((Operation:))" xalign="0" xoptions="none"/>
+    	<label name="pfname" xalign="0" expand="true"/>
+    	<label text="((Progress:))" xalign="0" xoptions="none"/>
+    	<progressbar name="pfprog"/>
+      </table>
+    </frame>
+    <frame id="pkg_frame" label="((Package Source Information))" fill="true" expand="true" />
+    <frame id="dirty_frame" label="((Dirty Partition))" fill="true" expand="true" visible="false" />
+    <frame id="format_frame" label="((Format Partition))" fill="true" expand="true" />
+    <frame id="tgtsys_frame" label="((Target Partition))" fill="true" expand="true" />
   </vbox>
 </dopartition>

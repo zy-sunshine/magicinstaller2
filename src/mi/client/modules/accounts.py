@@ -4,6 +4,8 @@ from mi.client.utils import magicstep, magicpopup
 from xml.dom.minidom import parseString
 
 class MIStep_accounts (magicstep.magicstepgroup):
+    NAME = 'accounts'
+    LABEL = _("Accounts")
     class account_dialog (magicpopup.magicpopup):
         def __init__(self, uixml, stepobj):
             magicpopup.magicpopup.__init__(self, stepobj, uixml, _('Add/Edit a user'),
@@ -25,7 +27,7 @@ class MIStep_accounts (magicstep.magicstepgroup):
         self.tmpvalues = None
 
     def get_label(self):
-        return  _("Accounts & hostname")
+        return self.LABEL
 
     def check_leave_root(self):
         self.fetch_values(self.rootobj.values)

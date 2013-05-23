@@ -20,18 +20,13 @@ if mia.pid > 0:
     # Control process.
     # Run short operation and transfer long operation to action process.
     #from mi.utils.milogger import ServerLogger_Short, ServerLogger_Long
-    from mi.utils import MiLogger
-    log_short = MiLogger("mi_short")
-    log_long = MiLogger("mi_long")
+    from mi.server.utils import logger
     from mi.server import handlers_short
-    def dolog(msg):
-        log_short.w(msg)
-    dolog('test short logger')
+    logger.d('test short logger')
     server_quit = 0
 
     class MIAction:
         def _dispatch(self, method, params):
-            print 'dispatch %s %s' % (method, params)
             global  server_quit
             if method == 'quit':
                 mia.put_operation('quit')
@@ -44,20 +39,20 @@ if mia.pid > 0:
                 return  mia.probe_step()
             if handlers_short.has_key(method):
                 if CF.D.EXPERT_MODE:
-                    dolog('Run short.%s() with %s,\n' % (method, params))
+                    logger.d('Run short.%s() with %s,\n' % (method, params))
                 result = handlers_short[method](*params)
                 if CF.D.EXPERT_MODE:
-                    dolog('    which returns %r\n' % (result,))
+                    logger.d('    which returns %r\n' % (result,))
                 return result
             else: # This is a long operation.
                 # Return the operation identifier to the caller.
                 if CF.D.EXPERT_MODE:
-                    log_long.w('Put long.%s() with %s' % (method, params))
+                    logger.d('Put long.%s() with %s' % (method, params))
                     t = xmlrpclib.dumps(params, methodname=method, allow_none = 1)
                     #log_long.debug('%s' % t)
                 id = mia.put_operation(t)
                 if CF.D.EXPERT_MODE:
-                    log_long.w(', and get id %d.\n' % (id))
+                    logger.d(', and get id %d.\n' % (id))
                 return id
 
     class ReuseXMLRPCServer(SimpleXMLRPCServer.SimpleXMLRPCServer):
@@ -116,12 +111,11 @@ if mia.pid > 0:
 
 elif mia.pid == 0:
     # Action process. For long operation only.
-    from mi.utils import MiLogger
-    log_long = MiLogger('mi_long')
+    #from mi.utils import MiLogger
+    #log_long = MiLogger('mi_long')
+    from mi.server.utils import logger
     from mi.server import handlers_long
-    def dolog(msg):
-        log_long.w(msg)
-    dolog('test long logger')
+    logger.i('test long logger')
     while 1:
         (id, opera) = mia.get_operation()
         if opera == 'quit':
@@ -130,19 +124,19 @@ elif mia.pid == 0:
             (params, method) = xmlrpclib.loads(opera)
             if handlers_long.has_key(method):
                 if CF.D.EXPERT_MODE:
-                    dolog('Run long.%s() with %s and id %d,\n' % (method, params, id))
+                    logger.d('Run long.%s() with %s and id %d,\n' % (method, params, id))
                 try:
                     result = handlers_long[method](mia, id, *params)
                 except:
-                    result = 'run method %s raise exception %s' % (method, sys.exc_info()[0])
-                    dolog(result)
+                    result = 'run method %s raise exception %s' % (method, str(sys.exc_info()[0:2]))
+                    logger.e(result, exc_info = sys.exc_info())
                 if CF.D.EXPERT_MODE:
-                    dolog('    which returns %r.\n' % (result,))
+                    logger.d('    which returns %r.\n' % (result,))
                 mia.put_result(xmlrpclib.dumps((id, result), methodname=method, allow_none = 1))
             else:
                 if CF.D.EXPERT_MODE:
-                    dolog('ERROR: NOT SUPPORTED method %s().\n' % method)
-                log_long.w('method %s NOT_SUPPORT' % method)
+                    logger.e('ERROR: NOT SUPPORTED method %s().\n' % method)
+                logger.e('method %s NOT_SUPPORT' % method)
                 mia.put_result(xmlrpclib.dumps((id, 'NOT_SUPPORT'), methodname=method, allow_none = 1))
 
 #if mia.pid > 0:

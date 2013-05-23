@@ -1072,4 +1072,12 @@ unset f
 addcompletions
 
 ## MI Custom
-export PYTHONPATH=$(gettop)/scripts
+function set_pythonpath() {
+    T=$(gettop)
+    if [ ! "$T" ]; then
+        echo "Couldn't locate the top of the tree.  Try setting TOP." >&2
+        return
+    fi
+    export PYTHONPATH=$T/scripts:$T/src
+}
+set_pythonpath

@@ -3,16 +3,16 @@ class MiRegister(object):
         self.handlers_long = {}
         self.handlers_short = {}
     
-    def server_handler(self, name):
+    def server_handler(self, type_, func_name=None):
         def dec(func):
-            #import pdb; pdb.set_trace()
-            if name == 'long':
-                self.handlers_long.setdefault(func.__name__, []).append(func)
-            elif name == 'short':
-                self.handlers_short.setdefault(func.__name__, []).append(func)
+            name = func_name and func_name or func.__name__
+            if type_ == 'long':
+                self.handlers_long.setdefault(name, []).append(func)
+            elif type_ == 'short':
+                self.handlers_short.setdefault(name, []).append(func)
             else:
                 raise Exception('%s Raise' % self.__class__, 'Regist "%s" method \
-                        Not Support' % name)
+                        Not Support' % type_)
             return func
 
         return dec

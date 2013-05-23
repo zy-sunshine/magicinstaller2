@@ -6,6 +6,8 @@ import string
 from xml.dom.minidom import parseString
 
 class MIStep_Xwindow (magicstep.magicstepgroup):
+    NAME = 'Xwindow'
+    LABEL = _("Xwindow")
     def __init__(self, rootobj):
         magicstep.magicstepgroup.__init__(self, rootobj, 'Xwindow.xml',
                                           ['monitor', 'videocard', 'mouse', 'misc'],
@@ -15,7 +17,7 @@ class MIStep_Xwindow (magicstep.magicstepgroup):
         self.x_settings = {}
 
     def get_label(self):
-        return  _("Xwindow")
+        return self.LABEL
 
     def startup_action(self):
         self.rootobj.tm.add_action(_('Probe Monitor'),

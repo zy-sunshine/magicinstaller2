@@ -41,19 +41,20 @@ class magicpopup (xmlgtk.xmlgtk):
 
         self.topwin = gtk.Window(gtk.WINDOW_POPUP)
         self.topwin.set_modal(True)
-        self.topwin.set_position(gtk.WIN_POS_CENTER_ALWAYS)
+        #self.topwin.set_position(gtk.WIN_POS_CENTER_ALWAYS)
+        self.topwin.set_position(gtk.WIN_POS_CENTER)
         self.topwin.add(self.dialogframe.widget)
         self.topwin.show()
 
     def closedialog(self, widget):
         self.topwin.destroy()
 
-class magicmsgbox (magicpopup):
+class magicmsgbox(magicpopup):
     MB_ERROR    = 0
     MB_INFO     = 1
     MB_QUESTION = 2
     MB_WARNING  = 3
-    def __init__(self, upobj, message, msgtype, buttons, prefix=''):
+    def __init__(self, upobj, message, msgtype=MB_INFO, buttons=magicpopup.MB_YES, prefix=''):
         uixml = parse('UIxml/mi_dialog.xml')
         labelnode = self.search_hook(uixml, 'label', 'LABEL')
         labelnode.setAttribute('text', message)
@@ -79,14 +80,15 @@ class magicmsgbox (magicpopup):
                                 buttons, 'messagedialog', prefix)
 
 class magichelp_popup(magicpopup):
-    def __init__(self, helpfile):
+    def __init__(self, helpfile=None):
         from mi.utils.miconfig import MiConfig
         CF = MiConfig.get_instance()
         
         uixml = parse('UIxml/mi_dialog.xml')
         textnodes = uixml.getElementsByTagName('text')
-        for tn in textnodes:
-            tn.setAttribute('filename', helpfile)
+        if helpfile:
+            for tn in textnodes:
+                tn.setAttribute('filename', helpfile)
         magicpopup.__init__(self, self, uixml, _('Help'), magicpopup.MB_OK, 'helpdialog')
         self.topwin.set_size_request(CF.D.HELP_WIDTH, CF.D.HELP_HEIGHT)
         self.topwin.set_resizable(False)

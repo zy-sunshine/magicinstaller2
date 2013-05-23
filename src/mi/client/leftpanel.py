@@ -1,7 +1,11 @@
 #!/usr/bin/python
 import gtk
 from mi.client.utils import logger
-
+from mi.client.utils.xmlgtk import xmlgtk
+XML_DATA = '''
+<vbox id="step_box">
+</vbox>
+'''
 class StepButton(gtk.Button):
     def __init__(self, img_path, label_text, *args, **kw):
         gtk.Button.__init__(self, *args, **kw)
@@ -29,37 +33,41 @@ class MILeftPanel(gtk.Frame):
     def __init__(self, sself, *args, **kw):
         gtk.Frame.__init__(self, *args, **kw)
         self.sself = sself
-        self.vbox = gtk.VBox()
-        self.btn_lst = []
         
-        self.vbox.set_border_width(4)
-        self.vbox.set_spacing(4)
-        self.vbox.show()
+#        self.vbox = gtk.VBox()
+#        
+#        self.vbox.set_border_width(4)
+#        self.vbox.set_spacing(4)
+#        self.vbox.show()
+        self.xml_obj = xmlgtk(XML_DATA)
+        
+        self.btn_lst = []
         self.stash_stack = []
-        self.stash_stack.append(self.vbox)
+        self.stash_stack.append(self.xml_obj.widget)
         self.add(self.stash_stack[-1])
         
-    def addstep(self, name):
+    def addstep(self, group, name):
         logger.d('addstep %s' % name)
         step = self.sself.steps.get_step_by_name(name)
 
         btn = StepButton('images/applet-blank.png', step.title)
         btn.connect('clicked', self.on_switch_to_page, name)
 
-        self.btn_lst.append(btn)
-        self.vbox.pack_start(btn, False, False)
+        self.btn_lst.append([group, btn])
+
+        self.xml_obj.id_map['step_box'].pack_start(btn, False, False)
         
     def skip_step(self, name):
         s_id = self.sself.steps.get_id_by_name(name)
-        self.btn_lst[s_id].set_sensitive(False)
+        self.btn_lst[s_id][1].set_sensitive(False)
     
     def on_switch_to_page(self, widget, name):
         self.sself.switch_to_page(name)
         
     def switch(self, from_id, to_id):
         logger.d('leftpanel.switch: %s, %s' % (from_id, to_id))
-        if from_id > 0: self.btn_lst[from_id].change_image('images/applet-okay.png')
-        self.btn_lst[to_id].change_image('images/applet-busy.png')
+        if from_id > 0: self.btn_lst[from_id][1].change_image('images/applet-okay.png')
+        self.btn_lst[to_id][1].change_image('images/applet-busy.png')
         
     def push(self, widget):
         if self.stash_stack: self.remove(self.stash_stack[-1]); self.stash_stack[-1].hide()

@@ -18,9 +18,10 @@
 
 import gettext
 import gobject
-import gtk
+import gtk, os
 import string
 import types
+from xml.dom.minidom import parse, parseString
 from gettext import gettext as _
 import pdb
 
@@ -128,8 +129,15 @@ def xgc_true_false(b):
 
 class xmlgtk:
     def __init__(self, uixmldoc, uixml_rootname=None):
+        if type(uixmldoc) is str:
+            if len(uixmldoc) < 4096 and os.path.exists(uixmldoc):
+                # a file
+                uixmldoc = parse(uixmldoc)
+            else:
+                uixmldoc = parseString(uixmldoc)
         self.uixmldoc = uixmldoc
         self.name_map = {}
+        self.id_map = {}
         self.group_map = {}
         self.readonly_map = {}
         self.togglebutton_map = {}
@@ -231,6 +239,17 @@ class xmlgtk:
         margin = node.getAttribute('margin')
         if margin:
             widget.set_border_width(int(margin))
+            
+        width = node.getAttribute("width")
+        height = node.getAttribute("height")
+            
+        if width and height:
+            widget.set_size_request(int(width), int(height))
+        elif height:
+            widget.set_size_request(-1, int(height))
+        elif width:
+            widget.set_size_request(int(width), -1)
+            
         for subnode in node.childNodes:
             if subnode.nodeType == subnode.ELEMENT_NODE:
                 subwidget = self.xgcwidget_create(subnode)
@@ -330,6 +349,138 @@ class xmlgtk:
         self._xgc_box_public(widget, node)
         return widget
 
+    def xgc_tableV2(self, node):
+        cell_list = []
+        cell_fill_map = {}
+        
+        def get_cur_col(row, col):
+            while True:
+                if not cell_fill_map.has_key((row, col)):
+                    break
+                col += 1
+            return col
+        
+        def get_cur_row(row, col):
+            while True:
+                if not cell_fill_map.has_key((row, col)):
+                    break
+                row += 1
+            return row
+        
+        def inc_col(row, col, inc):
+            for i in range(inc):
+                col = get_cur_col(row, col)
+                cell_fill_map[(row, col)] = 'y'
+                col += 1
+            return  col
+        
+        def inc_row(row, col, inc):
+            for i in range(inc):
+                row = get_cur_row(row, col)
+                cell_fill_map[(row, col)] = 'y'
+                row += 1
+            return row
+        
+        def add_cell(subnode, cur_row, cur_col):
+            rowspan = int(self._xgc_attr(subnode, 'rowspan', '1'))
+            colspan = int(self._xgc_attr(subnode, 'colspan', '1'))
+            
+            top = get_cur_row(cur_row, cur_col)
+            bottom = top + int(rowspan) - 1
+            
+            left = get_cur_col(cur_row, cur_col)
+            right = left + int(colspan) - 1
+                
+            for row in range(top, bottom + 1):
+                for col in range(left, right + 1):
+                    cell_fill_map[(row, col)] = 'y'
+
+            cell_list.append((subnode, cur_row, cur_col, left, right, top, bottom))
+            return right + 1
+        cur_row = -1
+        for trnode in node.childNodes:
+            if trnode.nodeType != trnode.ELEMENT_NODE:
+                continue
+            cur_row += 1
+            cur_col = get_cur_col(cur_row, 0)
+            if trnode.tagName == 'tr':
+                # do td in tr parse
+                for tdnode in trnode.childNodes:
+                    if tdnode.nodeType != tdnode.ELEMENT_NODE:
+                        continue
+                    if tdnode.tagName == 'td':
+                        for subnode in tdnode.childNodes:
+                            if subnode.nodeType != subnode.ELEMENT_NODE:
+                                continue
+                            cur_col = add_cell(subnode, cur_row, cur_col)
+                    else:
+                        cur_col = add_cell(tdnode, cur_row, cur_col)
+            else:
+                # do one row
+                cur_col = add_cell(trnode, cur_row, cur_col)
+        if cell_list:
+            rows = max(cell_list, key=lambda s: s[6])[6] + 1
+            columns = max(cell_list, key=lambda s: s[4])[4] + 1
+        else:
+            rows = 1
+            columns = 1
+            #raise Exception('Error', 'Cannot create zero table')
+        
+        homogeneous = xgc_get_bool(self._xgc_attr(node, 'homogeneous', 'false'))
+        widget = gtk.Table(rows, columns, homogeneous)
+        def_xoptions = self._xgc_attr(node, 'def_xoptions', 'notexpandfill')
+        def_yoptions = self._xgc_attr(node, 'def_yoptions', 'notexpandfill')
+        def_xpadding = self._xgc_attr(node, 'def_xpadding', '0')
+        def_ypadding = self._xgc_attr(node, 'def_ypadding', '0')
+        colspacings = node.getAttribute('colspacings')
+        if colspacings:
+            widget.set_col_spacings(int(colspacings))
+        rowspacings = node.getAttribute('rowspacings')
+        if rowspacings:
+            widget.set_row_spacings(int(rowspacings))
+        margin = node.getAttribute('margin')
+        if margin:
+            widget.set_border_width(int(margin))
+            
+        for subnode, cur_row, cur_col, left, right, top, bottom in cell_list:
+            child = self.xgcwidget_create(subnode)
+            expand = xgc_get_bool(self._xgc_attr(subnode, 'expand', 'false'))
+            fill = xgc_get_bool(self._xgc_attr(subnode, 'fill', 'false'))
+            expandfill = xgc_get_bool(self._xgc_attr(subnode, 'expandfill', 'false'))
+            if (expand and fill) or expandfill:
+                def_xoptions = 'expandfill'
+                def_yoptions = 'expandfill'
+            elif expand:
+                def_xoptions = 'expand'
+                def_yoptions = 'expand'
+            elif fill: 
+                def_xoptions = 'fill'
+                def_yoptions = 'fill'
+
+            xoptions = self._xgc_attr(subnode, 'xoptions', def_xoptions)
+            if xoptions == 'expand':
+                xoptions = gtk.EXPAND
+            elif xoptions == 'fill':
+                xoptions = gtk.FILL
+            elif xoptions == 'expandfill':
+                xoptions = gtk.EXPAND | gtk.FILL
+            else:
+                xoptions = 0
+            yoptions = self._xgc_attr(subnode, 'yoptions', def_yoptions)
+            if yoptions == 'expand':
+                yoptions = gtk.EXPAND
+            elif yoptions == 'fill':
+                yoptions = gtk.FILL
+            elif yoptions == 'expandfill':
+                yoptions = gtk.EXPAND | gtk.FILL
+            else:
+                yoptions = 0
+            xpadding = int(self._xgc_attr(subnode, 'xpadding', def_xpadding))
+            ypadding = int(self._xgc_attr(subnode, 'ypadding', def_ypadding))
+
+            widget.attach(child, left, right + 1, top, bottom + 1,
+                          xoptions, yoptions, xpadding, ypadding)
+        return widget
     def xgc_table(self, node):
         rows = int(self._xgc_attr(node, 'rows', '1'))
         columns = int(self._xgc_attr(node, 'columns', '1'))
@@ -480,7 +631,7 @@ class xmlgtk:
         name = node.getAttribute('name')
         if name:
             self.name_map[name + '_treeview'] = tv
-
+        
         selection = tv.get_selection()
         selection.set_mode(selection_mode)
         self._xgc_connect(selection, node, 'changed', selection)
@@ -548,7 +699,7 @@ class xmlgtk:
         tv = gtk.TextView()
         tv.show()
         widget.add(tv)
-
+        widget.tv = tv
         buffer = gtk.TextBuffer(None)
         tv.set_buffer(buffer)
         tv.set_editable(False)
@@ -557,10 +708,12 @@ class xmlgtk:
         
         iter = buffer.get_iter_at_offset(0)
         buffer.insert(iter, data)
-        return  widget
+        return widget
         
     def xgc_button(self, node):
         label = __(node.getAttribute('label'))
+        text = __(node.getAttribute('text'))
+        label = label and label or text
         if label:
             widget = gtk.Button(label)
         else:
@@ -640,8 +793,8 @@ class xmlgtk:
     def xgc_entry(self, node):
         max = int(self._xgc_attr(node, 'max', 0))
         widget = gtk.Entry(max)
-        visible = node.getAttribute('visible')
-        if visible == 'false':
+        type_ = node.getAttribute('type')
+        if type_ == 'password':
             widget.set_visibility(False)
         editable = node.getAttribute('editable')
         if editable == 'false':
@@ -743,15 +896,23 @@ class xmlgtk:
             return None
         name = node.getAttribute('name')
         if name:
+            widget.set_name(name)
             self.name_map[name] = widget
+            
+        id_ = node.getAttribute('id')
+        if id_:
+            if self.id_map.has_key(id_):
+                raise Exception('Error', 'there have duplicate id in xml "%s"' % id_)
+            self.id_map[id_] = widget
+            
         group = node.getAttribute('group')
         if group:
             if self.group_map.has_key(group):
                 self.group_map[group].append(widget)
             else:
                 self.group_map[group] = [widget]
-        show = node.getAttribute('show')
-        if not show or show == 'true':
+        visible = xgc_get_bool(self._xgc_attr(node, 'visible', 'true'))
+        if visible:
             widget.show()
         sensitive = node.getAttribute('sensitive')
         if sensitive == 'false':

@@ -36,7 +36,7 @@
 	  </vbox>
 	</frame>
       </vbox>
-      <vbox name="videocard" show="false" expand="true" fill="true">
+      <vbox name="videocard" visible="false" expand="true" fill="true">
         <hbox fill="true">
 	  <frame label="((Videocard Parameters))" margin="4" fill="true" expand="true">
 	    <table columns="2" rows="3" margin="4" colspacings="4" rowspacings="4">
@@ -84,7 +84,7 @@
 	  </vbox>
 	</frame>
       </vbox>
-      <vbox name="mouse" show="false" expand="true" fill="true">
+      <vbox name="mouse" visible="false" expand="true" fill="true">
         <hbox fill="true">
 	  <frame label="((Mouse Parameters))" margin="4" fill="true" expand="true">
 	    <table columns="2" rows="3" margin="4" colspacings="4" rowspacings="4">
@@ -120,7 +120,7 @@
 	  </vbox>
 	</frame>
       </vbox>
-      <vbox name="misc" show="false" expand="true" fill="true">
+      <vbox name="misc" visible="false" expand="true" fill="true">
         <frame label="((Modes))" margin="4" fill="true">
 	  <table margin="4" columns="5" rows="4">
 	    <label text="((256 Colors))"/>

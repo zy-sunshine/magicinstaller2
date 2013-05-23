@@ -1,12 +1,11 @@
 #!/usr/bin/python
 import gtk
-from mi.client.utils import logger
+from mi.client.utils import logger, xmlgtk
 
 class MIRightPanel(gtk.Frame):
     def __init__(self, sself, *args, **kw):
         gtk.Frame.__init__(self, *args, **kw)
         self.sself = sself
-        self.set_size_request(600, 500)
         self.curwidget = None
         self.stash_stack = []
 

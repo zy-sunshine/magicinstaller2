@@ -3,12 +3,7 @@ import os
 import sys
 import isys #@UnresolvedImport
 USE_ISYS = False
-
-# only mount dev and umount dev dolog, so we use server Logger
-import logging, logging.config
-logging.config.fileConfig('logging.conf')
-logger = logging.getLogger('log_long')
-dolog = logger.info
+from mi.utils import logger, CF
 
 class AttrDict(dict):
     """A dict class, holding the dict. Two extra method to get dict
@@ -46,7 +41,7 @@ def run_bash(cmd, argv=[], root='/', env=None):
         os.chroot(root)
     env = env and env or os.environ
     cmd_res = {}
-    dolog('runbash: %s %s' % (cmd, ' '.join(argv)))
+    logger.i('runbash: %s %s' % (cmd, ' '.join(argv)))
     res = subprocess.Popen([cmd] + argv, 
                             stdout = subprocess.PIPE, 
                             stderr = subprocess.PIPE, 
@@ -177,15 +172,16 @@ def mount_dev(fstype, devfn, mntdir=None,flags=None):
         else:
             return False, msg
     else:
-        ret, msg = remove_empty_dir(mntdir)
-        if not ret:
-            return False, msg
-        try:
-            os.makedirs(mntdir)
-        except OSError, e:
-            return False, str(e)
+        #ret, msg = remove_empty_dir(mntdir)
+        #if not ret:
+        #    return False, msg
+        if not os.path.exists(mntdir):
+            try:
+                os.makedirs(mntdir)
+            except OSError, e:
+                return False, str(e)
 
-    dolog("mount_dev: Device = %s Mount = %s Fstype = %s\n" % \
+    logger.i("mount_dev: Device = %s Mount = %s Fstype = %s\n" % \
         (devfn, mntdir, fstype))
     if not os.path.exists(mntdir):
         os.makedirs(mntdir)
@@ -194,7 +190,7 @@ def mount_dev(fstype, devfn, mntdir=None,flags=None):
             isys.mount(fstype, devfn, mntdir, flags)
         except SystemError, e:
             errmsg = "mount_dev: mount failed: %s\n" % str(e)
-            dolog(errmsg)
+            logger.e(errmsg)
             return False, errmsg
         else:
             return True, mntdir
@@ -229,7 +225,7 @@ def mount_dev(fstype, devfn, mntdir=None,flags=None):
                 argv = ['-t', fstype, '-o', flags, devfn, mntdir]
             else:
                 argv = ['-t', fstype, devfn, mntdir]
-        dolog("Run mount command: %s %s\n" % (cmd, ' '.join(argv)))
+        logger.i("Run mount command: %s %s\n" % (cmd, ' '.join(argv)))
         cmdres = run_bash(cmd, argv)
         if cmdres['ret']:
             errmsg = "mount_dev: mount failed: %s\n" % str([cmdres['out'], cmdres['err']])
@@ -262,7 +258,7 @@ def umount_dev(mntdir, rmdir=True):
             isys.umount(mntdir)
         except SystemError, e:
             errmsg = "umount_dev: umount failed: %s\n" % str(e)
-            dolog(errmsg)
+            logger.e(errmsg)
             return False, errmsg
     else:
         f_loop = False
@@ -278,7 +274,7 @@ def umount_dev(mntdir, rmdir=True):
 
         cmd = '/bin/umount'
         argv = [mntdir]
-        dolog("Run umount command: %s %s\n" % (cmd, ' '.join(argv)))
+        logger.i("Run umount command: %s %s\n" % (cmd, ' '.join(argv)))
         cmdres = run_bash(cmd, argv)
         if cmdres['ret']:
             errmsg = "umount_dev: umount failed: %s\n" % str([cmdres['out'], cmdres['err']])
@@ -335,8 +331,6 @@ STAT = Status()
 
 def get_devinfo(devfn, all_part_infor):
     if not devfn: return AttrDict()
-    from mi.utils.miconfig import MiConfig
-    CF = MiConfig.get_instance()
     for dev in all_part_infor:
         for tup in all_part_infor[dev]:
             if '%s%s' % (dev, tup[0]) == devfn:
