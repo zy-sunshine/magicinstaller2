@@ -100,6 +100,9 @@ $pythondir/UserDict.pyc
 $pythondir/UserList.pyc
 $pythondir/UserString.pyc
 $pythondir/weakref.pyc
+$pythondir/_weakrefset.pyc
+$pythondir/sysconfig.pyc
+$pythondir/_sysconfigdata.pyc
 $pythondir/logging/*.pyc
 $pythondir/xml/*.pyc
 $pythondir/xml/dom/*.pyc

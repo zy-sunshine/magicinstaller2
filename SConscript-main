@@ -1,0 +1,4 @@
+Import('_inc', '_p', 'TOPDIR')
+
+_inc(TOPDIR, 'SConscript-rootfs')
+_inc(TOPDIR, 'SConscript-iso')

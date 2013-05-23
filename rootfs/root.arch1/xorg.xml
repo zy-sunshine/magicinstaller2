@@ -359,28 +359,19 @@ rm -f $ROOT/usr/bin/fc-cache
 </post_action>
 </package>
 
-<!--
+<!-- Additional libs -->
 <package>
 <files>
-extra/mesa-*.xz
-extra/mesa-libgl-*.xz
-extra/graphite-*.xz
-extra/icu-*.xz
-extra/wayland-*.xz
+extra/libdrm-*.xz
+extra/systemd-*.xz
+core/libgcrypt-*.xz
+core/libgpg-error-*.xz
 </files>
 <install>
-usr/lib/libEGL.so*
-usr/lib/libgbm.so*
-usr/lib/libglapi.so*
-usr/lib/libGL.so*
-usr/lib/libgraphite2.so*
-usr/lib/libicule.so*
-usr/lib/libicuuc.so*
-usr/lib/libicudata.so*
-usr/lib/libwayland-client.so*
-usr/lib/libwayland-server.so*
+usr/lib/libgcrypt.so*
+usr/lib/libdrm.so*
+usr/lib/libgpg-error.so*
 </install>
 </package>
--->
 
 </packages>

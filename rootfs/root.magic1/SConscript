@@ -18,7 +18,7 @@
 
 import os
 import stat
-import sys
+import sys, glob
 from SCons.Action import ActionFactory
 from xml.dom.minidom import parse
 
@@ -83,6 +83,7 @@ class RootBuildNode(PkgMaker.BaseMaker):
         inst_list = []
         pre_list = []
         post_list = []
+        tarpkgs = []
 
         for pkgnode in rootdoc.getElementsByTagName('package'):
             pkgfiles_orig = get_node_value(pkgnode, 'files')
@@ -97,12 +98,14 @@ class RootBuildNode(PkgMaker.BaseMaker):
                         print "Can not find the package %s" % pkgfile
                         sys.exit(1)
 
-                source_list.extend(pkgfiles)
-                # extract
-                cmds.extend(self.get_extract_cmd(pkgfiles, '$build_prefix'))
+                tarpkgs.extend(pkgfiles)
             inst_list.extend(get_node_value(pkgnode, 'install'))
             pre_list.extend(get_node_value(pkgnode, 'pre_action'))
             post_list.extend(get_node_value(pkgnode, 'post_action'))
+
+        # extract
+        tarpkgs = list(set(tarpkgs))
+        cmds.extend(self.get_extract_cmd(tarpkgs, '$build_prefix'))
 
         # pre_action
         cmds.extend(pre_list)
@@ -125,8 +128,10 @@ class RootBuildNode(PkgMaker.BaseMaker):
     def search_file(self, filename, pathes):
         for p in pathes:
             f = os.path.join(p, filename)
-            if os.access(self.env.subst(f), os.R_OK):
-                return f
+            f = self.env.subst(f)
+            files = glob.glob(f)
+            if files and os.access(files[0], os.R_OK):
+                return files[0]
 
 class RootPkgMaker(MiPkgMaker):
     source_prefix = '#bindir/root_ext'
@@ -174,9 +179,9 @@ class RootPkgMaker(MiPkgMaker):
         self.initenv()
         self.build()
 
-class RootStep1Maker(RootPkgMaker):
-    alias = 'root.step1'
-    package = 'root.step1'
+class RootMagic1Maker(RootPkgMaker):
+    alias = 'root.magic1'
+    package = 'root.magic1'
     package_bin = '${package}.tar.gz'
 
     global_post_cmds = [PkgMaker.SearchExecAction('$ROOT',
@@ -209,5 +214,7 @@ class RootStep1Maker(RootPkgMaker):
         # theme is special
         mods.append(RootBuildTheme('themes', self.env))
 
-pkg = RootStep1Maker(env)
+pkg = RootMagic1Maker(env)
 pkg.make()
+env.Alias('rootfs', env.Command('#bindir/root.step1.tar.gz', 'root.magic1',
+        '[ -L $TARGET ] && rm $TARGET; ln -sv %s.tar.gz $TARGET' % pkg.package))

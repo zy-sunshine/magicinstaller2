@@ -68,4 +68,12 @@ $pythondir/site-packages/pyudev/*.pyc
 </install>
 </package>
 
+<package>
+<files>
+extra/systemd-*.xz
+</files>
+<install>
+usr/lib/libudev.so*
+</install>
+</package>
 </packages>

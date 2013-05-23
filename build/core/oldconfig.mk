@@ -3,16 +3,18 @@
 # Author:   zy_sunshine <zy.netsec@gmail.com>
 # All rights reserved.
 
+Import('env', '_p', '_inc', '_my_dir', '_error')
+Import('TOPDIR', 'BUILD_SYSTEM')
+
 import sys
 import os
 import types
 
 ### Command line and Config
 #get specdir
-specdir = ARGUMENTS.get('specdir', 'spec')
+specdir = ARGUMENTS.get('specdir', _p(TOPDIR, 'spec'))
 if specdir != '':
     sys.path.insert(0, specdir)
-sys.path.insert(0, 'scripts')
 
 import mi_config
 mi_config.specdir = specdir
@@ -25,7 +27,7 @@ if mi_config.pkgtype not in ['rpm', 'tar']:
 
 #get pkgdirs
 for pd in mi_config.pkgdirs.split(':'):
-    if not os.path.isdir(pd):
+    if not os.path.isdir(_p(TOPDIR, pd)):
         print "%s is not a directory" % pd
         sys.exit(1)
 
@@ -38,7 +40,6 @@ else:
 mi_config.debugopts = debugopts
 
 ### Base Environment
-env = Environment()
 for k in mi_config.__dict__:
     if k[:2] != '__' and type(mi_config.__dict__[k]) \
         in (types.BooleanType, types.IntType, types.StringType):
@@ -141,28 +142,28 @@ Export('DirValue')
 Export('PkgMaker', 'MiPkgMaker')
 Export('getSudoSh')
 
-##### Construct the magicinstaller main application, tar into :
-#       #bindir/root.src.tar.gz         (source file)
-#       #bindir/root.src.etc.tar.gz     (config file)
-#       needed by rootfs .
-WITH_MI = os.path.exists('.with_mi')
-WITH_FS = os.path.exists('.with_fs')
-WITH_ISO = os.path.exists('.with_iso')
+# ##### Construct the magicinstaller main application, tar into :
+# #       #bindir/root.src.tar.gz         (source file)
+# #       #bindir/root.src.etc.tar.gz     (config file)
+# #       needed by rootfs .
+# WITH_MI = os.path.exists('.with_mi')
+# WITH_FS = os.path.exists('.with_fs')
+# WITH_ISO = os.path.exists('.with_iso')
 
-Export('WITH_MI', 'WITH_FS', 'WITH_ISO')
+# Export('WITH_MI', 'WITH_FS', 'WITH_ISO')
 
-if WITH_MI:
-    SConscript('SConstruct-mi')
+# if WITH_MI:
+#     SConscript('SConstruct-mi')
 
-##### Construct the mirootfs, tar into :
-#       #bindir/mirootfs.gz
-#       #bindir/mi-vmlinuz-x.xx.xx
-if WITH_FS:
-    SConscript('SConstruct-rootfs')
+# ##### Construct the mirootfs, tar into :
+# #       #bindir/mirootfs.gz
+# #       #bindir/mi-vmlinuz-x.xx.xx
+# if WITH_FS:
+#     SConscript('SConstruct-rootfs')
 
-##### Construct the target iso file, need :
-#       #bindir/mi-vmlinuz-x.xx.xx      (kernel file)
-#       #bindir/mirootfs.gz             (initrd file)
-if WITH_ISO:
-    SConscript('SConstruct-iso')
+# ##### Construct the target iso file, need :
+# #       #bindir/mi-vmlinuz-x.xx.xx      (kernel file)
+# #       #bindir/mirootfs.gz             (initrd file)
+# if WITH_ISO:
+#     SConscript('SConstruct-iso')
 

@@ -6,6 +6,13 @@
 import os
 import sys
 
+TOPDIR = os.environ.get('MI_BUILD_TOP')
+if not TOPDIR:
+    TOPDIR = os.path.dirname(os.path.dirname(__file__))
+
+def _p(*args):
+    return os.path.join(*args)
+
 # Specify the kernel version which used by MI environment.
 mikernelver = '2.6.35.4'
 
@@ -39,9 +46,9 @@ else:
 
 autopart_profile = {}
 
-specdir = 'spec'
-specfn  = 'spec/specinfo.py'
-pkgarr = 'result/pkgarr.py'
+specdir = _p(TOPDIR, 'spec')
+specfn  = _p(TOPDIR, 'spec/specinfo.py')
+pkgarr = _p(TOPDIR, 'result/pkgarr.py')
 pkgdirs = specdir + '/packages'
 hotfixfiles_dir = specdir + '/hotfix'
 addfiles_dir = specdir + '/addfiles'
@@ -68,17 +75,12 @@ for key in dir(specinfo):
         vars()[key] = specinfo.__dict__[key]
 del specinfo
 
-# For tar packages install mode.
-tarpkgdir = specdir + '/tarpackages'
-if pkgtype == 'tar':
-    pkgdirs = tarpkgdir
-
 # iso name
 max_cd_no = 9
 isofn_fmt = '%s-%s-%d.iso'
 def mkisofn(iso_no):
     global distname, distver
-    return 'result/' + isofn_fmt % (distname, distver, iso_no)
+    return _p(TOPDIR, 'result/' + isofn_fmt % (distname, distver, iso_no))
 bootiso_fn = os.path.basename(mkisofn(1))
 
 if useudev:
@@ -103,8 +105,8 @@ hotfixdir = '/tmp/update'
 # }}}
 
 # {{{ Build environment
-tmpdir = os.path.abspath('tmp')
-bindir = os.path.abspath('bindir')
+tmpdir = _p(TOPDIR, 'tmp')
+bindir = _p(TOPDIR, 'bindir')
 
 # Some dirs and files in tmpdir.
 rpmdbtar = os.path.join(tmpdir, 'rpmdb.tar.bz2')
@@ -148,10 +150,10 @@ pyextdir = os.path.join(tmpdir, 'root.src.pyext')   # python module for MI.
 # i18n translation
 textdomain = 'magic.installer'
 translators = ''
-copyright_holder = 'Charles Wang'
+copyright_holder = 'Charles Wang, Glenn Zhang'
 all_linguas = ['zh_CN']
 
-lang_map = { 'ja_JP': ('eucJP', 'eucJP'),
+lang_map = {'ja_JP': ('eucJP', 'eucJP'),
              'ko_KR' : ('eucKR', 'eucKR'),
              'zh_CN': ('gb2312', 'GB2312'),
              'zh_TW': ('big5', 'BIG5') }

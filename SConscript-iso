@@ -71,15 +71,15 @@ class BootIsoMaker(PkgMaker.StepMaker):
 
     def install_bootload(self):
         if mi_config.bootload == 'grub':
-            bootload_files = ['bootload/grub/menu.lst',
+            bootload_files = ['bootloader/grub/menu.lst',
                               #'bindir/splash.xpm.gz',
                               '$devrootdir/grub/.prepared']
             cmds = ['mkdir -p $miimages_dir/grub',
                     'cp $devrootdir/grub/grub4dos-0.4.5b/chinese/grldr $miimages_dir/grub/',
                     'cp $devrootdir/grub/boot/grub/fonts $miimages_dir/grub/',
                     #'cp bindir/splash.xpm.gz $miimages_dir/grub',
-                    #'cp bootload/grub/menu.lst $miimages_dir/grub/',
-                    'cp bootload/grub/menu.lst $bootcd_dir/',
+                    #'cp bootloader/grub/menu.lst $miimages_dir/grub/',
+                    'cp bootloader/grub/menu.lst $bootcd_dir/',
                     ]
             return bootload_files, cmds
         else:
@@ -153,4 +153,3 @@ env.Command('tmp/pkginfor.py',
             [pkginfor_script, packages_value],
             ['python %s -o $TARGET -l tmp/%s.log %s' % \
             (pkginfor_script, mi_config.pkgtype, pkgdirs)])
-

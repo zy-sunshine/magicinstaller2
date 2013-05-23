@@ -19,14 +19,16 @@
 import os
 Import('*')
 
-root_bs = os.path.join(mi_config.tmpdir, 'root.bootscripts')
+root_bs = os.path.join(mi_config.tmpdir, 'bootscripts.arch1')
 
-depInstallExcludeSvn(env, 'root.bs', root_bs,
+depInstallExcludeSvn(env, 'bootscripts.arch1', root_bs,
                     srcdirs=['etc', 
-                             'lib',
                              'root'])
 
 ##### Construct the #bindir/root.bootscripts.tar.gz
-env.Command('#bindir/root.bootscripts.tar.gz', env.Alias('root.bs'),
+pkg = 'root.bootscripts.arch1.tar.gz'
+__root_bs = env.Command('#bindir/%s' % pkg, env.Alias('bootscripts.arch1'),
             [ getSudoSh("tar c -C %s . | gzip -9 > $TARGET" % root_bs) ])
 
+env.Alias('rootfs', env.Command('#bindir/root.bootscripts.tar.gz', __root_bs,
+        '[ -L $TARGET ] && rm $TARGET; ln -sv %s $TARGET' % pkg))

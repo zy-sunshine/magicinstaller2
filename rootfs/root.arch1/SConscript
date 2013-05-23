@@ -216,5 +216,5 @@ class RootArch1Maker(RootPkgMaker):
 
 pkg = RootArch1Maker(env)
 pkg.make()
-env.Command('#bindir/root.step1.tar.gz', 'root.arch1',
-        '[ -L $TARGET ] && rm $TARGET; ln -sv %s.tar.gz $TARGET' % pkg.package)
+env.Alias('rootfs', env.Command('#bindir/root.step1.tar.gz', 'root.arch1',
+        '[ -L $TARGET ] && rm $TARGET; ln -sv %s.tar.gz $TARGET' % pkg.package))

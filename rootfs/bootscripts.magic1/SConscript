@@ -19,14 +19,17 @@
 import os
 Import('*')
 
-root_bs = os.path.join(mi_config.tmpdir, 'root.bootscripts')
+root_bs = os.path.join(mi_config.tmpdir, 'bootscripts.magic1')
 
-depInstallExcludeSvn(env, 'root.bs', root_bs,
+depInstallExcludeSvn(env, 'bootscripts.magic1', root_bs,
                     srcdirs=['etc', 
                              'lib',
                              'root'])
 
 ##### Construct the #bindir/root.bootscripts.tar.gz
-env.Command('#bindir/root.bootscripts.tar.gz', env.Alias('root.bs'),
+pkg = 'root.bootscripts.magic1.tar.gz'
+__root_bs = env.Command('#bindir/root.bootscripts.magic1.tar.gz' % pkg, env.Alias('bootscripts.magic1'),
             [ getSudoSh("tar c -C %s . | gzip -9 > $TARGET" % root_bs) ])
 
+env.Alias('rootfs', env.Command('#bindir/root.bootscripts.tar.gz', __root_bs,
+        '[ -L $TARGET ] && rm $TARGET; ln -sv %s $TARGET' % pkg))

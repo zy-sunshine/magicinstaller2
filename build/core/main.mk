@@ -1,4 +1,4 @@
-import os
+import os, sys
 env = Environment()
 env['PRODUCTS'] = {}
 env['DEVICES'] = {}
@@ -6,29 +6,27 @@ def _p(*args):
     return os.path.join(*args)
 
 def _inc(*args):
-	if len(args) == 1:
-		if type(args[0]) is str:
-			SConscript(args[0])
+    if len(args) == 1:
+        if type(args[0]) is str:
+            SConscript(args[0])
 
-		if type(args[0]) is list or type(args[0]) is tuple:
-			for f in args[0]:
-				SConscript(f)
-	else:
-		SConscript(_p(*args))
+        if type(args[0]) is list or type(args[0]) is tuple:
+            for f in args[0]:
+                SConscript(f)
+    else:
+        SConscript(_p(*args))
 
 def _my_dir():
     return os.path.abspath(os.path.curdir)
 
 def _error(msg):
-	raise Exception(msg)
+    raise Exception(msg)
 
 def _get_var_by_product(target_product, var_name):
-	for name, product in env['PRODUCTS'].items():
-		if name == target_product:
-			return product.get(var_name)
-	return None
-
-
+    for name, product in env['PRODUCTS'].items():
+        if name == target_product:
+            return product.get(var_name)
+    return None
 
 Export('env', '_p', '_inc', '_my_dir', '_error', '_get_var_by_product')
 TOPDIR = os.environ.get('MI_BUILD_TOP')
@@ -40,5 +38,20 @@ BUILD_SYSTEM = _p(TOPDIR, 'build/core')
 
 Export('TOPDIR', 'BUILD_SYSTEM')
 
+_inc(BUILD_SYSTEM, 'oldconfig.mk')
+
+_inc(BUILD_SYSTEM, 'defines.mk')
+
 _inc(BUILD_SYSTEM, 'config.mk')
 
+def get_sconscripts(dir, topdown=True):
+    scripts = []
+    for root, dirs, files in os.walk(dir, topdown):
+        if 'SConscript' in files:
+            scripts.append(os.path.join(root, 'SConscript'))
+            dirs[:] = []
+    return scripts
+
+_inc(TOPDIR, 'SConscript-main')
+scripts = get_sconscripts(TOPDIR)
+_inc(scripts)
