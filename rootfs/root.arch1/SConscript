@@ -83,6 +83,7 @@ class RootBuildNode(PkgMaker.BaseMaker):
         inst_list = []
         pre_list = []
         post_list = []
+        tarpkgs = []
 
         for pkgnode in rootdoc.getElementsByTagName('package'):
             pkgfiles_orig = get_node_value(pkgnode, 'files')
@@ -97,12 +98,14 @@ class RootBuildNode(PkgMaker.BaseMaker):
                         print "Can not find the package %s" % pkgfile
                         sys.exit(1)
 
-                source_list.extend(pkgfiles)
-                # extract
-                cmds.extend(self.get_extract_cmd(pkgfiles, '$build_prefix'))
+                tarpkgs.extend(pkgfiles)
             inst_list.extend(get_node_value(pkgnode, 'install'))
             pre_list.extend(get_node_value(pkgnode, 'pre_action'))
             post_list.extend(get_node_value(pkgnode, 'post_action'))
+
+        # extract
+        tarpkgs = list(set(tarpkgs))
+        cmds.extend(self.get_extract_cmd(tarpkgs, '$build_prefix'))
 
         # pre_action
         cmds.extend(pre_list)

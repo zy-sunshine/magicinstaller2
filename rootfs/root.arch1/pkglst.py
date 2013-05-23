@@ -1,5 +1,5 @@
 # -*- python -*-
-# Copyright (C) 2007, MagicLinux.
+# Copyright (C) 2013, MagicLinux.
 # Author:  Yang Zhang <zy.netsec@gmail.com>
 # All rights reserved.
 #
@@ -16,12 +16,23 @@
 # with this program; if not, write to the Free Software Foundation, 59 Temple
 # Place - Suite 330, Boston, MA 02111-1307, USA.
 
-import os
+import os, sys
 import stat
 import sys, glob
 from SCons.Action import ActionFactory
 from xml.dom.minidom import parse
 import PkgMaker
+
+def usage():
+    return '''
+USAGE:
+%s <package dir>
+    package directory include packages used by create root file system.
+    ''' % sys.argv[0]
+
+if len(sys.argv) < 2:
+    print usage()
+    sys.exit(1)
 
 def line_split(lines):
     result = []
@@ -46,10 +57,15 @@ class PkgConfigManager(PkgMaker.BaseMaker):
         self.source_list = source_list = []
         self.build_cmds = cmds = []
         source_list.extend([ '%s.xml' % a for a in pkgnlist ])
+        self.inst_list = inst_list = []
+        self.pre_list = pre_list = []
+        self.post_list = post_list = []
+        self.pkg_list = pkg_list = []
         for pkgcf in source_list:
             self.parseConfig(pkgcf)
 
     def parseConfig(self, pkgcf):
+        cmds = self.build_cmds
         try:
             rootdoc = parse(pkgcf)
         except:
@@ -57,10 +73,10 @@ class PkgConfigManager(PkgMaker.BaseMaker):
             raise
 
         # init
-        self.inst_list = inst_list = []
-        self.pre_list = pre_list = []
-        self.post_list = post_list = []
-        self.pkg_list = pkg_list = []
+        inst_list = self.inst_list
+        pre_list = self.pre_list
+        post_list = self.post_list
+        pkg_list = self.pkg_list
 
         for pkgnode in rootdoc.getElementsByTagName('package'):
             pkgfiles_orig = get_node_value(pkgnode, 'files')
@@ -119,18 +135,19 @@ if __name__ == '__main__':
                 'xorg',
                 'gtk2',
                 'parted',
-                #'rhpl',
                 'rpm',
-                #'debug',
-                #'mkfs',
-                #'udev',
-                #'kudzu',
-                #'pyudev',
-                #'grub',
-                #'trace',
-                #'post_scripts',
+                'mkfs',
+                'udev',
+                'grub',
+                'trace',
+                'post_scripts',
                 ]
     source_prefix = sys.argv[1:]
     pkgManager = PkgConfigManager(pkgnlst, source_prefix)
-    print pkgManager.pkg_list
+    for pkg in pkgManager.pkg_list:
+        for prefix in source_prefix:
+            if pkg.startswith(prefix):
+                print pkg[len(prefix)+1:]
+                break
+
 

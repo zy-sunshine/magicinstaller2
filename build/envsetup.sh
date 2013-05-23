@@ -204,7 +204,7 @@ function addcompletions()
         return
     fi
 
-    dir="sdk/bash_completion"
+    dir="scripts/bash_completion"
     if [ -d ${dir} ]; then
         for f in `/bin/ls ${dir}/[a-z]*.bash 2> /dev/null`; do
             echo "including $f"
@@ -797,7 +797,7 @@ case `uname -s` in
     *)
         function mgrep()
         {
-            find . -name .repo -prune -o -name .git -prune -o -regextype posix-egrep -iregex '(.*\/Makefile|.*\/Makefile\..*|.*\.make|.*\.mak|.*\.mk)' -type f -print0 | xargs -0 grep --color -n "$@"
+            find . -name .repo -prune -o -name .git -prune -o -regextype posix-egrep -iregex '(.*\/Makefile|.*\/Makefile\..*|.*\.make|.*\.mak|.*\.mk|.*Scons.*)' -type f -print0 | xargs -0 grep --color -n "$@"
         }
 
         function treegrep()
@@ -1070,3 +1070,6 @@ done
 unset f
 
 addcompletions
+
+## MI Custom
+export PYTHONPATH=$(gettop)/scripts
