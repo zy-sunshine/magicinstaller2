@@ -13,9 +13,8 @@ from xml.dom.minidom import parse
 from mi.utils.common import search_file
 # This can import MIStem_* from modules.* automatically
 from mi.client.modules import *
-
-from mi.utils.miconfig import MiConfig
 from mi.client.utils.magicpopup import magicmsgbox, magichelp_popup
+from mi.utils.miconfig import MiConfig
 CF = MiConfig.get_instance()
 from mi.utils.mitaskman import MiTaskman
 from mi.client.utils import magicpopup
@@ -113,8 +112,8 @@ XML_DATA = '''
 <header logo="images/banner.png.800x600" />
 <tableV2 expand="true" fill="true">
 <tr>
-   <leftpanel />
-   <rightpanel expandfill="true" />
+   <td><vbox  fill="true"><leftpanel /><label expand="true" /></vbox></td>
+   <td><rightpanel expandfill="true" /></td>
 </tr>
 </tableV2>
 <statusbar />
@@ -165,8 +164,22 @@ class MIMainWindow(gtk.Window):
         self.connect('destroy', lambda x: gtk.main_quit())
         self.values = parse(search_file('magic.values.xml', [CF.D.HOTFIXDIR, '.']))
         self.tm = MiTaskman(1325, self.statusbar.get_progressbar(),
-                          self.statusbar.get_progressbar())
+                          self.statusbar.get_progressbar(), self.err_dialog)
         self.step_name_list = step_name_list
+        
+    def err_dialog(self, msg):
+        magicpopup.magicmsgbox(None, msg,
+                                   magicpopup.magicmsgbox.MB_ERROR,
+                                   magicpopup.magicpopup.MB_OK)
+        
+    def info_dialog(self, msg):
+        magicpopup.magicmsgbox(None, msg,
+                                   magicpopup.magicmsgbox.MB_INFO,
+                                   magicpopup.magicpopup.MB_OK)
+    def warn_dialog(self, msg):
+        magicpopup.magicmsgbox(None, msg,
+                                   magicpopup.magicmsgbox.MB_WARNING,
+                                   magicpopup.magicpopup.MB_OK)
         
     def init(self):
         self.curstep = -1
@@ -250,6 +263,8 @@ class MIMainWindow(gtk.Window):
         return ret
         
     def save_env(self, stepid):
+        if not os.path.exists('/tmpfs/step_conf'):
+            os.makedirs('/tmpfs/step_conf/')
         CF.save_to_file('/tmpfs/step_conf/step_%s.json' % stepid)
         
 ####----------------------------------------------------

@@ -125,19 +125,23 @@ elif mia.pid == 0:
             if handlers_long.has_key(method):
                 if CF.D.EXPERT_MODE:
                     logger.d('Run long.%s() with %s and id %d,\n' % (method, params, id))
+                exe_ok = True
                 try:
                     result = handlers_long[method](mia, id, *params)
                 except:
-                    result = 'run method %s raise exception %s' % (method, str(sys.exc_info()[0:2]))
+                    result = 'Exception: run method %s raise %s' % (method, str(sys.exc_info()[0:2]))
+                    exe_ok = False
                     logger.e(result, exc_info = sys.exc_info())
                 if CF.D.EXPERT_MODE:
                     logger.d('    which returns %r.\n' % (result,))
-                mia.put_result(xmlrpclib.dumps((id, result), methodname=method, allow_none = 1))
+                
+                mia.put_result(xmlrpclib.dumps((id, result, exe_ok), methodname=method, allow_none = 1))
             else:
                 if CF.D.EXPERT_MODE:
                     logger.e('ERROR: NOT SUPPORTED method %s().\n' % method)
                 logger.e('method %s NOT_SUPPORT' % method)
-                mia.put_result(xmlrpclib.dumps((id, 'NOT_SUPPORT'), methodname=method, allow_none = 1))
+                exe_ok = False
+                mia.put_result(xmlrpclib.dumps((id, 'method %s NOT_SUPPORT' % method, exe_ok), methodname=method, allow_none = 1))
 
 #if mia.pid > 0:
     #from mi.utils.milogger import ServerLogger_Short, ServerLogger_Long

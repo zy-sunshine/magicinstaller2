@@ -6,6 +6,7 @@ from xml.dom.minidom import parse, parseString
 from mi.utils.common import search_file, get_devinfo, convert_str_size
 
 from mi.utils.miconfig import MiConfig
+from mi.utils.exception import MiNotSatisfied
 CF = MiConfig.get_instance()
 
 from mi.server.utils import logger
@@ -29,7 +30,9 @@ class MIStep_Partition (magicstep.magicstep):
         # hide the frame if not autopart profile is defined
         if not self.optionmenu_map[self.name_map["autopart_om"]][1]:
             self.name_map["autopart_frame"].hide()
-
+            
+        self.sself = rootobj
+        
     def xgc_miparted_notebook(self, node):
         widget = gtk.Notebook()
         widget.set_tab_pos(gtk.POS_TOP)
@@ -82,6 +85,17 @@ class MIStep_Partition (magicstep.magicstep):
         return self.LABEL
 
     def probe_all_ok(self, tdata, data):
+        def check_tdata(tdata):
+            if not tdata:
+                return False
+            if type(tdata) not in (list, tuple):
+                return False
+            for t in tdata:
+                if len(t) != 3:
+                    return False
+            return True
+        if not check_tdata(tdata):
+            self.sself.warn_dialog('Can not probe all disk RESULT: %s' % repr(tdata))
         # remove pages in harddisk notebook first
         for i in range(self.nb_harddisk.get_n_pages()):
             self.nb_harddisk.remove_page(-1)
@@ -307,9 +321,20 @@ class MIStep_Partition (magicstep.magicstep):
 
 ##### Probe Result
     def got_pkgarr_probe_result(self, tdata, data):
+        def check_data(tdata):
+            for d in tdata:
+                if (type(d) is not list or type(d) is not tuple):
+                    return False
+            return True
         CF.G.pkgarr_probe_result = tdata
         CF.G.pkgarr_probe_status = STAT.OP_STATUS_DONE
         dolog('CF.G.pkgarr_probe_result: %s\n' % str(CF.G.pkgarr_probe_result))
+        if not check_data(CF.G.pkgarr_probe_result):
+            raise MiNotSatisfied('''Can not get pkgarr (pkgarr_probe) CF.G.pkgarr_probe_result 
+             TYPE %s VALUE: %s''' % (type(CF.G.pkgarr_probe_result), CF.G.pkgarr_probe_result))
+
+            
+        
 
     def got_win_probe_result(self, tdata, data):
         CF.G.win_probe_result = tdata
@@ -788,6 +813,7 @@ class  Harddisk(xmlgtk.xmlgtk):
         self.partlist = tdata
         if self.orig_partitions is None:  # save original partitions
             self.orig_partitions = {}
+            print self.partlist
             for p in self.partlist:
                 self.orig_partitions[p[6]] = self.partdevfn(p[0])
 

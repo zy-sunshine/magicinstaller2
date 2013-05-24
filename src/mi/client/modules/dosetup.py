@@ -155,7 +155,7 @@ class MIStep_dosetup (magicstep.magicstep):
     def startup_action(self):
         # If we skip X Setting, we should auto detect the hardware, and copy
         # the generated Xorg.conf to target system.
-        if 1:#CF.G.skipxsetting:
+        if 0:#CF.G.skipxsetting:
             self.rootobj.tm.add_action(_('Probe Monitor'),
                                    self.probe_monitor_ok, None,
                                    'probe_monitor', 0)

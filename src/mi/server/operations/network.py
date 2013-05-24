@@ -1,6 +1,5 @@
 #!/usr/bin/python
 import os.path
-import getdev
 
 from mi.utils.miconfig import MiConfig
 CF = MiConfig.get_instance()

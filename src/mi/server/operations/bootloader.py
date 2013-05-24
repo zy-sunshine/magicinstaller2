@@ -15,7 +15,7 @@ dolog = logger.info
 @register.server_handler('long')
 def do_mkinitrd(mia, operid, dummy):
     mia.set_step(operid, 0, -1)
-    os.system('rm -f %s' % os.path.join(CF.D.TGTSYS_ROOT, 'boot', CF.D.INITRD_FN))
+    os.system('rm -f %s' % os.path.join(CF.D.TGTSYS_ROOT, 'boot', CF.D.TARGET_INITRD_FN))
     os.system('sync')
     
     time.sleep(1)
@@ -23,11 +23,11 @@ def do_mkinitrd(mia, operid, dummy):
     #os.system('cp -f %s/tmp/fstab.* %s/etc/fstab' % (CF.D.TGTSYS_ROOT, CF.D.TGTSYS_ROOT))
     if CF.D.USEUDEV:
         os.system('cp -f %s/etc/fstab %s/etc/mtab' % (CF.D.TGTSYS_ROOT, CF.D.TGTSYS_ROOT)) # make udev happy
-    #dolog('/sbin/mkinitrd --fstab=/etc/fstab /boot/%s %s\n' % (CF.D.INITRD_FN, CF.D.DISTKERNELVER))
-    #os.system('/usr/sbin/chroot %s /sbin/mkinitrd --fstab=/etc/fstab /boot/%s %s' % (CF.D.TGTSYS_ROOT, CF.D.INITRD_FN, CF.D.DISTKERNELVER))
-    dolog('/sbin/new-kernel-pkg --install --mkinitrd --depmod %s\n' % CF.D.DISTKERNELVER)
-    os.system('/usr/sbin/chroot %s /sbin/new-kernel-pkg --install --mkinitrd --depmod %s' % (CF.D.TGTSYS_ROOT, CF.D.DISTKERNELVER))
-    return 0
+
+    cmd = '/usr/sbin/chroot %s /sbin/new-kernel-pkg --install --mkinitrd --depmod %s' % (CF.D.TGTSYS_ROOT, CF.D.TARGET_KERNELVER)
+    dolog(cmd)
+    ret = os.system(cmd)
+    return ret
 
 @register.server_handler('long')
 def prepare_grub(mia, operid, timeout, usepassword, password,
@@ -124,32 +124,32 @@ def prepare_grub(mia, operid, timeout, usepassword, password,
             # init new bootsplash
             text = text + '\troot %s\n' % grubdev
             text = text + '\tkernel %s  ro root=%s %s\n' % \
-                   (os.path.join('/', grubpath, CF.D.KERNEL_FN), dev, options)
+                   (os.path.join('/', grubpath, CF.D.TARGET_KERNEL_FN), dev, options)
             text = text + '\tinitrd %s\n' % \
-                   (os.path.join('/', grubpath, CF.D.INITRD_FN))
+                   (os.path.join('/', grubpath, CF.D.TARGET_INITRD_FN))
 
             # normal graphics
             #text = text + 'title %s (Graphics Mode)\n' % label
             #text = text + '\troot %s\n' % grubdev
             #text = text + '\tkernel %s init 5 ro root=%s %s\n' % \
-            #       (os.path.join('/', grubpath, CF.D.KERNEL_FN), dev, options)
+            #       (os.path.join('/', grubpath, CF.D.TARGET_KERNEL_FN), dev, options)
             #text = text + '\tinitrd %s\n' % \
-            #       (os.path.join('/', grubpath, CF.D.INITRD_FN))
+            #       (os.path.join('/', grubpath, CF.D.TARGET_INITRD_FN))
             # add by yourfeng for init 3 init 1 init 5
             #init console
             #text = text + 'title %s (Console Mode)\n' % label
             #text = text + '\troot %s\n' % grubdev
             #text = text + '\tkernel %s init 3 ro root=%s %s\n' % \
-            #        (os.path.join('/', grubpath, CF.D.KERNEL_FN), dev, options)
+            #        (os.path.join('/', grubpath, CF.D.TARGET_KERNEL_FN), dev, options)
             #text = text + '\tinitrd %s\n' % \
-            #       (os.path.join('/', grubpath, CF.D.INITRD_FN))
+            #       (os.path.join('/', grubpath, CF.D.TARGET_INITRD_FN))
             #init 1
             text = text + 'title %s (Single Mode)\n' % label
             text = text + '\troot %s\n' % grubdev
             text = text + '\tkernel %s single ro root=%s %s\n' % \
-                   (os.path.join('/', grubpath, CF.D.KERNEL_FN), dev, options)
+                   (os.path.join('/', grubpath, CF.D.TARGET_KERNEL_FN), dev, options)
             text = text + '\tinitrd %s\n' % \
-                   (os.path.join('/', grubpath, CF.D.INITRD_FN))
+                   (os.path.join('/', grubpath, CF.D.TARGET_INITRD_FN))
 
         if default_or_not == 'true':
             default_number = number
@@ -329,7 +329,7 @@ def setup_grub(mia, operid, grubdev, grubsetupdev, grubopt):
 #            text = text + '\toptional\n'
 #            text = text + 'label=%s\n' % label
 #        else:
-#            text = 'image=/boot/%s\n' % CF.D.KERNEL_FN
+#            text = 'image=/boot/%s\n' % CF.D.TARGET_KERNEL_FN
 #            text = text + '\tlabel=%s\n' % label
 #            text = text + '\tread-only\n'
 #            text = text + '\troot=%s\n' % dev

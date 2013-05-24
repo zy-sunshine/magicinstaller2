@@ -3,7 +3,8 @@
 
 from mi.client.utils import _
 import sys, os, time, string
-from mi import getdev, isys, iconv #@UnresolvedImport
+import isys, iconv
+from mi import getdev
 import parted, _ped #@UnresolvedImport
 from mi.utils.common import mount_dev, umount_dev, run_bash
 # Because the short operation and long operation are run in different process,
@@ -105,20 +106,24 @@ def get_all_partitions(mia, operid, devpath):
     if CF.S.all_harddisks.has_key(devpath):
         disk = CF.S.all_harddisks[devpath][1]
         if disk:
-            part = disk.getFirstPartition()
-            while part:
-                if part.type & parted.PARTITION_METADATA == 0:
-                    result.append(part2result(part))
-                part = part.nextPartition()
-            # Another way to get all partitions, but not include freespace partitions.
-            #for part in disk.partitions:
-            #    result.append(part2result(part))
-                
-            #part = disk.next_partition()
-            #while part:
-            #    if part.type & parted.PARTITION_METADATA == 0:
-            #        result.append(part2result(part))
-            #    part = disk.next_partition(part)
+            try:
+                part = disk.getFirstPartition()
+            except:
+                logger.warn('devpath %s can not get one partition.' % devpath)
+            else:
+                while part:
+                    if part.type & parted.PARTITION_METADATA == 0:
+                        result.append(part2result(part))
+                    part = part.nextPartition()
+                # Another way to get all partitions, but not include freespace partitions.
+                #for part in disk.partitions:
+                #    result.append(part2result(part))
+                    
+                #part = disk.next_partition()
+                #while part:
+                #    if part.type & parted.PARTITION_METADATA == 0:
+                #        result.append(part2result(part))
+                #    part = disk.next_partition(part)
     #dolog('operations.parted.get_all_partitions: %s\n' % str(result))
     return  result
 

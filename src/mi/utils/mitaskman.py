@@ -9,10 +9,11 @@ from xml.dom.minidom import parseString
 from mi.client.utils import logger, magicpopup
 import threading
 dolog = logger.i
-
+from mi.utils.miconfig import MiConfig
+CF = MiConfig.get_instance()
 # The task manager: It only manage the long operation.
 class MiTaskman :
-    def __init__(self, port, action_prog, aplabel):
+    def __init__(self, port, action_prog, aplabel, err_dialog = None):
         #--- object status ---
         self.actserver = xmlrpclib.ServerProxy('http://127.0.0.1:%d' % port, allow_none=True)
         # action_prog: The progress bar widget to show the action.
@@ -37,6 +38,7 @@ class MiTaskman :
         self.run_rcfunc = None
         self.run_rcdata = None
         self.run_prev_pulse_time = -1.0
+        self.err_dialog = err_dialog
 
     def push_progress(self, actprog, aplabel):
         self.apstack.append((actprog, aplabel))
@@ -131,6 +133,7 @@ class MiTaskman :
             res_tuple = xmlrpclib.loads(result_xmlstr)
             id = res_tuple[0][0]
             result = res_tuple[0][1]
+            exe_ok = res_tuple[0][2]
             method = res_tuple[1]  # Not used yet.
             if id != self.run_id:
                 dolog('WARNING: id(%s) != self.run_id(%s) in magic.installer.py:get_results().\n' % (id, self.run_id))
@@ -141,6 +144,10 @@ class MiTaskman :
                 self.action_prog.hide()
                 self.run_show = 0
             if self.run_rcfunc:
+                if not exe_ok:
+                    dolog('%s - %s' % ('ERROR EXECUTE %s' % method, result))
+                    if self.err_dialog and CF.D.DEBUG:
+                        self.err_dialog(result)
                 self.run_rcfunc(result, self.run_rcdata)
             self.run_tmid = -1
             self.run_rcfunc = None

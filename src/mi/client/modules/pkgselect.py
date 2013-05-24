@@ -3,6 +3,7 @@ import os
 from mi.client.utils import _
 from mi.client.utils import magicstep, magicpopup
 from mi.utils.common import STAT
+from mi.utils.exception import MiNotSatisfied
 from xml.dom.minidom import Document
 from mi.utils.miconfig import MiConfig
 CF = MiConfig.get_instance()
@@ -16,13 +17,29 @@ class MIStep_pkgselect(magicstep.magicstepgroup):
         magicstep.magicstepgroup.__init__(self, rootobj, 'pkgselect.xml',
                                           ['toplevel', 'pkgchoose'], 'steps')
         self.pa_choose = None
+        self.sself = rootobj
 
     def get_label(self):
         return self.LABEL
 
     def startup_action(self):
+        self.startup_flag = True
+        def check_data(tdata):
+            if not tdata:
+                return False
+            if type(tdata) not in (list, tuple):
+                return False
+            for d in tdata:
+                if (type(d) not in (list, tuple)):
+                    return False
+            return True
+        
         def resp_pkgarr_probe(tdata, data):
             logger.i('resp_pkgarr_probe result %s' % tdata)
+            if not check_data(tdata):
+                msg = _('Can not get packages info (pkgarr_probe)')+'''RESULT TYPE %s VALUE: %s''' % (type(tdata), tdata)
+                logger.e(msg)
+                self.sself.warn_dialog(msg)
             CF.G.pkgarr_probe_result = tdata
             CF.G.pkgarr_probe_status = STAT.OP_STATUS_DONE
         CF.G.pkgarr_probe_status = STAT.OP_STATUS_DOING
@@ -39,14 +56,18 @@ class MIStep_pkgselect(magicstep.magicstepgroup):
         valdoc.appendChild(topele)
         valtopele = valdoc.createElement('srcposlist')
         topele.appendChild(valtopele)
-        for (pafile, dev, fstype, reldir, isofn) in CF.G.pkgarr_probe_result:
-            rowele = valdoc.createElement('row')
-            rowele.setAttribute('c0', pafile)
-            rowele.setAttribute('c1', dev)
-            rowele.setAttribute('c2', fstype)
-            rowele.setAttribute('c3', '/' + reldir)
-            rowele.setAttribute('c4', isofn)
-            valtopele.appendChild(rowele)
+        try:
+            for (pafile, dev, fstype, reldir, isofn) in CF.G.pkgarr_probe_result:
+                rowele = valdoc.createElement('row')
+                rowele.setAttribute('c0', pafile)
+                rowele.setAttribute('c1', dev)
+                rowele.setAttribute('c2', fstype)
+                rowele.setAttribute('c3', '/' + reldir)
+                rowele.setAttribute('c4', isofn)
+                valtopele.appendChild(rowele)
+        except:
+            raise MiNotSatisfied('''Can not get information from CF.G.pkgarr_probe_result 
+                 TYPE %s VALUE: %s''' % (type(CF.G.pkgarr_probe_result), CF.G.pkgarr_probe_result))
         self.srcpos_dialog = magicpopup.magicpopup( \
             self, self.uixmldoc, _('You want fetch packages from...'),
             magicpopup.magicpopup.MB_OK, 'srcpos.dialog', 'srcpos_')
