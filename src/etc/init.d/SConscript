@@ -50,9 +50,5 @@ depInstall(env, 'root.src.etc',
 
 depInstall(env, 'root.src.etc',
             '$destdir/root',
-            ['cleanenv.py'])
-
-depInstall(env, 'root.src.etc',
-            '$destdir/root',
-            ['setup.py'])
+            ['clean.sh'])
 

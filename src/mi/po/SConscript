@@ -63,10 +63,9 @@ for lang in mi_config.all_linguas:
                     '${_lang}.po',
                     'iconv -f $langcharset -t UTF8 -o $TARGET $SOURCE',
                     langcharset = mi_config.lang_map[lang][1])
-    if mi_config.develmode:
-        depInstallAs(env, 'root_src',
-                     '$destdir/usr/share/locale/${_lang}/LC_MESSAGES/${textdomain}.mo',
-                     '${_lang}.mo')
+    depInstallAs(env, 'root_src',
+                '$destdir/usr/share/locale/${_lang}/LC_MESSAGES/${textdomain}.mo',
+                '${_lang}.mo')
 
     env.Alias('newpo', '${_lang}.new.po')
     env.Command('${_lang}.new.po',

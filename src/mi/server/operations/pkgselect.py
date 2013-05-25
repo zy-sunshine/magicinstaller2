@@ -41,15 +41,11 @@ def pkgarr_probe(mia, operid):
         # The format like ('allpa/hdc.1.pkgarr.py', '/dev/hdc', 'iso9660', 'MagicLinux/base', '')
         # ['allpa/sda6.100.pkgarr.py', '/dev/sda6', 'ext3', 'MagicLinux/base', 'MagicLinux-3.0-1.iso']
     mia.set_step(operid, 0, -1)
-    #cli = tftpc.TFtpClient()
-    #cli.connect('127.0.0.1')
+
     result = []
     
     all_drives = getdev.get_part_info(getdev.CLASS_CDROM | getdev.CLASS_HD)
-    #map(lambda cd: all_drives.append((os.path.join('/dev', cd.device),
-    #                                  'iso9660',
-    #                                  os.path.join('/dev', cd.device))),
-    #                                  cdlist)
+
     logger.i('all_drives: %s' % all_drives)
     pos_id = -1
     for k, value in all_drives.items():
@@ -76,7 +72,7 @@ def pkgarr_probe(mia, operid):
                 r = probe_position(pkgarr, pos_id,
                     devpath, fstype, reldir, '')
                 if r: result.append(r)
-#    del(cli)
+
     logger.w("pkgarr_probe %s" % result)
     return result
 

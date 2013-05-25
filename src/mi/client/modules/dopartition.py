@@ -177,15 +177,23 @@ class DoPartition(magicstep):
 
     def act_parted_format_result(self, tdata, data):
         result = tdata
+        class CallBack():
+            def __init__(self, cb):
+                self.cb = cb
+            def ok_clicked(self, widget, data):
+                self.cb()
+                
         if result:
             # Error occurred. Stop it?
             # Yes, we should stop it, and we should stop at mount failed place too.
             logger.info('format_result ERROR: %s\n' % str(result))
-            magicpopup.magicmsgbox(None, _('Format Partition Error: %s' % result),
+            call_back = CallBack(lambda : self.act_parted_format_start(data + 1))
+            magicpopup.magicmsgbox(call_back, _('Format Partition Error: %s' % result),
                        magicpopup.magicmsgbox.MB_ERROR,
                        magicpopup.magicpopup.MB_OK)
             #self.rootobj.btnback_do()
-        self.act_parted_format_start(data + 1)
+        else:
+            self.act_parted_format_start(data + 1)
 
     def act_end_parted(self):
         self.rootobj.tm.pop_progress()

@@ -1,0 +1,2 @@
+
+SConscript('pyftpdlib/SConscript')

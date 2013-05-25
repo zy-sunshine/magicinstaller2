@@ -36,7 +36,7 @@ else
         boot_mesg -n "Starting magicinstaller..." ${INFO}
         boot_mesg "" ${NORMAL}
         if [ -f $mi_toplevel ]; then
-            /usr/bin/python $mi_toplevel
+            $mi_toplevel
         else
             boot_mesg -n "Missing $mi_toplevel" ${FAILURE}
             boot_mesg -n "Cannot start magicinstaller."

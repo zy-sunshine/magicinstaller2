@@ -17,8 +17,7 @@
 # Place - Suite 330, Boston, MA 02111-1307, USA.
 Import('mi_config')
 
-if mi_config.develmode:
-    SConscript('init.d/SConscript')
-    SConscript('X11/SConscript')
-    SConscript('python/SConscript')
+SConscript('init.d/SConscript')
+SConscript('X11/SConscript')
+SConscript('python/SConscript')
 

@@ -15,17 +15,58 @@
 # You should have received a copy of the GNU General Public License along
 # with this program; if not, write to the Free Software Foundation, 59 Temple
 # Place - Suite 330, Boston, MA 02111-1307, USA.
+Import('*')
 
-Import('mi_config')
+def MI_pylibs(files):
+    depInstall(env, 'root_src', '$destdir$root_libdir', pymodules)
 
-# We will deal with m4 of mipublic.py magic.autopart.xml 
-# and po/ files at non-develmode.
-# If at develmode we will pack up all the src files.
+def MI_pymod(srcdir, target, sources):
+    print 'MI_pymod(%s, %s, %s)' % (srcdir, target, sources)
+    depPyModule(env, 'root.pyext', srcdir, target, sources)
+
+def MI_pymod_cpdir(srcdirs):
+    print "install %s to %s" % (srcdirs, mi_config.pyextdir)
+    if type(srcdirs) is str:
+        srcdirs = [srcdirs]
+    depInstallDir(env, 'root.pyext', '$pyextdir$root_libdir', srcdirs)
+
+def MI_data(files):
+    pass
+
+def MI_data_dir(dirlist):
+    for reldir, dir in dirlist:
+        depInstallDir()
+
+Export('MI_pylibs', 'MI_pymod', 'MI_pymod_cpdir', 'MI_data')
+
+## MI main program
 SConscript('mi/SConscript')
-# Install magicinstaller's config file.
+
+## MI configuration files
 SConscript('etc/SConscript')
 
-if mi_config.develmode:
-    # Only compile the python modules at develmode.
-    SConscript('pyext/SConscript')
+# Pack src/mi and src/etc into root.src.step1.tar.gz
 
+t0 = env.Command('$TOPDIR/bindir/root.src.step1.tar.gz', [env.Alias('root_src'), env.Alias('root.src.etc')],
+            #['tar c -C $destdir . | gzip -9 > $TARGET'])
+            ['tar czf $TARGET -C $destdir .'])
+### TARGET: root.src.step1
+env.Alias('root.src.step1', t0)
+### Maybe need some c compile, so include it in eng mode.
+if TARGET_BUILD_VARIANT == 'eng':
+    ## MI need some third part libs
+    SConscript('py3rd/SConscript')
+    
+    ## MI need some self libs
+    SConscript('pyext/SConscript')
+    
+    # There will compile the src/pyext (python modules for magicinstaller)
+    # Do it at develmode ,because we won't compile the python modules 
+    # every time (especially at dist mode).
+    t1 = env.Command('$TOPDIR/bindir/root.src.pyext.tar.gz', env.Alias('root.pyext'),
+                #['tar c -C $pyextdir . | gzip -9 > $TARGET'])
+                ['tar czf $TARGET -C $pyextdir .'])
+    ### TARGET: root.src.pyext
+    env.Alias('root.src.pyext', t1)
+
+SConscript('SConscript-mi')

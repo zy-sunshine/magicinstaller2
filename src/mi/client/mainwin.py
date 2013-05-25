@@ -209,6 +209,13 @@ class MIMainWindow(gtk.Window):
         self.switch_to_page(step.name)
         #self.switch_to_page('welcome')
         
+    def get_cur_stepobj(self):
+        step = self.steps.get_step_by_id(self.curstep)
+        if step:
+            return step.obj
+        else:
+            return None
+        
     def load_env(self, stepid):
         if stepid > 0:
             conf_file = '/tmpfs/step_conf/step_%s.json'

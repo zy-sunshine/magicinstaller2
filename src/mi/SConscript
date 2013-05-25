@@ -31,6 +31,7 @@ POTFILES = ['magic.installer.py', 'magicstep.py', 'magicpopup.py', 'xmlgtk.py', 
 POTXMLS = ['magic.installer.xml', 'magic.autopart.xml', 'magic.logger.xml'] + glob.glob('UIxml/*.xml') + \
           glob.glob('games/*.xml') + ['UIxml/takeactions.xml.cpinstmode']
 
+
 env.Command('mipublic.py', 'm4.mipublic.py',
             'm4 -DFULL_WIDTH=$full_width -DFULL_HEIGHT=$full_height' + \
                ' -Dkernelver=$mikernelver -Disofn_fmt="$isofn_fmt"' + \
@@ -75,72 +76,74 @@ def gen_magic_autopart_xml(target, source, env):
 env.Command('magic.autopart.xml', [env.Value(mi_config.autopart_profile)],
             gen_magic_autopart_xml)
 
+
+bin_programs = ['mi.toplevel',        # MagicInstaller Toplevel Controller.
+                'mi.runserver'	  # execute by toplevel, will run all servers of MI.
+                ]
+
+for bp in bin_programs:
+    env['_bp'] = bp
+    depInstallAs(env, 'root_src', '$destdir$root_bindir/${_bp}', '${_bp}.sh')
+    AddPostAction('$destdir$root_bindir/${_bp}',
+                  'chmod +x $destdir$root_bindir/${_bp}')
+del env['_bp']
+
+pydatas = ['magic.values.xml', ]
+depInstall(env, 'root_src', '$destdir$root_datadir', pydatas)
+
+def gen_magic_values_m4defs(target, source, env):
+
+    f = file(str(target[0]), 'w')
+    f.write("changequote(/--, --/)dnl\n")
+    f.write("define(vender_list, /--\n")
+
+    f.write("--/)dnl\n")
+    f.write("define(mouse_list, /--\n")
+
+    f.write("--/)dnl\n")
+    f.write("define(card_list, /--\n")
+
+    f.write("--/)dnl\n")
+
+    f.close()
+
+env.Command('magic.values.m4defs', '', gen_magic_values_m4defs)
+
+env.Command('magic.values.xml', ['magic.values.m4defs',
+                                 'm4.magic.values.xml'],
+            'm4 $SOURCES > $TARGET')
+# Fill distname in m4.magic.values.xml at run time.
+#            'm4 -Ddistname="%s" -Ddistver="%s" $SOURCES > $TARGET' % \
+#            (mi_config.distname, mi_config.distver))
+#env.Depends('magic.values.xml', [env.Value(mi_config.distname),
+#                                 env.Value(mi_config.distver)])
+
+
+
+
+#for pym in pymodules:
+#    env.PYCBuilder(pym, pym[:-1])
+def depInstall_pylibs(pymodules):
+    depInstall(env, 'root_src', '$destdir$root_libdir', pymodules)
+    pass
+
+def depInstall_MIdata(files):
+    pass
+
+Export('depInstall_pylibs', 'depInstall_MIdata')
+
+depInstall_pylibs(['mipublic.py', #'xmlgtk.py',
+             'getdev.py', ] #'magictaskman.py']
+             )
+
 Export('TOPSRCDIR', 'POTFILES', 'POTXMLS') # FIXME
 SConscript('po/SConscript')
 
-if mi_config.develmode:
-    #m4bld = Builder(action = 'm4 -DTEXTDOMAIN=$textdomain -Dbindir=$root_bindir -Ddatadir=$root_datadir -Dlibdir=$root_libdir -Dmoduledir=$root_moduledir -Doperationdir=$root_operationdir $SOURCES > $TARGET')
-    #env['BUILDERS']['M4Builder'] = m4bld
-    #env.M4Builder('magic.installer.py', 'm4.magic.installer.py')
-    #env.M4Builder('magic.actions.server.py', 'm4.magic.actions.server.py')
+SConscript('server/SConscript')
+SConscript('client/SConscript')
 
-    bin_programs = ['mi.client',        # MagicInstaller Toplevel Controller.
-                    'mi.server',  # MagicInstaller Actions Sevrer.
-                    'mi.logging',
-                    'mi.toplevel'
-                    ]
+SConscript('UIxml/SConscript')
+SConscript('helptext/SConscript')
+SConscript('images/SConscript')
+SConscript('games/SConscript')
 
-    for bp in bin_programs:
-        env['_bp'] = bp
-        depInstallAs(env, 'root_src', '$destdir$root_bindir/${_bp}', '${_bp}.py')
-        AddPostAction('$destdir$root_bindir/${_bp}',
-                      'chmod +x $destdir$root_bindir/${_bp}')
-    del env['_bp']
-
-    pydatas = ['magic.installer.xml', 'magic.values.xml','magic.logger.xml']
-    depInstall(env, 'root_src', '$destdir$root_datadir', pydatas)
-
-    def gen_magic_values_m4defs(target, source, env):
-
-        f = file(str(target[0]), 'w')
-        f.write("changequote(/--, --/)dnl\n")
-        f.write("define(vender_list, /--\n")
-
-        f.write("--/)dnl\n")
-        f.write("define(mouse_list, /--\n")
-
-        f.write("--/)dnl\n")
-        f.write("define(card_list, /--\n")
-
-        f.write("--/)dnl\n")
-
-        f.close()
-
-    env.Command('magic.values.m4defs', '', gen_magic_values_m4defs)
-
-    env.Command('magic.values.xml', ['magic.values.m4defs',
-                                     'm4.magic.values.xml'],
-                'm4 $SOURCES > $TARGET')
-    # Fill distname in m4.magic.values.xml at run time.
-    #            'm4 -Ddistname="%s" -Ddistver="%s" $SOURCES > $TARGET' % \
-    #            (mi_config.distname, mi_config.distver))
-    #env.Depends('magic.values.xml', [env.Value(mi_config.distname),
-    #                                 env.Value(mi_config.distver)])
-
-
-    pymodules = ['mipublic.py', #'xmlgtk.py',
-                 #'magicstep.py', 'magicpopup.py',
-                 #'miutil.py',
-                 #'short_operations.py', 'long_operations.py',
-                 'getdev.py', ] #'magictaskman.py']
-    depInstall(env, 'root_src', '$destdir$root_libdir', pymodules)
-
-    #for pym in pymodules:
-    #    env.PYCBuilder(pym, pym[:-1])
-
-    SConscript('UIxml/SConscript')
-    SConscript('helptext/SConscript')
-    SConscript('images/SConscript')
-    #SConscript('modules/SConscript')
-    #SConscript('operations/SConscript')
-    SConscript('games/SConscript')

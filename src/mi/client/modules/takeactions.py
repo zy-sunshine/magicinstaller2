@@ -173,7 +173,10 @@ class MIStep_takeactions(magicstep.magicstep):
         self.name_map['otprog'].set_fraction(1)
         self.name_map['frame_other'].set_sensitive(False)
         self.rootobj.btnnext_sensitive(True)
-        self.rootobj.btnnext_clicked(None, None)
+        print self.rootobj.get_cur_stepobj() == self
+        print self.rootobj.get_cur_stepobj(), self
+        if self.rootobj.get_cur_stepobj() == self: # If user at the current page, we do next step automatically.
+            self.rootobj.btnnext_clicked(None, None)
         
     def start_install(self):
         self.name_map['frame_packages'].set_sensitive(True)
@@ -241,7 +244,7 @@ class MIStep_takeactions(magicstep.magicstep):
         if self.install_progress_hooked:
             self.tm.pop_progress()
             
-        if not self.setup_finished:
+        if self.rootobj.get_cur_stepobj() == self and not self.setup_finished:
             self.rootobj.btnnext_clicked(None, None)
         
     def cb0_insert_next_disc(self, cur_discno, cb_retry_clicked, cb_abort_clicked):

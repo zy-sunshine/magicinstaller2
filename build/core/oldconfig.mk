@@ -46,27 +46,17 @@ for k in mi_config.__dict__:
         env[k] = mi_config.__dict__[k]
 
 ### Scon Utils
-def depInstallExcludeSvn(env, alias, destdir, srcdirs):
+def depInstallDir(env, alias, destdir, srcdirs):
     def getAllExcludeSvnFile(dir):
-        svndirs = []
         allfiles = []
-        excludesvnfiles = []
         topdown = True
         for root, dirs, files in os.walk(dir, topdown):
             for d in dirs:
                 if d == '.svn':
-                    svndirs.append(os.path.join(root, d))
+                    dirs.remove(d)
             for f in files:
                 allfiles.append(os.path.join(root, f))
-        for f in allfiles:
-            issvn = False
-            for svndir in svndirs:
-                if f.startswith(svndir):
-                    issvn = True
-                    break
-            if not issvn:
-                excludesvnfiles.append(f)
-        return excludesvnfiles
+        return  allfiles
 
     for srcd in srcdirs:
         files = []
@@ -78,7 +68,7 @@ def depInstallExcludeSvn(env, alias, destdir, srcdirs):
         for f in files:
             related_dir = os.path.dirname(f)
             env.Alias(target=alias, 
-                    source=env.Install(os.path.join(destdir,related_dir), f))
+                    source=env.Install(os.path.join(destdir,related_dir.lstrip('/')), f))
 
 def depInstall(env, alias, destdir, files):
     env.Alias(target=alias, source=env.Install(destdir, files))
@@ -88,7 +78,7 @@ def depInstallAs(env, alias, destfile, file):
 
 def depPyModule(env, alias, dir, sofile, cfiles):
     sopath = os.path.join(mi_config.destdir, mi_config.pythondir, 'site-packages', sofile)
-    env.Command(sopath, ['setup.py'] + cfiles,
+    env.Command(sopath, cfiles,
                 ['cd %s; %s setup.py install --prefix=%s/usr' % \
                  (dir, mi_config.pythonbin, mi_config.pyextdir)])
     env.Alias(alias, sopath)
@@ -137,7 +127,7 @@ def getSudoSh(cmd):
 
 Export('env')
 Export('mi_config')
-Export('depInstall', 'depInstallAs', 'depPyModule', 'depInstallExcludeSvn')
+Export('depInstall', 'depInstallAs', 'depPyModule', 'depInstallDir')
 Export('DirValue')
 Export('PkgMaker', 'MiPkgMaker')
 Export('getSudoSh')

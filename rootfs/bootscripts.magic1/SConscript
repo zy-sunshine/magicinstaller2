@@ -21,7 +21,7 @@ Import('*')
 
 root_bs = os.path.join(mi_config.tmpdir, 'bootscripts.magic1')
 
-depInstallExcludeSvn(env, 'bootscripts.magic1', root_bs,
+depInstallDir(env, 'bootscripts.magic1', root_bs,
                     srcdirs=['etc', 
                              'lib',
                              'root'])

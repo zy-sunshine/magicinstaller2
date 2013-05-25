@@ -813,7 +813,6 @@ class  Harddisk(xmlgtk.xmlgtk):
         self.partlist = tdata
         if self.orig_partitions is None:  # save original partitions
             self.orig_partitions = {}
-            print self.partlist
             for p in self.partlist:
                 self.orig_partitions[p[6]] = self.partdevfn(p[0])
 

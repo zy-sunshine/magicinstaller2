@@ -21,7 +21,7 @@ Import('*')
 
 root_bs = os.path.join(mi_config.tmpdir, 'bootscripts.arch1')
 
-depInstallExcludeSvn(env, 'bootscripts.arch1', root_bs,
+depInstallDir(env, 'bootscripts.arch1', root_bs,
                     srcdirs=['etc', 
                              'root'])
 

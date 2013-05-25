@@ -109,8 +109,6 @@ tmpdir = _p(TOPDIR, 'tmp')
 bindir = _p(TOPDIR, 'bindir')
 
 # Some dirs and files in tmpdir.
-rpmdbtar = os.path.join(tmpdir, 'rpmdb.tar.bz2')
-etctar = os.path.join(tmpdir, 'etc.tar.bz2')
 devrootdir = os.path.join(tmpdir, 'devroot')   # building sources dir
 
 # For iso.

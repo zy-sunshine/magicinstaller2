@@ -5,7 +5,7 @@
         ],
         "LOG_FILE": "/var/log/mi/mi.log",
         "HELP_HEIGHT": 540,
-        "DISTVER": "3.0",
+        "DISTVER": "2.5",
         "USEUDEV": true,
         "PKGARR_FILE": "pkgarr.py",
         "TEXTDOMAIN": "magic.installer",

@@ -1,0 +1,88 @@
+# -*- python -*-
+
+Import('*')
+import os
+import glob
+
+##### Construct the root.src.tar.gz
+class miSrcMaker(PkgMaker.StepMaker):
+    target_list = ['$TOPDIR/bindir/root.src.tar.gz']
+    ROOT = '$tmpdir/root.src'
+    steps = ['init_dir',
+             'install_src_step1',
+             'install_src_pyext',
+             'install_configfiles',
+             'install_tranlatefiles',
+             'install_post',
+             'mkmisrc',
+            ]
+    alias = 'root.src'
+
+    def init_dir(self):
+        cmds = ['rm -rf $ROOT',
+        'mkdir -p $ROOT']
+        return [], cmds
+
+    def install_src_step1(self):
+        inst_file = ['$TOPDIR/bindir/root.src.step1.tar.gz']
+        cmds = [self.get_extract_cmd('$TOPDIR/bindir/root.src.step1.tar.gz', self.ROOT)]
+        return inst_file, cmds
+
+    def install_src_pyext(self):
+        # Install python extention module for MI, the package have been packed 
+        # in the develop mode.
+        inst_file = ['$TOPDIR/bindir/root.src.pyext.tar.gz']
+        cmds = [self.get_extract_cmd('$TOPDIR/bindir/root.src.pyext.tar.gz', self.ROOT)]
+        return inst_file, cmds
+
+    def install_configfiles(self):
+        configfiles = [ ('$TOPDIR/src/mi/magic.autopart.xml',
+                        '$ROOT/usr/share/MagicInstaller/'),
+                        ]
+        slist = []
+        cmds = []
+        for src, dest in configfiles:
+            slist.append(src)
+            cmds.extend(['mkdir -p %s' % dest,
+                         'cp -a %s %s' % (src, dest)])
+        return slist, cmds
+
+    def install_tranlatefiles(self):
+        slist = []
+        cmds = []
+        for lang in mi_config.all_linguas:
+            inst_file = '$TOPDIR/src/mi/po/%s.mo' % lang
+            dest_file = '$ROOT/usr/share/locale/%s/LC_MESSAGES/${textdomain}.mo' % lang
+            slist.append(inst_file)
+            cmds.extend(['mkdir -p %s' % os.path.dirname(dest_file),
+                         'cp -a %s %s' % (inst_file, dest_file)])
+        return slist, cmds
+
+    def install_post(self):
+        env = self.env
+        post_script = '$specdir/post_install.sh'
+        if os.path.exists(env.subst(post_script)):
+            cmds = ['mkdir -pv $ROOT/root && cp %s $ROOT/root' % post_script,
+                    'chmod 700 $ROOT/root/post_install.sh']
+            return [post_script], cmds
+        else:
+            return [], []
+
+    def mkmisrc(self):
+        #cmds = ['tar c -C $ROOT . | gzip -9 > $TARGET']
+        cmds = ['tar czvf $TARGET -C $ROOT .']
+        return [], cmds
+
+misrc = miSrcMaker(env)
+misrc.make()
+
+### Hotfix file
+# Handle with hotfix file
+hotfix_path = mi_config.hotfixfiles_dir
+if glob.glob(hotfix_path + '/*'):
+    Default(env.Command('%s.hotfix' % mi_config.mkisofn(1),
+                        DirValue(hotfix_path),
+                        ['(cd $SOURCE && find . -print | cpio -o -H newc | gzip -9) > $TARGET']))
+else:
+    Delete('%s.hotfix' % mi_config.mkisofn(1))
+

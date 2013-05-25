@@ -4,6 +4,7 @@ import os
 import xmlrpclib
 import SimpleXMLRPCServer
 import sys
+import select
 import miactions
 from mi.utils.miconfig import MiConfig
 CF = MiConfig.get_instance()
@@ -17,13 +18,13 @@ except:
 mia = miactions.MIActions(128, 128*1024, 128*1024)
 
 if mia.pid > 0:
+    server_quit = 0
     # Control process.
     # Run short operation and transfer long operation to action process.
     #from mi.utils.milogger import ServerLogger_Short, ServerLogger_Long
     from mi.server.utils import logger
     from mi.server import handlers_short
     logger.d('test short logger')
-    server_quit = 0
 
     class MIAction:
         def _dispatch(self, method, params):
@@ -62,38 +63,7 @@ if mia.pid > 0:
     class RequestHandler(SimpleXMLRPCServer.SimpleXMLRPCRequestHandler):
         def __init__(self, *args, **kwgs):
             SimpleXMLRPCServer.SimpleXMLRPCRequestHandler.__init__(self, *args, **kwgs)
-#            self.do_OPTIONS = self.do_POST
-#            self.do_GET = self.do_POST
-#        def do_GET(self):
-#            print 'do_GET'
-#            return self.do_POST()
 
-#        def do_OPTIONS(self):
-#            print 'do_OPTIONS'
-#            return self.do_POST()
-##            print 'self.path %s' % self.path 
-##            if self.path in ('*', '/list'):
-##                self.send_response(200)
-##                self.send_header('Allow', 'GET, OPTIONS')
-##                self.send_header('Access-Control-Allow-Origin', '*')
-##                self.send_header('Access-Control-Allow-Headers', 'X-Request, X-Requested-With')
-##            else:
-##                self.send_response(404)
-##            self.send_header('Content-Length', '0')
-##            self.end_headers()
-#        def do_GET(self):
-#            print 'do_GET'
-#            return self.do_POST()
-##            print 'self.path %s' % self.path 
-##            if self.path in ('*', '/list'):
-##                self.send_response(200)
-##                self.send_header('Allow', 'GET, OPTIONS')
-##                self.send_header('Access-Control-Allow-Origin', '*')
-##                self.send_header('Access-Control-Allow-Headers', 'X-Request, X-Requested-With')
-##            else:
-##                self.send_response(404)
-##            self.send_header('Content-Length', '0')
-##            self.end_headers()
             
     server = ReuseXMLRPCServer(  #SimpleXMLRPCServer.SimpleXMLRPCServer( \
         ('127.0.0.1', 1325),
@@ -102,8 +72,12 @@ if mia.pid > 0:
         allow_none=True)
     server.register_instance(MIAction())
     server.register_introspection_functions()
+
     while 1:
-        server.handle_request()
+        try:
+            server.handle_request()
+        except select.error:
+            print 'select.error exception'
         if server_quit:
             break
     # Block until the action process terminate.
@@ -143,13 +117,3 @@ elif mia.pid == 0:
                 exe_ok = False
                 mia.put_result(xmlrpclib.dumps((id, 'method %s NOT_SUPPORT' % method, exe_ok), methodname=method, allow_none = 1))
 
-#if mia.pid > 0:
-    #from mi.utils.milogger import ServerLogger_Short, ServerLogger_Long
-    #print ServerLogger_Short.get_logpath(ServerLogger_Short)
-    #print ServerLogger_Long.get_logpath(ServerLogger_Long)
-    #ServerLogger_Long.del_instances(ServerLogger_Long)
-    #ServerLogger_Short.del_instances(ServerLogger_Short)
-    ##log_short = ServerLogger_Short.get_instance(ServerLogger_Short, __name__)
-    ##log_short.del_instances(ServerLogger_Short)
-    #log_long = ServerLogger_Long.get_instance(ServerLogger_Long, __name__)
-    #log_long.del_instances(ServerLogger_Long)

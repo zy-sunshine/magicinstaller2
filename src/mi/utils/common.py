@@ -221,10 +221,11 @@ def mount_dev(fstype, devfn, mntdir=None,flags=None):
             argv = [devfn, mntdir]
         else:
             cmd = '/bin/mount'
+            if fstype:
+                argv = argv + ['-t', fstype]
             if flags:
-                argv = ['-t', fstype, '-o', flags, devfn, mntdir]
-            else:
-                argv = ['-t', fstype, devfn, mntdir]
+                argv = argv + ['-o', flags]
+            argv = argv + [devfn, mntdir]
         logger.i("Run mount command: %s %s\n" % (cmd, ' '.join(argv)))
         cmdres = run_bash(cmd, argv)
         if cmdres['ret']:

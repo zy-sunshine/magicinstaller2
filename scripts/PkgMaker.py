@@ -72,8 +72,10 @@ class StepMaker(BaseMaker):
     BUILD = ''
     ROOT = ''
     steps = []
+    alias = ''
     def __init__(self, env):
         self.env = env.Clone()
+        self.alias = self.alias or self.name
 
     def initenv(self):
         env = self.env
@@ -96,9 +98,11 @@ class StepMaker(BaseMaker):
         self.initenv()
         env = self.env
         self.source_list, self.build_cmds = self.all_steps()
-        env.Command(self.target_list,
+        c0 = env.Command(self.target_list,
                     self.source_list,
                     self.build_cmds)
+        if self.alias:
+            env.Alias(self.alias, c0)
 
 class BasePkgMaker(BaseMaker):
     # Package Info
