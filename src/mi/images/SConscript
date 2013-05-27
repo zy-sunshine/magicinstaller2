@@ -20,9 +20,8 @@ import glob
 
 Import ('*')
 
-depInstall(env, 'root_src', '$destdir$root_datadir/images',
-           glob.glob('*.png'))
+LOCAL_PATH = _my_dir()
 
-depInstallAs(env, 'root_src',
-             '$destdir$root_datadir/images/banner.png',
-             'banner.png.%s' % mi_config.gui_resolution)
+MI_data(glob.glob('%s/*.png' % LOCAL_PATH), 'images/')
+MI_data('%s/banner.png.%s' % (LOCAL_PATH, mi_config.gui_resolution), 'images/banner.png')
+

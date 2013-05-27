@@ -18,8 +18,9 @@
 
 import glob
 
-Import ('*')
+Import('*')
 
-instdir = '$destdir$root_datadir/UIxml'
+LOCAL_PATH = _my_dir()
 
-depInstall(env, 'root_src', instdir, glob.glob('*.xml'))
+MI_data(glob.glob('%s/*.xml' % LOCAL_PATH), 'UIxml/')
+

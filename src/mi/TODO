@@ -1,7 +1,11 @@
-Make cache things smartly
+x Make cache things smartly
+-> do not use cache on server
 
-We just complete format operation, and should add a unique installl task queue,
-do installation background parallelly.
+x We just complete format operation, and should add a unique installl task queue,
+  do installation background parallelly.
+-> miaction is the FIFO queue.
 
-Make a beautiful document for xmlgtk and magicinstaller2
+* Make a beautiful document for xmlgtk and magicinstaller2
 
+* generate config.json by python template, choose a template engine or write a
+  simple engine.

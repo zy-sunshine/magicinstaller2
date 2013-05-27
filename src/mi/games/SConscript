@@ -18,10 +18,10 @@
 
 import glob
 
-Import ('*')
+Import('*')
 
-instdir = '$destdir$root_datadir/games'
+LOCAL_PATH = _my_dir()
 
-depInstall(env, 'root_src', instdir, glob.glob('*.png'))
+MI_data(glob.glob('%s/*.png' % LOCAL_PATH), 'games/')
+MI_data(['xglines.py', 'xglines.xml'], 'games/')
 
-depInstall(env, 'root_src', instdir, ['xglines.py', 'xglines.xml'])

@@ -47,6 +47,10 @@ for k in mi_config.__dict__:
 
 ### Scon Utils
 def depInstallDir(env, alias, destdir, srcdirs):
+    '''
+    destdir<str> is the target directory which will be installed source directories in.
+    srcdirs<list> is the list of source directories.
+    '''
     def getAllExcludeSvnFile(dir):
         allfiles = []
         topdown = True
@@ -58,6 +62,7 @@ def depInstallDir(env, alias, destdir, srcdirs):
                 allfiles.append(os.path.join(root, f))
         return  allfiles
 
+    allfiles = []
     for srcd in srcdirs:
         files = []
         if not os.path.isdir(srcd):
@@ -65,10 +70,12 @@ def depInstallDir(env, alias, destdir, srcdirs):
             continue
         else:
             files = getAllExcludeSvnFile(srcd)
+        allfiles.extend(files)
         for f in files:
             related_dir = os.path.dirname(f)
             env.Alias(target=alias, 
-                    source=env.Install(os.path.join(destdir,related_dir.lstrip('/')), f))
+                    source=env.Install(os.path.join(destdir, os.path.dirname(related_dir)), f))
+    return allfiles
 
 def depInstall(env, alias, destdir, files):
     env.Alias(target=alias, source=env.Install(destdir, files))

@@ -2,5 +2,5 @@ Import('*')
 
 LOCAL_PATH = _my_dir()
 
-MI_pymod_cpdir('pyftpdlib')
+MI_pymod_cpdir(_p(LOCAL_PATH, 'pyftpdlib'))
 

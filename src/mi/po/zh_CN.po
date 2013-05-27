@@ -7,684 +7,77 @@ msgid ""
 msgstr ""
 "Project-Id-Version: magic.installer 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-02-23 20:52+0800\n"
-"PO-Revision-Date: 2011-02-23 20:56+0800\n"
+"POT-Creation-Date: 2013-05-28 01:15+0800\n"
+"PO-Revision-Date: 2013-05-28 01:21+0800\n"
 "Last-Translator: zy_sunshine <zy.netsec@gmail.com>\n"
 "Language-Team: zh_CN <i18n-translation@lists.linux.net.cn>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=gb2312\n"
 "Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 1.5.5\n"
 
-#: src/magic.installer/magic.installer.py:373
-#: src/magic.installer/po/xmltranslation.py:191
-#: src/magic.installer/po/xmltranslation.py:244
-#: src/magic.installer/po/xmltranslation.py:299
-msgid "Theme Choice"
-msgstr "场景选择"
-
-#: src/magic.installer/magic.installer.py:400
-#: src/magic.installer/po/xmltranslation.py:124
-msgid "Default"
-msgstr "默认"
-
-#: src/magic.installer/magicstep.py:47
-msgid "UNDEFINED"
-msgstr "未定义"
-
-#: src/magic.installer/magicpopup.py:81
-msgid "Error"
-msgstr "错误"
-
-#: src/magic.installer/magicpopup.py:85
-msgid "Info"
-msgstr "信息"
-
-#: src/magic.installer/magicpopup.py:89
-msgid "Question"
-msgstr "提问"
-
-#: src/magic.installer/magicpopup.py:93
-msgid "Warning"
-msgstr "警告"
-
-#: src/magic.installer/magicpopup.py:105
-msgid "Help"
-msgstr "求助"
-
-#: src/magic.installer/xmlgtk.py:534
-msgid "File is not found: "
-msgstr "找不到文件："
-
-#: src/magic.installer/magic.logger.py:101
-#: src/magic.installer/magic.logger.py:105
-msgid "ChooseType"
-msgstr "选择类型"
-
-#: src/magic.installer/magic.logger.py:101
-msgid "USB Devices"
-msgstr "USB 设备"
-
-#: src/magic.installer/magic.logger.py:105
-msgid "ALL Devices"
-msgstr "所有设备"
-
-#: src/magic.installer/magic.logger.py:123
-msgid "Select a partition:"
-msgstr "选择一个分区"
-
-#: src/magic.installer/magic.logger.py:134
-#: src/magic.installer/magic.logger.py:136
-msgid "USB INFO"
-msgstr "设备信息"
-
-#: src/magic.installer/magic.logger.py:136
-msgid "You haven't choose a device"
-msgstr "你没有选择任何设备"
-
-#: src/magic.installer/magic.logger.py:185
-#: src/magic.installer/po/xmltranslation.py:15
-msgid "Start Copy"
-msgstr "开始拷贝"
-
-#: src/magic.installer/magic.logger.py:192
-#: src/magic.installer/magic.logger.py:193
-msgid "Failed"
-msgstr "失败"
-
-#: src/magic.installer/magic.logger.py:195
-#: src/magic.installer/magic.logger.py:196
-msgid "Success"
-msgstr "成功！"
-
-#: src/magic.installer/magic.logger.py:195
-#, python-format
-msgid "copy %s to %s device"
-msgstr "拷贝 %s 到 %s 设备"
-
-#: src/magic.installer/magic.logger.py:217
-msgid "Select..."
-msgstr "选择"
-
-#: src/magic.installer/magic.logger.py:225
-msgid "All Files"
-msgstr "所有文件"
-
-#: src/magic.installer/magic.logger.py:271
-#, python-format
-msgid "none \"%s\" value, please check!"
-msgstr "不能获得 \"%s\", 请检查!"
-
-#: src/magic.installer/magic.logger.py:274
-msgid "Usb Partition"
-msgstr "分区"
-
-#: src/magic.installer/magic.logger.py:275
-msgid "Usb Disk Belong"
-msgstr "设备属于"
-
-#: src/magic.installer/magic.logger.py:278
-msgid "Can not get some parameters"
-msgstr "鼠标参数"
-
-#: src/magic.installer/modules/dosetup.py:43
-msgid "Do Setup"
-msgstr "进行设置"
-
-#: src/magic.installer/modules/dosetup.py:169
-#: src/magic.installer/modules/Xwindow.py:32
-#: src/magic.installer/modules/Xwindow.py:66
-msgid "Probe Monitor"
-msgstr "探测显示器"
-
-#: src/magic.installer/modules/dosetup.py:172
-#: src/magic.installer/modules/Xwindow.py:35
-#: src/magic.installer/modules/Xwindow.py:71
-msgid "Probe VideoCard"
-msgstr "探测显卡"
-
-#: src/magic.installer/modules/dosetup.py:175
-#: src/magic.installer/modules/Xwindow.py:38
-#: src/magic.installer/modules/Xwindow.py:76
-msgid "Probe Mouse"
-msgstr "探测鼠标"
-
-#: src/magic.installer/modules/dosetup.py:183
-#: src/magic.installer/modules/Xwindow.py:57
-msgid "Failed to collect the information about Xwindow configuration."
-msgstr "收集同 Xwindow 配置有关的信息失败。"
-
-#: src/magic.installer/modules/dosetup.py:188
-#: src/magic.installer/modules/Xwindow.py:61
-msgid "Generate Xwindow configuration"
-msgstr "生成 X 视窗配置"
-
-#: src/magic.installer/modules/dosetup.py:190
-msgid "Backup Xwindow configuration files"
-msgstr "生成 X 视窗配置"
-
-#: src/magic.installer/modules/dosetup.py:209
-msgid "Setup accounts"
-msgstr "设定帐号"
-
-#: src/magic.installer/modules/dosetup.py:217
-msgid "We are doing setup, do not leave please."
-msgstr "正在进行设置，请勿离开。"
-
-#: src/magic.installer/modules/dosetup.py:227
-msgid "Run post install script"
-msgstr "运行后期安装脚本"
-
-#: src/magic.installer/modules/dosetup.py:231
-msgid "Umount all target partition(s)"
-msgstr "卸载所有目标分区"
-
-#: src/magic.installer/modules/Xwindow.py:29
-msgid "Xwindow"
-msgstr "X 视窗"
-
-#: src/magic.installer/modules/Xwindow.py:122
-msgid "Please choose your monitor here."
-msgstr "请在此处选择您的显示器。"
-
-#: src/magic.installer/modules/Xwindow.py:164
-msgid "Test X Settings"
-msgstr "测试 X 视窗设置"
-
-#: src/magic.installer/modules/Xwindow.py:172
-msgid "Success!"
-msgstr "成功！"
-
-#: src/magic.installer/modules/Xwindow.py:225
-msgid "Widemode resolution or refresh rate error."
-msgstr "宽屏分辨率或刷新率有误。"
-
-#: src/magic.installer/modules/Xwindow.py:233
-msgid "At least one mode has to be chosen."
-msgstr "必须至少选择一个模式。"
-
-#: src/magic.installer/modules/accounts.py:22
-msgid "Add/Edit a user"
-msgstr "添加/编辑用户"
-
-#: src/magic.installer/modules/accounts.py:41
-msgid "Accounts & hostname"
-msgstr "帐号和主机名"
-
-#: src/magic.installer/modules/accounts.py:49
-msgid "Your root password is different with your root password confirmation!"
-msgstr "您的根用户口令和根用户口令确认不相同！"
-
-#: src/magic.installer/modules/accounts.py:55
-msgid "Please do not use the password which shorter than 3 characters."
-msgstr "请不要选择选择短于三个字符的口令。"
-
-#: src/magic.installer/modules/accounts.py:70
-#, python-format
-msgid "Two user share the same username '%s'."
-msgstr "两个用户共用同一个用户名“%s”。"
-
-#: src/magic.installer/modules/accounts.py:81
-#, python-format
-msgid "The custom uid is conflict between '%s' and '%s'."
-msgstr "用户“%s”和“%s”的定制 uid 冲突。"
-
-#: src/magic.installer/modules/accounts.py:115
-#: src/magic.installer/modules/accounts.py:166
-msgid "Auto"
-msgstr "自动"
-
-#: src/magic.installer/modules/accounts.py:129
-msgid "Please choose a user to remove."
-msgstr "请选择一个要删除的用户。"
-
-#: src/magic.installer/modules/accounts.py:138
-msgid "Username is not specified."
-msgstr "未给出用户名。"
-
-#: src/magic.installer/modules/accounts.py:146
-msgid "Your password is different with your confirm password."
-msgstr "您的口令和口令确认不相同。"
-
-#: src/magic.installer/modules/accounts.py:152
-msgid "You can not login in this user directly because you leave the password to blank"
-msgstr "由于您将口令设为空，您将无法直接登录该用户。"
-
-#. TO_TRANSLATOR: All of these strings are extracted from xml file: src/magic.installer/UIxml/mouse.xml.
-#: src/magic.installer/modules/mouse.py:24
-#: src/magic.installer/po/xmltranslation.py:164
-#: src/magic.installer/po/xmltranslation.py:280
-msgid "Mouse"
-msgstr "鼠标"
-
-#: src/magic.installer/modules/startsetup.py:24
-msgid "Start to setup"
-msgstr "开始设置"
-
-#: src/magic.installer/modules/pkgselect.py:26
-msgid "Package Select"
-msgstr "包选择"
-
-#: src/magic.installer/modules/pkgselect.py:45
-msgid "You want fetch packages from..."
-msgstr "您想要从那里获取软件包..."
-
-#: src/magic.installer/modules/pkgselect.py:84
-msgid "All Packages"
-msgstr "所有软件包"
-
-#: src/magic.installer/modules/pkgselect.py:108
-msgid "Load the choosed package arrangement failed!"
-msgstr "装入选中的包管理信息失败！"
-
-#: src/magic.installer/modules/pkgselect.py:113
-msgid "Please choose one position."
-msgstr "请选择一个位置。"
-
-#: src/magic.installer/modules/pkgselect.py:125
-msgid "Please wait a while for the search of package arrangement information."
-msgstr "正在搜索包分布信息，请稍候。"
-
-#: src/magic.installer/modules/pkgselect.py:130
-msgid ""
-"Not any package arrangement information can be found!\n"
-"Please return to the parted step to check your setup."
-msgstr ""
-"找不到任何包分布信息！\n"
-"请返回分区步骤检查您的设定。"
-
-#: src/magic.installer/modules/pkgselect.py:147
-msgid ""
-"Load the only package arrangement failed!\n"
-"Please return to the parted step to check your step."
-msgstr ""
-"装入唯一的包管理信息失败！\n"
-"请返回分区步骤检查您的设定。"
-
-#: src/magic.installer/modules/finish.py:24
-msgid "Finish"
-msgstr "完成"
-
-#: src/magic.installer/modules/network.py:24
-msgid "Network"
-msgstr "网络"
-
-#: src/magic.installer/modules/keyboard.py:24
-msgid "Keyboard"
-msgstr "键盘"
-
-#: src/magic.installer/modules/welcome.py:34
+#: src/mi/mi.client.py:16 src/mi/client/modules/welcome.py:7
 msgid "Welcome"
 msgstr "欢迎"
 
-#: src/magic.installer/modules/welcome.py:78
-msgid "Do you realy want to cancel the installation?"
-msgstr "您真的要放弃安装？"
+#: src/mi/mi.client.py:18
+#, fuzzy
+msgid "Package"
+msgstr "软件包："
 
-#: src/magic.installer/modules/parted.py:105
-#: src/magic.installer/modules/scsi.py:64
-msgid "Please wait......"
-msgstr "请稍候......"
-
-#: src/magic.installer/modules/parted.py:228
-msgid "More than one partition is mounted on /"
-msgstr "不能重复加载 / 分区"
-
-#: src/magic.installer/modules/parted.py:236
-#, python-format
-msgid "%0.2fM is too small for %s, %dM at least."
-msgstr "%0.2fM 对 %s 来说太小了，至少需要 %dM。"
-
-#: src/magic.installer/modules/parted.py:242
-#, python-format
-msgid "%0.2fM is too big for %s, %dM at most."
-msgstr "%0.2fM 对 %s 来说太大了，至多为 %dM。"
-
-#: src/magic.installer/modules/parted.py:552
-msgid "Create a new partition"
-msgstr "创建一个新分区"
-
-#: src/magic.installer/modules/parted.py:620
-msgid "Edit an exist partition"
-msgstr "编辑现有分区"
-
-#: src/magic.installer/modules/parted.py:680
-msgid "This operation will reload partition table from harddisk. All your custom information will be lost."
-msgstr "此操作将从硬盘中重新读入分区表。您目前所有的定制信息都将消失。"
-
-#: src/magic.installer/modules/parted.py:705
-msgid "Create an empty new disk label"
-msgstr "创建一个新的空白分区表"
-
-#: src/magic.installer/modules/parted.py:721
-msgid "This operation will erase the whole partition table when apply."
-msgstr "此操作在应用的时候将清除整个分区表。"
-
-#: src/magic.installer/modules/parted.py:760
-#: src/magic.installer/modules/parted.py:822
-msgid "Probe all harddisk"
-msgstr "探测所有硬盘"
-
-#: src/magic.installer/modules/parted.py:801
+#: src/mi/mi.client.py:19 src/mi/mi.client.py:20
+#: src/mi/client/modules/partition.py:19
 msgid "Partition"
 msgstr "分区"
 
-#: src/magic.installer/modules/parted.py:830
-msgid "Please wait until the harddisk probe finished."
-msgstr "请稍候以等待硬盘探测的结束。"
+#: src/mi/mi.client.py:22 src/mi/mi.client.py:24 src/mi/mi.client.py:25
+#, fuzzy
+msgid "Setup"
+msgstr "进行设置"
 
-#: src/magic.installer/modules/parted.py:835
-msgid "Not any harddisk is detected, you might need to load driver for your SCSI harddisk..."
-msgstr "没有找到任何硬盘，您可能需要为您的 SCSI 硬盘载入驱动模块..."
+#: src/mi/mi.client.py:27 src/mi/client/modules/finish.py:7
+msgid "Finish"
+msgstr "完成"
 
-#: src/magic.installer/modules/parted.py:841
-msgid "Please read the help carefully if it is the first time that you use this partition code."
-msgstr "如果您是首次使用本分区程序，请仔细阅读求助信息。"
-
-#: src/magic.installer/modules/parted.py:874
-msgid "Not any usable MBR is found."
-msgstr "找不到可用的 MBR"
-
-#: src/magic.installer/modules/parted.py:894
-msgid "No partition is mounted on /."
-msgstr "没有加载到 / 的分区。"
-
-#: src/magic.installer/modules/parted.py:910
-#, python-format
-msgid "More than one partitions are mounted on %s."
-msgstr "在 %s 上多次加载分区。"
-
-#: src/magic.installer/modules/parted.py:918
-#, python-format
-msgid "Mount %s%d(%s) on %s might corrupt bootloader. Please do not mount any partition in the subdirectory of /boot."
-msgstr "将 %s%d(%s) 加载于 %s 可能损坏引导管理器。请不要在 /boot 的任何子目录上加载分区。"
-
-#: src/magic.installer/modules/parted.py:927
-#, python-format
-msgid ""
-"fat16, fat32 or ntfs must be mounted in the subdirectory of /mnt.\n"
-"But one %s%d(%s) is mounted on %s."
-msgstr ""
-"fat16、fat32 或 ntfs 必须加载在 /mnt 的子目录上。\n"
-"但 %s%d(%s) 是加载在 %s 上。"
-
-#: src/magic.installer/modules/parted.py:965
-msgid "Search package information"
-msgstr "搜索包信息"
-
-#: src/magic.installer/modules/parted.py:969
-msgid "Search for Windows partitions"
-msgstr "搜索 Windows 分区"
-
-#: src/magic.installer/modules/parted.py:975
-#, python-format
-msgid "Could not install the bootloader into %s as you will because it contain %s which will prevent the bootloader boot your system. Reset to MBR forcely."
-msgstr "无法将引导管理器安装到 %s，这是因为该分区含有的 %s 将导致引导管理器不能启动您的系统。强制设为 MBR。"
-
-#: src/magic.installer/modules/parted.py:997
-#, python-format
-msgid ""
-"The capacity of %s should >= %s. \n"
-"Please increase the size of partition %s%d."
-msgstr ""
-"%s 的容量应大于或等于 %s。\n"
-"请增加 %s%d 分区的大小。"
-
-#: src/magic.installer/modules/parted.py:1050
-msgid "helptext/parted.help.en.txt"
-msgstr "helptext/parted.help.gb.utf8.txt"
-
-#: src/magic.installer/modules/parted.py:1060
-msgid ""
-"Auto-partition will erase all existing partitions.\n"
-"Continue?"
-msgstr ""
-"自动分区会先删除所有现存分区，\n"
-"是否继续？"
-
-#: src/magic.installer/modules/parted.py:1071
-msgid "No auto-partition profile is defined or selected."
-msgstr "没有定义或选择好的自动分区方案。"
-
-#: src/magic.installer/modules/parted.py:1086
-#: src/magic.installer/modules/parted.py:1132
-msgid "Read auto-partition profile failed."
-msgstr "读取自动分区方案出错。"
-
-#: src/magic.installer/modules/parted.py:1117
-#, python-format
-msgid "Filesystem type '%s' not supported."
-msgstr "不支持文件系统类型 '%s'。"
-
-#: src/magic.installer/modules/parted.py:1152
-#: src/magic.installer/modules/parted.py:1162
-msgid "Insufficient disk space for this auto-partition profile."
-msgstr "磁盘空间不足以应用当前自动分区方案。"
-
-#: src/magic.installer/modules/scsi.py:25
-msgid "SCSI Driver"
-msgstr "SCSI 驱动"
-
-#: src/magic.installer/modules/scsi.py:51
-msgid "Not any driver is selected."
-msgstr "未找到任何驱动。"
-
-#: src/magic.installer/modules/scsi.py:57
-msgid "The selected module has been loaded already."
-msgstr "选中的模块已经加载。"
-
-#: src/magic.installer/modules/scsi.py:72
-msgid "Load module failed."
-msgstr "模块加载失败。"
-
-#: src/magic.installer/modules/scsi.py:80
-msgid "Load module success."
-msgstr "模块加载成功。"
-
-#: src/magic.installer/modules/bootloader.py:32
-msgid "Bootloader"
-msgstr "引导管理器"
-
-#: src/magic.installer/modules/bootloader.py:38
-msgid "helptext/bootloader.help.en.txt"
-msgstr "helptext/bootloader.help.gb.utf8.txt"
-
-#: src/magic.installer/modules/bootloader.py:44
-msgid "Please wait a while for the search of Windows partition."
-msgstr "正在搜索 Windows 分区，请稍候。"
-
-#: src/magic.installer/modules/bootloader.py:89
-#, python-format
-msgid "%s is not a Windows partition."
-msgstr "%s 不是 Windows 分区。"
-
-#: src/magic.installer/modules/bootloader.py:95
-#, python-format
-msgid "Cannot install grldr: %s does not contain ntldr."
-msgstr "不能安装 grldr 到 %s，因为它没有 Nt Loader。"
-
-#: src/magic.installer/modules/bootloader.py:101
-msgid "Windows partition is empty."
-msgstr "没有 Windows 分区。"
-
-#: src/magic.installer/modules/bootloader.py:193
-msgid "Please choose an entry to edit."
-msgstr "请选择一个要编辑的条目。"
-
-#: src/magic.installer/modules/bootloader.py:206
-msgid "Edit a boot entry."
-msgstr "编辑引导条目"
-
-#: src/magic.installer/modules/bootloader.py:253
-msgid "Please choose an entry to remove."
-msgstr "请选择一个要删除的条目。"
-
-#: src/magic.installer/modules/bootloader.py:260
-msgid "Please do not remove the entry to boot the installed system."
-msgstr "请不要删除即将安装的系统的启动条目。"
-
-#: src/magic.installer/modules/testops.py:24
-msgid "Test"
-msgstr "测试"
-
-#: src/magic.installer/modules/takeactions.py:40
-msgid "XGlines"
-msgstr "XGlines"
-
-#: src/magic.installer/modules/takeactions.py:47
-msgid "helptext/games.xglines.en.txt"
-msgstr "helptext/games.xglines.gb.utf8.txt"
-
-#: src/magic.installer/modules/takeactions.py:60
-msgid "Package not found"
-msgstr "找不到软件包"
-
-#: src/magic.installer/modules/takeactions.py:84
-msgid "Package install error"
-msgstr "软件包安装出错"
-
-#: src/magic.installer/modules/takeactions.py:108
-msgid "Partition/Format"
-msgstr "分区/格式化"
-
-#: src/magic.installer/modules/takeactions.py:109
-msgid "Install Package"
-msgstr "安装软件包"
-
-#: src/magic.installer/modules/takeactions.py:110
-#: src/magic.installer/modules/takeactions.py:555
-msgid "Make initrd"
-msgstr "制作 initrd"
-
-#: src/magic.installer/modules/takeactions.py:111
-msgid "Install Bootloader"
-msgstr "安装引导管理器"
-
-#: src/magic.installer/modules/takeactions.py:120
-msgid "Take Actions"
-msgstr "实施安装"
-
-#: src/magic.installer/modules/takeactions.py:190
-msgid "Get all dirty disk"
-msgstr "获取所有受影响的硬盘"
-
-#: src/magic.installer/modules/takeactions.py:210
-#, python-format
-msgid "Write the partition table of %s."
-msgstr "写入 %s 的分区表。"
-
-#: src/magic.installer/modules/takeactions.py:255
-msgid "Mount all target partitions."
-msgstr "加载所有目标分区。"
-
-#: src/magic.installer/modules/takeactions.py:278
-#, python-format
-msgid "Format Partition Error: %s"
-msgstr "格式化磁盘错误: %s"
-
-#: src/magic.installer/modules/takeactions.py:352
-msgid "Search packages"
-msgstr "搜索软件包"
-
-#: src/magic.installer/modules/takeactions.py:405
-#, python-format
-msgid ""
-"Can't find packages in disc %d.\n"
-"If you are using CDROM to install system, it is the chance to eject the original disc and insert the %d disc."
-msgstr ""
-"无法找到碟片 %d 中的包。\n"
-"如果您正使用 CDROM 安装系统，请此时弹出光碟并插入第 %d 张碟。"
-
-#: src/magic.installer/modules/takeactions.py:415
-msgid "Last operations for package installation"
-msgstr "包安装的最后操作"
-
-#: src/magic.installer/modules/takeactions.py:422
-#: src/magic.installer/modules/takeactions.py:429
-#: src/magic.installer/modules/takeactions.py:438
-msgid "Researching packages..."
-msgstr "正在重新搜索软件包..."
-
-#: src/magic.installer/modules/takeactions.py:445
-msgid "Aborting..."
-msgstr "正在取消..."
-
-#: src/magic.installer/modules/takeactions.py:453
-msgid "Umount the target filesystem(s)."
-msgstr "卸载目标文件系统。"
-
-#: src/magic.installer/modules/takeactions.py:462
-msgid ""
-"Click \"OK\" to reboot your system!\n"
-"Eject the cdrom if you are installed from cdrom."
-msgstr ""
-"点击“确认”以重新启动您的系统！\n"
-"如果您是光盘安装，请弹出光盘。"
-
-#: src/magic.installer/modules/takeactions.py:480
-#, python-format
-msgid "Target System Arch %s is not Compatible with package arch %s"
-msgstr "目标系统的体系结构 %s 与您选择安装的包不兼容 %s"
-
-#: src/magic.installer/modules/takeactions.py:552
-msgid "Generate modprobe.conf"
-msgstr "生成 modprobe.conf"
-
-#: src/magic.installer/modules/takeactions.py:593
-msgid "Prepare bootloader"
-msgstr "准备引导管理器"
-
-#: src/magic.installer/modules/takeactions.py:603
-msgid "Umount all target partitions before bootloader setup."
-msgstr "设置引导管理器之前卸载所有目标分区。"
-
-#: src/magic.installer/modules/takeactions.py:609
-msgid "Setup bootloader"
-msgstr "设置引导管理器"
-
-#: src/magic.installer/modules/takeactions.py:614
-msgid "Mount all target partitions after bootloader setup."
-msgstr "设置引导管理器之后加载所有目标分区。"
-
-#: src/magic.installer/operations/Xwindow.py:306
+#: src/mi/server/operations/Xwindow.py:291
 msgid "Failed: The target system is not exists yet."
 msgstr "失败：目标系统尚不存在。"
 
-#: src/magic.installer/operations/Xwindow.py:308
+#: src/mi/server/operations/Xwindow.py:293
 msgid "Failed: xinit is not installed."
 msgstr "失败：未安装 xinit。"
 
-#: src/magic.installer/operations/Xwindow.py:310
+#: src/mi/server/operations/Xwindow.py:295
 msgid "Failed: X is not inistalled."
 msgstr "失败：未安装 X。"
 
-#: src/magic.installer/operations/Xwindow.py:321
+#: src/mi/server/operations/Xwindow.py:306
 msgid "Failed: Please recheck X settings."
 msgstr "失败：请重新检查 X 设置。"
 
-#: src/magic.installer/operations/parted.py:300
+#: src/mi/server/operations/partition.py:218
 msgid "Can't find the specified disk."
 msgstr "无法找到指定的磁盘。"
 
-#: src/magic.installer/operations/parted.py:403
+#: src/mi/server/operations/partition.py:303
 #, python-format
 msgid "Unrecoginzed filesystem %s."
 msgstr "不可识别的文件系统 %s。"
 
-#: src/magic.installer/operations/parted.py:406
+#: src/mi/server/operations/partition.py:306
 #, python-format
 msgid "Format %s is not supported."
 msgstr "不支持格式化 %s。"
 
-#: src/magic.installer/operations/parted.py:409
+#: src/mi/server/operations/partition.py:309
 msgid "No such device: "
 msgstr "没有这样的设备："
 
-#: src/magic.installer/operations/parted.py:412
+#: src/mi/server/operations/partition.py:312
 msgid "Not any partition table found on: "
 msgstr "找不到此磁盘上的任何分区表："
 
-#: src/magic.installer/operations/parted.py:457
-#: src/magic.installer/operations/parted.py:591
+#: src/mi/server/operations/partition.py:357
 #, python-format
 msgid ""
 "Not exists device block on %s: \n"
@@ -693,7 +86,7 @@ msgstr ""
 "不存在设备 %s: \n"
 "尝试次数: %d\n"
 
-#: src/magic.installer/operations/parted.py:476
+#: src/mi/server/operations/partition.py:369
 #, python-format
 msgid ""
 "Run \"%s %s\" failed: %s\n"
@@ -702,1033 +95,1705 @@ msgstr ""
 "执行 \"%s %s\" 失败: %s\n"
 "尝试次数: %d\n"
 
-#: src/magic.installer/operations/parted.py:480
+#: src/mi/server/operations/partition.py:373
 msgid "Not any partition found on position: "
 msgstr "无法在此位置找到任何分区："
 
-#: src/magic.installer/operations/parted.py:574
-#, python-format
-msgid "swapon(%s) failed: %s"
-msgstr "swapon(%s) 失败：%s"
-
-#: src/magic.installer/operations/parted.py:596
-#, python-format
-msgid "Mount %s on %s as %s failed: %s"
-msgstr "加载 %s 于 %s (文件系统 %s) 失败：%s"
-
-#: src/magic.installer/operations/parted.py:663
-#, python-format
-msgid "swapoff(%s) failed: %s"
-msgstr "swapoff(%s) 失败：%s"
-
-#: src/magic.installer/operations/parted.py:670
-#, python-format
-msgid "UMount %s failed: %s"
-msgstr "卸载 %s 失败：%s"
-
-#. TO_TRANSLATOR: All of these strings are extracted from xml file: src/magic.installer/magic.autopart.xml.
-#: src/magic.installer/po/xmltranslation.py:2
-msgid "Single partition with swap"
-msgstr "仅根分区和交换分区"
-
-#: src/magic.installer/po/xmltranslation.py:3
-msgid "Separated /, /home"
-msgstr "独立的 /boot, / 和 /home 分区"
-
-#: src/magic.installer/po/xmltranslation.py:4
-msgid "Customed autopart profile"
-msgstr "定制特殊分区"
-
-#. TO_TRANSLATOR: All of these strings are extracted from xml file: src/magic.installer/magic.logger.xml.
-#: src/magic.installer/po/xmltranslation.py:6
-msgid "Backup Files"
-msgstr "备份文件"
-
-#: src/magic.installer/po/xmltranslation.py:7
-msgid "Add File"
-msgstr "添加文件"
-
-#: src/magic.installer/po/xmltranslation.py:8
-msgid "Delete File"
-msgstr "删除文件"
-
-#: src/magic.installer/po/xmltranslation.py:9
-msgid "Default File"
-msgstr "默认文件"
-
-#: src/magic.installer/po/xmltranslation.py:10
-msgid "Choose The Device"
-msgstr "选择设备"
-
-#: src/magic.installer/po/xmltranslation.py:11
-msgid "usb devices"
-msgstr "USB 设备"
-
-#: src/magic.installer/po/xmltranslation.py:12
-msgid "all devices"
-msgstr "所有设备"
-
-#: src/magic.installer/po/xmltranslation.py:13
-msgid "Refresh Devices"
-msgstr "刷新设备"
-
-#: src/magic.installer/po/xmltranslation.py:14
-msgid "progress"
-msgstr "进度"
-
-#: src/magic.installer/po/xmltranslation.py:16
-msgid "Exit"
-msgstr "退出"
-
-#. TO_TRANSLATOR: All of these strings are extracted from xml file: src/magic.installer/UIxml/parted.xml.
-#: src/magic.installer/po/xmltranslation.py:18
-msgid "Auto-partition"
-msgstr "自动分区"
-
-#: src/magic.installer/po/xmltranslation.py:19
-msgid "Apply the selected auto-partition profile"
-msgstr "应用所选的自动分区方案"
-
-#: src/magic.installer/po/xmltranslation.py:20
-#: src/magic.installer/po/xmltranslation.py:201
-msgid "_Apply"
-msgstr "应用(_A)"
-
-#: src/magic.installer/po/xmltranslation.py:21
-msgid "Capacity:"
-msgstr "容量："
-
-#: src/magic.installer/po/xmltranslation.py:22
-msgid "Disklabel:"
-msgstr "分区表类型："
-
-#: src/magic.installer/po/xmltranslation.py:23
-msgid "Model:"
-msgstr "型号："
-
-#: src/magic.installer/po/xmltranslation.py:24
-#: src/magic.installer/po/xmltranslation.py:44
-#: src/magic.installer/po/xmltranslation.py:91
-msgid "Device"
-msgstr "设备(_D)："
-
-#: src/magic.installer/po/xmltranslation.py:25
-msgid "Format"
-msgstr "格式化"
-
-#: src/magic.installer/po/xmltranslation.py:26
-#: src/magic.installer/po/xmltranslation.py:70
-msgid "Flags"
-msgstr "标志"
-
-#: src/magic.installer/po/xmltranslation.py:27
-#: src/magic.installer/po/xmltranslation.py:86
-#: src/magic.installer/po/xmltranslation.py:96
-msgid "Type"
-msgstr "类型"
-
-#: src/magic.installer/po/xmltranslation.py:28
-msgid "Capacity"
-msgstr "容量"
-
-#: src/magic.installer/po/xmltranslation.py:29
-#: src/magic.installer/po/xmltranslation.py:92
-msgid "Filesystem"
-msgstr "文件系统"
-
-#: src/magic.installer/po/xmltranslation.py:30
-#: src/magic.installer/po/xmltranslation.py:51
-#: src/magic.installer/po/xmltranslation.py:67
-msgid "Mount point"
-msgstr "加载点"
-
-#: src/magic.installer/po/xmltranslation.py:31
-#: src/magic.installer/po/xmltranslation.py:64
-#: src/magic.installer/po/xmltranslation.py:125
-msgid "Label"
-msgstr "标签"
-
-#: src/magic.installer/po/xmltranslation.py:32
-#: src/magic.installer/po/xmltranslation.py:60
-msgid "Start"
-msgstr "起点"
-
-#: src/magic.installer/po/xmltranslation.py:33
-#: src/magic.installer/po/xmltranslation.py:61
-msgid "End"
-msgstr "终点"
-
-#: src/magic.installer/po/xmltranslation.py:34
-msgid "_Create"
-msgstr "创建(_C)"
-
-#: src/magic.installer/po/xmltranslation.py:35
-msgid "Create a new partition at the selected freespace"
-msgstr "在选中的空闲空间中创建一个新分区"
-
-#: src/magic.installer/po/xmltranslation.py:36
-msgid "_Edit"
-msgstr "编辑(_E)"
-
-#: src/magic.installer/po/xmltranslation.py:37
-msgid "Edit the selected partition"
-msgstr "编辑选中的分区"
-
-#: src/magic.installer/po/xmltranslation.py:38
-msgid "_Remove"
-msgstr "删除(_R)"
-
-#: src/magic.installer/po/xmltranslation.py:39
-msgid "Remove the selected partition"
-msgstr "删除选中的分区"
-
-#: src/magic.installer/po/xmltranslation.py:40
-msgid "Re_store"
-msgstr "恢复(_S)"
-
-#: src/magic.installer/po/xmltranslation.py:41
-msgid "Reload the original partition table"
-msgstr "重新读入原始分区表"
-
-#: src/magic.installer/po/xmltranslation.py:42
-msgid "New _Disk Label"
-msgstr "新建分区表(_D)"
-
-#: src/magic.installer/po/xmltranslation.py:43
-msgid "Create a new empty disk label"
-msgstr "创建一个新的空白分区表"
-
-#: src/magic.installer/po/xmltranslation.py:45
-msgid "Partition _Type"
-msgstr "分区类型(_T)"
-
-#: src/magic.installer/po/xmltranslation.py:46
-msgid "Primary"
-msgstr "主分区"
-
-#: src/magic.installer/po/xmltranslation.py:47
-msgid "Extended"
-msgstr "扩展分区"
-
-#: src/magic.installer/po/xmltranslation.py:48
-msgid "Logical"
-msgstr "逻辑分区"
-
-#: src/magic.installer/po/xmltranslation.py:49
-#: src/magic.installer/po/xmltranslation.py:65
-msgid "Fo_rmat it or not"
-msgstr "是否格式化(_R)"
-
-#: src/magic.installer/po/xmltranslation.py:50
-#: src/magic.installer/po/xmltranslation.py:66
-msgid "_File System"
-msgstr "文件系统(_F)"
-
-#: src/magic.installer/po/xmltranslation.py:52
-#: src/magic.installer/po/xmltranslation.py:68
-msgid "_Use"
-msgstr "使用(_U)"
-
-#: src/magic.installer/po/xmltranslation.py:53
-#: src/magic.installer/po/xmltranslation.py:69
-msgid "_Don't use"
-msgstr "不使用(_D)"
-
-#: src/magic.installer/po/xmltranslation.py:54
-msgid "Partition Position"
-msgstr "分区位置"
-
-#: src/magic.installer/po/xmltranslation.py:55
-msgid "From _begin"
-msgstr "从起点开始(_B)"
-
-#: src/magic.installer/po/xmltranslation.py:56
-msgid "From _end"
-msgstr "从终点开始(_E)"
-
-#: src/magic.installer/po/xmltranslation.py:57
-msgid "_Size:"
-msgstr "大小(_S)："
-
-#: src/magic.installer/po/xmltranslation.py:58
-msgid "Sectors"
-msgstr "扇区数"
-
-#: src/magic.installer/po/xmltranslation.py:59
-msgid "Megabytes"
-msgstr "兆数"
-
-#: src/magic.installer/po/xmltranslation.py:62
-msgid "Size"
-msgstr "大小"
-
-#: src/magic.installer/po/xmltranslation.py:63
-msgid "Partition Size"
-msgstr "分区大小"
-
-#: src/magic.installer/po/xmltranslation.py:71
-msgid "(_1).Boot"
-msgstr "(_1).Boot"
-
-#: src/magic.installer/po/xmltranslation.py:72
-msgid "(_2).Root"
-msgstr "(_2).Root"
-
-#: src/magic.installer/po/xmltranslation.py:73
-msgid "(_3).Swap"
-msgstr "(_3).Swap"
-
-#: src/magic.installer/po/xmltranslation.py:74
-msgid "(_4).Hidden"
-msgstr "(_4).Hidden"
-
-#: src/magic.installer/po/xmltranslation.py:75
-msgid "(_5).RAID"
-msgstr "(_5).RAID"
-
-#: src/magic.installer/po/xmltranslation.py:76
-msgid "(_6).LVM"
-msgstr "(_6).LVM"
-
-#: src/magic.installer/po/xmltranslation.py:77
-msgid "(_7).LBA"
-msgstr "(_7).LBA"
-
-#: src/magic.installer/po/xmltranslation.py:78
-msgid "_Label"
-msgstr "标签(_L)"
-
-#: src/magic.installer/po/xmltranslation.py:79
-msgid "helptext/newdisklabel.help.en.txt"
-msgstr "helptext/newdisklabel.help.gb.utf8.txt"
-
-#. TO_TRANSLATOR: All of these strings are extracted from xml file: src/magic.installer/UIxml/pkgselect.xml.
-#: src/magic.installer/po/xmltranslation.py:81
-msgid "Source position:"
-msgstr "来源位置："
-
-#: src/magic.installer/po/xmltranslation.py:82
-#: src/magic.installer/po/xmltranslation.py:136
-#: src/magic.installer/po/xmltranslation.py:185
-msgid "Name"
-msgstr "名称"
-
-#: src/magic.installer/po/xmltranslation.py:83
-msgid "_Change the source position"
-msgstr "改变来源位置(_C)"
-
-#: src/magic.installer/po/xmltranslation.py:84
-msgid "Choose _individual packages"
-msgstr "选择单个包(_I)"
-
-#: src/magic.installer/po/xmltranslation.py:85
-#: src/magic.installer/po/xmltranslation.py:95
-msgid "Status"
-msgstr "状态"
-
-#: src/magic.installer/po/xmltranslation.py:87
-#: src/magic.installer/po/xmltranslation.py:97
-msgid "Name/Group Name"
-msgstr "名字/组名"
-
-#: src/magic.installer/po/xmltranslation.py:88
-#: src/magic.installer/po/xmltranslation.py:98
-msgid "Install _All"
-msgstr "全部安装(_A)"
-
-#: src/magic.installer/po/xmltranslation.py:89
-#: src/magic.installer/po/xmltranslation.py:99
-msgid "Install _Nothing"
-msgstr "全部不安装(_N)"
-
-#: src/magic.installer/po/xmltranslation.py:90
-#: src/magic.installer/po/xmltranslation.py:100
-msgid "_Details"
-msgstr "细节(_D)"
-
-#: src/magic.installer/po/xmltranslation.py:93
-msgid "Directory"
-msgstr "目录"
-
-#: src/magic.installer/po/xmltranslation.py:94
-msgid "ISO Filename"
-msgstr "ISO 文件名"
-
-#. TO_TRANSLATOR: All of these strings are extracted from xml file: src/magic.installer/UIxml/startsetup.xml.
-#: src/magic.installer/po/xmltranslation.py:102
-msgid "OK, your system has been installed successfully. Click 'Next' to start the system configuration steps."
-msgstr "祝贺，您已经成功地安装了的系统。请点击“下一页”以便开始系统配置步骤。"
-
-#: src/magic.installer/po/xmltranslation.py:103
-msgid "If you want to manually set the Xwindow, please select the Expert Mode, it will generate a xorg.conf configuration file for your system."
-msgstr "如果你想要手动设置 Xwindow, 请选择专家模式, 它会为你的系统生成一个 xorg.conf 配置文件."
-
-#: src/magic.installer/po/xmltranslation.py:104
-msgid "If you do not know Xwindow parameter settings, please skip Xwindow settings (recommended)."
-msgstr "如果你不知道怎样配置Xwindow, 请跳过 Xwindow 设置 (推荐)."
-
-#: src/magic.installer/po/xmltranslation.py:105
-msgid "_Skip Xwindow Setup(Recommended)"
-msgstr "跳过 Xwindow 设置(建议)(_G)"
-
-#: src/magic.installer/po/xmltranslation.py:106
-msgid "_Do not skip Xwindow Setup(Expert Mode)"
-msgstr "进行 Xwindow 设置(专家模式)"
-
-#. TO_TRANSLATOR: All of these strings are extracted from xml file: src/magic.installer/UIxml/dosetup.xml.
-#: src/magic.installer/po/xmltranslation.py:108
-msgid "Make the setup take effect..."
-msgstr "使设置生效..."
-
-#. TO_TRANSLATOR: All of these strings are extracted from xml file: src/magic.installer/UIxml/bootloader.xml.
-#: src/magic.installer/po/xmltranslation.py:110
-msgid "Please choose the bootloader that you like."
-msgstr "请选择您喜欢的引导管理器。"
-
-#: src/magic.installer/po/xmltranslation.py:111
-msgid "_Grub(Recommended)"
-msgstr "Grub(建议)(_G)"
-
-#: src/magic.installer/po/xmltranslation.py:112
-msgid "_Lilo"
-msgstr "Lilo(_L)"
-
-#: src/magic.installer/po/xmltranslation.py:113
-msgid "_Do not use boot loader"
-msgstr "不使用引导管理器(_D)"
-
-#: src/magic.installer/po/xmltranslation.py:114
-msgid "Install Position"
-msgstr "安装位置"
-
-#: src/magic.installer/po/xmltranslation.py:115
-msgid "_Master Boot Record(MBR)"
-msgstr "主引导记录(MBR)(_M)"
-
-#: src/magic.installer/po/xmltranslation.py:116
-msgid "The partition which contain /_boot"
+#: src/mi/server/utils/iutil.py:808
+msgid "Error determining boot device's disk name"
+msgstr ""
+
+#: src/mi/server/utils/iutil.py:831
+#, fuzzy
+msgid "the device containing /boot"
 msgstr "含有 /boot 的分区(_B)"
 
-#: src/magic.installer/po/xmltranslation.py:117
-msgid "The Win_dows partition"
-msgstr "Windows 分区(_D)"
+#: src/mi/server/utils/iutil.py:833
+#, python-format
+msgid ""
+"After shutdown, please perform a manual IPL from %s to continue installation."
+msgstr ""
 
-#: src/magic.installer/po/xmltranslation.py:118
-msgid "Bootloader Option"
-msgstr "引导管理器选项："
+#: src/mi/server/utils/tar/tarfile_install.py:33
+#, python-format
+msgid "Failed on get tar pakcage size \"%s\""
+msgstr "不能获取 tar 包大小 \"%s\""
 
-#: src/magic.installer/po/xmltranslation.py:119
-msgid "Menu t_imeout(second):"
-msgstr "菜单等候时间(秒)(_I)："
+#: src/mi/server/utils/tar/tarfile_install.py:40
+#, python-format
+msgid "Failed on create tarfile object on file \"%s\" size\"%d\"\n"
+msgstr "不能创建 tar 文件对象 file \"%s\" size\"%d\"\n"
 
-#: src/magic.installer/po/xmltranslation.py:120
-msgid "_Force enable LBA32"
-msgstr "强制启用 LBA32(_F)"
+#: src/mi/server/utils/tar/tarfile_install.py:49
+#, python-format
+msgid "Failed on extract file \"%s\" size\"%d\" to directory \"%s\"\n"
+msgstr "不能解压文件 \"%s\" size\"%d\" 到文件夹 \"%s\"\n"
 
-#: src/magic.installer/po/xmltranslation.py:121
-msgid "Use bootloader pass_word:"
-msgstr "使用引导管理器口令(_W)："
+#: src/mi/server/utils/yum/yumpayload.py:797
+#, fuzzy
+msgid "Starting package installation process"
+msgstr "包安装的最后操作"
 
-#: src/magic.installer/po/xmltranslation.py:122
-msgid "Other bootloader _options:"
-msgstr "其它引导管理器选项(_O)："
+#: src/mi/server/utils/yum/yumpayload.py:985
+msgid "Preparing transaction from installation source"
+msgstr ""
 
-#: src/magic.installer/po/xmltranslation.py:123
-msgid "Please modify the bootloader entry here."
-msgstr "请在此编辑引导管理器条目。"
+#: src/mi/server/utils/yum/yumpayload.py:1005
+msgid "Upgrading"
+msgstr ""
 
-#: src/magic.installer/po/xmltranslation.py:126
-msgid "Root Device"
-msgstr "根设备"
+#: src/mi/server/utils/yum/yumpayload.py:1007
+#, fuzzy
+msgid "Installing"
+msgstr "全部不安装(_N)"
 
-#: src/magic.installer/po/xmltranslation.py:127
-msgid "_Restore entry"
-msgstr "恢复条目(_R)"
+#: src/mi/server/utils/yum/yumpayload.py:1085
+msgid "Performing post-install setup tasks"
+msgstr ""
 
-#: src/magic.installer/po/xmltranslation.py:128
-msgid "_Edit entry"
-msgstr "编辑条目(_E)"
-
-#: src/magic.installer/po/xmltranslation.py:129
-msgid "Remo_ve entry"
-msgstr "删除条目(_V)"
-
-#: src/magic.installer/po/xmltranslation.py:130
-msgid "_Default Boot Entry"
-msgstr "默认启动条目(_D)"
-
-#: src/magic.installer/po/xmltranslation.py:131
-msgid "_Label:"
-msgstr "标签(_L)："
-
-#: src/magic.installer/po/xmltranslation.py:132
-msgid "Root device:"
-msgstr "根设备："
-
-#. TO_TRANSLATOR: All of these strings are extracted from xml file: src/magic.installer/UIxml/scsi.xml.
-#: src/magic.installer/po/xmltranslation.py:134
-msgid "Loaded"
-msgstr "已装入"
-
-#: src/magic.installer/po/xmltranslation.py:135
-msgid "Module"
-msgstr "模块"
-
-#: src/magic.installer/po/xmltranslation.py:137
-msgid "_Load the selected driver"
-msgstr "加载选中的驱动模块(_L)"
-
-#. TO_TRANSLATOR: All of these strings are extracted from xml file: src/magic.installer/UIxml/Xwindow.xml.
-#: src/magic.installer/po/xmltranslation.py:139
-msgid "Monitor Parameters"
-msgstr "显示器参数"
-
-#: src/magic.installer/po/xmltranslation.py:140
-msgid "_Monitor Name :"
-msgstr "显示器名称(_M)："
-
-#: src/magic.installer/po/xmltranslation.py:141
-msgid "_HorizSync :"
-msgstr "水平同步(_H)："
-
-#: src/magic.installer/po/xmltranslation.py:142
-msgid "_VertRefresh :"
-msgstr "垂直扫描率(_V)："
-
-#: src/magic.installer/po/xmltranslation.py:143
-msgid "Monitor Vender List"
-msgstr "显示器厂家列表"
-
-#: src/magic.installer/po/xmltranslation.py:144
-msgid "You can choose your monitor vender and then choose your monitor."
-msgstr "您可以选择您的显示器厂家而后选择您的显示器。"
-
-#: src/magic.installer/po/xmltranslation.py:145
-msgid "Monitor Vender"
-msgstr "显示器厂家"
-
-#: src/magic.installer/po/xmltranslation.py:146
-#: src/magic.installer/po/xmltranslation.py:155
-#: src/magic.installer/po/xmltranslation.py:165
-msgid "_Choose"
-msgstr "选中(_C)"
-
-#: src/magic.installer/po/xmltranslation.py:147
-msgid "Videocard Parameters"
-msgstr "显卡参数"
-
-#: src/magic.installer/po/xmltranslation.py:148
-msgid "_Videocard Name :"
-msgstr "显卡名称(_V)："
-
-#: src/magic.installer/po/xmltranslation.py:149
-msgid "_Driver :"
-msgstr "驱动程序(_D)："
-
-#: src/magic.installer/po/xmltranslation.py:150
-msgid "_VideoRam :"
-msgstr "显存(_V)："
-
-#: src/magic.installer/po/xmltranslation.py:151
-msgid "_Reprobe Videocard"
-msgstr "重新探测显卡(_R)"
-
-#: src/magic.installer/po/xmltranslation.py:152
-msgid "Video Card List"
-msgstr "显卡列表"
-
-#: src/magic.installer/po/xmltranslation.py:153
-msgid "You can choose your video card here directly."
-msgstr "您可以在此处直接选择您的显卡。"
-
-#: src/magic.installer/po/xmltranslation.py:154
-msgid "Videocard"
-msgstr "显卡"
-
-#: src/magic.installer/po/xmltranslation.py:156
-msgid "Mouse Parameters"
-msgstr "显示器参数"
-
-#: src/magic.installer/po/xmltranslation.py:157
-msgid "_Mouse Name :"
-msgstr "鼠标名称(_M)："
-
-#: src/magic.installer/po/xmltranslation.py:158
-msgid "_Protocol :"
-msgstr "协议(_P)："
-
-#: src/magic.installer/po/xmltranslation.py:159
-msgid "_Device :"
-msgstr "设备(_D)："
-
-#: src/magic.installer/po/xmltranslation.py:160
-msgid "_Emulate 3 Buttons"
-msgstr "模拟鼠标第三键(_E)"
-
-#: src/magic.installer/po/xmltranslation.py:161
-msgid "_Reprobe Mouse"
-msgstr "重新探测鼠标(_R)"
-
-#: src/magic.installer/po/xmltranslation.py:162
-msgid "Mouse List"
-msgstr "鼠标列表"
-
-#: src/magic.installer/po/xmltranslation.py:163
-msgid "If auto probe is incorrect, choose your mouse here directly. If you have a wheel mouse, please choose one tagged with 'wheel mouse' according to the interface."
-msgstr "如果自动检测不正确，请直接选择您的鼠标类型。滚轮鼠标需要根据接口来选择相应的 wheel mouse。"
-
-#: src/magic.installer/po/xmltranslation.py:166
-msgid "Modes"
-msgstr "显示模式"
-
-#: src/magic.installer/po/xmltranslation.py:167
-#: src/magic.installer/po/xmltranslation.py:176
-msgid "256 Colors"
-msgstr "256 色"
-
-#: src/magic.installer/po/xmltranslation.py:168
-#: src/magic.installer/po/xmltranslation.py:177
-msgid "32K Colors"
-msgstr "3.2 万色"
-
-#: src/magic.installer/po/xmltranslation.py:169
-#: src/magic.installer/po/xmltranslation.py:178
-msgid "64K Colors"
-msgstr "6.4 万色"
-
-#: src/magic.installer/po/xmltranslation.py:170
-#: src/magic.installer/po/xmltranslation.py:179
-msgid "16M Colors"
-msgstr "16 兆色"
-
-#: src/magic.installer/po/xmltranslation.py:171
-msgid "LCD Widescreen"
-msgstr "液晶宽屏"
-
-#: src/magic.installer/po/xmltranslation.py:172
-msgid "Resolution:"
-msgstr "分辨度"
-
-#: src/magic.installer/po/xmltranslation.py:173
-msgid "none"
-msgstr "无"
-
-#: src/magic.installer/po/xmltranslation.py:174
-msgid "Custom:"
-msgstr "定制："
-
-#: src/magic.installer/po/xmltranslation.py:175
-msgid "Color Depth:"
-msgstr "颜色位数："
-
-#: src/magic.installer/po/xmltranslation.py:180
-msgid "Refresh Rate:"
-msgstr "垂直刷新率(_V)："
-
-#: src/magic.installer/po/xmltranslation.py:181
-msgid "Init Mode"
-msgstr "初始化显示模式"
-
-#: src/magic.installer/po/xmltranslation.py:182
-msgid "_Text"
-msgstr "文本(_T)"
-
-#: src/magic.installer/po/xmltranslation.py:183
-msgid "_Graphics"
-msgstr "图形(_G)"
-
-#: src/magic.installer/po/xmltranslation.py:184
-msgid "Test Xwindow _Settings"
-msgstr "测试 X 视窗设置(_S)"
-
-#: src/magic.installer/po/xmltranslation.py:186
-msgid "Horiz Sync"
-msgstr "水平同步"
-
-#: src/magic.installer/po/xmltranslation.py:187
-msgid "Vert Refresh"
-msgstr "垂直扫描率"
-
-#. TO_TRANSLATOR: All of these strings are extracted from xml file: src/magic.installer/UIxml/mi_main.xml.
-#: src/magic.installer/po/xmltranslation.py:189
-#: src/magic.installer/po/xmltranslation.py:242
-#: src/magic.installer/po/xmltranslation.py:298
+#. TO_TRANSLATOR: All of these strings are extracted from xml file: src/mi/UIxml/mi_main.xml.
+#: src/mi/client/mainwin.py:128 src/mi/po/xmltranslation.py:149
 msgid "Steps"
 msgstr "步骤"
 
-#: src/magic.installer/po/xmltranslation.py:190
-#: src/magic.installer/po/xmltranslation.py:243
-msgid "_Logger"
+#: src/mi/client/mainwin.py:162
+#, fuzzy
+msgid "Magic Installer"
+msgstr "软件包安装出错"
+
+#: src/mi/client/mainwin.py:289
+#, fuzzy
+msgid "This page has no help information."
+msgstr "搜索包信息"
+
+#: src/mi/client/mainwin.py:399 src/mi/po/xmltranslation.py:151
+msgid "Theme Choice"
+msgstr "场景选择"
+
+#: src/mi/client/mainwin.py:426 src/mi/po/xmltranslation.py:236
+msgid "Default"
+msgstr "默认"
+
+#: src/mi/client/buttonbar.py:11
+#, fuzzy
+msgid "Logger"
 msgstr "备份日志(_L)"
 
-#: src/magic.installer/po/xmltranslation.py:192
-#: src/magic.installer/po/xmltranslation.py:286
-msgid "_Help"
-msgstr "求助(_H)"
+#: src/mi/client/buttonbar.py:13
+#, fuzzy
+msgid "Theme"
+msgstr "时间"
 
-#: src/magic.installer/po/xmltranslation.py:193
-msgid "_Finish"
-msgstr "完成(_F)"
+#: src/mi/client/buttonbar.py:15 src/mi/client/utils/magicpopup.py:92
+msgid "Help"
+msgstr "求助"
 
-#: src/magic.installer/po/xmltranslation.py:194
-msgid "_Next"
-msgstr "下一页(_N)"
-
-#: src/magic.installer/po/xmltranslation.py:195
-msgid "_Back"
+#: src/mi/client/buttonbar.py:17
+#, fuzzy
+msgid "Back"
 msgstr "上一页(_B)"
 
-#: src/magic.installer/po/xmltranslation.py:196
-msgid "_Cancel the Installation"
-msgstr "放弃安装(_C)"
+#: src/mi/client/buttonbar.py:19
+#, fuzzy
+msgid "Next"
+msgstr "下一页(_N)"
 
-#: src/magic.installer/po/xmltranslation.py:197
-msgid "Click the button to choose the theme that you like."
-msgstr "点击按钮以切换到您喜欢的场景。"
+#: src/mi/client/modules/network.py:7
+msgid "Network"
+msgstr "网络"
 
-#. TO_TRANSLATOR: All of these strings are extracted from xml file: src/magic.installer/UIxml/mi_dialog.xml.
-#: src/magic.installer/po/xmltranslation.py:199
-msgid "_Yes"
-msgstr "是(_Y)"
+#: src/mi/client/modules/takeactions.py:15
+msgid "Package not found"
+msgstr "找不到软件包"
 
-#: src/magic.installer/po/xmltranslation.py:200
-msgid "_OK"
-msgstr "确认(_O)"
+#: src/mi/client/modules/takeactions.py:36
+msgid "Package install error"
+msgstr "软件包安装出错"
 
-#: src/magic.installer/po/xmltranslation.py:202
-msgid "_Cancel"
-msgstr "取消(_C)"
+#: src/mi/client/modules/takeactions.py:54
+msgid "Take Actions"
+msgstr "实施安装"
 
-#: src/magic.installer/po/xmltranslation.py:203
-msgid "_No"
-msgstr "否(_N)"
+#: src/mi/client/modules/takeactions.py:147
+msgid "Generate modprobe.conf"
+msgstr "生成 modprobe.conf"
 
-#: src/magic.installer/po/xmltranslation.py:204
-msgid "_Ignore"
-msgstr "忽略(_I)"
+#: src/mi/client/modules/takeactions.py:150
+msgid "Make initrd"
+msgstr "制作 initrd"
 
-#. TO_TRANSLATOR: All of these strings are extracted from xml file: src/magic.installer/UIxml/accounts.xml.
-#: src/magic.installer/po/xmltranslation.py:206
+#: src/mi/client/modules/takeactions.py:153
+msgid "Prepare bootloader"
+msgstr "准备引导管理器"
+
+#: src/mi/client/modules/takeactions.py:159
+#: src/mi/client/modules/dosetup.py:198
+msgid "Setup accounts"
+msgstr "设定帐号"
+
+#: src/mi/client/modules/takeactions.py:162
+#: src/mi/client/modules/dosetup.py:219 src/mi/client/modules/dosetup.py:223
+#: src/mi/client/modules/dosetup.py:227
+msgid "Run post install script"
+msgstr "运行后期安装脚本"
+
+#: src/mi/client/modules/takeactions.py:254
+#, python-format
+msgid ""
+"Can't find packages in disc %d.\n"
+"If you are using CDROM to install system, it is the chance to eject the "
+"original disc and insert the %d disc."
+msgstr ""
+"无法找到碟片 %d 中的包。\n"
+"如果您正使用 CDROM 安装系统，请此时弹出光碟并插入第 %d 张碟。"
+
+#: src/mi/client/modules/takeactions.py:299
+msgid "Umount the target filesystem(s)."
+msgstr "卸载目标文件系统。"
+
+#: src/mi/client/modules/takeactions.py:310
+msgid ""
+"Click \"OK\" to reboot your system!\n"
+"Eject the cdrom if you are installed from cdrom."
+msgstr ""
+"点击“确认”以重新启动您的系统！\n"
+"如果您是光盘安装，请弹出光盘。"
+
+#: src/mi/client/modules/takeactions.py:321
+msgid "XGlines"
+msgstr "XGlines"
+
+#: src/mi/client/modules/takeactions.py:328
+msgid "helptext/games.xglines.en.txt"
+msgstr "helptext/games.xglines.gb.utf8.txt"
+
+#: src/mi/client/modules/startsetup.py:12
+msgid "Start to setup"
+msgstr "开始设置"
+
+#. TO_TRANSLATOR: All of these strings are extracted from xml file: src/mi/UIxml/mouse.xml.
+#: src/mi/client/modules/mouse.py:7 src/mi/po/xmltranslation.py:31
+#: src/mi/po/xmltranslation.py:158
+msgid "Mouse"
+msgstr "鼠标"
+
+#: src/mi/client/modules/finish.py:18
+msgid "You can not go back because the installation has finished."
+msgstr "由于安装已完成您无法回去。"
+
+#: src/mi/client/modules/accounts.py:8
+#, fuzzy
+msgid "Accounts"
+msgstr "设定帐号"
+
+#: src/mi/client/modules/accounts.py:11
+msgid "Add/Edit a user"
+msgstr "添加/编辑用户"
+
+#: src/mi/client/modules/accounts.py:38
+msgid "Your root password is different with your root password confirmation!"
+msgstr "您的根用户口令和根用户口令确认不相同！"
+
+#: src/mi/client/modules/accounts.py:44
+msgid "Please do not use the password which shorter than 3 characters."
+msgstr "请不要选择选择短于三个字符的口令。"
+
+#: src/mi/client/modules/accounts.py:59
+#, python-format
+msgid "Two user share the same username '%s'."
+msgstr "两个用户共用同一个用户名“%s”。"
+
+#: src/mi/client/modules/accounts.py:70
+#, python-format
+msgid "The custom uid is conflict between '%s' and '%s'."
+msgstr "用户“%s”和“%s”的定制 uid 冲突。"
+
+#: src/mi/client/modules/accounts.py:104 src/mi/client/modules/accounts.py:155
+msgid "Auto"
+msgstr "自动"
+
+#: src/mi/client/modules/accounts.py:118
+msgid "Please choose a user to remove."
+msgstr "请选择一个要删除的用户。"
+
+#: src/mi/client/modules/accounts.py:127
+msgid "Username is not specified."
+msgstr "未给出用户名。"
+
+#: src/mi/client/modules/accounts.py:135
+msgid "Your password is different with your confirm password."
+msgstr "您的口令和口令确认不相同。"
+
+#: src/mi/client/modules/accounts.py:141
+msgid ""
+"You can not login in this user directly because you leave the password to "
+"blank"
+msgstr "由于您将口令设为空，您将无法直接登录该用户。"
+
+#: src/mi/client/modules/testops.py:7
+msgid "Test"
+msgstr "测试"
+
+#: src/mi/client/modules/welcome.py:63
+msgid "Do you realy want to cancel the installation?"
+msgstr "您真的要放弃安装？"
+
+#: src/mi/client/modules/bootloader.py:11
+msgid "Bootloader"
+msgstr "引导管理器"
+
+#: src/mi/client/modules/bootloader.py:30
+msgid "helptext/bootloader.help.en.txt"
+msgstr "helptext/bootloader.help.gb.utf8.txt"
+
+#: src/mi/client/modules/bootloader.py:34
+msgid "Please wait a while for the search of Windows partition."
+msgstr "正在搜索 Windows 分区，请稍候。"
+
+#: src/mi/client/modules/bootloader.py:75
+#, python-format
+msgid "%s is not a Windows partition."
+msgstr "%s 不是 Windows 分区。"
+
+#: src/mi/client/modules/bootloader.py:81
+#, python-format
+msgid "Cannot install grldr: %s does not contain ntldr."
+msgstr "不能安装 grldr 到 %s，因为它没有 Nt Loader。"
+
+#: src/mi/client/modules/bootloader.py:87
+msgid "Windows partition is empty."
+msgstr "没有 Windows 分区。"
+
+#: src/mi/client/modules/bootloader.py:175
+msgid "Please choose an entry to edit."
+msgstr "请选择一个要编辑的条目。"
+
+#: src/mi/client/modules/bootloader.py:188
+msgid "Edit a boot entry."
+msgstr "编辑引导条目"
+
+#: src/mi/client/modules/bootloader.py:233
+msgid "Please choose an entry to remove."
+msgstr "请选择一个要删除的条目。"
+
+#: src/mi/client/modules/bootloader.py:240
+msgid "Please do not remove the entry to boot the installed system."
+msgstr "请不要删除即将安装的系统的启动条目。"
+
+#: src/mi/client/modules/pkgselect.py:15
+msgid "Package Select"
+msgstr "包选择"
+
+#: src/mi/client/modules/pkgselect.py:40
+msgid "Can not get packages info (pkgarr_probe)"
+msgstr "不能获得包信息(pkgarr_probe)"
+
+#: src/mi/client/modules/pkgselect.py:48
+msgid "Search package information"
+msgstr "搜索包信息"
+
+#: src/mi/client/modules/pkgselect.py:72
+msgid "You want fetch packages from..."
+msgstr "您想要从那里获取软件包..."
+
+#: src/mi/client/modules/pkgselect.py:107
+msgid "All Packages"
+msgstr "所有软件包"
+
+#: src/mi/client/modules/pkgselect.py:130
+msgid "Load the choosed package arrangement failed!"
+msgstr "装入选中的包管理信息失败！"
+
+#: src/mi/client/modules/pkgselect.py:135
+msgid "Please choose one position."
+msgstr "请选择一个位置。"
+
+#: src/mi/client/modules/pkgselect.py:145
+msgid "Please wait a while for the search of package arrangement information."
+msgstr "正在搜索包分布信息，请稍候。"
+
+#: src/mi/client/modules/pkgselect.py:150
+msgid ""
+"Not any package arrangement information can be found!\n"
+"Please return to the parted step to check your setup."
+msgstr ""
+"找不到任何包分布信息！\n"
+"请返回分区步骤检查您的设定。"
+
+#: src/mi/client/modules/pkgselect.py:166
+msgid ""
+"Load the only package arrangement failed!\n"
+"Please return to the parted step to check your step."
+msgstr ""
+"装入唯一的包管理信息失败！\n"
+"请返回分区步骤检查您的设定。"
+
+#: src/mi/client/modules/scsi.py:10
+msgid "SCSI Driver"
+msgstr "SCSI 驱动"
+
+#: src/mi/client/modules/scsi.py:42
+msgid "Not any driver is selected."
+msgstr "未找到任何驱动。"
+
+#: src/mi/client/modules/scsi.py:48
+msgid "The selected module has been loaded already."
+msgstr "选中的模块已经加载。"
+
+#: src/mi/client/modules/scsi.py:55 src/mi/client/modules/partition.py:668
+msgid "Please wait......"
+msgstr "请稍候......"
+
+#: src/mi/client/modules/scsi.py:63
+msgid "Load module failed."
+msgstr "模块加载失败。"
+
+#: src/mi/client/modules/scsi.py:71
+msgid "Load module success."
+msgstr "模块加载成功。"
+
+#: src/mi/client/modules/Xwindow.py:10
+msgid "Xwindow"
+msgstr "X 视窗"
+
+#: src/mi/client/modules/Xwindow.py:23 src/mi/client/modules/Xwindow.py:57
+#: src/mi/client/modules/dosetup.py:159
+msgid "Probe Monitor"
+msgstr "探测显示器"
+
+#: src/mi/client/modules/Xwindow.py:26 src/mi/client/modules/Xwindow.py:62
+#: src/mi/client/modules/dosetup.py:162
+msgid "Probe VideoCard"
+msgstr "探测显卡"
+
+#: src/mi/client/modules/Xwindow.py:29 src/mi/client/modules/Xwindow.py:67
+#: src/mi/client/modules/dosetup.py:165
+msgid "Probe Mouse"
+msgstr "探测鼠标"
+
+#: src/mi/client/modules/Xwindow.py:48 src/mi/client/modules/dosetup.py:173
+msgid "Failed to collect the information about Xwindow configuration."
+msgstr "收集同 Xwindow 配置有关的信息失败。"
+
+#: src/mi/client/modules/Xwindow.py:52 src/mi/client/modules/dosetup.py:178
+msgid "Generate Xwindow configuration"
+msgstr "生成 X 视窗配置"
+
+#: src/mi/client/modules/Xwindow.py:113
+msgid "Please choose your monitor here."
+msgstr "请在此处选择您的显示器。"
+
+#: src/mi/client/modules/Xwindow.py:155
+msgid "Test X Settings"
+msgstr "测试 X 视窗设置"
+
+#: src/mi/client/modules/Xwindow.py:163
+msgid "Success!"
+msgstr "成功！"
+
+#: src/mi/client/modules/Xwindow.py:216
+msgid "Widemode resolution or refresh rate error."
+msgstr "宽屏分辨率或刷新率有误。"
+
+#: src/mi/client/modules/Xwindow.py:224
+msgid "At least one mode has to be chosen."
+msgstr "必须至少选择一个模式。"
+
+#: src/mi/client/modules/partition.py:44
+#: src/mi/client/modules/partition.py:116
+msgid "Probe all harddisk"
+msgstr "探测所有硬盘"
+
+#: src/mi/client/modules/partition.py:134
+#, fuzzy
+msgid "Please choose a package resource."
+msgstr "请选择一个要删除的用户。"
+
+#: src/mi/client/modules/partition.py:145
+msgid "Please wait until the harddisk probe finished."
+msgstr "请稍候以等待硬盘探测的结束。"
+
+#: src/mi/client/modules/partition.py:150
+msgid ""
+"Not any harddisk is detected, you might need to load driver for your SCSI "
+"harddisk..."
+msgstr "没有找到任何硬盘，您可能需要为您的 SCSI 硬盘载入驱动模块..."
+
+#: src/mi/client/modules/partition.py:156
+msgid ""
+"Please read the help carefully if it is the first time that you use this "
+"partition code."
+msgstr "如果您是首次使用本分区程序，请仔细阅读求助信息。"
+
+#: src/mi/client/modules/partition.py:181
+msgid "Not any usable MBR is found."
+msgstr "找不到可用的 MBR"
+
+#: src/mi/client/modules/partition.py:204
+msgid "No partition is mounted on /."
+msgstr "没有加载到 / 的分区。"
+
+#: src/mi/client/modules/partition.py:220
+#, python-format
+msgid "More than one partitions are mounted on %s."
+msgstr "在 %s 上多次加载分区。"
+
+#: src/mi/client/modules/partition.py:228
+#, python-format
+msgid ""
+"Mount %s%d(%s) on %s might corrupt bootloader. Please do not mount any "
+"partition in the subdirectory of /boot."
+msgstr ""
+"将 %s%d(%s) 加载于 %s 可能损坏引导管理器。请不要在 /boot 的任何子目录上加载分"
+"区。"
+
+#: src/mi/client/modules/partition.py:237
+#, python-format
+msgid ""
+"fat16, fat32 or ntfs must be mounted in the subdirectory of /mnt.\n"
+"But one %s%d(%s) is mounted on %s."
+msgstr ""
+"fat16、fat32 或 ntfs 必须加载在 /mnt 的子目录上。\n"
+"但 %s%d(%s) 是加载在 %s 上。"
+
+#: src/mi/client/modules/partition.py:274
+msgid "Search for Windows partitions"
+msgstr "搜索 Windows 分区"
+
+#: src/mi/client/modules/partition.py:280
+#, python-format
+msgid ""
+"Could not install the bootloader into %s as you will because it contain %s "
+"which will prevent the bootloader boot your system. Reset to MBR forcely."
+msgstr ""
+"无法将引导管理器安装到 %s，这是因为该分区含有的 %s 将导致引导管理器不能启动您"
+"的系统。强制设为 MBR。"
+
+#: src/mi/client/modules/partition.py:302
+#, python-format
+msgid ""
+"The capacity of %s should >= %s. \n"
+"Please increase the size of partition %s%d."
+msgstr ""
+"%s 的容量应大于或等于 %s。\n"
+"请增加 %s%d 分区的大小。"
+
+#: src/mi/client/modules/partition.py:364
+msgid "helptext/parted.help.en.txt"
+msgstr "helptext/parted.help.gb.utf8.txt"
+
+#: src/mi/client/modules/partition.py:374
+msgid ""
+"Auto-partition will erase all existing partitions.\n"
+"Continue?"
+msgstr ""
+"自动分区会先删除所有现存分区，\n"
+"是否继续？"
+
+#: src/mi/client/modules/partition.py:385
+msgid "No auto-partition profile is defined or selected."
+msgstr "没有定义或选择好的自动分区方案。"
+
+#: src/mi/client/modules/partition.py:400
+#: src/mi/client/modules/partition.py:446
+msgid "Read auto-partition profile failed."
+msgstr "读取自动分区方案出错。"
+
+#: src/mi/client/modules/partition.py:431
+#, python-format
+msgid "Filesystem type '%s' not supported."
+msgstr "不支持文件系统类型 '%s'。"
+
+#: src/mi/client/modules/partition.py:466
+#: src/mi/client/modules/partition.py:476
+msgid "Insufficient disk space for this auto-partition profile."
+msgstr "磁盘空间不足以应用当前自动分区方案。"
+
+#: src/mi/client/modules/partition.py:785
+msgid "More than one partition is mounted on /"
+msgstr "不能重复加载 / 分区"
+
+#: src/mi/client/modules/partition.py:793
+#, python-format
+msgid "%0.2fM is too small for %s, %dM at least."
+msgstr "%0.2fM 对 %s 来说太小了，至少需要 %dM。"
+
+#: src/mi/client/modules/partition.py:799
+#, python-format
+msgid "%0.2fM is too big for %s, %dM at most."
+msgstr "%0.2fM 对 %s 来说太大了，至多为 %dM。"
+
+#: src/mi/client/modules/partition.py:1107
+msgid "Create a new partition"
+msgstr "创建一个新分区"
+
+#: src/mi/client/modules/partition.py:1188
+msgid ""
+"Sorry, you can not edit this deivce.\n"
+"Because the setup package is in it."
+msgstr ""
+"对不起，你不能编辑这个设备。\n"
+"因为安装包在这个设备中。"
+
+#: src/mi/client/modules/partition.py:1196
+msgid "Edit an exist partition"
+msgstr "编辑现有分区"
+
+#: src/mi/client/modules/partition.py:1256
+msgid ""
+"This operation will reload partition table from harddisk. All your custom "
+"information will be lost."
+msgstr "此操作将从硬盘中重新读入分区表。您目前所有的定制信息都将消失。"
+
+#: src/mi/client/modules/partition.py:1281
+msgid "Create an empty new disk label"
+msgstr "创建一个新的空白分区表"
+
+#: src/mi/client/modules/partition.py:1297
+msgid "This operation will erase the whole partition table when apply."
+msgstr "此操作在应用的时候将清除整个分区表。"
+
+#: src/mi/client/modules/dosetup.py:11
+msgid "Do Setup"
+msgstr "进行设置"
+
+#: src/mi/client/modules/dosetup.py:180
+msgid "Backup Xwindow configuration files"
+msgstr "生成 X 视窗配置"
+
+#: src/mi/client/modules/dosetup.py:206
+msgid "We are doing setup, do not leave please."
+msgstr "正在进行设置，请勿离开。"
+
+#: src/mi/client/modules/dopartition.py:16
+#, fuzzy
+msgid "Do Partition"
+msgstr "分区"
+
+#: src/mi/client/modules/dopartition.py:49
+msgid "Get all dirty disk"
+msgstr "获取所有受影响的硬盘"
+
+#: src/mi/client/modules/dopartition.py:144
+#, python-format
+msgid "Write the partition table of %s."
+msgstr "写入 %s 的分区表。"
+
+#: src/mi/client/modules/dopartition.py:191
+#, python-format
+msgid "Format Partition Error: %s"
+msgstr "格式化磁盘错误: %s"
+
+#: src/mi/client/modules/keyboard.py:7
+msgid "Keyboard"
+msgstr "键盘"
+
+#: src/mi/client/utils/xmlgtk.py:685
+msgid "File is not found: "
+msgstr "找不到文件："
+
+#: src/mi/client/utils/magicpopup.py:64
+msgid "Error"
+msgstr "错误"
+
+#: src/mi/client/utils/magicpopup.py:68
+msgid "Info"
+msgstr "信息"
+
+#: src/mi/client/utils/magicpopup.py:72
+msgid "Question"
+msgstr "提问"
+
+#: src/mi/client/utils/magicpopup.py:76
+msgid "Warning"
+msgstr "警告"
+
+#: src/mi/client/utils/magicstep.py:64
+msgid "UNDEFINED"
+msgstr "未定义"
+
+#. TO_TRANSLATOR: All of these strings are extracted from xml file: src/mi/magic.autopart.xml.
+#: src/mi/po/xmltranslation.py:2
+msgid "Single partition with swap"
+msgstr "仅根分区和交换分区"
+
+#: src/mi/po/xmltranslation.py:3
+msgid "Separated /, /home"
+msgstr "独立的 /boot, / 和 /home 分区"
+
+#: src/mi/po/xmltranslation.py:4
+msgid "Customed autopart profile"
+msgstr "定制特殊分区"
+
+#. TO_TRANSLATOR: All of these strings are extracted from xml file: src/mi/UIxml/Xwindow.xml.
+#: src/mi/po/xmltranslation.py:6
+msgid "Monitor Parameters"
+msgstr "显示器参数"
+
+#: src/mi/po/xmltranslation.py:7
+msgid "_Monitor Name :"
+msgstr "显示器名称(_M)："
+
+#: src/mi/po/xmltranslation.py:8
+msgid "_HorizSync :"
+msgstr "水平同步(_H)："
+
+#: src/mi/po/xmltranslation.py:9
+msgid "_VertRefresh :"
+msgstr "垂直扫描率(_V)："
+
+#: src/mi/po/xmltranslation.py:10
+msgid "Monitor Vender List"
+msgstr "显示器厂家列表"
+
+#: src/mi/po/xmltranslation.py:11
+msgid "You can choose your monitor vender and then choose your monitor."
+msgstr "您可以选择您的显示器厂家而后选择您的显示器。"
+
+#: src/mi/po/xmltranslation.py:12
+msgid "Monitor Vender"
+msgstr "显示器厂家"
+
+#: src/mi/po/xmltranslation.py:13 src/mi/po/xmltranslation.py:22
+#: src/mi/po/xmltranslation.py:32
+msgid "_Choose"
+msgstr "选中(_C)"
+
+#: src/mi/po/xmltranslation.py:14
+msgid "Videocard Parameters"
+msgstr "显卡参数"
+
+#: src/mi/po/xmltranslation.py:15
+msgid "_Videocard Name :"
+msgstr "显卡名称(_V)："
+
+#: src/mi/po/xmltranslation.py:16
+msgid "_Driver :"
+msgstr "驱动程序(_D)："
+
+#: src/mi/po/xmltranslation.py:17
+msgid "_VideoRam :"
+msgstr "显存(_V)："
+
+#: src/mi/po/xmltranslation.py:18
+msgid "_Reprobe Videocard"
+msgstr "重新探测显卡(_R)"
+
+#: src/mi/po/xmltranslation.py:19
+msgid "Video Card List"
+msgstr "显卡列表"
+
+#: src/mi/po/xmltranslation.py:20
+msgid "You can choose your video card here directly."
+msgstr "您可以在此处直接选择您的显卡。"
+
+#: src/mi/po/xmltranslation.py:21
+msgid "Videocard"
+msgstr "显卡"
+
+#: src/mi/po/xmltranslation.py:23
+msgid "Mouse Parameters"
+msgstr "显示器参数"
+
+#: src/mi/po/xmltranslation.py:24
+msgid "_Mouse Name :"
+msgstr "鼠标名称(_M)："
+
+#: src/mi/po/xmltranslation.py:25
+msgid "_Protocol :"
+msgstr "协议(_P)："
+
+#: src/mi/po/xmltranslation.py:26
+msgid "_Device :"
+msgstr "设备(_D)："
+
+#: src/mi/po/xmltranslation.py:27
+msgid "_Emulate 3 Buttons"
+msgstr "模拟鼠标第三键(_E)"
+
+#: src/mi/po/xmltranslation.py:28
+msgid "_Reprobe Mouse"
+msgstr "重新探测鼠标(_R)"
+
+#: src/mi/po/xmltranslation.py:29
+msgid "Mouse List"
+msgstr "鼠标列表"
+
+#: src/mi/po/xmltranslation.py:30
+msgid ""
+"If auto probe is incorrect, choose your mouse here directly. If you have a "
+"wheel mouse, please choose one tagged with 'wheel mouse' according to the "
+"interface."
+msgstr ""
+"如果自动检测不正确，请直接选择您的鼠标类型。滚轮鼠标需要根据接口来选择相应的 "
+"wheel mouse。"
+
+#: src/mi/po/xmltranslation.py:33
+msgid "Modes"
+msgstr "显示模式"
+
+#: src/mi/po/xmltranslation.py:34 src/mi/po/xmltranslation.py:43
+msgid "256 Colors"
+msgstr "256 色"
+
+#: src/mi/po/xmltranslation.py:35 src/mi/po/xmltranslation.py:44
+msgid "32K Colors"
+msgstr "3.2 万色"
+
+#: src/mi/po/xmltranslation.py:36 src/mi/po/xmltranslation.py:45
+msgid "64K Colors"
+msgstr "6.4 万色"
+
+#: src/mi/po/xmltranslation.py:37 src/mi/po/xmltranslation.py:46
+msgid "16M Colors"
+msgstr "16 兆色"
+
+#: src/mi/po/xmltranslation.py:38
+msgid "LCD Widescreen"
+msgstr "液晶宽屏"
+
+#: src/mi/po/xmltranslation.py:39
+msgid "Resolution:"
+msgstr "分辨度"
+
+#: src/mi/po/xmltranslation.py:40
+msgid "none"
+msgstr "无"
+
+#: src/mi/po/xmltranslation.py:41
+msgid "Custom:"
+msgstr "定制："
+
+#: src/mi/po/xmltranslation.py:42
+msgid "Color Depth:"
+msgstr "颜色位数："
+
+#: src/mi/po/xmltranslation.py:47
+msgid "Refresh Rate:"
+msgstr "垂直刷新率(_V)："
+
+#: src/mi/po/xmltranslation.py:48
+msgid "Init Mode"
+msgstr "初始化显示模式"
+
+#: src/mi/po/xmltranslation.py:49
+msgid "_Text"
+msgstr "文本(_T)"
+
+#: src/mi/po/xmltranslation.py:50
+msgid "_Graphics"
+msgstr "图形(_G)"
+
+#: src/mi/po/xmltranslation.py:51
+msgid "Test Xwindow _Settings"
+msgstr "测试 X 视窗设置(_S)"
+
+#: src/mi/po/xmltranslation.py:52 src/mi/po/xmltranslation.py:162
+#: src/mi/po/xmltranslation.py:247
+msgid "Name"
+msgstr "名称"
+
+#: src/mi/po/xmltranslation.py:53
+msgid "Horiz Sync"
+msgstr "水平同步"
+
+#: src/mi/po/xmltranslation.py:54
+msgid "Vert Refresh"
+msgstr "垂直扫描率"
+
+#. TO_TRANSLATOR: All of these strings are extracted from xml file: src/mi/UIxml/dosetup.xml.
+#: src/mi/po/xmltranslation.py:56
+msgid "Make the setup take effect..."
+msgstr "使设置生效..."
+
+#. TO_TRANSLATOR: All of these strings are extracted from xml file: src/mi/UIxml/accounts.xml.
+#: src/mi/po/xmltranslation.py:58
 msgid "Hostname"
 msgstr "主机名"
 
-#: src/magic.installer/po/xmltranslation.py:207
+#: src/mi/po/xmltranslation.py:59
 msgid "_Hostname :"
 msgstr "主机名(_H)："
 
-#: src/magic.installer/po/xmltranslation.py:208
+#: src/mi/po/xmltranslation.py:60
 msgid "The password of root"
 msgstr "根用户口令"
 
-#: src/magic.installer/po/xmltranslation.py:209
-msgid "IMPORTANT: The password of root account is the key of your system, choose it carefully please and don't forget it. Please do not use the password shorter than 3 characters for security."
-msgstr "重要：根用户口令对您的系统来说非常关键，请慎重选择并不要忘记。为了安全，请不要使用少于 3 个字符的口令。"
+#: src/mi/po/xmltranslation.py:61
+msgid ""
+"IMPORTANT: The password of root account is the key of your system, choose it "
+"carefully please and don't forget it. Please do not use the password shorter "
+"than 3 characters for security."
+msgstr ""
+"重要：根用户口令对您的系统来说非常关键，请慎重选择并不要忘记。为了安全，请不"
+"要使用少于 3 个字符的口令。"
 
-#: src/magic.installer/po/xmltranslation.py:210
+#: src/mi/po/xmltranslation.py:62
 msgid "_Root password :"
 msgstr "根用户口令(_R)："
 
-#: src/magic.installer/po/xmltranslation.py:211
+#: src/mi/po/xmltranslation.py:63
 msgid "Root password _confirm :"
 msgstr "根用户口令确认(_C)："
 
-#: src/magic.installer/po/xmltranslation.py:212
+#: src/mi/po/xmltranslation.py:64
 msgid "If you want to add more user, please click 'Add user'."
 msgstr "如果您需要添加更多用户，请点击“添加用户”。"
 
-#: src/magic.installer/po/xmltranslation.py:213
+#: src/mi/po/xmltranslation.py:65
 msgid "_Add user"
 msgstr "添加用户(_A)"
 
-#: src/magic.installer/po/xmltranslation.py:214
+#: src/mi/po/xmltranslation.py:66
 msgid "_Edit user"
 msgstr "编辑用户(_E)"
 
-#: src/magic.installer/po/xmltranslation.py:215
+#: src/mi/po/xmltranslation.py:67
 msgid "_Remove user"
 msgstr "删除用户(_R)"
 
-#: src/magic.installer/po/xmltranslation.py:216
+#: src/mi/po/xmltranslation.py:68
 msgid "Username"
 msgstr "用户名"
 
-#: src/magic.installer/po/xmltranslation.py:217
+#: src/mi/po/xmltranslation.py:69
 msgid "Shell"
 msgstr "Shell"
 
-#: src/magic.installer/po/xmltranslation.py:218
+#: src/mi/po/xmltranslation.py:70
 msgid "Home directory"
 msgstr "家目录"
 
-#: src/magic.installer/po/xmltranslation.py:219
+#: src/mi/po/xmltranslation.py:71
 msgid "UID"
 msgstr "UID"
 
-#: src/magic.installer/po/xmltranslation.py:220
+#: src/mi/po/xmltranslation.py:72
 msgid "_Username :"
 msgstr "用户名(_U)："
 
-#: src/magic.installer/po/xmltranslation.py:221
+#: src/mi/po/xmltranslation.py:73
 msgid "_Password :"
 msgstr "口令(_P)："
 
-#: src/magic.installer/po/xmltranslation.py:222
+#: src/mi/po/xmltranslation.py:74
 msgid "_Confirm Password :"
 msgstr "口令确认(_C)："
 
-#: src/magic.installer/po/xmltranslation.py:223
+#: src/mi/po/xmltranslation.py:75
 msgid "_Shell :"
 msgstr "_Shell："
 
-#: src/magic.installer/po/xmltranslation.py:224
+#: src/mi/po/xmltranslation.py:76
 msgid "Custom _home directory"
 msgstr "定制家目录(_H)"
 
-#: src/magic.installer/po/xmltranslation.py:225
+#: src/mi/po/xmltranslation.py:77
 msgid "Custom U_ID"
 msgstr "定制 U_ID"
 
-#. TO_TRANSLATOR: All of these strings are extracted from xml file: src/magic.installer/UIxml/welcome.xml.
-#: src/magic.installer/po/xmltranslation.py:227
-msgid "Welcome to the MagicLinux. It is a composition of Chinese Linux lovers. Enjoy it!"
-msgstr "欢迎使用 MagicLinux。它是中国 Linux 爱好者的作品。Enjoy it！"
+#. TO_TRANSLATOR: All of these strings are extracted from xml file: src/mi/UIxml/mi_dialog.xml.
+#: src/mi/po/xmltranslation.py:79
+msgid "_Yes"
+msgstr "是(_Y)"
 
-#: src/magic.installer/po/xmltranslation.py:228
-msgid "Most of the softwares that distributed in MagicLinux are licensed by free software license. These licenses include: GPL, LGPL, MPL, BSD License, and so on. This program, MagicInstaller, is licensed by General Public License. If you are not agree General Public License, sure you can't use this MagicInstaller to install MagicLinux. Read it carefully please."
-msgstr "由 MagicLinux 发行的大部分软件都是以自由软件许可证发行的。这些许可证包括：GPL、LGPL、MPL、BSD License 等等。本程序，即 MagicInstaller，是按照 GNU 通用公共许可证 (GPL) 发行的。如果您不同意 GPL，您就不能使用本安装程序安装 MagicLinux。请仔细阅读。"
+#: src/mi/po/xmltranslation.py:80
+msgid "_OK"
+msgstr "确认(_O)"
 
-#: src/magic.installer/po/xmltranslation.py:229
-#: src/magic.installer/po/xmltranslation.py:233
-msgid "I _Agree"
-msgstr "我同意(_A)"
+#: src/mi/po/xmltranslation.py:81 src/mi/po/xmltranslation.py:88
+msgid "_Apply"
+msgstr "应用(_A)"
 
-#: src/magic.installer/po/xmltranslation.py:230
-#: src/magic.installer/po/xmltranslation.py:234
-msgid "I _DISAGREE"
-msgstr "我不同意(_D)"
+#: src/mi/po/xmltranslation.py:82
+msgid "_Cancel"
+msgstr "取消(_C)"
 
-#: src/magic.installer/po/xmltranslation.py:231
-msgid "You have agree the license"
-msgstr "您已经同意了许可证"
+#: src/mi/po/xmltranslation.py:83
+msgid "_No"
+msgstr "否(_N)"
 
-#: src/magic.installer/po/xmltranslation.py:232
-msgid "It is very important to noticed that there is NO WARRANTY. I take it out for emphasis even it is contained in General Public License already. Read the following text carefully please."
-msgstr "没有担保是非常重要的。虽然 GPL 已经含有没有担保的条文，但我仍然把它提取出来加以强调。请仔细阅读以下条文。注意：请您在安装 Magic Linux 操作系统前，拔下所有移动存储设备，包括但不限于：移动硬盘、闪存盘(U 盘、MP3、MP4、MP5)、存储卡、存储棒、数码相机、移动电话，等等。这是为了避免由于插拔这些设备造成安装前后系统分区发生变化，导致 Magic Linux 操作系统不能正常启动。除非您希望将您的 Magic Linux 安装到移动硬盘或者容量不少于 4GB 的闪存盘上。"
+#: src/mi/po/xmltranslation.py:84
+msgid "_Ignore"
+msgstr "忽略(_I)"
 
-#: src/magic.installer/po/xmltranslation.py:235
-msgid "You have agree the nowarranty"
-msgstr "您已同意没有担保"
+#. TO_TRANSLATOR: All of these strings are extracted from xml file: src/mi/UIxml/parted.xml.
+#: src/mi/po/xmltranslation.py:86
+msgid "Auto-partition"
+msgstr "自动分区"
 
-#. TO_TRANSLATOR: All of these strings are extracted from xml file: src/magic.installer/UIxml/takeactions.xml.
-#. TO_TRANSLATOR: All of these strings are extracted from xml file: src/magic.installer/UIxml/takeactions.xml.cpinstmode.
-#: src/magic.installer/po/xmltranslation.py:237
-#: src/magic.installer/po/xmltranslation.py:289
-msgid "Release Notes"
-msgstr "发行说明"
+#: src/mi/po/xmltranslation.py:87
+msgid "Apply the selected auto-partition profile"
+msgstr "应用所选的自动分区方案"
 
-#: src/magic.installer/po/xmltranslation.py:238
-#: src/magic.installer/po/xmltranslation.py:290
-msgid "helptext/release.en.txt"
-msgstr "helptext/release.gb.utf8.txt"
+#: src/mi/po/xmltranslation.py:89
+msgid "Capacity:"
+msgstr "容量："
 
-#: src/magic.installer/po/xmltranslation.py:239
-#: src/magic.installer/po/xmltranslation.py:291
-msgid "Authors"
-msgstr "作者"
+#: src/mi/po/xmltranslation.py:90
+msgid "Disklabel:"
+msgstr "分区表类型："
 
-#: src/magic.installer/po/xmltranslation.py:240
-#: src/magic.installer/po/xmltranslation.py:292
-msgid "helptext/authors.en.txt"
-msgstr "helptext/authors.gb.utf8.txt"
+#: src/mi/po/xmltranslation.py:91
+msgid "Model:"
+msgstr "型号："
 
-#: src/magic.installer/po/xmltranslation.py:241
-#: src/magic.installer/po/xmltranslation.py:293
-msgid "NOTE: All required information have been collected. Click 'Next' to take the real action (partition, format, packages installation and other setup) and there is no chance to revert... Are you sure?"
-msgstr "注意：已收集了所有必要的信息。点击“下一页”以开始实际安装 (分区、格式化、包安装和其它设置) 而且无法恢复... 您确认吗？"
+#: src/mi/po/xmltranslation.py:92 src/mi/po/xmltranslation.py:112
+#: src/mi/po/xmltranslation.py:256
+msgid "Device"
+msgstr "设备(_D)："
 
-#: src/magic.installer/po/xmltranslation.py:245
-#: src/magic.installer/po/xmltranslation.py:300
-msgid "xglines"
-msgstr "xglines"
+#: src/mi/po/xmltranslation.py:93
+msgid "Format"
+msgstr "格式化"
 
-#: src/magic.installer/po/xmltranslation.py:246
-#: src/magic.installer/po/xmltranslation.py:301
+#: src/mi/po/xmltranslation.py:94 src/mi/po/xmltranslation.py:138
+msgid "Flags"
+msgstr "标志"
+
+#: src/mi/po/xmltranslation.py:95 src/mi/po/xmltranslation.py:251
+#: src/mi/po/xmltranslation.py:261
+msgid "Type"
+msgstr "类型"
+
+#: src/mi/po/xmltranslation.py:96
+msgid "Capacity"
+msgstr "容量"
+
+#: src/mi/po/xmltranslation.py:97 src/mi/po/xmltranslation.py:257
+msgid "Filesystem"
+msgstr "文件系统"
+
+#: src/mi/po/xmltranslation.py:98 src/mi/po/xmltranslation.py:119
+#: src/mi/po/xmltranslation.py:135
+msgid "Mount point"
+msgstr "加载点"
+
+#: src/mi/po/xmltranslation.py:99 src/mi/po/xmltranslation.py:132
+#: src/mi/po/xmltranslation.py:237
+msgid "Label"
+msgstr "标签"
+
+#: src/mi/po/xmltranslation.py:100 src/mi/po/xmltranslation.py:128
+msgid "Start"
+msgstr "起点"
+
+#: src/mi/po/xmltranslation.py:101 src/mi/po/xmltranslation.py:129
+msgid "End"
+msgstr "终点"
+
+#: src/mi/po/xmltranslation.py:102
+msgid "_Create"
+msgstr "创建(_C)"
+
+#: src/mi/po/xmltranslation.py:103
+msgid "Create a new partition at the selected freespace"
+msgstr "在选中的空闲空间中创建一个新分区"
+
+#: src/mi/po/xmltranslation.py:104
+msgid "_Edit"
+msgstr "编辑(_E)"
+
+#: src/mi/po/xmltranslation.py:105
+msgid "Edit the selected partition"
+msgstr "编辑选中的分区"
+
+#: src/mi/po/xmltranslation.py:106
+msgid "_Remove"
+msgstr "删除(_R)"
+
+#: src/mi/po/xmltranslation.py:107
+msgid "Remove the selected partition"
+msgstr "删除选中的分区"
+
+#: src/mi/po/xmltranslation.py:108
+msgid "Re_store"
+msgstr "恢复(_S)"
+
+#: src/mi/po/xmltranslation.py:109
+msgid "Reload the original partition table"
+msgstr "重新读入原始分区表"
+
+#: src/mi/po/xmltranslation.py:110
+msgid "New _Disk Label"
+msgstr "新建分区表(_D)"
+
+#: src/mi/po/xmltranslation.py:111
+msgid "Create a new empty disk label"
+msgstr "创建一个新的空白分区表"
+
+#: src/mi/po/xmltranslation.py:113
+msgid "Partition _Type"
+msgstr "分区类型(_T)"
+
+#: src/mi/po/xmltranslation.py:114
+msgid "Primary"
+msgstr "主分区"
+
+#: src/mi/po/xmltranslation.py:115
+msgid "Extended"
+msgstr "扩展分区"
+
+#: src/mi/po/xmltranslation.py:116
+msgid "Logical"
+msgstr "逻辑分区"
+
+#: src/mi/po/xmltranslation.py:117 src/mi/po/xmltranslation.py:133
+msgid "Fo_rmat it or not"
+msgstr "是否格式化(_R)"
+
+#: src/mi/po/xmltranslation.py:118 src/mi/po/xmltranslation.py:134
+msgid "_File System"
+msgstr "文件系统(_F)"
+
+#: src/mi/po/xmltranslation.py:120 src/mi/po/xmltranslation.py:136
+msgid "_Use"
+msgstr "使用(_U)"
+
+#: src/mi/po/xmltranslation.py:121 src/mi/po/xmltranslation.py:137
+msgid "_Don't use"
+msgstr "不使用(_D)"
+
+#: src/mi/po/xmltranslation.py:122
+msgid "Partition Position"
+msgstr "分区位置"
+
+#: src/mi/po/xmltranslation.py:123
+msgid "From _begin"
+msgstr "从起点开始(_B)"
+
+#: src/mi/po/xmltranslation.py:124
+msgid "From _end"
+msgstr "从终点开始(_E)"
+
+#: src/mi/po/xmltranslation.py:125
+msgid "_Size:"
+msgstr "大小(_S)："
+
+#: src/mi/po/xmltranslation.py:126
+msgid "Sectors"
+msgstr "扇区数"
+
+#: src/mi/po/xmltranslation.py:127
+msgid "Megabytes"
+msgstr "兆数"
+
+#: src/mi/po/xmltranslation.py:130
+msgid "Size"
+msgstr "大小"
+
+#: src/mi/po/xmltranslation.py:131
+msgid "Partition Size"
+msgstr "分区大小"
+
+#: src/mi/po/xmltranslation.py:139
+msgid "(_1).Boot"
+msgstr "(_1).Boot"
+
+#: src/mi/po/xmltranslation.py:140
+msgid "(_2).Root"
+msgstr "(_2).Root"
+
+#: src/mi/po/xmltranslation.py:141
+msgid "(_3).Swap"
+msgstr "(_3).Swap"
+
+#: src/mi/po/xmltranslation.py:142
+msgid "(_4).Hidden"
+msgstr "(_4).Hidden"
+
+#: src/mi/po/xmltranslation.py:143
+msgid "(_5).RAID"
+msgstr "(_5).RAID"
+
+#: src/mi/po/xmltranslation.py:144
+msgid "(_6).LVM"
+msgstr "(_6).LVM"
+
+#: src/mi/po/xmltranslation.py:145
+msgid "(_7).LBA"
+msgstr "(_7).LBA"
+
+#: src/mi/po/xmltranslation.py:146
+msgid "_Label"
+msgstr "标签(_L)"
+
+#: src/mi/po/xmltranslation.py:147
+msgid "helptext/newdisklabel.help.en.txt"
+msgstr "helptext/newdisklabel.help.gb.utf8.txt"
+
+#: src/mi/po/xmltranslation.py:150
+msgid "_Logger"
+msgstr "备份日志(_L)"
+
+#: src/mi/po/xmltranslation.py:152 src/mi/po/xmltranslation.py:271
+msgid "_Help"
+msgstr "求助(_H)"
+
+#: src/mi/po/xmltranslation.py:153
+msgid "_Finish"
+msgstr "完成(_F)"
+
+#: src/mi/po/xmltranslation.py:154
+msgid "_Next"
+msgstr "下一页(_N)"
+
+#: src/mi/po/xmltranslation.py:155
+msgid "_Back"
+msgstr "上一页(_B)"
+
+#: src/mi/po/xmltranslation.py:156
+msgid "_Cancel the Installation"
+msgstr "放弃安装(_C)"
+
+#. TO_TRANSLATOR: All of these strings are extracted from xml file: src/mi/UIxml/scsi.xml.
+#: src/mi/po/xmltranslation.py:160
+msgid "Loaded"
+msgstr "已装入"
+
+#: src/mi/po/xmltranslation.py:161
+msgid "Module"
+msgstr "模块"
+
+#: src/mi/po/xmltranslation.py:163
+msgid "_Load the selected driver"
+msgstr "加载选中的驱动模块(_L)"
+
+#. TO_TRANSLATOR: All of these strings are extracted from xml file: src/mi/UIxml/startsetup.xml.
+#: src/mi/po/xmltranslation.py:165
+msgid ""
+"OK, your system has been installed successfully. Click 'Next' to start the "
+"system configuration steps."
+msgstr "祝贺，您已经成功地安装了的系统。请点击“下一页”以便开始系统配置步骤。"
+
+#: src/mi/po/xmltranslation.py:166
+msgid ""
+"If you want to manually set the Xwindow, please select the Expert Mode, it "
+"will generate a xorg.conf configuration file for your system."
+msgstr ""
+"如果你想要手动设置 Xwindow, 请选择专家模式, 它会为你的系统生成一个 xorg.conf "
+"配置文件."
+
+#: src/mi/po/xmltranslation.py:167
+msgid ""
+"If you do not know Xwindow parameter settings, please skip Xwindow settings "
+"(recommended)."
+msgstr "如果你不知道怎样配置Xwindow, 请跳过 Xwindow 设置 (推荐)."
+
+#: src/mi/po/xmltranslation.py:168
+msgid "_Skip Xwindow Setup(Recommended)"
+msgstr "跳过 Xwindow 设置(建议)(_G)"
+
+#: src/mi/po/xmltranslation.py:169
+msgid "_Do not skip Xwindow Setup(Expert Mode)"
+msgstr "进行 Xwindow 设置(专家模式)"
+
+#. TO_TRANSLATOR: All of these strings are extracted from xml file: src/mi/UIxml/dopartition.xml.
+#: src/mi/po/xmltranslation.py:171
+msgid "Note: Please Click Next button to format partition and install system."
+msgstr "提示：请点击下一个按钮来格式化磁盘并安装系统。"
+
+#: src/mi/po/xmltranslation.py:172
 msgid "Partition/Format Progress"
 msgstr "分区/格式化进度"
 
-#: src/magic.installer/po/xmltranslation.py:247
-#: src/magic.installer/po/xmltranslation.py:302
+#: src/mi/po/xmltranslation.py:173
 msgid "Operation:"
 msgstr "操作："
 
-#: src/magic.installer/po/xmltranslation.py:248
-#: src/magic.installer/po/xmltranslation.py:303
+#: src/mi/po/xmltranslation.py:174
 msgid "Progress:"
 msgstr "进度："
 
-#: src/magic.installer/po/xmltranslation.py:249
-#: src/magic.installer/po/xmltranslation.py:304
+#: src/mi/po/xmltranslation.py:175
+#, fuzzy
+msgid "Package Source Information"
+msgstr "搜索包信息"
+
+#: src/mi/po/xmltranslation.py:176
+#, fuzzy
+msgid "Dirty Partition"
+msgstr "分区"
+
+#: src/mi/po/xmltranslation.py:177
+#, fuzzy
+msgid "Format Partition"
+msgstr "格式化磁盘错误: %s"
+
+#: src/mi/po/xmltranslation.py:178
+#, fuzzy
+msgid "Target Partition"
+msgstr "分区"
+
+#. TO_TRANSLATOR: All of these strings are extracted from xml file: src/mi/UIxml/finish.xml.
+#: src/mi/po/xmltranslation.py:180
+msgid ""
+"Congratulation! Your system has been installed and setup successfully. Click "
+"'Finish' to reboot system and enjoy it. Be note that if you are install it "
+"from CDROM you should remove the ejected CDROM so your system can boot from "
+"your harddisk."
+msgstr ""
+"祝贺您！您已经成功地安装并设置了系统。点击“完成”以重新启动系统并享用它。请"
+"注意如果您是从光盘安装，请取出弹出的光盘以便您的系统能够从您的硬盘启动。"
+
+#. TO_TRANSLATOR: All of these strings are extracted from xml file: src/mi/UIxml/takeactions.xml.
+#: src/mi/po/xmltranslation.py:182
 msgid "Installation Progress"
 msgstr "安装进度"
 
-#: src/magic.installer/po/xmltranslation.py:250
-#: src/magic.installer/po/xmltranslation.py:305
+#: src/mi/po/xmltranslation.py:183
 msgid "Package:"
 msgstr "软件包："
 
-#: src/magic.installer/po/xmltranslation.py:251
-#: src/magic.installer/po/xmltranslation.py:306
+#: src/mi/po/xmltranslation.py:184
 msgid "Total Progress:"
 msgstr "总进度："
 
-#: src/magic.installer/po/xmltranslation.py:252
-#: src/magic.installer/po/xmltranslation.py:307
+#: src/mi/po/xmltranslation.py:185
 msgid "Package Progress:"
 msgstr "包进度："
 
-#: src/magic.installer/po/xmltranslation.py:253
-#: src/magic.installer/po/xmltranslation.py:308
+#: src/mi/po/xmltranslation.py:186
 msgid "Package Number"
 msgstr "软件包数量"
 
-#: src/magic.installer/po/xmltranslation.py:254
-#: src/magic.installer/po/xmltranslation.py:258
-#: src/magic.installer/po/xmltranslation.py:309
-#: src/magic.installer/po/xmltranslation.py:313
+#: src/mi/po/xmltranslation.py:187 src/mi/po/xmltranslation.py:191
 msgid "Total:"
 msgstr "总计："
 
-#: src/magic.installer/po/xmltranslation.py:255
-#: src/magic.installer/po/xmltranslation.py:259
-#: src/magic.installer/po/xmltranslation.py:310
-#: src/magic.installer/po/xmltranslation.py:314
+#: src/mi/po/xmltranslation.py:188 src/mi/po/xmltranslation.py:192
 msgid "Done:"
 msgstr "完成："
 
-#: src/magic.installer/po/xmltranslation.py:256
-#: src/magic.installer/po/xmltranslation.py:260
-#: src/magic.installer/po/xmltranslation.py:311
-#: src/magic.installer/po/xmltranslation.py:315
+#: src/mi/po/xmltranslation.py:189 src/mi/po/xmltranslation.py:193
 msgid "Remain:"
 msgstr "剩余："
 
-#: src/magic.installer/po/xmltranslation.py:257
-#: src/magic.installer/po/xmltranslation.py:312
+#: src/mi/po/xmltranslation.py:190
 msgid "Package Size"
 msgstr "软件包大小"
 
-#: src/magic.installer/po/xmltranslation.py:261
-#: src/magic.installer/po/xmltranslation.py:316
+#: src/mi/po/xmltranslation.py:194
 msgid "Time"
 msgstr "时间"
 
-#: src/magic.installer/po/xmltranslation.py:262
-#: src/magic.installer/po/xmltranslation.py:317
+#: src/mi/po/xmltranslation.py:195
 msgid "Total(est):"
 msgstr "总时间(估)："
 
-#: src/magic.installer/po/xmltranslation.py:263
-#: src/magic.installer/po/xmltranslation.py:318
+#: src/mi/po/xmltranslation.py:196
 msgid "Elapsed:"
 msgstr "已用时间："
 
-#: src/magic.installer/po/xmltranslation.py:264
-#: src/magic.installer/po/xmltranslation.py:319
+#: src/mi/po/xmltranslation.py:197
 msgid "Remain(est):"
 msgstr "剩余(估)："
 
-#: src/magic.installer/po/xmltranslation.py:265
-#: src/magic.installer/po/xmltranslation.py:320
+#: src/mi/po/xmltranslation.py:198
+msgid "xglines"
+msgstr "xglines"
+
+#: src/mi/po/xmltranslation.py:199
 msgid "Rescan the packages."
 msgstr "重新搜索软件包。"
 
-#: src/magic.installer/po/xmltranslation.py:266
-#: src/magic.installer/po/xmltranslation.py:272
-#: src/magic.installer/po/xmltranslation.py:321
-#: src/magic.installer/po/xmltranslation.py:327
+#: src/mi/po/xmltranslation.py:200 src/mi/po/xmltranslation.py:206
 msgid "_Retry"
 msgstr "重试(_R)"
 
-#: src/magic.installer/po/xmltranslation.py:267
-#: src/magic.installer/po/xmltranslation.py:322
-msgid "Abort the installation of the following packages and continues to the next step of installtion."
+#: src/mi/po/xmltranslation.py:201
+msgid ""
+"Abort the installation of the following packages and continues to the next "
+"step of installtion."
 msgstr "放弃对以下包的安装并继续随后的安装步骤。"
 
-#: src/magic.installer/po/xmltranslation.py:268
-#: src/magic.installer/po/xmltranslation.py:323
+#: src/mi/po/xmltranslation.py:202
 msgid "_Abort"
 msgstr "放弃(_A)"
 
-#: src/magic.installer/po/xmltranslation.py:269
-#: src/magic.installer/po/xmltranslation.py:275
-#: src/magic.installer/po/xmltranslation.py:324
-#: src/magic.installer/po/xmltranslation.py:330
-msgid "Abort the installation, umount the filesystems and reboot the system right now."
+#: src/mi/po/xmltranslation.py:203 src/mi/po/xmltranslation.py:209
+msgid ""
+"Abort the installation, umount the filesystems and reboot the system right "
+"now."
 msgstr "放弃安装，卸载文件系统并立刻重新启动系统。"
 
-#: src/magic.installer/po/xmltranslation.py:270
-#: src/magic.installer/po/xmltranslation.py:276
-#: src/magic.installer/po/xmltranslation.py:325
-#: src/magic.installer/po/xmltranslation.py:331
+#: src/mi/po/xmltranslation.py:204 src/mi/po/xmltranslation.py:210
 msgid "Re_boot"
 msgstr "重新启动(_B)"
 
-#: src/magic.installer/po/xmltranslation.py:271
-#: src/magic.installer/po/xmltranslation.py:326
+#: src/mi/po/xmltranslation.py:205
 msgid "Retry installing this package."
 msgstr "再次尝试安装此软件包。"
 
-#: src/magic.installer/po/xmltranslation.py:273
-#: src/magic.installer/po/xmltranslation.py:328
+#: src/mi/po/xmltranslation.py:207
 msgid "Skip installing this package."
 msgstr "跳过此软件包，继续安装下一个。"
 
-#: src/magic.installer/po/xmltranslation.py:274
-#: src/magic.installer/po/xmltranslation.py:329
+#: src/mi/po/xmltranslation.py:208
 msgid "_Skip"
 msgstr "跳过(_S)"
 
-#. TO_TRANSLATOR: All of these strings are extracted from xml file: src/magic.installer/UIxml/finish.xml.
-#: src/magic.installer/po/xmltranslation.py:278
-msgid "Congratulation! Your system has been installed and setup successfully. Click 'Finish' to reboot system and enjoy it. Be note that if you are install it from CDROM you should remove the ejected CDROM so your system can boot from your harddisk."
-msgstr "祝贺您！您已经成功地安装并设置了系统。点击“完成”以重新启动系统并享用它。请注意如果您是从光盘安装，请取出弹出的光盘以便您的系统能够从您的硬盘启动。"
+#. TO_TRANSLATOR: All of these strings are extracted from xml file: src/mi/UIxml/welcome.xml.
+#: src/mi/po/xmltranslation.py:212
+msgid ""
+"Welcome to the MagicLinux. It is a composition of Chinese Linux lovers. "
+"Enjoy it!"
+msgstr "欢迎使用 MagicLinux。它是中国 Linux 爱好者的作品。Enjoy it！"
 
-#. TO_TRANSLATOR: All of these strings are extracted from xml file: src/magic.installer/games/xglines.xml.
-#: src/magic.installer/po/xmltranslation.py:282
+#: src/mi/po/xmltranslation.py:213
+msgid ""
+"Most of the softwares that distributed in MagicLinux are licensed by free "
+"software license. These licenses include: GPL, LGPL, MPL, BSD License, and "
+"so on. This program, MagicInstaller, is licensed by General Public License. "
+"If you are not agree General Public License, sure you can't use this "
+"MagicInstaller to install MagicLinux. Read it carefully please."
+msgstr ""
+"由 MagicLinux 发行的大部分软件都是以自由软件许可证发行的。这些许可证包括："
+"GPL、LGPL、MPL、BSD License 等等。本程序，即 MagicInstaller，是按照 GNU 通用"
+"公共许可证 (GPL) 发行的。如果您不同意 GPL，您就不能使用本安装程序安装 "
+"MagicLinux。请仔细阅读。"
+
+#: src/mi/po/xmltranslation.py:214 src/mi/po/xmltranslation.py:218
+msgid "I _Agree"
+msgstr "我同意(_A)"
+
+#: src/mi/po/xmltranslation.py:215 src/mi/po/xmltranslation.py:219
+msgid "I _DISAGREE"
+msgstr "我不同意(_D)"
+
+#: src/mi/po/xmltranslation.py:216
+msgid "You have agree the license"
+msgstr "您已经同意了许可证"
+
+#: src/mi/po/xmltranslation.py:217
+msgid ""
+"It is very important to noticed that there is NO WARRANTY. I take it out for "
+"emphasis even it is contained in General Public License already. Read the "
+"following text carefully please."
+msgstr ""
+"没有担保是非常重要的。虽然 GPL 已经含有没有担保的条文，但我仍然把它提取出来加"
+"以强调。请仔细阅读以下条文。注意：请您在安装 Magic Linux 操作系统前，拔下所有"
+"移动存储设备，包括但不限于：移动硬盘、闪存盘(U 盘、MP3、MP4、MP5)、存储卡、存"
+"储棒、数码相机、移动电话，等等。这是为了避免由于插拔这些设备造成安装前后系统"
+"分区发生变化，导致 Magic Linux 操作系统不能正常启动。除非您希望将您的 Magic "
+"Linux 安装到移动硬盘或者容量不少于 4GB 的闪存盘上。"
+
+#: src/mi/po/xmltranslation.py:220
+msgid "You have agree the nowarranty"
+msgstr "您已同意没有担保"
+
+#. TO_TRANSLATOR: All of these strings are extracted from xml file: src/mi/UIxml/bootloader.xml.
+#: src/mi/po/xmltranslation.py:222
+msgid "Please choose the bootloader that you like."
+msgstr "请选择您喜欢的引导管理器。"
+
+#: src/mi/po/xmltranslation.py:223
+msgid "_Grub(Recommended)"
+msgstr "Grub(建议)(_G)"
+
+#: src/mi/po/xmltranslation.py:224
+msgid "_Lilo"
+msgstr "Lilo(_L)"
+
+#: src/mi/po/xmltranslation.py:225
+msgid "_Do not use boot loader"
+msgstr "不使用引导管理器(_D)"
+
+#: src/mi/po/xmltranslation.py:226
+msgid "Install Position"
+msgstr "安装位置"
+
+#: src/mi/po/xmltranslation.py:227
+msgid "_Master Boot Record(MBR)"
+msgstr "主引导记录(MBR)(_M)"
+
+#: src/mi/po/xmltranslation.py:228
+msgid "The partition which contain /_boot"
+msgstr "含有 /boot 的分区(_B)"
+
+#: src/mi/po/xmltranslation.py:229
+msgid "The Win_dows partition"
+msgstr "Windows 分区(_D)"
+
+#: src/mi/po/xmltranslation.py:230
+msgid "Bootloader Option"
+msgstr "引导管理器选项："
+
+#: src/mi/po/xmltranslation.py:231
+msgid "Menu t_imeout(second):"
+msgstr "菜单等候时间(秒)(_I)："
+
+#: src/mi/po/xmltranslation.py:232
+msgid "_Force enable LBA32"
+msgstr "强制启用 LBA32(_F)"
+
+#: src/mi/po/xmltranslation.py:233
+msgid "Use bootloader pass_word:"
+msgstr "使用引导管理器口令(_W)："
+
+#: src/mi/po/xmltranslation.py:234
+msgid "Other bootloader _options:"
+msgstr "其它引导管理器选项(_O)："
+
+#: src/mi/po/xmltranslation.py:235
+msgid "Please modify the bootloader entry here."
+msgstr "请在此编辑引导管理器条目。"
+
+#: src/mi/po/xmltranslation.py:238
+msgid "Root Device"
+msgstr "根设备"
+
+#: src/mi/po/xmltranslation.py:239
+msgid "_Restore entry"
+msgstr "恢复条目(_R)"
+
+#: src/mi/po/xmltranslation.py:240
+msgid "_Edit entry"
+msgstr "编辑条目(_E)"
+
+#: src/mi/po/xmltranslation.py:241
+msgid "Remo_ve entry"
+msgstr "删除条目(_V)"
+
+#: src/mi/po/xmltranslation.py:242
+msgid "_Default Boot Entry"
+msgstr "默认启动条目(_D)"
+
+#: src/mi/po/xmltranslation.py:243
+msgid "_Label:"
+msgstr "标签(_L)："
+
+#: src/mi/po/xmltranslation.py:244
+msgid "Root device:"
+msgstr "根设备："
+
+#. TO_TRANSLATOR: All of these strings are extracted from xml file: src/mi/UIxml/pkgselect.xml.
+#: src/mi/po/xmltranslation.py:246
+msgid "Source position:"
+msgstr "来源位置："
+
+#: src/mi/po/xmltranslation.py:248
+msgid "_Change the source position"
+msgstr "改变来源位置(_C)"
+
+#: src/mi/po/xmltranslation.py:249
+msgid "Choose _individual packages"
+msgstr "选择单个包(_I)"
+
+#: src/mi/po/xmltranslation.py:250 src/mi/po/xmltranslation.py:260
+msgid "Status"
+msgstr "状态"
+
+#: src/mi/po/xmltranslation.py:252 src/mi/po/xmltranslation.py:262
+msgid "Name/Group Name"
+msgstr "名字/组名"
+
+#: src/mi/po/xmltranslation.py:253 src/mi/po/xmltranslation.py:263
+msgid "Install _All"
+msgstr "全部安装(_A)"
+
+#: src/mi/po/xmltranslation.py:254 src/mi/po/xmltranslation.py:264
+msgid "Install _Nothing"
+msgstr "全部不安装(_N)"
+
+#: src/mi/po/xmltranslation.py:255 src/mi/po/xmltranslation.py:265
+msgid "_Details"
+msgstr "细节(_D)"
+
+#: src/mi/po/xmltranslation.py:258
+msgid "Directory"
+msgstr "目录"
+
+#: src/mi/po/xmltranslation.py:259
+msgid "ISO Filename"
+msgstr "ISO 文件名"
+
+#. TO_TRANSLATOR: All of these strings are extracted from xml file: src/mi/games/xglines.xml.
+#: src/mi/po/xmltranslation.py:267
 msgid "TOP Score"
 msgstr "最高分"
 
-#: src/magic.installer/po/xmltranslation.py:283
+#: src/mi/po/xmltranslation.py:268
 msgid "Current Score"
 msgstr "当前得分"
 
-#: src/magic.installer/po/xmltranslation.py:284
+#: src/mi/po/xmltranslation.py:269
 msgid "The Next Three"
 msgstr "下三个"
 
-#: src/magic.installer/po/xmltranslation.py:285
+#: src/mi/po/xmltranslation.py:270
 msgid "_Restart"
 msgstr "重新开始(_R)"
 
-#: src/magic.installer/po/xmltranslation.py:287
+#: src/mi/po/xmltranslation.py:272
 msgid "_Quit"
 msgstr "退出(_Q)"
 
-#: src/magic.installer/po/xmltranslation.py:294
-msgid "Please select the install mode."
-msgstr "请选择安装模式"
+#~ msgid "ChooseType"
+#~ msgstr "选择类型"
 
-#: src/magic.installer/po/xmltranslation.py:295
-msgid "If you do not know which should be selected, please select Copy Install Mode (Recommended)."
-msgstr "如果你不知道应该选择哪种模式, 请选择拷贝安装模式 (推荐)."
+#~ msgid "USB Devices"
+#~ msgstr "USB 设备"
 
-#: src/magic.installer/po/xmltranslation.py:296
-msgid "_Copy Install Mode (Recommended)"
-msgstr "拷贝安装模式(推荐)(_C)"
+#~ msgid "ALL Devices"
+#~ msgstr "所有设备"
 
-#: src/magic.installer/po/xmltranslation.py:297
-msgid "_Rpm  Install Mode"
-msgstr "Rpm 安装模式(_R)"
+#~ msgid "Select a partition:"
+#~ msgstr "选择一个分区"
+
+#~ msgid "USB INFO"
+#~ msgstr "设备信息"
+
+#~ msgid "You haven't choose a device"
+#~ msgstr "你没有选择任何设备"
+
+#~ msgid "Start Copy"
+#~ msgstr "开始拷贝"
+
+#~ msgid "Failed"
+#~ msgstr "失败"
+
+#~ msgid "Success"
+#~ msgstr "成功！"
+
+#~ msgid "copy %s to %s device"
+#~ msgstr "拷贝 %s 到 %s 设备"
+
+#~ msgid "Select..."
+#~ msgstr "选择"
+
+#~ msgid "All Files"
+#~ msgstr "所有文件"
+
+#~ msgid "none \"%s\" value, please check!"
+#~ msgstr "不能获得 \"%s\", 请检查!"
+
+#~ msgid "Usb Partition"
+#~ msgstr "分区"
+
+#~ msgid "Usb Disk Belong"
+#~ msgstr "设备属于"
+
+#~ msgid "Can not get some parameters"
+#~ msgstr "鼠标参数"
+
+#~ msgid "Umount all target partition(s)"
+#~ msgstr "卸载所有目标分区"
+
+#~ msgid "Accounts & hostname"
+#~ msgstr "帐号和主机名"
+
+#~ msgid "Partition/Format"
+#~ msgstr "分区/格式化"
+
+#~ msgid "Install Package"
+#~ msgstr "安装软件包"
+
+#~ msgid "Install Bootloader"
+#~ msgstr "安装引导管理器"
+
+#~ msgid "Mount all target partitions."
+#~ msgstr "加载所有目标分区。"
+
+#~ msgid "Search packages"
+#~ msgstr "搜索软件包"
+
+#~ msgid "Researching packages..."
+#~ msgstr "正在重新搜索软件包..."
+
+#~ msgid "Aborting..."
+#~ msgstr "正在取消..."
+
+#~ msgid "Target System Arch %s is not Compatible with package arch %s"
+#~ msgstr "目标系统的体系结构 %s 与您选择安装的包不兼容 %s"
+
+#~ msgid "Umount all target partitions before bootloader setup."
+#~ msgstr "设置引导管理器之前卸载所有目标分区。"
+
+#~ msgid "Setup bootloader"
+#~ msgstr "设置引导管理器"
+
+#~ msgid "Mount all target partitions after bootloader setup."
+#~ msgstr "设置引导管理器之后加载所有目标分区。"
+
+#~ msgid "swapon(%s) failed: %s"
+#~ msgstr "swapon(%s) 失败：%s"
+
+#~ msgid "Mount %s on %s as %s failed: %s"
+#~ msgstr "加载 %s 于 %s (文件系统 %s) 失败：%s"
+
+#~ msgid "swapoff(%s) failed: %s"
+#~ msgstr "swapoff(%s) 失败：%s"
+
+#~ msgid "UMount %s failed: %s"
+#~ msgstr "卸载 %s 失败：%s"
+
+#~ msgid "Backup Files"
+#~ msgstr "备份文件"
+
+#~ msgid "Add File"
+#~ msgstr "添加文件"
+
+#~ msgid "Delete File"
+#~ msgstr "删除文件"
+
+#~ msgid "Default File"
+#~ msgstr "默认文件"
+
+#~ msgid "Choose The Device"
+#~ msgstr "选择设备"
+
+#~ msgid "usb devices"
+#~ msgstr "USB 设备"
+
+#~ msgid "all devices"
+#~ msgstr "所有设备"
+
+#~ msgid "Refresh Devices"
+#~ msgstr "刷新设备"
+
+#~ msgid "progress"
+#~ msgstr "进度"
+
+#~ msgid "Exit"
+#~ msgstr "退出"
+
+#~ msgid "Click the button to choose the theme that you like."
+#~ msgstr "点击按钮以切换到您喜欢的场景。"
+
+#~ msgid "Release Notes"
+#~ msgstr "发行说明"
+
+#~ msgid "helptext/release.en.txt"
+#~ msgstr "helptext/release.gb.utf8.txt"
+
+#~ msgid "Authors"
+#~ msgstr "作者"
+
+#~ msgid "helptext/authors.en.txt"
+#~ msgstr "helptext/authors.gb.utf8.txt"
+
+#~ msgid ""
+#~ "NOTE: All required information have been collected. Click 'Next' to take "
+#~ "the real action (partition, format, packages installation and other "
+#~ "setup) and there is no chance to revert... Are you sure?"
+#~ msgstr ""
+#~ "注意：已收集了所有必要的信息。点击“下一页”以开始实际安装 (分区、格式化、"
+#~ "包安装和其它设置) 而且无法恢复... 您确认吗？"
+
+#~ msgid "Please select the install mode."
+#~ msgstr "请选择安装模式"
+
+#~ msgid ""
+#~ "If you do not know which should be selected, please select Copy Install "
+#~ "Mode (Recommended)."
+#~ msgstr "如果你不知道应该选择哪种模式, 请选择拷贝安装模式 (推荐)."
+
+#~ msgid "_Copy Install Mode (Recommended)"
+#~ msgstr "拷贝安装模式(推荐)(_C)"
+
+#~ msgid "_Rpm  Install Mode"
+#~ msgstr "Rpm 安装模式(_R)"
 
 #~ msgid "Finished"
 #~ msgstr "已完成"
@@ -1765,9 +1830,6 @@ msgstr "Rpm 安装模式(_R)"
 
 #~ msgid "Vender"
 #~ msgstr "厂家"
-
-#~ msgid "You can not go back because the installation has finished."
-#~ msgstr "由于安装已完成您无法回去。"
 
 #~ msgid "_Exec"
 #~ msgstr "执行(_X)"

@@ -11,8 +11,7 @@ class miSrcMaker(PkgMaker.StepMaker):
     steps = ['init_dir',
              'install_src_step1',
              'install_src_pyext',
-             'install_configfiles',
-             'install_tranlatefiles',
+             #'install_tranlatefiles',
              'install_post',
              'mkmisrc',
             ]
@@ -35,28 +34,16 @@ class miSrcMaker(PkgMaker.StepMaker):
         cmds = [self.get_extract_cmd('$TOPDIR/bindir/root.src.pyext.tar.gz', self.ROOT)]
         return inst_file, cmds
 
-    def install_configfiles(self):
-        configfiles = [ ('$TOPDIR/src/mi/magic.autopart.xml',
-                        '$ROOT/usr/share/MagicInstaller/'),
-                        ]
-        slist = []
-        cmds = []
-        for src, dest in configfiles:
-            slist.append(src)
-            cmds.extend(['mkdir -p %s' % dest,
-                         'cp -a %s %s' % (src, dest)])
-        return slist, cmds
-
-    def install_tranlatefiles(self):
-        slist = []
-        cmds = []
-        for lang in mi_config.all_linguas:
-            inst_file = '$TOPDIR/src/mi/po/%s.mo' % lang
-            dest_file = '$ROOT/usr/share/locale/%s/LC_MESSAGES/${textdomain}.mo' % lang
-            slist.append(inst_file)
-            cmds.extend(['mkdir -p %s' % os.path.dirname(dest_file),
-                         'cp -a %s %s' % (inst_file, dest_file)])
-        return slist, cmds
+    #def install_tranlatefiles(self):
+    #    slist = []
+    #    cmds = []
+    #    for lang in mi_config.all_linguas:
+    #        inst_file = '$TOPDIR/src/mi/po/%s.mo' % lang
+    #        dest_file = '$ROOT/usr/share/locale/%s/LC_MESSAGES/${textdomain}.mo' % lang
+    #        slist.append(inst_file)
+    #        cmds.extend(['mkdir -p %s' % os.path.dirname(dest_file),
+    #                     'cp -a %s %s' % (inst_file, dest_file)])
+    #    return slist, cmds
 
     def install_post(self):
         env = self.env

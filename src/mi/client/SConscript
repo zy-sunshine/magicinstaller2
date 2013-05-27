@@ -1,0 +1,9 @@
+import glob
+Import('*')
+
+LOCAL_PATH = _my_dir()
+
+MI_data(glob.glob('%s/*.py' % LOCAL_PATH), 'client/')
+MI_data(glob.glob('%s/modules/*.py' % LOCAL_PATH), 'client/modules/')
+MI_data(glob.glob('%s/utils/*.py' % LOCAL_PATH), 'client/utils/')
+

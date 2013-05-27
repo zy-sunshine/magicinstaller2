@@ -29,18 +29,14 @@ xgettext_opt  = "--default-domain=$textdomain" + \
                 " --keyword=_ --keyword=N_" + \
                 " --copyright-holder='$copyright_holder'"
 
-potfiles = []
-for f in POTFILES:
-    potfiles.append('%s/%s' % (TOPSRCDIR, f))
+potfiles = filter( lambda x: x.endswith('.py'), MI_DATAFILES)
 
 env.Command('${textdomain}.pot',
             potfiles + ['xmltranslation.py'],
             'xgettext $xgettext_opt -o $TARGET $SOURCES',
             xgettext_opt = xgettext_opt)
 
-potxmls = []
-for f in POTXMLS:
-    potxmls.append('%s/%s' % (TOPSRCDIR, f))
+potxmls = filter( lambda x: x.endswith('.xml'), MI_DATAFILES)
 
 env.Command('xmltranslation.py', potxmls,
             'python scripts/xmlgettext.py $SOURCES > $TARGET')
@@ -75,3 +71,4 @@ for lang in mi_config.all_linguas:
                  '@echo "Please replace $SOURCE with edited $TARGET"'])
 
 del env['_lang']
+

@@ -128,8 +128,8 @@ busybox_version = '1.17.2'                       # busybox in rootfs
 root_bindir = '/usr/bin'
 root_libdir = '/$pythondir/site-packages'
 root_datadir = '/usr/share/MagicInstaller'
-root_moduledir = '/usr/share/MagicInstaller/modules'
-root_operationdir = '/usr/share/MagicInstaller/operations'
+#root_moduledir = '/usr/share/MagicInstaller/modules'
+#root_operationdir = '/usr/share/MagicInstaller/operations'
 
 # whether use sudo promopt in sudo commands, every time.
 use_sudo_prom = False
@@ -148,12 +148,12 @@ pyextdir = os.path.join(tmpdir, 'root.src.pyext')   # python module for MI.
 # i18n translation
 textdomain = 'magic.installer'
 translators = ''
-copyright_holder = 'Charles Wang, Glenn Zhang'
+copyright_holder = 'Charles Wang, Zhang Yang'
 all_linguas = ['zh_CN']
 
 lang_map = {'ja_JP': ('eucJP', 'eucJP'),
              'ko_KR' : ('eucKR', 'eucKR'),
-             'zh_CN': ('gb2312', 'GB2312'),
+             'zh_CN': ('gb2312', 'GB2312'), # GB2312 is used by iconv in po file charset translate
              'zh_TW': ('big5', 'BIG5') }
 # For magicinstaller debug
 ip_mihost = '192.168.56.111'

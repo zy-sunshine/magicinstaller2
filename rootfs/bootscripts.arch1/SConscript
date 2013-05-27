@@ -27,8 +27,8 @@ depInstallDir(env, 'bootscripts.arch1', root_bs,
 
 ##### Construct the #bindir/root.bootscripts.tar.gz
 pkg = 'root.bootscripts.arch1.tar.gz'
-__root_bs = env.Command('#bindir/%s' % pkg, env.Alias('bootscripts.arch1'),
+__root_bs = env.Command('$TOPDIR/bindir/%s' % pkg, env.Alias('bootscripts.arch1'),
             [ getSudoSh("tar c -C %s . | gzip -9 > $TARGET" % root_bs) ])
 
-env.Alias('rootfs', env.Command('#bindir/root.bootscripts.tar.gz', __root_bs,
+env.Alias('rootfs', env.Command('$TOPDIR/bindir/root.bootscripts.tar.gz', __root_bs,
         '[ -L $TARGET ] && rm $TARGET; ln -sv %s $TARGET' % pkg))

@@ -20,12 +20,14 @@ import glob
 
 Import ('*')
 
-instdir = '$destdir$root_datadir/helptext'
-
-depInstall(env, 'root_src', instdir, glob.glob('*.en.txt'))
+MI_data(glob.glob('*.en.txt'), 'helptext/')
 
 env['BUILDERS']['UTF8Text'] = Builder(action = 'iconv -f GB2312 -t UTF8 -o $TARGET $SOURCES')
 
+utf8_lst = []
 for gbtxt in glob.glob('*.gb.txt'):
     env.UTF8Text(gbtxt[:-4] + '.utf8.txt', gbtxt)
-    depInstall(env, 'root_src', instdir, gbtxt[:-4] + '.utf8.txt')
+    utf8_lst.append(gbtxt[:-4] + '.utf8.txt')
+
+MI_data(utf8_lst, 'helptext/')
+

@@ -30,14 +30,14 @@ class InstallTar(object):
         try:
             tar_size = os.path.getsize(pkgpath)
         except:
-            errstr = _('Faild on get tar pakcage size "%s"') % (pkgpath, )
+            errstr = _('Failed on get tar pakcage size "%s"') % (pkgpath, )
             logger.e(errstr)
             return errstr
         
         try:
             tarobj = tarfile.open(fileobj=CBFileObj(pkgpath, (progress_cb, tar_size)))
         except:
-            errstr = _('Faild on create tarfile object on file "%s" size"%d"\n') % (pkgpath, tar_size)
+            errstr = _('Failed on create tarfile object on file "%s" size"%d"\n') % (pkgpath, tar_size)
             logger.e(errstr)
             return errstr
         
@@ -46,7 +46,7 @@ class InstallTar(object):
         except:
             if tarobj:
                 tarobj.close()
-            errstr = _('Faild on extract file "%s" size"%d" to directory "%s"\n') % (pkgpath, tar_size, self.tgtsys_root)
+            errstr = _('Failed on extract file "%s" size"%d" to directory "%s"\n') % (pkgpath, tar_size, self.tgtsys_root)
             logger.e(errstr)
             return errstr
         

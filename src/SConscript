@@ -1,6 +1,6 @@
 # -*- python -*-
-# Copyright (C) 2003, Charles Wang.
-# Author:  Charles Wang <charles@linux.net.cn>
+# Copyright (C) 2013, Zhang Yang.
+# Author:  Zhang Yang <zy.netsec@gmail.com>
 # All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify it
@@ -15,10 +15,10 @@
 # You should have received a copy of the GNU General Public License along
 # with this program; if not, write to the Free Software Foundation, 59 Temple
 # Place - Suite 330, Boston, MA 02111-1307, USA.
+import os
 Import('*')
 
-def MI_pylibs(files):
-    depInstall(env, 'root_src', '$destdir$root_libdir', pymodules)
+MI_DATAFILES = []
 
 def MI_pymod(srcdir, target, sources):
     print 'MI_pymod(%s, %s, %s)' % (srcdir, target, sources)
@@ -30,14 +30,38 @@ def MI_pymod_cpdir(srcdirs):
         srcdirs = [srcdirs]
     depInstallDir(env, 'root.pyext', '$pyextdir$root_libdir', srcdirs)
 
-def MI_data(files):
-    pass
+def MI_data(filelist, reldir):
+    '''
+    1. filelist<str> is a source file path, reldir<str> is the relative file path of 
+    the target installation path.
+    2. filelist<list> is a list contains of source files, reldir<str> is the
+    relative directory path of the target installation position.
+    '''
+    if type(filelist) is str:
+        fpath = os.path.abspath(filelist)
+        destfile = reldir
+        MI_DATAFILES.append(fpath)
+        depInstallAs(env, 'root_src', '$destdir$root_datadir/%s' % destfile, fpath)
+        return
 
-def MI_data_dir(dirlist):
-    for reldir, dir in dirlist:
-        depInstallDir()
+    files = []
+    dirs = []
+    for f in filelist:
+        f = os.path.abspath(f)
+        if os.path.isdir(f):
+            dirs.append(f)
+        else:
+            files.append(f)
 
-Export('MI_pylibs', 'MI_pymod', 'MI_pymod_cpdir', 'MI_data')
+    if dirs:
+        MI_DATAFILES.extend(depInstallDir(env, 'root_src', '$destdir$root_datadir/%s' % reldir, dirs))
+
+    if files:
+        MI_DATAFILES.extend(files)
+        depInstall(env, 'root_src', '$destdir$root_datadir/%s' % reldir, files)
+
+Export('MI_pymod', 'MI_pymod_cpdir', 'MI_data')
+Export('MI_DATAFILES')
 
 ## MI main program
 SConscript('mi/SConscript')
@@ -70,3 +94,4 @@ if TARGET_BUILD_VARIANT == 'eng':
     env.Alias('root.src.pyext', t1)
 
 SConscript('SConscript-mi')
+

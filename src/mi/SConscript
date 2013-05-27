@@ -22,26 +22,26 @@ import string
 
 Import('*')
 
-env = env.Clone()
+LOCAL_PATH = _my_dir()
 
 TOPSRCDIR = os.path.abspath('.')
 POTFILES = ['magic.installer.py', 'magicstep.py', 'magicpopup.py', 'xmlgtk.py', 'magic.logger.py'] \
            + glob.glob('modules/*.py') + glob.glob('operations/*.py') + \
            glob.glob('games/*.py')
-POTXMLS = ['magic.installer.xml', 'magic.autopart.xml', 'magic.logger.xml'] + glob.glob('UIxml/*.xml') + \
-          glob.glob('games/*.xml') + ['UIxml/takeactions.xml.cpinstmode']
+POTXMLS = ['magic.autopart.xml'] + glob.glob('UIxml/*.xml') + \
+          glob.glob('games/*.xml')
 
 
-env.Command('mipublic.py', 'm4.mipublic.py',
-            'm4 -DFULL_WIDTH=$full_width -DFULL_HEIGHT=$full_height' + \
-               ' -Dkernelver=$mikernelver -Disofn_fmt="$isofn_fmt"' + \
-               ' -Ddistname="$distname" -Ddistver="$distver" -Ddistkernelver="$distkernelver"' + \
-               ' -Dbootcdfn="$bootiso_fn" -Ddolog="$dolog" -Duseudev="$useudev"' + \
-               ' -Dhotfixdir="$hotfixdir"' + \
-               ' -DTEXTDOMAIN="$textdomain" -DBINDIR="$root_bindir" -DDATADIR="$root_datadir"' + \
-               ' -DPKGTYPE="$pkgtype"'+ \
-               ' -DLIBDIR="$root_libdir" -DMODULEDIR="$root_moduledir" -DOPERATIONDIR="$root_operationdir" '
-               ' < $SOURCES > $TARGET')
+#env.Command('mipublic.py', 'm4.mipublic.py',
+#            'm4 -DFULL_WIDTH=$full_width -DFULL_HEIGHT=$full_height' + \
+#               ' -Dkernelver=$mikernelver -Disofn_fmt="$isofn_fmt"' + \
+#               ' -Ddistname="$distname" -Ddistver="$distver" -Ddistkernelver="$distkernelver"' + \
+#               ' -Dbootcdfn="$bootiso_fn" -Ddolog="$dolog" -Duseudev="$useudev"' + \
+#               ' -Dhotfixdir="$hotfixdir"' + \
+#               ' -DTEXTDOMAIN="$textdomain" -DBINDIR="$root_bindir" -DDATADIR="$root_datadir"' + \
+#               ' -DPKGTYPE="$pkgtype"'+ \
+#               ' -DLIBDIR="$root_libdir" -DMODULEDIR="$root_moduledir" -DOPERATIONDIR="$root_operationdir" '
+#               ' < $SOURCES > $TARGET')
 
 def xmlesc(s):
     s = string.replace(s, "&", "&amp;")
@@ -77,8 +77,8 @@ env.Command('magic.autopart.xml', [env.Value(mi_config.autopart_profile)],
             gen_magic_autopart_xml)
 
 
-bin_programs = ['mi.toplevel',        # MagicInstaller Toplevel Controller.
-                'mi.runserver'	  # execute by toplevel, will run all servers of MI.
+bin_programs = ['mi.toplevel',     # MagicInstaller Toplevel Controller.
+                'mi.runserver',    # execute by toplevel, will run all servers of MI.
                 ]
 
 for bp in bin_programs:
@@ -87,9 +87,6 @@ for bp in bin_programs:
     AddPostAction('$destdir$root_bindir/${_bp}',
                   'chmod +x $destdir$root_bindir/${_bp}')
 del env['_bp']
-
-pydatas = ['magic.values.xml', ]
-depInstall(env, 'root_src', '$destdir$root_datadir', pydatas)
 
 def gen_magic_values_m4defs(target, source, env):
 
@@ -112,32 +109,14 @@ env.Command('magic.values.m4defs', '', gen_magic_values_m4defs)
 env.Command('magic.values.xml', ['magic.values.m4defs',
                                  'm4.magic.values.xml'],
             'm4 $SOURCES > $TARGET')
-# Fill distname in m4.magic.values.xml at run time.
-#            'm4 -Ddistname="%s" -Ddistver="%s" $SOURCES > $TARGET' % \
-#            (mi_config.distname, mi_config.distver))
-#env.Depends('magic.values.xml', [env.Value(mi_config.distname),
-#                                 env.Value(mi_config.distver)])
-
-
-
 
 #for pym in pymodules:
 #    env.PYCBuilder(pym, pym[:-1])
-def depInstall_pylibs(pymodules):
-    depInstall(env, 'root_src', '$destdir$root_libdir', pymodules)
-    pass
 
-def depInstall_MIdata(files):
-    pass
+pydatas = ['logging.conf', 'magic.values.xml', 'magic.autopart.xml',
+    ] + glob.glob('%s/*.py' % LOCAL_PATH)
 
-Export('depInstall_pylibs', 'depInstall_MIdata')
-
-depInstall_pylibs(['mipublic.py', #'xmlgtk.py',
-             'getdev.py', ] #'magictaskman.py']
-             )
-
-Export('TOPSRCDIR', 'POTFILES', 'POTXMLS') # FIXME
-SConscript('po/SConscript')
+MI_data(pydatas, '')
 
 SConscript('server/SConscript')
 SConscript('client/SConscript')
@@ -146,4 +125,8 @@ SConscript('UIxml/SConscript')
 SConscript('helptext/SConscript')
 SConscript('images/SConscript')
 SConscript('games/SConscript')
+
+# Put this po SConscript at the end, because all data files should be 
+# collected in above SConscripts.
+SConscript('po/SConscript')
 
