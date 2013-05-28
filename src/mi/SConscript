@@ -24,25 +24,6 @@ Import('*')
 
 LOCAL_PATH = _my_dir()
 
-TOPSRCDIR = os.path.abspath('.')
-POTFILES = ['magic.installer.py', 'magicstep.py', 'magicpopup.py', 'xmlgtk.py', 'magic.logger.py'] \
-           + glob.glob('modules/*.py') + glob.glob('operations/*.py') + \
-           glob.glob('games/*.py')
-POTXMLS = ['magic.autopart.xml'] + glob.glob('UIxml/*.xml') + \
-          glob.glob('games/*.xml')
-
-
-#env.Command('mipublic.py', 'm4.mipublic.py',
-#            'm4 -DFULL_WIDTH=$full_width -DFULL_HEIGHT=$full_height' + \
-#               ' -Dkernelver=$mikernelver -Disofn_fmt="$isofn_fmt"' + \
-#               ' -Ddistname="$distname" -Ddistver="$distver" -Ddistkernelver="$distkernelver"' + \
-#               ' -Dbootcdfn="$bootiso_fn" -Ddolog="$dolog" -Duseudev="$useudev"' + \
-#               ' -Dhotfixdir="$hotfixdir"' + \
-#               ' -DTEXTDOMAIN="$textdomain" -DBINDIR="$root_bindir" -DDATADIR="$root_datadir"' + \
-#               ' -DPKGTYPE="$pkgtype"'+ \
-#               ' -DLIBDIR="$root_libdir" -DMODULEDIR="$root_moduledir" -DOPERATIONDIR="$root_operationdir" '
-#               ' < $SOURCES > $TARGET')
-
 def xmlesc(s):
     s = string.replace(s, "&", "&amp;")
     s = string.replace(s, "<", "&lt;")
@@ -120,6 +101,7 @@ MI_data(pydatas, '')
 
 SConscript('server/SConscript')
 SConscript('client/SConscript')
+SConscript('utils/SConscript')
 
 SConscript('UIxml/SConscript')
 SConscript('helptext/SConscript')

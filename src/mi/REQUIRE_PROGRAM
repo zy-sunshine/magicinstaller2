@@ -1,3 +1,8 @@
 eject
 sync
 inetd tftpd tftp (busybox)
+
+libs:
+    pyudev -> easy_install
+    pyparted -> bindir/root_ext
+    decorator -> easy_install

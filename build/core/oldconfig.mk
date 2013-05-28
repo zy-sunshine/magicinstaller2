@@ -40,10 +40,12 @@ else:
 mi_config.debugopts = debugopts
 
 ### Base Environment
+env['MI_BASE_VARS'] = []
 for k in mi_config.__dict__:
     if k[:2] != '__' and type(mi_config.__dict__[k]) \
-        in (types.BooleanType, types.IntType, types.StringType):
+        in (types.BooleanType, types.IntType, types.StringType, types.ListType, types.TupleType):
         env[k] = mi_config.__dict__[k]
+        env['MI_BASE_VARS'].append(k)
 
 ### Scon Utils
 def depInstallDir(env, alias, destdir, srcdirs):
@@ -65,16 +67,19 @@ def depInstallDir(env, alias, destdir, srcdirs):
     allfiles = []
     for srcd in srcdirs:
         files = []
+        srcd = os.path.abspath(srcd)
         if not os.path.isdir(srcd):
             # Omit the file, Only deal with directory.
             continue
         else:
             files = getAllExcludeSvnFile(srcd)
+            files
         allfiles.extend(files)
         for f in files:
-            related_dir = os.path.dirname(f)
+            related_dir = os.path.dirname(f)[len(srcd):]
             env.Alias(target=alias, 
-                    source=env.Install(os.path.join(destdir, os.path.dirname(related_dir)), f))
+                    source=env.Install(os.path.join(destdir, os.path.basename(srcd), 
+                                       related_dir.lstrip('/')), f))
     return allfiles
 
 def depInstall(env, alias, destdir, files):

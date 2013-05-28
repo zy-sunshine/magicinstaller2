@@ -38,10 +38,20 @@ BUILD_SYSTEM = _p(TOPDIR, 'build/core')
 
 Export('TOPDIR', 'BUILD_SYSTEM')
 
+### mainly set all variable into env of SCons, and some SCons install function encapsulation.
 _inc(BUILD_SYSTEM, 'oldconfig.mk')
 
+### export variables for SCons scripts build branch control.
 _inc(BUILD_SYSTEM, 'defines.mk')
 
+## config.mk will export some varibales for SConscripts envsetup.mk and then include 
+## envsetup.mk file.
+## envsetup.mk script will export some varialbes for product_config.mk and then include
+## version_defaults.mk *product_config.mk. These are the main framework of Makefile from 
+## android. The tactics will be invoked in product_config.mk <- vendor/*/*/MiProducts.mk
+## 
+## Note: we remove the BoardConfig.mk include in config.mk, because we do not have a target
+## board to run our rootfs, we must run our rootfs on all the x86/amd64 computers.
 _inc(BUILD_SYSTEM, 'config.mk')
 
 def get_sconscripts(dir, topdown=True):
@@ -52,6 +62,12 @@ def get_sconscripts(dir, topdown=True):
             dirs[:] = []
     return scripts
 
+## Historical issue include some SConscripts in TOPDIR, it is conveniently for pack packages.
 _inc(TOPDIR, 'SConscript-main')
+
+## Search all "SConscipt" in each directory branch top down, if find a "SConscript" we do not
+## search other in its subdirectories, on the other hand the toppest SConscript has to include
+## other SConscripts in its subdirectories.
 scripts = get_sconscripts(TOPDIR)
 _inc(scripts)
+

@@ -19,5 +19,5 @@
 import os
 Import('*')
 
-depPyModule(env, 'root_src', os.getcwd(),
+depPyModule(env, 'root.pyext', os.getcwd(),
             'lowlevel.so', ['lowlevel.c'])

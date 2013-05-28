@@ -41,3 +41,4 @@ _inc(BUILD_SYSTEM, 'envsetup.mk')
 # TARGET_DEVICE_DIR = os.path.dirname(board_config_mk)
 
 _inc(BUILD_SYSTEM, 'dumpvar.mk')
+

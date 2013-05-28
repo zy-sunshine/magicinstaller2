@@ -159,3 +159,12 @@ lang_map = {'ja_JP': ('eucJP', 'eucJP'),
 ip_mihost = '192.168.56.111'
 ip_devhost = '192.168.56.1'
 #}}
+
+pkgarr_ser_hdpath = [
+    "boot",
+    "MagicLinux",
+    "usr/share/MagicInstaller",
+    "",
+    "tmp",
+]
+

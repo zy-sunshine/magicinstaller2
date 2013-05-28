@@ -180,8 +180,8 @@ class RootPkgMaker(MiPkgMaker):
         self.build()
 
 class RootMagic1Maker(RootPkgMaker):
-    alias = 'root.magic1'
-    package = 'root.magic1'
+    alias = 'root.step1.magic1'
+    package = 'root.step1.magic1'
     package_bin = '${package}.tar.gz'
 
     global_post_cmds = [PkgMaker.SearchExecAction('$ROOT',
@@ -216,5 +216,7 @@ class RootMagic1Maker(RootPkgMaker):
 
 pkg = RootMagic1Maker(env)
 pkg.make()
-env.Alias('rootfs', env.Command('#bindir/root.step1.tar.gz', 'root.magic1',
+env.Alias('root.step1', env.Command('#bindir/root.step1.tar.gz', 'root.step1.magic1',
         '[ -L $TARGET ] && rm $TARGET; ln -sv %s.tar.gz $TARGET' % pkg.package))
+env.Alias('rootfs', 'root.step1')
+

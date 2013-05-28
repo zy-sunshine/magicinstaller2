@@ -21,11 +21,9 @@ Import('*')
 MI_DATAFILES = []
 
 def MI_pymod(srcdir, target, sources):
-    print 'MI_pymod(%s, %s, %s)' % (srcdir, target, sources)
     depPyModule(env, 'root.pyext', srcdir, target, sources)
 
 def MI_pymod_cpdir(srcdirs):
-    print "install %s to %s" % (srcdirs, mi_config.pyextdir)
     if type(srcdirs) is str:
         srcdirs = [srcdirs]
     depInstallDir(env, 'root.pyext', '$pyextdir$root_libdir', srcdirs)

@@ -16,6 +16,7 @@ class MirootfsMaker(PkgMaker.StepMaker):
              'run_post_scripts',
              'mkcramfs',
              ]
+    alias = 'root.rootfs'
 
     def init_dir(self):
         # Check if $ROOT is your mount dir.
@@ -43,10 +44,9 @@ class MirootfsMaker(PkgMaker.StepMaker):
     def extract_bins(self):
         toextract = ['bindir/root.step1.tar.gz',
                      'bindir/root.bootscripts.tar.gz',
+                     'bindir/root.src.tar.gz',
                      'bindir/kmodules-${mikernelver}.tar.bz2']
         
-        #toextract.append('bindir/root.src.tar.gz')
-
         mkstep2_script = 'scripts/mkstep2.py'
         # Use sudo, because we use root to create the root.step1.tar.gz .
         # If we use other user to extract the root.step1.tar.gz, the files

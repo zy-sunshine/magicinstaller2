@@ -5,7 +5,11 @@ from mi.client.utils import _, CF, logger
 
 ## Setup constants and working directory.
 logger.info('change current working directory to %s' % CF.D.DATADIR)
-os.chdir(CF.D.DATADIR)
+build_top = os.environ.get('MI_BUILD_TOP', None)
+if build_top:
+    os.chdir('%s/src/mi' % build_top)
+else:
+    os.chdir(CF.D.DATADIR)
 
 settings = gtk.settings_get_default()
 #settings.set_string_property('gtk-theme-name', 'Default', '')

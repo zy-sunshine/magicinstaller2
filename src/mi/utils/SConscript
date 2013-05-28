@@ -1,0 +1,60 @@
+import os, glob
+import json
+from string import Template
+
+Import("*")
+LOCAL_PATH = _my_dir()
+
+class JsonVar(object):
+    def __init__(self, var):
+        self.var = var
+
+    def __str__(self):
+        return json.dumps(self.var).strip('"')
+
+def get_json_var_map():
+    json_var_map = {}
+    for key in env['MI_BASE_VARS']:
+        var = env.get(key, None)
+        json_var_map[key] = JsonVar(var)
+    ## create some local variables
+    json_var_map['pkgarr_file'] = JsonVar(os.path.basename(env['pkgarr']))
+    fstype_map = {
+        # fstype : (mount_type, make_command, minsize(m), maxsize(m), flags)
+        # For flags:  b: grub can be installed on the partition which contain
+        #                this type of filesystem.
+        'ext3':       ('ext3',     '/sbin/mkfs.ext3 -I 128',           1,   -1, 'b'),
+        'ext2':       ('ext2',     'internal',                  1,   -1, 'b'),
+        'ext4':       ('ext4',     '/sbin/mkfs.ext4',           1,   -1, 'b'),
+        'fat32':      ('vfat',     'internal',                  1,   -1, 'b'),
+        'fat16':      ('vfat',     'internal',                  1, 2048, 'b'),
+        'iso9660':    ('iso9660',  '',                         -1,   -1, ''),
+        'jfs':        ('jfs',      '/sbin/mkfs.jfs -q',        16,   -1, 'b'),
+        'linux-swap': ('',         'internal',                 -1,   -1, ''),
+        #'ntfs':       ('ntfs',      '',                          -1,    -1,  ''),
+        'ntfs':       ('ntfs-3g',   '/sbin/mkfs.ntfs -Q',         1,    -1,  ''),
+        'reiserfs':   ('reiserfs', '/sbin/mkreiserfs -f -f',   33,   -1, 'b'),
+        'xfs':        ('xfs',      '/sbin/mkfs.xfs -q -f',      5,   -1, 'b')
+        }
+    json_var_map['fstype_map'] = JsonVar(fstype_map)
+    return json_var_map
+
+def gen_config_json(target, source, env):
+    
+    with open(str(source[0])) as f:
+        tpl_content = f.read()
+    
+    tpl = Template(tpl_content)
+    json_var_map = get_json_var_map()
+    config_json = tpl.substitute(**json_var_map)
+    with open(str(target[0]), 'w') as f:
+        f.write(config_json)
+    # Check generated json format.
+    with open(str(target[0]), 'r') as f:
+        json.load(f)
+
+env.Command('config.json', 'config.json.tpl', gen_config_json)
+
+MI_data('config.json', 'utils/')
+MI_data(glob.glob('%s/*.py' % LOCAL_PATH), 'utils/')
+

@@ -29,17 +29,21 @@ Import('*')
 #           #bindir/mi-vmlinuz-x.xx.xx  (needed by iso)
 
 if DEF_ROOTFS == 'root.magic1' and TARGET_BUILD_VARIANT == 'eng':
-    if 'root.magic1' in COMMAND_LINE_TARGETS:
-        ## TARGET: root.magic1
+    if 'root.step1' in COMMAND_LINE_TARGETS:
+        ## TARGET: root.step1
         SConscript('root.magic1/SConscript')
-    ## TARGET: bootscripts.magic1
+
+if DEF_ROOTFS == 'root.magic1':
+    ## TARGET: root.bootscripts
     SConscript('bootscripts.magic1/SConscript')
 
 if DEF_ROOTFS == 'root.arch1' and TARGET_BUILD_VARIANT == 'eng':
-    if 'root.arch1' in COMMAND_LINE_TARGETS:
-        ## TARGET: root.arch1
+    if 'root.step1' in COMMAND_LINE_TARGETS:
+        ## TARGET: root.step1
         SConscript('root.arch1/SConscript')
-    ## TARGET: bootscripts.arch1
+
+if DEF_ROOTFS == 'root.arch1':
+    ## TARGET: root.bootscripts
     SConscript('bootscripts.arch1/SConscript')
 
 ## TARGET: busybox.bin

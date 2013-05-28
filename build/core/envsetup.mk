@@ -43,3 +43,4 @@ _inc(BUILD_SYSTEM, 'product_config.mk')
 TARGET_ARCH = 'x86'
 TARGET_OS = 'linux'
 Export('TARGET_ARCH', 'TARGET_OS')
+
