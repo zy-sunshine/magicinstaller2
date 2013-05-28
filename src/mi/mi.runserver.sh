@@ -2,7 +2,7 @@
 ROOT_DIR=
 if [ -z $MI_BUILD_TOP ]; then
 	echo "not in build mode"
-	ROOT_DIR=/usr/share/MagicInstaller
+	ROOT_DIR=/usr/share/MagicInstaller/mi
 	SCRIPT_LOGGING=$ROOT_DIR/mi.logging.py
 	SCRIPT_FTPD=$ROOT_DIR/mi.ftpd.py
 	SCRIPT_SERVER=$ROOT_DIR/mi.server.py
@@ -38,14 +38,12 @@ echo $SCRIPT_FTPD ...
 $SCRIPT_FTPD &
 pid_ftpd=$!
 
-echo $SCRIPT_SERVER ...
-$SCRIPT_SERVER &
-pid_server=$!
+pid_server=
 
 function kill_servers(){
-	kill $pid_server >/dev/null 2>&1
-	kill $pid_ftpd >/dev/null 2>&1
-	kill $pid_logger >/dev/null 2>&1
+	[[ $pid_server ]] && kill $pid_server >/dev/null 2>&1
+	[[ $pid_ftpd ]] && kill $pid_ftpd >/dev/null 2>&1
+	[[ $pid_logger ]] && kill $pid_logger >/dev/null 2>&1
 }
 pid=
 function terminate_signal(){
@@ -55,15 +53,20 @@ function terminate_signal(){
 	kill_servers
 
 	[[ $pid ]] && kill $pid >/dev/null 2>&1
-	wait $pid_server
-	wait $pid_ftpd
-	wait $pid_logger
+	[[ $pid_server ]] && wait $pid_server
+	[[ $pid_ftpd ]] && wait $pid_ftpd
+	[[ $pid_logger ]] && wait $pid_logger
 	clean_servers
 	exit 0
 }
 trap terminate_signal SIGINT SIGTERM
-while true; do
-	sleep 10000 & pid=$!
-	wait
-done
+
+echo $SCRIPT_SERVER ...
+$SCRIPT_SERVER
+pid_server=$!
+terminate_signal
+#while true; do
+#	sleep 10000 & pid=$!
+#	wait
+#done
 

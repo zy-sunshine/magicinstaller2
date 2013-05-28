@@ -89,17 +89,15 @@ env.Command('magic.values.m4defs', '', gen_magic_values_m4defs)
 
 env.Command('magic.values.xml', ['magic.values.m4defs',
                                  'm4.magic.values.xml'],
-            'm4 $SOURCES > $TARGET')
+            'm4 -Dhostname=$distname $SOURCES > $TARGET')
 
 #for pym in pymodules:
 #    env.PYCBuilder(pym, pym[:-1])
 
-pydatas = ['magic.values.xml', 'magic.autopart.xml',   
-'mi.client.py', 'mi.ftpd.py', 'mi.logging.py', 'mi.server.py']
-MI_data(pydatas, '')
-
-pydatas2 = ['getdev.py', '__init__.py']
-MI_data(pydatas2, 'mi')
+pydatas = ['magic.values.xml', 
+           'magic.autopart.xml', 
+           ] + glob.glob('%s/*.py' % LOCAL_PATH)
+MI_data(pydatas, 'mi/')
 
 SConscript('server/SConscript')
 SConscript('client/SConscript')

@@ -52,7 +52,9 @@ def revision_fstype(fstype):
 @register.server_handler('long')
 def device_probe_all(mia, operid, dummy):
     def get_device_list():
-        hd_list = filter(lambda d: d.type != parted.DEVICE_DM, parted.getAllDevices())
+        hd_list = filter(lambda d: d.type != parted.DEVICE_DM and \
+                         d.readOnly != True, # CD-ROM will be read only. 
+                         parted.getAllDevices())
         
         return hd_list
 

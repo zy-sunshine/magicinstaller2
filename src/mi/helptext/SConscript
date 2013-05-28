@@ -20,7 +20,7 @@ import glob
 
 Import ('*')
 
-MI_data(glob.glob('*.en.txt'), 'helptext/')
+MI_data(glob.glob('*.en.txt'), 'mi/helptext/')
 
 env['BUILDERS']['UTF8Text'] = Builder(action = 'iconv -f GB2312 -t UTF8 -o $TARGET $SOURCES')
 
@@ -29,5 +29,5 @@ for gbtxt in glob.glob('*.gb.txt'):
     env.UTF8Text(gbtxt[:-4] + '.utf8.txt', gbtxt)
     utf8_lst.append(gbtxt[:-4] + '.utf8.txt')
 
-MI_data(utf8_lst, 'helptext/')
+MI_data(utf8_lst, 'mi/helptext/')
 

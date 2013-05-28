@@ -2,7 +2,9 @@
 ROOT_DIR=
 if [ -z $MI_BUILD_TOP ]; then
 	echo "not in build mode"
-	ROOT_DIR=/usr/share/MagicInstaller
+	ROOT_DIR0=/usr/share/MagicInstaller
+	export PYTHONPATH=$ROOT_DIR0:$PYTHONPATH
+	ROOT_DIR=$ROOT_DIR0/mi
 	SCRIPT_SERVER=/usr/bin/mi.runserver
 	SCRIPT_CLIENT=$ROOT_DIR/mi.client.py
 else
@@ -23,8 +25,6 @@ function clean_servers(){
 		clean_server $server
 	done
 }
-
-export PYTHONPATH=$ROOT_DIR:$PYTHONPATH
 
 clean_servers 
 echo cd $ROOT_DIR
@@ -56,8 +56,11 @@ function terminate_signal(){
 trap terminate_signal SIGINT SIGTERM
 
 echo $SCRIPT_CLIENT
-xinit /usr/bin/python $SCRIPT_CLIENT -- /usr/bin/X :1
-pid_client=$!
+for layout in LayoutFb LayoutVesa; do
+	xinit /usr/bin/python $SCRIPT_CLIENT -- /usr/bin/X :1 -layout $layout
+	pid_client=$!
+	[ $? -eq 0 ] && break
+done
 
 kill_servers
 wait $pid_server

@@ -73,8 +73,7 @@ class MiTaskman :
             return  False
         # The first action should be self.tasks[0][0]
         (tmid, describe, rcfunc, rcdata, method, params) = self.tasks[0][0]
-        if method == 'quit':
-            gtk.main_quit()
+
         try:
             id = eval('self.actserver.%s(*params)' % method)
         except socket.error:
@@ -83,6 +82,9 @@ class MiTaskman :
         #except xmlrpclib.Fault:
         #    import pdb; pdb.set_trace()
         # put action successfully.
+        if method == 'quit':
+            gtk.main_quit()
+            
         self.tasks[0].pop(0) # Remove it from queue head.
         self.run_tmid = tmid
         self.run_id = id

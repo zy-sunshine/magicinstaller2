@@ -64,7 +64,7 @@ class MIStep_accounts (magicstep.magicstepgroup):
                 return 0
             all_username[username] = 'y'
             uid = rownode.getAttribute('c4')
-            if uid == 'Auto':
+            if uid == _('Auto'):
                 continue
             if all_uid.has_key(uid):
                 errtxt = _("The custom uid is conflict between '%s' and '%s'.")

@@ -1,6 +1,7 @@
 #!/usr/bin/python
 import os, glob, sys
 import isys
+from mi.utils import _
 from mi import getdev
 from mi.utils.common import mount_dev, umount_dev
 from mi.utils.miconfig import MiConfig
@@ -13,10 +14,10 @@ register = MiRegister()
 from mi.server.utils import logger
 dolog = logger.info
 
-global dev_hd # the harddisk device where save packages.
-global dev_iso # the iso where save pkgs.
-global dev_tgt # the target system devices.
-global inst_h
+dev_hd = None # the harddisk device where save packages.
+dev_iso = None # the iso where save pkgs.
+dev_tgt = None # the target system devices.
+inst_h = None
 
 class MiDevice_TgtSys(object):
     def __init__(self, tgtsys_devinfo):
@@ -58,7 +59,7 @@ class MiDevice_TgtSys(object):
                     self.mounted_devs.append(dev_tgt_other)
                     
         for mpoint, dev_, type_ in self.tgtsys_devinfo:
-            if mpoint != '/':
+            if mpoint not in ('/', 'USE'):
                 mount_each(tgt_root_dev, dev_, type_, mpoint)
         
         # mount -t proc proc myroot/proc/
@@ -102,12 +103,12 @@ def install_prep(mia, operid, pkgsrc_devinfo, tgtsys_devinfo):
     ############################## Mount Start #####################################            
     dev_tgt = MiDevice_TgtSys(tgtsys_devinfo)
     if not dev_tgt.mount_tgt_device(): #### NOTE: carefully handle this device's mount.
-        msg = 'Mount target system devices Failed, install operate can not continue!!!'
+        msg = _('Mount target system devices Failed, install operate can not continue!!!')
         logger.e(msg)
         dev_tgt = None
         return msg
         
-    return  0
+    return 0
 
 @register.server_handler('long')
 def install_post(mia, operid, pkgsrc_devinfo, tgtsys_devinfo):

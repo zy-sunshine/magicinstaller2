@@ -18,6 +18,7 @@ class MiAction_InstallRpm():
         self.cb0_install_pkg_err = self.rootobj.cb0_install_pkg_err
         self.cb0_install_pkg_end = self.rootobj.cb0_install_pkg_end
         self.cb0_install_end = self.rootobj.cb0_install_end
+        self.cb0_fatal_err = self.rootobj.cb0_fatal_err
         
         self.disc_first_pkgs = []
         self.cur_disc_no = -1 # current installing disc number
@@ -106,7 +107,9 @@ class MiAction_InstallRpm():
     def act_rpm_pre_install(self, tdata, disc_no):
         if tdata != 0:
             ### TODO: Only reboot, because install_prep can not mount target system partitions, so we can not install packages in it.
-            pass #### occur error, tdata is the error msg
+            #### occur error, tdata is the error msg
+            self.cb0_fatal_err(str(tdata))
+            return
         self.add_action(None,
                         self.act_install_disc_start, 0,
                         'rpm_pre_install', None)

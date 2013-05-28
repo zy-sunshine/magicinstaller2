@@ -22,6 +22,6 @@ Import ('*')
 
 LOCAL_PATH = _my_dir()
 
-MI_data(glob.glob('%s/*.png' % LOCAL_PATH), 'images/')
-MI_data('%s/banner.png.%s' % (LOCAL_PATH, mi_config.gui_resolution), 'images/banner.png')
+MI_data(glob.glob('%s/*.png' % LOCAL_PATH), 'mi/images/')
+MI_data(glob.glob('%s/banner.png.*' % LOCAL_PATH) , 'mi/images/')
 

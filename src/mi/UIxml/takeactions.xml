@@ -120,4 +120,19 @@
       <label name="tiplabel" fill="true" xalign="0"/>
     </vbox>
   </rpmerr.dialog>
+  <fatalerr.dialog>
+    <vbox spacing="4">
+      <hbox expand="true" fill="true" spacing="4">
+        <image file="images/stock_dialog_error_48.png"/>
+    <label name="msg" line_wrap="true"/>
+      </hbox>
+      <hseparator/>
+      <hbox fill="true" spacing="4" homogeneous="true">
+    <button label="((Re_boot))" clicked="reboot_clicked"
+            desclabel="tiplabel"
+        desctext="((Abort the installation, umount the filesystems and reboot the system right now.))"/>
+      </hbox>
+      <label name="tiplabel" fill="true" xalign="0"/>
+    </vbox>
+  </fatalerr.dialog>
 </takeactions>

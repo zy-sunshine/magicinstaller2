@@ -7,7 +7,7 @@
     <nowarranty>disagree</nowarranty>
   </welcome>
   <network>
-    <hostname></hostname>
+    <hostname>--/hostname/--</hostname>
   </network>
   <accounts>
     <root>

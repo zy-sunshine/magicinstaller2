@@ -44,8 +44,14 @@ def pkgarr_probe(mia, operid):
 
     result = []
     
-    all_drives = getdev.get_part_info(getdev.CLASS_CDROM | getdev.CLASS_HD)
-
+    all_drives = {}
+    all_parts = getdev.get_part_info(getdev.CLASS_HD)
+    cdrom_dev = getdev.get_dev_info(getdev.CLASS_CDROM)
+    for k, v in cdrom_dev.items():
+        v['fstype'] = 'iso9660'   # fill cdrom file type, because it is None for default.
+    
+    all_drives.update(all_parts)
+    all_drives.update(cdrom_dev)
     logger.i('all_drives: %s' % all_drives)
     pos_id = -1
     for k, value in all_drives.items():
@@ -56,9 +62,9 @@ def pkgarr_probe(mia, operid):
         if CF.D.FSTYPE_MAP[fstype][0] == '':
             continue
         midev = MiDevice(devpath, CF.D.FSTYPE_MAP[fstype][0])
-        logger.d('Search %s pkgarr(%s) in dirs %s' % (CF.D.BOOTCDFN, CF.D.PKGARR_FILE, repr(CF.D.PKGARR_SER_HDPATH)))
-        for f, reldir in midev.iter_searchfiles([CF.D.PKGARR_FILE, CF.D.BOOTCDFN], CF.D.PKGARR_SER_HDPATH):
-            if f.endswith('iso'):
+        logger.d('Search %s pkgarr(%s) in dirs %s' % (CF.D.BOOTCDFN, CF.D.PKGARR_FILE, repr(CF.D.PKGARR_SER_HDPATH+CF.D.PKGARR_SER_CDPATH)))
+        for f, reldir in midev.iter_searchfiles([CF.D.PKGARR_FILE, CF.D.BOOTCDFN], CF.D.PKGARR_SER_HDPATH+CF.D.PKGARR_SER_CDPATH):
+            if f.endswith('.iso'):
                 midev_iso = MiDevice(f, 'iso9660')
                 for pkgarr, relative_dir in midev_iso.iter_searchfiles([CF.D.PKGARR_FILE], CF.D.PKGARR_SER_CDPATH):
                     pos_id += 1
@@ -69,7 +75,7 @@ def pkgarr_probe(mia, operid):
                         result.append(r)
             else:
                 pos_id += 1
-                r = probe_position(pkgarr, pos_id,
+                r = probe_position(f, pos_id,
                     devpath, fstype, reldir, '')
                 if r: result.append(r)
 

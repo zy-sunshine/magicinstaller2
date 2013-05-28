@@ -22,5 +22,5 @@ Import('*')
 
 LOCAL_PATH = _my_dir()
 
-MI_data(glob.glob('%s/*.xml' % LOCAL_PATH), 'UIxml/')
+MI_data(glob.glob('%s/*.xml' % LOCAL_PATH), 'mi/UIxml/')
 

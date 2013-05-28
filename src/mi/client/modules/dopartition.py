@@ -21,7 +21,10 @@ class DoPartition(magicstep):
         self.sself = sself
         self.doparted = False
         self.add_action = self.rootobj.tm.add_action
-
+        
+    def get_label(self):
+        return self.LABEL
+    
     def enter(self):
         self.sself.btnback_sensitive(False)
         self.sself.btnnext_sensitive(False)

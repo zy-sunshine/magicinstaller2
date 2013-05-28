@@ -15,6 +15,7 @@ from mi.utils.common import search_file
 from mi.client.modules import *
 from mi.client.utils.magicpopup import magicmsgbox, magichelp_popup
 from mi.utils.miconfig import MiConfig
+import gettext
 CF = MiConfig.get_instance()
 from mi.utils.mitaskman import MiTaskman
 from mi.client.utils import magicpopup
@@ -41,7 +42,7 @@ class Steps(object):
         for group, name in step_name_list:
             cls = self.get_step_class(name)
             if cls:
-                __step_l.append([group, cls.NAME, cls(sself), cls.LABEL, True])
+                __step_l.append([group, cls.NAME, cls(sself), gettext.gettext(cls.LABEL), True])
             else:
                 raise Exception('Can not find class by name %s' % name)
         i = -1
@@ -110,12 +111,10 @@ XML_DATA = '''
 -->
 </hbox>
 <header logo="images/banner.png.800x600" />
-<tableV2 expand="true" fill="true">
-<tr>
-   <td><vbox  fill="true"><leftpanel /><label expand="true" /></vbox></td>
-   <td><rightpanel expandfill="true" /></td>
-</tr>
-</tableV2>
+<hbox margin="2" spacing="2" expand="true" fill="true">
+  <vbox><leftpanel /><label expand="true" /></vbox>
+  <vbox expand="true" fill="true"><rightpanel expand="true" fill="true" /></vbox>
+</hbox>
 <statusbar />
 <buttonbar />
 </vbox>
@@ -126,7 +125,7 @@ class MainXmlUi(xmlgtk.xmlgtk):
         self.sself = sself
         self.header0 = MIHeader(sself)
         self.leftpanel = MILeftPanel(sself, _('Steps'))
-        self.rightpanel = MIRightPanel(sself, _(''))
+        self.rightpanel = MIRightPanel(sself, '')
         self.statusbar = MIStatusBar(sself)
         self.buttonbar = MIButtonBar(sself)
         xmlgtk.xmlgtk.__init__(self, XML_DATA)
@@ -247,6 +246,7 @@ class MIMainWindow(gtk.Window):
             dolog('switch_to_page "%s" step from %s to %s Success' % (name, self.curstep, nextstep))
             self.rightpanel.switch(step.obj.widget)
             self.leftpanel.switch(self.curstep, step.id)
+            self.buttonbar.switch(step.obj)
             self.curstep = nextstep
         else:
             dolog('switch_to_page "%s" step from %s to %s Failed' % (name, self.curstep, nextstep))
@@ -292,7 +292,9 @@ class MIMainWindow(gtk.Window):
         tv.get_buffer().set_text(content)
 
     def btncancel_clicked(self, widget, data):
-        self.steps.get_step_by_id(self.curstep).btncancel_clicked(widget, data)
+        step = self.steps.get_step_by_id(self.curstep)
+        if(hasattr(step.obj, 'btncancel_clicked')):
+            step.obj.btncancel_clicked(widget, data)
 
     def btnback_clicked(self, widget, data):
         step = self.steps.get_step_by_id(self.curstep)
@@ -334,22 +336,6 @@ class MIMainWindow(gtk.Window):
                 n_step_id = s_id
                 break
         return n_step_id
-        
-    #def switch_to_page(self, pageno):
-        #if self.curstep != pageno:
-            #if pageno < self.curstep:
-                #self.stepsarr[self.curstep].set_from_file('images/applet-blank.png')
-                #self.stepsarr[pageno].set_from_file('images/applet-busy.png')
-                #self.switch2step(pageno)
-            #elif pageno > self.curstep:
-                #if self.leave_step(self.curstep) and self.enter_step(pageno): # only check next
-                    #self.stepsarr[self.curstep].set_from_file('images/applet-okay.png')
-                    #self.stepsarr[pageno].set_from_file('images/applet-busy.png')
-                    #self.switch2step(pageno)
-            #else:
-                ## Call set_current_page is useless here, so use timeout
-                ## to switch back.
-                #gobject.timeout_add(10, self.page_restore)
 
     def cb_push_leftpanel(self, widget):
         logger.d('cb_push_leftpanel')
@@ -369,9 +355,9 @@ class MIMainWindow(gtk.Window):
 #-------------------------- TODO ---------------------------------------
 
     def btnfinish_clicked(self, widget, data):
-        if self.stepobj_list[self.curstep].btnfinish_clicked(widget, data):
-            # Do real installation.
-            pass
+        step = self.steps.get_step_by_id(self.curstep)
+        if(hasattr(step.obj, 'btnfinish_clicked')):
+            step.obj.btnfinish_clicked(widget, data)
         
     def theme_clicked(self, widget, themedir):
         # Use 'gtk.settings' instead of 'gtk.rc'             By demonlj@linuxfans.org

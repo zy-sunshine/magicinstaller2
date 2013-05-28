@@ -51,7 +51,7 @@ class MILeftPanel(gtk.Frame):
         step = self.sself.steps.get_step_by_name(name)
 
         btn = StepButton('images/applet-blank.png', step.title)
-        btn.connect('clicked', self.on_switch_to_page, name)
+        #btn.connect('clicked', self.on_switch_to_page, name)
 
         self.btn_lst.append([group, btn])
 
@@ -66,7 +66,7 @@ class MILeftPanel(gtk.Frame):
         
     def switch(self, from_id, to_id):
         logger.d('leftpanel.switch: %s, %s' % (from_id, to_id))
-        if from_id > 0: self.btn_lst[from_id][1].change_image('images/applet-okay.png')
+        if from_id >= 0: self.btn_lst[from_id][1].change_image('images/applet-okay.png')
         self.btn_lst[to_id][1].change_image('images/applet-busy.png')
         
     def push(self, widget):

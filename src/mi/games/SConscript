@@ -22,6 +22,6 @@ Import('*')
 
 LOCAL_PATH = _my_dir()
 
-MI_data(glob.glob('%s/*.png' % LOCAL_PATH), 'games/')
-MI_data(['xglines.py', 'xglines.xml'], 'games/')
+MI_data(glob.glob('%s/*.png' % LOCAL_PATH), 'mi/games/')
+MI_data(['__init__.py', 'xglines.py', 'xglines.xml'], 'mi/games/')
 

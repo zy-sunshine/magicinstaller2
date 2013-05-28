@@ -448,7 +448,10 @@ class MIStep_Partition (magicstep.magicstep):
                                    magicpopup.magicmsgbox.MB_ERROR,
                                    magicpopup.magicpopup.MB_OK)
             return
-        hdobj = self.hdobj_list[0]       # default to the first harddisk
+        n = self.nb_harddisk.get_current_page()
+        if n < 0 or n >= len(self.hdobj_list):
+            n = 0
+        hdobj = self.hdobj_list[n]       # default to the first harddisk
         remain_size = hdobj.length * 512 # convert sector to byte
         proportion_sum = 0
         cleaned_autoparts = []

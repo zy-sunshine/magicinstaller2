@@ -48,7 +48,19 @@ class RpmErrDialog(magicpopup.magicpopup):
     def reboot_clicked(self, widget, data):
         self.sself.reboot_clicked(widget, data)
         self.topwin.destroy()
-    
+        
+class FatalErrDialog(magicpopup.magicpopup):
+    def __init__(self, sself, uixml, msg, uirootname):
+        self.sself = sself
+        magicpopup.magicpopup.__init__(self, sself, uixml,
+                                        _('Fatal Error Occur'), 0,
+                                        uirootname)
+        self.name_map['msg'].set_text(msg)
+        
+    def reboot_clicked(self, widget, data):
+        self.sself.reboot_clicked(widget, data)
+        self.topwin.destroy()
+        
 class MIStep_takeactions(magicstep.magicstep):
     NAME = 'takeactions'
     LABEL = _('Take Actions')
@@ -294,6 +306,16 @@ class MIStep_takeactions(magicstep.magicstep):
                     
         RpmErrDialog(CallBack(self, cb_retry_clicked, cb_abort_clicked, data), self.uixmldoc, msg, 'rpmerr.dialog')
 
+    def cb0_fatal_err(self, msg):
+        class CallBack():
+            def __init__(self, sself):
+                self.sself = sself
+                
+            def reboot_clicked(self, widget, data):
+                self.sself.reboot_clicked(widget, data)
+                
+        FatalErrDialog(CallBack(self), self.uixmldoc, msg, 'fatalerr.dialog')
+        
     def reboot_clicked(self, widget, data):
         (pafile, dev, fstype, reldir, bootiso_relpath) = CF.G.choosed_patuple
         msg = _('Umount the target filesystem(s).')
