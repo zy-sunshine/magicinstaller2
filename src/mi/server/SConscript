@@ -20,10 +20,10 @@ Import('*')
 
 LOCAL_PATH = _my_dir()
 
-MI_data(glob.glob('%s/*.py' % LOCAL_PATH), 'server/')
-MI_data(glob.glob('%s/operations/*.py' % LOCAL_PATH), 'server/operations/')
-MI_data(glob.glob('%s/utils/*.py' % LOCAL_PATH), 'server/utils/')
-MI_data(glob.glob('%s/utils/rpm/*.py' % LOCAL_PATH), 'server/utils/rpm/')
-MI_data(glob.glob('%s/utils/tar/*.py' % LOCAL_PATH), 'server/utils/tar/')
-MI_data(glob.glob('%s/utils/yum/*.py' % LOCAL_PATH), 'server/utils/yum/')
+MI_data(glob.glob('%s/*.py' % LOCAL_PATH), 'mi/server/')
+MI_data(glob.glob('%s/operations/*.py' % LOCAL_PATH), 'mi/server/operations/')
+MI_data(glob.glob('%s/utils/*.py' % LOCAL_PATH), 'mi/server/utils/')
+MI_data(glob.glob('%s/utils/rpm/*.py' % LOCAL_PATH), 'mi/server/utils/rpm/')
+MI_data(glob.glob('%s/utils/tar/*.py' % LOCAL_PATH), 'mi/server/utils/tar/')
+MI_data(glob.glob('%s/utils/yum/*.py' % LOCAL_PATH), 'mi/server/utils/yum/')
 

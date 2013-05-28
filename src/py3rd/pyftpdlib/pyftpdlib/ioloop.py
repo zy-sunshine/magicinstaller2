@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: ioloop.py 1171 2013-02-19 10:13:09Z g.rodola $
+# $Id: ioloop.py 1217 2013-04-18 18:21:44Z g.rodola $
 
 #  ======================================================================
 #  Copyright (C) 2007-2013 Giampaolo Rodola' <g.rodola@gmail.com>
@@ -103,6 +103,7 @@ from pyftpdlib._compat import MAXSIZE, callable, b
 from pyftpdlib.log import logger, _config_logging
 
 
+timer = getattr(time, 'monotonic', time.time)
 _read = asyncore.read
 _write = asyncore.write
 
@@ -123,7 +124,7 @@ class _Scheduler(object):
         """Run the scheduled functions due to expire soonest and
         return the timeout of the next one (if any, else None).
         """
-        now = time.time()
+        now = timer()
         calls = []
         while self._tasks:
             if now < self._tasks[0].timeout:
@@ -149,8 +150,6 @@ class _Scheduler(object):
         # entire queue
         if self._cancellations > 512 \
           and self._cancellations > (len(self._tasks) >> 1):
-            self._cancellations = 0
-            self._tasks = [x for x in self._tasks if not x.cancelled]
             self.reheapify()
 
         try:
@@ -169,6 +168,9 @@ class _Scheduler(object):
         self._cancellations += 1
 
     def reheapify(self):
+        """Get rid of cancelled calls and reinitialize the internal heap."""
+        self._cancellations = 0
+        self._tasks = [x for x in self._tasks if not x.cancelled]
         heapq.heapify(self._tasks)
 
 
@@ -193,7 +195,7 @@ class _CallLater(object):
         if not seconds:
             self.timeout = 0
         else:
-            self.timeout = time.time() + self._delay
+            self.timeout = timer() + self._delay
         self.cancelled = False
         self._sched.register(self)
 
@@ -238,7 +240,7 @@ class _CallLater(object):
     def reset(self):
         """Reschedule this call resetting the current countdown."""
         assert not self.cancelled, "already cancelled"
-        self.timeout = time.time() + self._delay
+        self.timeout = timer() + self._delay
         self._repush = True
 
     def cancel(self):
@@ -257,7 +259,7 @@ class _CallEvery(_CallLater):
             if exc:
                 self.cancel()
             else:
-                self.timeout = time.time() + self._delay
+                self.timeout = timer() + self._delay
                 self._sched.register(self)
 
 
@@ -492,8 +494,10 @@ class _BasePollEpoll(_IOLoop):
             if err.args[0] == errno.EINTR:
                 return
             raise
+        # localize variable access to minimize overhead
+        smap_get = self.socket_map.get
         for fd, event in events:
-            inst = self.socket_map.get(fd)
+            inst = smap_get(fd)
             if inst is None:
                 continue
             if event & self._ERROR and not event & self.READ:
@@ -549,6 +553,10 @@ if hasattr(select, 'epoll'):
         _ERROR = select.EPOLLERR | select.EPOLLHUP
         _poller = select.epoll
 
+        def fileno(self):
+            """Return epoll() fd."""
+            return self._poller.fileno()
+
         def close(self):
             _IOLoop.close(self)
             self._poller.close()
@@ -567,6 +575,10 @@ if hasattr(select, 'kqueue'):
             _IOLoop.__init__(self)
             self._kqueue = select.kqueue()
             self._active = {}
+
+        def fileno(self):
+            """Return kqueue() fd."""
+            return self._poller.fileno()
 
         def close(self):
             _IOLoop.close(self)
@@ -690,6 +702,12 @@ class Acceptor(asyncore.dispatcher):
         """
         assert self.socket is None
         host, port = addr
+        if host == "":
+            # When using bind() "" is a symbolic name meaning all
+            # available interfaces. People might not know we're
+            # using getaddrinfo() internally, which uses None
+            # instead of "", so we'll make the conversion for them.
+            host = None
         err = "getaddrinfo() returned an empty list"
         info = socket.getaddrinfo(host, port, socket.AF_UNSPEC,
                                   socket.SOCK_STREAM, 0, socket.AI_PASSIVE)
@@ -706,6 +724,7 @@ class Acceptor(asyncore.dispatcher):
                 if self.socket is not None:
                     self.socket.close()
                     self.del_channel()
+                    self.socket = None
                 continue
             break
         if self.socket is None:
@@ -793,6 +812,7 @@ class Connector(Acceptor):
                 if self.socket is not None:
                     self.socket.close()
                     self.del_channel()
+                    self.socket = None
                 continue
             break
         if self.socket is None:

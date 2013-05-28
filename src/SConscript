@@ -23,24 +23,20 @@ MI_DATAFILES = []
 def MI_pymod(srcdir, target, sources):
     depPyModule(env, 'root.pyext', srcdir, target, sources)
 
-def MI_pymod_cpdir(srcdirs):
-    if type(srcdirs) is str:
-        srcdirs = [srcdirs]
-    depInstallDir(env, 'root.pyext', '$pyextdir$root_libdir', srcdirs)
-
-def MI_data(filelist, reldir):
+def _cp(env, alias, filelist, reldir):
     '''
     1. filelist<str> is a source file path, reldir<str> is the relative file path of 
     the target installation path.
     2. filelist<list> is a list contains of source files, reldir<str> is the
     relative directory path of the target installation position.
     '''
+    inst_flist = []
     if type(filelist) is str:
         fpath = os.path.abspath(filelist)
         destfile = reldir
-        MI_DATAFILES.append(fpath)
-        depInstallAs(env, 'root_src', '$destdir$root_datadir/%s' % destfile, fpath)
-        return
+        inst_flist.append(fpath)
+        depInstallAs(env, alias, destfile, fpath)
+        return inst_flist
 
     files = []
     dirs = []
@@ -52,13 +48,22 @@ def MI_data(filelist, reldir):
             files.append(f)
 
     if dirs:
-        MI_DATAFILES.extend(depInstallDir(env, 'root_src', '$destdir$root_datadir/%s' % reldir, dirs))
+        inst_flist.extend(depInstallDir(env, alias, reldir, dirs))
 
     if files:
-        MI_DATAFILES.extend(files)
-        depInstall(env, 'root_src', '$destdir$root_datadir/%s' % reldir, files)
+        inst_flist.extend(files)
+        depInstall(env, alias, reldir, files)
 
-Export('MI_pymod', 'MI_pymod_cpdir', 'MI_data')
+    return inst_flist
+
+def MI_data(filelist, reldir):
+    flist = _cp(env, 'root_src', filelist, '$destdir$root_datadir/%s' % reldir)
+    MI_DATAFILES.extend(flist)
+
+def MI_pymod_cp(filelist, reldir):
+    _cp(env, 'root.pyext', filelist, '$pyextdir$root_libdir/%s' % reldir)
+
+Export('MI_pymod', 'MI_pymod_cp', 'MI_data')
 Export('MI_DATAFILES')
 
 ## MI main program

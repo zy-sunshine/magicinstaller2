@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: servers.py 1181 2013-02-22 17:48:37Z g.rodola $
+# $Id: servers.py 1219 2013-04-19 14:35:41Z g.rodola $
 
 #  ======================================================================
 #  Copyright (C) 2007-2013 Giampaolo Rodola' <g.rodola@gmail.com>
@@ -68,6 +68,7 @@ import errno
 import select
 import logging
 import signal
+import time
 
 from pyftpdlib.log import logger
 from pyftpdlib.ioloop import Acceptor, IOLoop
@@ -104,34 +105,45 @@ class FTPServer(Acceptor):
     max_cons = 512
     max_cons_per_ip = 0
 
-    def __init__(self, address, handler, ioloop=None):
-        """Initiate the FTP server opening listening on address.
+    def __init__(self, address_or_socket, handler, ioloop=None, backlog=5):
+        """Creates a socket listening on 'address' dispatching
+        connections to a 'handler'.
 
-         - (tuple) address: the host:port pair on which the command
-           channel will listen.
+         - (tuple) address_or_socket: the (host, port) pair on which
+           the command channel will listen for incoming connections or
+           an existent socket object.
 
-         - (classobj) handler: the handler class to use.
+         - (instance) handler: the handler class to use.
+
+         - (instance) ioloop: a pyftpdlib.ioloop.IOLoop instance
+
+         - (int) backlog: the maximum number of queued connections
+           passed to listen(). If a connection request arrives when
+           the queue is full the client may raise ECONNRESET.
+           Defaults to 5.
         """
         Acceptor.__init__(self, ioloop=ioloop)
         self.handler = handler
+        self.backlog = backlog
         self.ip_map = []
-        host, port = address
         # in case of FTPS class not properly configured we want errors
         # to be raised here rather than later, when client connects
         if hasattr(handler, 'get_ssl_context'):
             handler.get_ssl_context()
-
-        # AF_INET or AF_INET6 socket
-        # Get the correct address family for our host (allows IPv6 addresses)
-        try:
-            self._af = self.bind_af_unspecified((host, port))
-        except socket.gaierror:
-            # Probably a DNS issue. Assume IPv4.
-            self.create_socket(socket.AF_INET, socket.SOCK_STREAM)
-            self.set_reuse_addr()
-            self.bind((host, port))
-            self._af = socket.AF_INET
-        self.listen(5)
+        if isinstance(address_or_socket, socket.socket):
+            sock = address_or_socket
+            sock.setblocking(0)
+            self.set_socket(sock)
+            if hasattr(sock, 'family'):
+                self._af = sock.family
+            else:
+                # python 2.4
+                ip, port = self.socket.getsockname()[:2]
+                self._af = socket.getaddrinfo(ip, port, socket.AF_UNSPEC,
+                                              socket.SOCK_STREAM)[0][0]
+        else:
+            self._af = self.bind_af_unspecified(address_or_socket)
+        self.listen(backlog)
 
     @property
     def address(self):
@@ -161,7 +173,9 @@ class FTPServer(Acceptor):
                                      self.handler.passive_ports[-1])
         else:
             pasv_ports = None
-        logger.info(">>> starting FTP server on %s:%s <<<" % self.address)
+        addr = self.address
+        logger.info(">>> starting FTP server on %s:%s, pid=%i <<<"
+                    % (addr[0], addr[1], os.getpid()))
         logger.info("poller: %r", self.ioloop.__class__)
         logger.info("masquerade (NAT) address: %s",
                     self.handler.masquerade_address)
@@ -310,18 +324,30 @@ class _SpawnerBase(FTPServer):
 
             # Here we localize variable access to minimize overhead.
             poll = ioloop.poll
-            socket_map = ioloop.socket_map
-            tasks = ioloop.sched._tasks
             sched_poll = ioloop.sched.poll
             poll_timeout = getattr(self, 'poll_timeout', None)
             soonest_timeout = poll_timeout
 
-            while (socket_map or tasks) and not self._exit.is_set():
+            while (ioloop.socket_map or ioloop.sched._tasks) and not \
+              self._exit.is_set():
                 try:
-                    if socket_map:
+                    if ioloop.socket_map:
                         poll(timeout=soonest_timeout)
-                    if tasks:
+                    if ioloop.sched._tasks:
                         soonest_timeout = sched_poll()
+                        # Handle the case where socket_map is emty but some
+                        # cancelled scheduled calls are still around causing
+                        # this while loop to hog CPU resources.
+                        # In theory this should never happen as all the sched
+                        # functions are supposed to be cancel()ed on close()
+                        # but by using threads we can incur into
+                        # synchronization issues such as this one.
+                        # https://code.google.com/p/pyftpdlib/issues/detail?id=245
+                        if not ioloop.socket_map:
+                            ioloop.sched.reheapify() # get rid of cancel()led calls
+                            soonest_timeout = sched_poll()
+                            if soonest_timeout:
+                                time.sleep(min(soonest_timeout, 1))
                     else:
                         soonest_timeout = None
                 except (KeyboardInterrupt, SystemExit):
@@ -333,14 +359,14 @@ class _SpawnerBase(FTPServer):
                     # rapidly connect and disconnects
                     err = sys.exc_info()[1]
                     if os.name == 'nt' and err.args[0] == 10038:
-                        for fd in list(socket_map.keys()):
+                        for fd in list(ioloop.socket_map.keys()):
                             try:
                                 select.select([fd], [], [], 0)
                             except select.error:
                                 try:
                                     logger.info("discarding broken socket %r",
-                                                socket_map[fd])
-                                    del socket_map[fd]
+                                                ioloop.socket_map[fd])
+                                    del ioloop.socket_map[fd]
                                 except KeyError:
                                     # dict changed during iteration
                                     pass

@@ -2,7 +2,7 @@
 ROOT_DIR=
 if [ -z $MI_BUILD_TOP ]; then
 	echo "not in build mode"
-	ROOT_DIR=/usr/local/MagicInstaller
+	ROOT_DIR=/usr/share/MagicInstaller
 	SCRIPT_LOGGING=$ROOT_DIR/mi.logging.py
 	SCRIPT_FTPD=$ROOT_DIR/mi.ftpd.py
 	SCRIPT_SERVER=$ROOT_DIR/mi.server.py

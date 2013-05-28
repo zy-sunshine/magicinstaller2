@@ -76,7 +76,7 @@ class LogRecordSocketReceiver(SocketServer.ThreadingTCPServer):
 
 def main():
     logging.basicConfig(
-            filename='mi.log',
+            filename='/var/log/mi.log',
             #format='%(levelname)-8s %(asctime)s %(name)-8s %(module)s [%(filename)s:%(lineno)d] [%(processName)s -> %(process)d] [%(threadName)s -> %(thread)d] %(message)s',
             format='%(levelname)-8s %(asctime)s [%(process)d|%(thread)d] [%(filename)s:%(lineno)d] %(message)s',
             datefmt='%m-%d %H:%M:%S',

@@ -2,7 +2,7 @@ from milogger import MiLogger
 #logger = MiLogger('mi')
 import logging, logging.config
 import os, sys
-CUR_DIR = os.path.dirname(os.path.dirname(__file__))
+CUR_DIR = os.path.dirname(__file__)
 logconf = os.path.join(CUR_DIR, 'logging.conf')
 print logconf
 logging.config.fileConfig(logconf)

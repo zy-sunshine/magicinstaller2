@@ -77,6 +77,9 @@ $pythondir/lib-dynload/zlibmodule.so
 $pythondir/lib-dynload/fcntlmodule.so
 $pythondir/lib-dynload/itertoolsmodule.so
 $pythondir/lib-dynload/_ctypes.so
+$pythondir/lib-dynload/cPickle.so
+$pythondir/lib-dynload/datetimemodule.so
+$pythondir/lib-dynload/_multiprocessing.so
 @$pythondir/ctypes
 # For pdb
 $pythondir/pdb.pyc
@@ -118,6 +121,18 @@ $pythondir/xmlrpclib.pyc
 $pythondir/gzip.pyc
 $pythondir/subprocess.pyc
 $pythondir/pickle.pyc
+$pythondir/asynchat.pyc
+$pythondir/asyncore.pyc
+$pythondir/ConfigParser.pyc
+$pythondir/multiprocessing/*.pyc
+$pythondir/multiprocessing/dummy/*.pyc
+$pythondir/heapq.pyc
+$pythondir/bisect.pyc
+$pythondir/json/*.pyc
+$pythondir/pkgutil.pyc
+$pythondir/ftplib.pyc
+$pythondir/atexit.pyc
+
 +$pythondir/site-packages
 </install>
 </package>
