@@ -1,0 +1,8 @@
+#!/bin/bash
+## Note: run in chroot environment
+# parameters:
+#    $1 <distkernelver> target system kernel version, pass from magicinstaller
+
+/sbin/new-kernel-pkg --mkinitrd --dracut --depmod --update $1
+exit $?
+

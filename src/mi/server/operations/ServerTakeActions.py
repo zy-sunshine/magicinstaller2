@@ -17,7 +17,8 @@ dolog = logger.info
 dev_hd = None # the harddisk device where save packages.
 dev_iso = None # the iso where save pkgs.
 dev_tgt = None # the target system devices.
-inst_h = None
+inst_h = None   # install package handler
+dev_mnt_dir = '/' # the current hd or iso mount dir
 
 class MiDevice_TgtSys(object):
     def __init__(self, tgtsys_devinfo):
@@ -85,7 +86,20 @@ class MiDevice_TgtSys(object):
                     logger.w('Umount device %s Failed, but we continue')
             else:
                 umount_dev(dev)
-
+                
+@register.server_handler('long')
+def mount_tgtsys(mia, operid, tgtsys_devinfo):
+    dolog('mount_tgtsys %s' % repr(tgtsys_devinfo))
+    global dev_tgt # the target system devices.
+    logger.d('######### Mount target system (please check the umount point) #############')            
+    dev_tgt = MiDevice_TgtSys(tgtsys_devinfo)
+    if not dev_tgt.mount_tgt_device(): #### NOTE: carefully handle this device's mount.
+        msg = _('Mount target system devices Failed, install operate can not continue!!!')
+        logger.e(msg)
+        dev_tgt = None
+        return msg
+    return 0
+    
 @register.server_handler('long')
 def install_prep(mia, operid, pkgsrc_devinfo, tgtsys_devinfo):
     '''
@@ -93,33 +107,27 @@ def install_prep(mia, operid, pkgsrc_devinfo, tgtsys_devinfo):
         We should mount target system device, to prepare install packages.
         and mount disk which packages source is saved on.
     '''    
-    global dev_tgt # the target system devices.
-    
     dev, fstype, bootiso_relpath, reldir = pkgsrc_devinfo
 
     dolog('install_prep(%s, %s, %s, %s)\n' % (dev, fstype, bootiso_relpath, reldir))
-    dolog('tgtsys_devinfo %s' % repr(tgtsys_devinfo))
-    
-    ############################## Mount Start #####################################            
-    dev_tgt = MiDevice_TgtSys(tgtsys_devinfo)
-    if not dev_tgt.mount_tgt_device(): #### NOTE: carefully handle this device's mount.
-        msg = _('Mount target system devices Failed, install operate can not continue!!!')
-        logger.e(msg)
+    return mount_tgtsys(mia, operid, tgtsys_devinfo)
+
+@register.server_handler('long')
+def umount_tgtsys(mia, operid, tgtsys_devinfo):
+    dolog('umount_tgtsys %s' % repr(tgtsys_devinfo))
+    logger.d('######### UMount target system (please check the mount point) #############') 
+    global dev_tgt # the target system devices.
+    logger.d('umount dev_tgt %s' % dev_tgt)
+    if dev_tgt:
+        dev_tgt.umount_tgt_device()
         dev_tgt = None
-        return msg
-        
     return 0
 
 @register.server_handler('long')
 def install_post(mia, operid, pkgsrc_devinfo, tgtsys_devinfo):
     dev, fstype, bootiso_relpath, reldir = pkgsrc_devinfo
     dolog('install_post(%s, %s, %s, %s)\n' % (dev, fstype, bootiso_relpath, reldir))
-    dolog('tgtsys_devinfo %s' % repr(tgtsys_devinfo))
-    global dev_tgt # the target system devices.
-    if dev_tgt:
-        dev_tgt.umount_tgt_device()
-        dev_tgt = None
-    return 0
+    return umount_tgtsys(mia, operid, tgtsys_devinfo)
     
 @register.server_handler('long')
 def install_disc_prep(mia, operid, dev, fstype, bootiso_relpath, reldir):
@@ -129,7 +137,7 @@ def install_disc_prep(mia, operid, dev, fstype, bootiso_relpath, reldir):
     '''
     global dev_hd # the harddisk device where save packages.
     global dev_iso # the iso where save pkgs.
-
+    global dev_mnt_dir # the current hd or iso mount dir
     dolog('instpkg_disc_prep(%s, %s, %s, %s)\n' % \
           (dev, fstype, bootiso_relpath, reldir))
     ############################## Mount Start #####################################
@@ -138,7 +146,7 @@ def install_disc_prep(mia, operid, dev, fstype, bootiso_relpath, reldir):
         msg = 'Mount device %s Failed, install operate can not continue' % dev_hd.get_dev()
         logger.e(msg)
         return msg
-        
+    dev_mnt_dir = dev_hd.get_mountdir()    
     if bootiso_relpath:
         # an iso file on harddisk
         dev_iso = MiDevice(dev_hd.get_file_path(bootiso_relpath), 'iso9660')
@@ -148,7 +156,8 @@ def install_disc_prep(mia, operid, dev, fstype, bootiso_relpath, reldir):
             logger.e(msg)
             dev_iso = None
             return msg
-            
+        dev_mnt_dir = dev_iso.get_mountdir()
+    
     ############################## Mount Finished #####################################
     return  0
 
@@ -252,18 +261,19 @@ def rpm_pre_install(mia, operid, data):
     from mi.server.utils.rpm.pyrpm_install import InstallRpm
 
     inst_h = InstallRpm(CF.D.TGTSYS_ROOT)
-    inst_h.install_pre()
+    return inst_h.install_pre()
     
 @register.server_handler('long')
 def rpm_post_install(mia, operid, data):
     global inst_h
-    inst_h.install_post()
+    return inst_h.install_post()
     
 @register.server_handler('long')
 def rpm_install_pkg(mia, operid, pkg, first_pkg):
     global inst_h
+    dir_ = os.path.dirname(os.path.join(dev_mnt_dir, first_pkg))
     progress_cb = Progress_CB(mia, operid)
-    inst_h.install(pkg, progress_cb)
+    return inst_h.install('%s/%s' % (dir_, pkg), progress_cb)
     
 ### Test Case
 class MiaTest(object):

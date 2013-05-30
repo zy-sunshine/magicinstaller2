@@ -1,0 +1,24 @@
+#!/bin/bash
+## Note: run in chroot target system environment
+# parameters:
+# $1 <mbr_device> install mbr to this device
+# $2 <cmdline> kernel cmdline
+# $3 <timeout> grub2 wait timeout
+
+out() { printf "$1 $2\n" "${@:3}"; }
+error() { out "==> ERROR:" "$@"; } >&2
+msg() { out "==>" "$@"; }
+
+grub2-install $1 #/dev/sd{x}
+ret=$?
+if [ $ret != 0 ]; then
+  error "Can not install grub2 onto $1"
+  exit $ret
+fi
+
+GRUB_CMDLINE_LINUX_DEFAULT="$2" GRUB_TIMEOUT="$3" grub2-mkconfig -o /boot/grub2/grub2.cfg
+if [ $ret != 0 ]; then
+  error "Can not create grub2 config file to /boot/grub2/grub2.cfg"
+  exit $ret
+fi
+

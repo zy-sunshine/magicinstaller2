@@ -165,11 +165,11 @@ class MiAction_InstallRpm():
                 (apkg, aarch, asize) = archpkg
                 apkg = os.path.basename(apkg)
                 # Debug
-                self.add_action(apkg, self.act_install_pkg_end, (disc_no, pkg_no, asize, False),
-                                'sleep', 0)
-#                self.add_action(apkg,
-#                                self.act_install_pkg_end, (disc_no, pkg_no, asize, False),
-#                                'rpm_install_pkg', apkg, self.probe_all_disc_result[disc_no][1])
+#                 self.add_action(apkg, self.act_install_pkg_end, (disc_no, pkg_no, asize, False),
+#                                 'sleep', 0)
+                self.add_action(apkg,
+                                self.act_install_pkg_end, (disc_no, pkg_no, asize, False),
+                                'rpm_install_pkg', apkg, self.probe_all_disc_result[disc_no][1])
                 return
             pkg_no = pkg_no + 1
         (pafile, dev, fstype, reldir, bootiso_relpath) = CF.G.choosed_patuple

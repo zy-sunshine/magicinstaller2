@@ -6,8 +6,8 @@ from pyftpdlib.servers import FTPServer
 
 authorizer = DummyAuthorizer()
 ftp_home = "/tmpfs/tftpboot"
-if not os.path.exists(ftp_home):
-    os.makedirs(ftp_home)
+if not os.path.exists(ftp_home+'/allpa'):
+    os.makedirs(ftp_home+'/allpa')
 authorizer.add_user("root", "magic", ftp_home, perm="elradfmw")
 #authorizer.add_anonymous("/home/nobody")
 

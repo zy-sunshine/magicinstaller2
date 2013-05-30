@@ -12,6 +12,7 @@ class magicpopup (xmlgtk.xmlgtk):
     MB_OK       = 8
     MB_YES      = 16
     MB_IGNORE   = 32
+    MB_REBOOT   = 64
     def __init__(self, upobj, uixml, title, buttons, uirootname=None, prefix=''):
         if not upobj:
             upobj = self
@@ -30,7 +31,8 @@ class magicpopup (xmlgtk.xmlgtk):
                                 (self.MB_NO,     'no'),
                                 (self.MB_OK,     'ok'),
                                 (self.MB_YES,    'yes'),
-                                (self.MB_IGNORE, 'ignore')]:
+                                (self.MB_IGNORE, 'ignore'),
+                                (self.MB_REBOOT, 'reboot')]:
                 if buttons & bit:
                     self.dialogframe.name_map[name].show()
                     self.dialogframe.name_map[name + '_space'].show()
@@ -41,12 +43,12 @@ class magicpopup (xmlgtk.xmlgtk):
 
         self.topwin = gtk.Window(gtk.WINDOW_POPUP)
         self.topwin.set_modal(True)
-        #self.topwin.set_position(gtk.WIN_POS_CENTER_ALWAYS)
-        self.topwin.set_position(gtk.WIN_POS_CENTER)
+        self.topwin.set_position(gtk.WIN_POS_CENTER_ALWAYS)
+        #self.topwin.set_position(gtk.WIN_POS_CENTER)
         self.topwin.add(self.dialogframe.widget)
         self.topwin.show()
 
-    def closedialog(self, widget):
+    def closedialog(self, widget=None):
         self.topwin.destroy()
 
 class magicmsgbox(magicpopup):

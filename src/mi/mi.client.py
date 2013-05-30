@@ -33,7 +33,7 @@ if USE_TEXTDOMAIN:
 settings = gtk.settings_get_default()
 settings.set_string_property("gtk-theme-name", "Gnursid", "")
 
-step_name_list = (
+step_name_list = [
     (_('Welcome'), 'welcome'), # (group name, module name)
     #'scsi',
     (_('Package'), 'pkgselect'),
@@ -46,7 +46,7 @@ step_name_list = (
     (_('Setup'), 'takeactions'),
     #(_('Setup'), 'dosetup'),
     (_('Finish'), 'finish')
-    )
+    ]
 win = MIMainWindow(step_name_list, gtk.WINDOW_TOPLEVEL)
 win.set_size_request(CF.D.FULL_WIDTH, CF.D.FULL_HEIGHT)
 win.set_resizable(False)

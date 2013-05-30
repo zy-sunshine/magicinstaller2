@@ -12,25 +12,7 @@ register = MiRegister()
 from mi.server.utils import logger
 dolog = logger.info
 
-@register.server_handler('long')
-def do_mkinitrd(mia, operid, dummy):
-    mia.set_step(operid, 0, -1)
-    os.system('rm -f %s' % os.path.join(CF.D.TGTSYS_ROOT, 'boot', CF.D.TARGET_INITRD_FN))
-    os.system('sync')
-    
-    time.sleep(1)
-    # Remove Dirty Work
-    #os.system('cp -f %s/tmp/fstab.* %s/etc/fstab' % (CF.D.TGTSYS_ROOT, CF.D.TGTSYS_ROOT))
-    if CF.D.USEUDEV:
-        os.system('cp -f %s/etc/fstab %s/etc/mtab' % (CF.D.TGTSYS_ROOT, CF.D.TGTSYS_ROOT)) # make udev happy
-
-    cmd = '/usr/sbin/chroot %s /sbin/new-kernel-pkg --install --mkinitrd --depmod %s' % (CF.D.TGTSYS_ROOT, CF.D.TARGET_KERNELVER)
-    dolog(cmd)
-    ret = os.system(cmd)
-    return ret
-
-@register.server_handler('long')
-def prepare_grub(mia, operid, timeout, usepassword, password,
+def _prepare_grub(mia, operid, timeout, usepassword, password,
                  lba, options, entrylist, default, instpos, bootdev, mbrdev, windev, winfs):
     def get_grub_device_map():
         """The content of grub device map file is:
@@ -86,8 +68,12 @@ def prepare_grub(mia, operid, timeout, usepassword, password,
     mia.set_step(operid, 0, -1)
 
     device_map = get_grub_device_map()
+    
+    # eg. (10, 'false', '', 'false', 'vga=791 splash=silent,fadein,theme:default console=tty1', '', 'mbr', '', '/dev/sda', '', '')
     dolog('(timeout, usepassword, password, lba, options, default, instpos, bootdev, mbrdev, windev, winfs) = %s\n' % \
           str((timeout, usepassword, password, lba, options, default, instpos, bootdev, mbrdev, windev, winfs)))
+    
+    # eg. entrylist = [['', '/dev/sda2', 'true']]
     dolog('entrylist = %s\n' % str(entrylist))
 
     #has_dos = len(entrylist) == 2
@@ -119,7 +105,7 @@ def prepare_grub(mia, operid, timeout, usepassword, password,
                 grubsetupdev = windev
 
             if grubdev == None or grubsetupdev == None:
-                return 1 # Install grub failed.
+                return 1, _('Install grub failed') # Install grub failed.
 
             # init new bootsplash
             text = text + '\troot %s\n' % grubdev
@@ -160,7 +146,7 @@ def prepare_grub(mia, operid, timeout, usepassword, password,
     if instpos == 'win':
         ret, win_mntdir = mount_dev(winfs, windev)
         if not ret:
-            return 1
+            return 1, _('Install position on windows partition(%s) failed!' % windev)
         #grubdir = os.path.join(win_mntdir, 'grub')
         grubdir = win_mntdir        # Put it in the root 
     else:
@@ -231,12 +217,12 @@ def prepare_grub(mia, operid, timeout, usepassword, password,
         os.system('cp -a %s %s/' % ('/usr/share/grldr',
                                    win_mntdir))
         umount_dev(win_mntdir)
-        return 0
+        return 0, ''
 
     else:
         if os.path.exists('/tmpfs/debug/nobootloader'):
             dolog('TURN ON: nobootloader\n')
-            return 0
+            return 0, ''
         # Get the command arguments for grub.
         #floppy = kudzu.probe(kudzu.CLASS_FLOPPY,
         #                     kudzu.BUS_IDE | kudzu.BUS_SCSI | kudzu.BUS_MISC,
@@ -260,8 +246,8 @@ def prepare_grub(mia, operid, timeout, usepassword, password,
                   (os.path.join(CF.D.TGTSYS_ROOT, 'usr/lib/grub'),
                    os.path.join(CF.D.TGTSYS_ROOT, 'boot/grub')))
         os.system('sync')
-                   
-        #return (grubdev, grubsetupdev, grubopt)
+        
+        return 0, (grubdev, grubsetupdev, grubopt)
 
 # Setup grub with all of the partitions mounted as readonly.
 # grub makes use of raw devices instead of filesystems that the operation
@@ -269,7 +255,8 @@ def prepare_grub(mia, operid, timeout, usepassword, password,
 # inconsistency may corrupt the filesystems. So I have to run grub without
 # any target partitions mounted for security.
 @register.server_handler('long')
-def setup_grub(mia, operid, grubdev, grubsetupdev, grubopt):
+def setup_grub(mia, operid, timeout, usepassword, password,
+                 lba, options, entrylist, default, instpos, bootdev, mbrdev, windev, winfs):
     def check_grub_result(filename):
         try:
             r = 1
@@ -285,7 +272,11 @@ def setup_grub(mia, operid, grubdev, grubsetupdev, grubopt):
             return  r
         except Exception, errmsg:
             return  None
-
+    ret, msg = _prepare_grub(mia, operid, timeout, usepassword, password, lba, options, entrylist, default, instpos, bootdev, mbrdev, windev, winfs)
+    if ret != 0:
+        return ret, msg
+    
+    (grubdev, grubsetupdev, grubopt) = msg
     # install grub
     grub_result = '/tmpfs/grub.%d.result'
     for sleep_time in [1, 2, 4, 8, 16, 32]:
@@ -301,7 +292,7 @@ def setup_grub(mia, operid, grubdev, grubsetupdev, grubopt):
             break
         os.system('sync')
         time.sleep(sleep_time)
-    return 0
+    return 0, ''
 
 ## setup_lilo is not debug and not finished.
 #@register.server_handler('long')

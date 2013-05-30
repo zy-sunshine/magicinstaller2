@@ -190,7 +190,7 @@ class MIStep_bootloader (magicstep.magicstepgroup):
                                                  magicpopup.magicpopup.MB_CANCEL,
                                                  'bootentry.dialog', 'edit_')
         self.edit_dialog.fill_values(self.edit_values.documentElement)
-        self.edit_dialog.name_map['CF.G.root_device'].set_text(device)
+        self.edit_dialog.name_map[CF.G.root_device].set_text(device)
 
     def edit_ok_clicked(self, widget, data):
         self.edit_dialog.fetch_values(self.edit_values)
@@ -259,3 +259,13 @@ class MIStep_bootloader (magicstep.magicstepgroup):
         new_win_device = self.name_map['winpartition_entry'].get_text()
         if win_device != new_win_device:
             self.restore_entrylist()
+            
+def TestMIStep_bootloader():
+    from mi.client.tests import TestRootObject
+    obj = TestRootObject(MIStep_bootloader)
+    obj.init()
+    obj.main()
+    
+if __name__ == '__main__':
+    TestMIStep_bootloader()
+    

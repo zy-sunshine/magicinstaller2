@@ -25,7 +25,7 @@ function clean_servers(){
 		clean_server $server
 	done
 }
-/root/clean.sh >/dev/null 2>&1
+[ -x /root/clean.sh ] && /root/clean.sh >/dev/null 2>&1
 clean_servers 
 echo cd $ROOT_DIR
 cd $ROOT_DIR

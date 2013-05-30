@@ -14,6 +14,7 @@
         "DATADIR": "${root_datadir}",
         "EXPERT_MODE": 1,
         "TARGET_KERNEL_FN": "vmlinuz-${distkernelver}",
+        "TARGET_INITRD_FN": "initrd-${distkernelver}.img",
         "TGTSYS_ROOT": "/tmpfs/tgtsys",
         "ISOLOOP": "loop3",
         "MI_KERNELVER": "${mikernelver}",
@@ -21,7 +22,6 @@
         "RESCUE_MODE": 0,
         "FSTYPE_MAP": ${fstype_map},
         "HOTFIXDIR": "${hotfixdir}",
-        "TARGET_INITRD_FN": "initrd-${distkernelver}.img",
         "FULL_HEIGHT": ${full_height},
         "FULL_WIDTH": ${full_width},
         "TEXT_MODE": 0,
@@ -34,7 +34,8 @@
         "BOOTCDFN": "${bootiso_fn}",
         "ISOFN_FMT": "${isofn_fmt}",
         "MBROOT": "/mnt/MagicBooter",
-        "MNT_ROOT": "/tmpfs/mnt"
+        "MNT_ROOT": "/tmpfs/mnt",
+        "POST_SCRIPTS_DIR": "/root/post_scripts"
     },
     "G": {
         "fstype_map": {},

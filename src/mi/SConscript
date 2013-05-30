@@ -89,7 +89,10 @@ env.Command('magic.values.m4defs', '', gen_magic_values_m4defs)
 
 env.Command('magic.values.xml', ['magic.values.m4defs',
                                  'm4.magic.values.xml'],
-            'm4 -Dhostname=$distname $SOURCES > $TARGET')
+            'm4 -Dhostname=$distname -Dbltype=$bltype $SOURCES > $TARGET')
+
+# TARGET: mi.dev.prepare
+env.Alias('mi.dev.prepare', ['magic.values.xml', 'magic.autopart.xml'])
 
 #for pym in pymodules:
 #    env.PYCBuilder(pym, pym[:-1])

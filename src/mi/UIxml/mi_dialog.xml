@@ -60,6 +60,13 @@
               </hbox>
             </button>
             <label name="ignore_space" expand="true" fill="true" visible="false"/>
+            <button name="reboot" visible="false">
+              <hbox>
+                <image file="images/stock_cancel_20.png" fill="true"/>
+                <label text="((_Reboot))" use_underline="true" expand="true" fill="true"/>
+              </hbox>
+            </button>
+            <label name="reboot_space" expand="true" fill="true" visible="false"/>
           </hbox>
         </frame>
       </vbox>

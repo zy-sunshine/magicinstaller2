@@ -7,5 +7,7 @@ x We just complete format operation, and should add a unique installl task queue
 
 * Make a beautiful document for xmlgtk and magicinstaller2
 
-* generate config.json by python template, choose a template engine or write a
+x generate config.json by python template, choose a template engine or write a
   simple engine.
+-> config.json.tpl use string.Template to fill variables in it.
+

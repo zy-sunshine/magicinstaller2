@@ -24,7 +24,7 @@
   </parted>
   <autopart>--/autopart_profile/--  </autopart>
   <bootloader>
-    <bltype>grub</bltype>
+    <bltype>--/bltype/--</bltype>
     <timeout>10</timeout>
     <instpos>mbr</instpos>
     <usepassword>false</usepassword>

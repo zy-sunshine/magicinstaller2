@@ -7,8 +7,12 @@ class MIStep_finish (magicstep.magicstep):
     LABEL = _("Finish")
     def __init__(self, rootobj):
         magicstep.magicstep.__init__(self, rootobj, 'finish.xml', 'finish')
-        rootobj.btnnext_sensitive(False)
-        rootobj.btnback_sensitive(False)
+        self.rootobj = rootobj
+        
+    def enter(self):
+        self.rootobj.btnnext_sensitive(False)
+        self.rootobj.btnback_sensitive(False)
+        return 1
 
     def get_label(self):
         return self.LABEL

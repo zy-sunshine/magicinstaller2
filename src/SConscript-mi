@@ -47,11 +47,11 @@ class miSrcMaker(PkgMaker.StepMaker):
 
     def install_post(self):
         env = self.env
-        post_script = '$specdir/post_install.sh'
-        if os.path.exists(env.subst(post_script)):
-            cmds = ['mkdir -pv $ROOT/root && cp %s $ROOT/root' % post_script,
-                    'chmod 700 $ROOT/root/post_install.sh']
-            return [post_script], cmds
+        post_scripts_dir = '$specdir/post_scripts'
+        if os.path.exists(env.subst(post_scripts_dir)):
+            cmds = ['mkdir -pv $ROOT/root && cp -pr %s $ROOT/root' % post_scripts_dir,
+                    'chmod 777 $ROOT/root/post_scripts/*']
+            return glob.glob('%s/*' % env.subst(post_scripts_dir)), cmds
         else:
             return [], []
 

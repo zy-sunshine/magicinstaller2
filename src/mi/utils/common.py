@@ -35,17 +35,20 @@ class NamedTuple(tuple):
         idx = self.attr_order.index(attr)
         return self[idx]
 
-def run_bash(cmd, argv=[], root='/', env=None):
+def run_bash(cmd, argv=[], root=None, env=None, cwd=None):
     import subprocess
     def chroot():
-        os.chroot(root)
+        if root:
+            os.chroot(root)
     env = env and env or os.environ
     cmd_res = {}
+    if cwd is None:
+        cwd = os.path.dirname(cmd)
     logger.i('runbash: %s %s' % (cmd, ' '.join(argv)))
     res = subprocess.Popen([cmd] + argv, 
                             stdout = subprocess.PIPE, 
                             stderr = subprocess.PIPE, 
-                            preexec_fn = chroot, cwd = root,
+                            preexec_fn = chroot, cwd = cwd,
                             close_fds = True,
                             env = env)
     res.wait()

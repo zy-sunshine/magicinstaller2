@@ -10,7 +10,8 @@
                 <hbox expand="true" fill="true">
                     <label expand="true"/>
                     <vbox fill="true" spacing="4">
-                        <radiobutton label="((_Grub(Recommended)))" value="bootloader.bltype" valuedata="grub"/>
+                    	<radiobutton label="((Grub2(_Recommended)))" value="bootloader.bltype" valuedata="grub2"/>
+                        <radiobutton label="((_Grub))" value="bootloader.bltype" valuedata="grub"/>
                         <radiobutton visible="false" label="((_Lilo))" value="bootloader.bltype" valuedata="lilo"/>
                         <radiobutton name="bltype_none_radiobutton" label="((_Do not use boot loader))" value="bootloader.bltype" valuedata="none"/>
                     </vbox>
@@ -23,10 +24,10 @@
                     <table columns="2" rows="3" colspaings="2" rowspacings="2">
                         <radiobutton name="mbr" label="((_Master Boot Record(MBR)))" value="bootloader.instpos" valuedata="mbr"/>
                         <entry name="mbr_entry" value="bootloader.mbr_device" expand="true" fill="true"/>
-                        <radiobutton name="bootpartition" label="((The partition which contain /_boot))" value="bootloader.instpos" valuedata="boot"/>
-                        <entry name="bootpartition_entry" value="bootloader.boot_device" expand="true" fill="true"/>
-                        <radiobutton name="winpartition" label="((The Win_dows partition))" value="bootloader.instpos" valuedata="win"/>
-                        <entry name="winpartition_entry" value="bootloader.win_device" expand="true" fill="true"/>
+                        <radiobutton name="bootpartition" label="((The partition which contain /_boot))" value="bootloader.instpos" valuedata="boot" visible="false"/>
+                        <entry name="bootpartition_entry" value="bootloader.boot_device" expand="true" fill="true" visible="false"/>
+                        <radiobutton name="winpartition" label="((The Win_dows partition))" value="bootloader.instpos" valuedata="win" visible="false"/>
+                        <entry name="winpartition_entry" value="bootloader.win_device" expand="true" fill="true" visible="false"/>
                     </table>
                 </frame>
                 <frame label="((Bootloader Option))" expand="true" fill="true">
@@ -34,7 +35,7 @@
                         <label text="((Menu t_imeout(second):))" mnemonic="bt-timeout" xalign="0"/>
                         <spinbutton name="bt-timeout" value="bootloader.timeout" 
                                 lower="1" upper="120" stepinc="1" pagesize="0" pageinc="0"/>
-                        <checkbutton label="((_Force enable LBA32))" value="bootloader.lba"/>
+                        <checkbutton label="((_Force enable LBA32))" value="bootloader.lba" visible="false"/>
                         <label/>
                         <checkbutton visible="false" name="useblpassword" label="((Use bootloader pass_word:))" value="bootloader.usepassword"/>
                         <entry type="password" value="bootloader.password" visible="false" enable="useblpassword" expand="true" fill="true"/>
@@ -42,8 +43,9 @@
                         <entry name="bt-options" value="bootloader.options" expand="true" fill="true"/>
                     </table>
                 </frame>
-                <label text="((Please modify the bootloader entry here.))" xalign="0"/>
-                <hbox spacing="4" expand="true" fill="true">
+                <label expand="true" />
+                <label text="((Please modify the bootloader entry here.))" xalign="0" visible="false" />
+                <hbox spacing="4" expand="true" fill="true" visible="false">
                     <list name="bootlist" value="bootloader.entrylist"
                             selection_mode="single" expand="true" fill="true">
                         <column label="((Default))" type="pixmap"/>

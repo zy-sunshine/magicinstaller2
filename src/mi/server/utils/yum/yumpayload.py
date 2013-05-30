@@ -1126,11 +1126,11 @@ def show_groups(payload):
 
 
 if __name__ == '__main__':
-    TEST_INSTALL = True
+    TEST_INSTALL = False
     payload = YumPayload()
     CF.S.BASE_REPO_NAME = 'magiclinux'
     #CF.S.BASE_REPO_URL = '/mnt/fedora_iso'
-    CF.S.BASE_REPO_URL = '/home/zhangyang09/work/magicbin/packages_magiclinux3.0'
+    CF.S.BASE_REPO_URL = '/home/netsec/work/RPMS.base64'
     
     payload.setup()
     

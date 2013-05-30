@@ -1,4 +1,5 @@
 #!/bin/sh
+## Note: run in chroot target system environment
 
 rpm_run_post() {
      rpm -q --qf "%{POSTIN}" $1 > t.sh

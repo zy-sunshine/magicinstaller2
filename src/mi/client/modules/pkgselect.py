@@ -43,8 +43,6 @@ class MIStep_pkgselect(magicstep.magicstepgroup):
             CF.G.pkgarr_probe_result = tdata
             CF.G.pkgarr_probe_status = STAT.OP_STATUS_DONE
         CF.G.pkgarr_probe_status = STAT.OP_STATUS_DOING
-        if not os.path.isdir(CF.G.path_allpa):
-            os.makedirs(CF.G.path_allpa)
         self.rootobj.tm.add_action(_('Search package information'), 
                                    resp_pkgarr_probe, None, 
                                    'pkgarr_probe')

@@ -810,7 +810,7 @@ class  Harddisk(xmlgtk.xmlgtk):
         return  None
 
     def got_all_partitions(self, tdata, data):
-        "Callback of op 'get_all_partitions'"
+        logger.d("Callback of op 'get_all_partitions' %s" % str(tdata))
         self.tm.add_action(None, self.refresh_disklabel_label, None,
                            'get_disk_type', self.devfn)
         self.partlist = tdata
@@ -1236,7 +1236,8 @@ class  Harddisk(xmlgtk.xmlgtk):
             if o_label != label:
                 set_label = 'true'
                 self.ae_model.set_value(self.ae_iter, self.COLUMN_LABEL, label)
-        if true_flags != '' or false_flags != '' or set_label:
+
+        if true_flags != '' or false_flags != '' or set_label != 'false':
             self.tm.add_action(None, self.close_dialog, self.waitdlg(),
                                'set_flags_and_label', self.devfn, self.ae_start,
                                self.str2partflags(true_flags),

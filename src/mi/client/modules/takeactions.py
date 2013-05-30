@@ -35,7 +35,7 @@ class RpmErrDialog(magicpopup.magicpopup):
         magicpopup.magicpopup.__init__(self, sself, uixml,
                                         _('Package install error'), 0,
                                         uirootname)
-        self.name_map['msg'].set_text(msg)
+        self.name_map['msg'].set_text(str(msg))
 
     def retry_clicked(self, widget, data):
         self.sself.retry_clicked(widget, data)
@@ -60,7 +60,7 @@ class FatalErrDialog(magicpopup.magicpopup):
     def reboot_clicked(self, widget, data):
         self.sself.reboot_clicked(widget, data)
         self.topwin.destroy()
-        
+
 class MIStep_takeactions(magicstep.magicstep):
     NAME = 'takeactions'
     LABEL = _('Take Actions')
@@ -143,6 +143,7 @@ class MIStep_takeactions(magicstep.magicstep):
         return 1
     
     def leave(self):
+        logger.d('install_finished %s setup_finished %s entered %s' % (self.install_finished, self.setup_finished, self.entered))
         if not self.install_finished:
             return 0
         elif not self.setup_finished:
@@ -150,7 +151,8 @@ class MIStep_takeactions(magicstep.magicstep):
             self.name_map['frame_other'].set_sensitive(True)
             self.rootobj.tm.push_progress(self.name_map['otprog'],
                                           self.name_map['otname'])
-            # make initrd
+            
+            # set modprobe.conf
             scsi_module_list = self.get_data(self.values, 'scsi.modules')
             if scsi_module_list == None or scsi_module_list == '':
                 logger.w('No scsi driver has to be written into modprobe.conf.\n')
@@ -158,21 +160,99 @@ class MIStep_takeactions(magicstep.magicstep):
                 logger.i('scsi_modprobe_conf(%s)\n' % scsi_module_list)
                 self.add_action(_("Generate modprobe.conf"), None, None,
                                 'scsi_modprobe_conf', scsi_module_list)
-            logger.i('action_mkinitrd\n')
-            self.add_action(_('Make initrd'), None, None, 'do_mkinitrd', 0)
             
-            # set bootloader
-            self.add_action(_('Prepare bootloader'), None, None,
-                            'prepare_' + CF.BOOTLDR.bltype, CF.BOOTLDR.timeout, CF.BOOTLDR.usepassword, CF.BOOTLDR.password,
-                            CF.BOOTLDR.lba, CF.BOOTLDR.options, CF.BOOTLDR.entries, CF.BOOTLDR.default, CF.BOOTLDR.instpos, 
-                            CF.BOOTLDR.bootdev, CF.BOOTLDR.mbr_device, CF.BOOTLDR.win_device, CF.BOOTLDR.win_fs)    
-            # setup account
-            logger.i('action_accounts')
-            self.rootobj.tm.add_action(_('Setup accounts'), None, None,
-                                       'setup_accounts', CF.ACCOUNT.rootpasswd, CF.ACCOUNT.acclist)
-            # run post install script
-            self.tm.add_action(_('Run post install script'), self.do_setup_finished, None,
-                                   'run_post_install', 0)    
+            step_lst = []
+                
+            class WarningDialog(magicpopup.magicmsgbox):
+                def __init__(self, sself, msg, next_func):
+                    self.sself = sself
+                    self.next_func = next_func
+                    magicpopup.magicmsgbox.__init__(self, self,
+                          msg,
+                          magicpopup.magicmsgbox.MB_WARNING,
+                          magicpopup.magicpopup.MB_IGNORE|magicpopup.magicmsgbox.MB_REBOOT,
+                          '')
+                def reboot_clicked(self, widget, data):
+                    self.sself.reboot_clicked(widget, data)
+                    self.closedialog()
+                    
+                def ignore_clicked(self, widget, data):
+                    self.next_func()
+                    self.closedialog()
+                    
+            def next_post_script(tdata, data):
+                logger.d('next_post_script %s %s' % (str(tdata), str(data)))
+                # these post script return value is a tuple (ret, msg)
+                # If ret is 0 the operation is right, otherwise the operation is wrong, 
+                # and msg is the error message
+                if type(tdata) is str:
+                    ret = -1
+                    msg = tdata
+                elif type(tdata) is int:
+                    ret = tdata
+                    msg = ''
+                elif type(tdata) in (list, tuple) and len(tdata) == 2:
+                    ret, msg = tdata
+                else:
+                    ret = -1
+                    msg = 'Unknown error result %s' % tdata
+                    
+                logger.d('next_post_script index %s func %s' % (data, step_lst[data]))
+                if ret != 0:
+                    # dialog pop up to warning user and then run next step.
+                    WarningDialog(self, msg, step_lst[data])
+                    return
+                else:
+                    step_lst[data]()
+                    
+            def step0_0():
+                # mount target system
+                self.add_action(_('Mount Target System'),
+                        next_post_script, 1,
+                        'mount_tgtsys', CF.G.mount_all_list,    # partition list [(mntpoint, devfn, fstype), ...] , be filled at partition step.
+                            )
+            step_lst.append(step0_0)
+            
+            def step0():
+                # generate fstab
+                logger.i('do_genfstab')
+                self.add_action(_('Generate fstab'), next_post_script, 2, 'do_genfstab', 0)
+            step_lst.append(step0)
+            
+            def step1():
+                # make initrd
+                logger.i('do_mkinitrd')
+                self.add_action(_('Make initrd'), next_post_script, 3, 'do_mkinitrd', 0)
+            step_lst.append(step1)    
+            
+            def step2():
+                # set bootloader
+                logger.i('setup_' + CF.BOOTLDR.bltype)
+                self.add_action(_('Setup bootloader'), next_post_script, 4,
+                                'setup_' + CF.BOOTLDR.bltype, CF.BOOTLDR.timeout, CF.BOOTLDR.usepassword, CF.BOOTLDR.password,
+                                CF.BOOTLDR.lba, CF.BOOTLDR.options, CF.BOOTLDR.entries, CF.BOOTLDR.default, CF.BOOTLDR.instpos, 
+                                CF.BOOTLDR.bootdev, CF.BOOTLDR.mbr_device, CF.BOOTLDR.win_device, CF.BOOTLDR.win_fs)    
+            step_lst.append(step2)
+            
+            def step3():
+                # setup account
+                logger.i('action_accounts')
+                self.rootobj.tm.add_action(_('Setup accounts'), next_post_script, 5,
+                                           'setup_accounts', CF.ACCOUNT.rootpasswd, CF.ACCOUNT.acclist)
+            step_lst.append(step3)
+            
+            def step4():
+                # run post install script
+                self.tm.add_action(_('Run post install script'), next_post_script, 6,
+                                       'run_post_install', 0)    
+            step_lst.append(step4)
+            def step4_1():
+                self.add_action(_('Mount Target System'),
+                        self.do_setup_finished, None,
+                        'umount_tgtsys', CF.G.mount_all_list,    # partition list [(mntpoint, devfn, fstype), ...] , be filled at partition step.
+                            )
+            step_lst.append(step4_1)
+            step_lst[0]()
             return 0
         if not self.entered:
             return 0
@@ -320,10 +400,8 @@ class MIStep_takeactions(magicstep.magicstep):
         (pafile, dev, fstype, reldir, bootiso_relpath) = CF.G.choosed_patuple
         msg = _('Umount the target filesystem(s).')
         self.add_action(msg, None, None,
-                        'install_post', dev, reldir, fstype)
-        #### TODO Add an clean server operator
-        #self.add_action(msg, self.reboot_0, None,
-                        #'umount_all_tgtpart', CF.G.mount_all_list, 'y')
+                        'install_post', (dev, fstype, reldir, bootiso_relpath), CF.G.mount_all_list)
+
         self.reboot_0(None, None)
 
     def reboot_0(self, tdata, data):

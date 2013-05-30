@@ -30,9 +30,9 @@ class MIButtonBar(gtk.HBox):
         self.pack_start(self.theme, False, True)
         self.pack_start(self.help, False, True)
         
-        self.pack_end(self.cancel, False, True)
         self.pack_end(self.next, False, True)
         self.pack_end(self.back, False, True)
+        self.pack_end(self.cancel, False, True)
         self.pack_end(self.finish, False, True)
         
         self.logger.connect('clicked', self.logger_btn_clicked, None)

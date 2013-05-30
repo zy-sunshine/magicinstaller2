@@ -53,7 +53,8 @@ def gen_config_json(target, source, env):
     with open(str(target[0]), 'r') as f:
         json.load(f)
 
-env.Command('config.json', 'config.json.tpl', gen_config_json)
+c0 = env.Command('config.json', 'config.json.tpl', gen_config_json)
+env.Alias('mi.dev.prepare', c0)
 
 MI_data(['config.json', 'logging.conf'], 'mi/utils/')
 MI_data(glob.glob('%s/*.py' % LOCAL_PATH), 'mi/utils/')

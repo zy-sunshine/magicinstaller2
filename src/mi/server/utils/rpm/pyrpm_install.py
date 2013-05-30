@@ -38,6 +38,9 @@ class InstallRpm(object):
         rpm.addMacro("__dbi_htconfig", #@UndefinedVariable
              "hash nofsync %{__dbi_other} %{__dbi_perms}")
         rpm.addMacro("__file_context_path", "%{nil}") #@UndefinedVariable
+        var_lib_rpm = os.path.join(self.tgtsys_root, 'var/lib/rpm')
+        if not os.path.isdir(var_lib_rpm):
+            os.makedirs(var_lib_rpm)
         return 0
     
     def install_post(self):
@@ -65,7 +68,7 @@ class InstallRpm(object):
                 #    (rpm.RPMPROB_FILE_CONFLICT, conflict_filename, 0L)
                 return  problems
         except Exception, errmsg:
-            logger.i('FAILED: %s\n' % str(errmsg))
+            logger.w('FAILED: %s\n' % str(errmsg))
             return str(errmsg)
         return 0
 

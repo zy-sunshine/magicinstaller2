@@ -26,6 +26,6 @@ class TestRootObject(object):
         window.set_position(gtk.WIN_POS_CENTER)
         window.add(self.xmlgtk_obj.widget)
         window.connect('destroy', lambda x: gtk.main_quit())
-        window.show_all()
+        window.show()
         gtk.main()
         

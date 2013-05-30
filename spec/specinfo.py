@@ -20,6 +20,12 @@ distkernelver='2.6.30.10-smp'
 #
 pkgtype='rpm'
 
+# bootloader type (bltype) only support grub and grub2 now.
+# If use grub, please create a script at spec/post_scripts/post-grub to 
+# install and config grub.
+# If use grub2, please create a script at spec/post_scripts/post-grub2
+bltype='grub2'
+
 # pkgdirs is used to specify the directories which contain the packages
 # which should be installed by MagicInstaller as a part of the installed
 # distribution. Multiple directories can be separated by ':'. This value
