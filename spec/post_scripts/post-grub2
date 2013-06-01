@@ -9,6 +9,8 @@ out() { printf "$1 $2\n" "${@:3}"; }
 error() { out "==> ERROR:" "$@"; } >&2
 msg() { out "==>" "$@"; }
 
+export LANG="en_US.UTF-8"
+
 grub2-install $1 #/dev/sd{x}
 ret=$?
 if [ $ret != 0 ]; then
@@ -16,9 +18,9 @@ if [ $ret != 0 ]; then
   exit $ret
 fi
 
-GRUB_CMDLINE_LINUX_DEFAULT="$2" GRUB_TIMEOUT="$3" grub2-mkconfig -o /boot/grub2/grub2.cfg
+GRUB_CMDLINE_LINUX_DEFAULT="$2" GRUB_TIMEOUT="$3" grub2-mkconfig -o /boot/grub2/grub.cfg
 if [ $ret != 0 ]; then
-  error "Can not create grub2 config file to /boot/grub2/grub2.cfg"
+  error "Can not create grub2 config file to /boot/grub2/grub.cfg"
   exit $ret
 fi
 

@@ -35,7 +35,9 @@
         "ISOFN_FMT": "${isofn_fmt}",
         "MBROOT": "/mnt/MagicBooter",
         "MNT_ROOT": "/tmpfs/mnt",
-        "POST_SCRIPTS_DIR": "/root/post_scripts"
+        "POST_SCRIPTS_DIR": "/root/post_scripts",
+        "ALLPKG_NOPRE": ${allpkg_nopre},
+        "ALLPKG_NOPOST": ${allpkg_nopost}
     },
     "G": {
         "fstype_map": {},

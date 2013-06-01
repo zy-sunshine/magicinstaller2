@@ -41,6 +41,9 @@ class MiTaskman :
         self.err_dialog = err_dialog
 
     def push_progress(self, actprog, aplabel):
+        if len(self.apstack) == 1:
+            self.action_prog.hide()
+            self.aplabel.hide()
         self.apstack.append((actprog, aplabel))
         self.action_prog = actprog
         self.aplabel = aplabel

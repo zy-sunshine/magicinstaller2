@@ -42,8 +42,9 @@ def run_bash(cmd, argv=[], root=None, env=None, cwd=None):
             os.chroot(root)
     env = env and env or os.environ
     cmd_res = {}
-    if cwd is None:
-        cwd = os.path.dirname(cmd)
+    if cwd and root:
+        cwd = '/%s/%s' % (root.strip('/'), cwd.strip('/'))
+        
     logger.i('runbash: %s %s' % (cmd, ' '.join(argv)))
     res = subprocess.Popen([cmd] + argv, 
                             stdout = subprocess.PIPE, 

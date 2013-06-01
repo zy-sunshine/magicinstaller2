@@ -131,7 +131,7 @@ for iso_cnt in range(2, mi_config.max_cd_no + 1):
 
 ### Package arrangement
 # result/pkgarr.py <- scripts/PkgArrange.py, scripts/pkgpublic.py, tmp/pkginfor.py, mi_config.sifile
-env.Command(['result/pkgarr.py'],
+c0 = env.Command(['result/pkgarr.py'],
             ['scripts/PkgArrange.py',
             'scripts/pkgpublic.py',
             'tmp/pkginfor.py',
@@ -143,7 +143,7 @@ env.Command(['result/pkgarr.py'],
                         mi_config.remove_deps)),
             ],
             ['$pythonbin scripts/PkgArrange.py -o $TARGET -l tmp/pkgarr.log'])
-
+env.Alias('pkgarr', c0)
 # packages_md5sum <- packages_value
 env.Command(packages_md5sum, packages_value,
             'find %s -name \"*.rpm\" -exec md5sum {} \; > $TARGET' % pkgdirs)

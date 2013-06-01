@@ -348,7 +348,25 @@ class xmlgtk:
         widget = gtk.HBox(homogeneous, spacing)
         self._xgc_box_public(widget, node)
         return widget
-
+    
+    def xgc_eventbox(self, node):
+        widget = gtk.EventBox()
+        color = (self._xgc_attr(node, 'background', 'blank'))
+        bcolor = None
+        if color == 'blank':
+            pass
+        elif color == 'red':
+            bcolor = gtk.gdk.Color(65535, 0, 0)
+        elif color == 'blue':
+            bcolor = gtk.gdk.Color(0, 0, 65535)
+        elif color == 'green':
+            bcolor = gtk.gdk.Color(0, 65535, 0)
+            
+        self._xgc_container_public(widget, node)
+        if bcolor:
+            widget.modify_bg(gtk.STATE_NORMAL, bcolor) 
+        return widget
+    
     def xgc_tableV2(self, node):
         cell_list = []
         cell_fill_map = {}

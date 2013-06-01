@@ -9,7 +9,6 @@ initial_data.json
 .pydevproject
 /bindir
 /out
-/spec
 /tmp
 /result
 /.settings

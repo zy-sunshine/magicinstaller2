@@ -5,8 +5,8 @@ from mi.client.utils import logger, magicpopup, xmlgtk
 from mi.utils.miconfig import MiConfig
 from xml.dom.minidom import parseString
 import os
+import gtk
 CF = MiConfig.get_instance()
-
 
 class DoPartition(magicstep):
     '''
@@ -62,13 +62,6 @@ class DoPartition(magicstep):
             return 0
         else:
             self.sself.btnnext_sensitive(True)
-            ### ### TODO: mount these partition before install system.
-#            self.add_action(_('Mount all target partitions.'),
-#                            None, None,
-#                            'mount_all_tgtpart', CF.G.mount_all_list, 'y')
-            #self.add_action()
-            ### TODO: make a unique task queue, to make install operation run background.
-            #self.add_action(_('Start Install System'), None, None)
             self.sself.start_install()
             return 1
 
@@ -94,20 +87,22 @@ class DoPartition(magicstep):
         dirty_frame = self.id_map['dirty_frame']
         format_frame = self.id_map['format_frame']
         tgtsys_frame = self.id_map['tgtsys_frame']
-        
+
         def gen_table(info_list):
-            table_doc = parseString('<?xml version="1.0"?><tableV2></tableV2>')
-            root0 = table_doc.getElementsByTagName('tableV2')[0]
+            docstr = '''
+            <hbox expand="true" fill="true" margin="4">
+            <vbox>
+            '''
             for k, v in info_list:
-                trnode = table_doc.createElement('tr')
-                label0 = table_doc.createElement('label')
-                label0.setAttribute('text', k+'\t:\t')
-                root0.appendChild(trnode)
-                trnode.appendChild(label0)
-                label1 = table_doc.createElement('label')
-                label1.setAttribute('text', v)
-                trnode.appendChild(label1)
-            return table_doc
+                docstr += '''
+                <hbox><label text="%s" /><label expand="true" /></hbox>
+                ''' % ("%-32s %s" % (k, v), )
+            docstr += '''
+            </vbox>
+            <label expand="true" />
+            </hbox>
+            '''
+            return parseString(docstr)
         
         # Package Information
         info_list = []
@@ -136,8 +131,8 @@ class DoPartition(magicstep):
         
         for table, frame in ((pkg_table, pkg_frame), (dirty_table, dirty_frame), 
                              (format_table, format_frame), (tgtsys_table, tgtsys_frame)):
-            widget = xmlgtk.xmlgtk(table).widget
-            frame.add(widget)
+            xmlwidget = xmlgtk.xmlgtk(table)
+            frame.add(xmlwidget.widget)
         
     def act_start_parted(self):
         self.act_parted_commit_start(0)
@@ -205,19 +200,13 @@ class DoPartition(magicstep):
         self.name_map['frame_parted'].set_sensitive(False)
         
         self.sself.btnnext_clicked(None, None)
-
+        
+def TestMIStep_dopartition():
+    from mi.client.tests import TestRootObject
+    obj = TestRootObject(DoPartition)
+    obj.init()
+    obj.main()
+    
 if __name__ == '__main__':
-    #from mi.client.tests import TestRootObject
-    #rootobj = TestRootObject(DoPartition)
-    #rootobj.init()
-    #rootobj.main()
-    import gtk
-    class Ui(xmlgtk.xmlgtk):
-        def __init__(self, sself):
-            xmlgtk.xmlgtk.__init__(self, 'UIxml/dopartition.xml', 'dopartition')
-    ui = Ui(None)
-    win = gtk.Window(gtk.WINDOW_TOPLEVEL)
-    win.add(ui.widget)
-    win.show()
-    gtk.main()
+    TestMIStep_dopartition()
     

@@ -11,7 +11,24 @@ title 安装 Magic Linux
 	kernel /boot/mivmlinuz root=/dev/ram0 vga=788
 	initrd /boot/mirootfs.gz
 
-title 搜寻第一个 Linux 系统
+
+title 搜寻第一个 Linux 系统 grub2#1
+    find --set-root --ignore-floppies --ignore-cd /boot/grub2/grub.cfg
+    map () (hd0)
+    map (hd0) ()
+    map --rehook
+    find --set-root --ignore-floppies --ignore-cd /boot/grub2/grub.cfg
+    configfile /boot/grub2/grub.cfg
+
+title 搜寻第一个 Linux 系统 grub2#0
+    find --set-root --ignore-floppies --ignore-cd /boot/grub/grub.cfg
+    map () (hd0)
+    map (hd0) ()
+    map --rehook
+    find --set-root --ignore-floppies --ignore-cd /boot/grub/grub.cfg
+    configfile /boot/grub/grub.cfg
+
+title 搜寻第一个 Linux 系统 grub1
     find --set-root --ignore-floppies --ignore-cd /boot/grub/menu.lst
     map () (hd0)
     map (hd0) ()

@@ -102,7 +102,7 @@ class MIStep_takeactions(magicstep.magicstep):
         CF.BOOTLDR.mbr_device = self.get_data(self.values, 'bootloader.mbr_device')
         CF.BOOTLDR.win_device = self.get_data(self.values, 'bootloader.win_device')
         if CF.BOOTLDR.bltype == 'none':
-            logger.i('takeactions get bootloader: bltype %s' % self.bltype)
+            logger.i('takeactions get bootloader: bltype %s' % CF.BOOTLDR.bltype)
         else:
             if CF.G.root_device == CF.G.boot_device:
                 CF.BOOTLDR.bootdev = ''
@@ -139,6 +139,8 @@ class MIStep_takeactions(magicstep.magicstep):
                 self.tm.push_progress(self.name_map['pkgprog'],
                                       self.name_map['pkgname'])
                 self.install_progress_hooked = True
+            self.rootobj.btnnext_sensitive(False)
+            self.rootobj.btnback_sensitive(False)
         self.gather_setup_information()
         return 1
     
@@ -231,7 +233,7 @@ class MIStep_takeactions(magicstep.magicstep):
                 self.add_action(_('Setup bootloader'), next_post_script, 4,
                                 'setup_' + CF.BOOTLDR.bltype, CF.BOOTLDR.timeout, CF.BOOTLDR.usepassword, CF.BOOTLDR.password,
                                 CF.BOOTLDR.lba, CF.BOOTLDR.options, CF.BOOTLDR.entries, CF.BOOTLDR.default, CF.BOOTLDR.instpos, 
-                                CF.BOOTLDR.bootdev, CF.BOOTLDR.mbr_device, CF.BOOTLDR.win_device, CF.BOOTLDR.win_fs)    
+                                CF.BOOTLDR.bootdev, CF.BOOTLDR.mbr_device, CF.BOOTLDR.win_device, CF.BOOTLDR.win_fs)
             step_lst.append(step2)
             
             def step3():
@@ -246,6 +248,11 @@ class MIStep_takeactions(magicstep.magicstep):
                 self.tm.add_action(_('Run post install script'), next_post_script, 6,
                                        'run_post_install', 0)    
             step_lst.append(step4)
+            def step4_0():
+                # backup log files
+                self.tm.add_action(_('Backup MI log files'), next_post_script, 7,
+                                       'backup_mi_logfiles', 0)
+            step_lst.append(step4_0)
             def step4_1():
                 self.add_action(_('Mount Target System'),
                         self.do_setup_finished, None,

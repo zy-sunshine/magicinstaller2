@@ -231,12 +231,12 @@ def probe_all_disc(mia, operid, device, devfstype, bootiso_relpath, pkgarr_reldi
                 midev_iso = MiDevice(f, 'iso9660')
                 for pkgpath, relative_dir in midev_iso.iter_searchfiles([disc_first_pkgs[disc_no]], pkgarr_reldirs): # from iso
                     probe_ret = ( os.path.join(os.path.dirname(bootiso_relpath), iso_fn), 
-                        os.path.normpath(os.path.join(relative_dir, os.path.basename(pkgpath))) )
+                        os.path.normpath(os.path.join(relative_dir, pkgpath)) )
         else:
             # deal with harddisk case
             pkgs = [ os.path.join(p, disc_first_pkgs[disc_no]) for p in pkg_probe_path ]
             for f, reldir in midev.iter_searchfiles(pkgs, [pkgarr_reldir]):
-                probe_ret = ('', os.path.join(reldir, os.path.basename(f)))
+                probe_ret = ('', os.path.normpath(os.path.join(reldir, f)))
         if probe_ret:
             result.append(probe_ret)
 
@@ -269,11 +269,11 @@ def rpm_post_install(mia, operid, data):
     return inst_h.install_post()
     
 @register.server_handler('long')
-def rpm_install_pkg(mia, operid, pkg, first_pkg):
+def rpm_install_pkg(mia, operid, pkg, first_pkg, noscripts):
     global inst_h
     dir_ = os.path.dirname(os.path.join(dev_mnt_dir, first_pkg))
     progress_cb = Progress_CB(mia, operid)
-    return inst_h.install('%s/%s' % (dir_, pkg), progress_cb)
+    return inst_h.install('%s/%s' % (dir_, pkg), progress_cb, noscripts)
     
 ### Test Case
 class MiaTest(object):

@@ -97,3 +97,4 @@ class magichelp_popup(magicpopup):
 
     def ok_clicked(self, widget, data):
         self.topwin.destroy()
+

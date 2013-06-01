@@ -26,23 +26,48 @@ class InstallRpm(object):
 
     def install_pre(self):
         logger.i('Create TransactionSet\n')
+        
+        var_lib_rpm = os.path.join(self.tgtsys_root, 'var/lib/rpm')
+        if not os.path.isdir(var_lib_rpm):
+            os.makedirs(var_lib_rpm)
+        self.ts = None
+        self.initTs()
+        #self.ts.setVSFlags(~(rpm.RPMVSF_NORSA | rpm.RPMVSF_NODSA)) #@UndefinedVariable
+        # have been removed from last rpm version
+        #self.ts.setFlags(rpm.RPMTRANS_FLAG_ANACONDA)
+#         rpm.addMacro("__dbi_htconfig", #@UndefinedVariable
+#              "hash nofsync %{__dbi_other} %{__dbi_perms}")
+#         rpm.addMacro("__file_context_path", "%{nil}") #@UndefinedVariable
+        self.ts.initDB()
+        return 0
+    
+    def initTs(self):
+        if self.ts:
+            self.ts.closeDB()
         self.ts = rpm.TransactionSet(self.tgtsys_root)
+        
         self.ts.setProbFilter(rpm.RPMPROB_FILTER_OLDPACKAGE | #@UndefinedVariable
                             rpm.RPMPROB_FILTER_REPLACENEWFILES | #@UndefinedVariable
                             rpm.RPMPROB_FILTER_REPLACEOLDFILES | #@UndefinedVariable
                             rpm.RPMPROB_FILTER_REPLACEPKG) #@UndefinedVariable
-        self.ts.setVSFlags(~(rpm.RPMVSF_NORSA | rpm.RPMVSF_NODSA)) #@UndefinedVariable
-
-        # have been removed from last rpm version
-        #self.ts.setFlags(rpm.RPMTRANS_FLAG_ANACONDA)
-        rpm.addMacro("__dbi_htconfig", #@UndefinedVariable
-             "hash nofsync %{__dbi_other} %{__dbi_perms}")
-        rpm.addMacro("__file_context_path", "%{nil}") #@UndefinedVariable
-        var_lib_rpm = os.path.join(self.tgtsys_root, 'var/lib/rpm')
-        if not os.path.isdir(var_lib_rpm):
-            os.makedirs(var_lib_rpm)
-        return 0
-    
+        self.ts.setVSFlags(-1) # disable all verification flags.
+        should_setflag = False
+        flag = None
+        if CF.D.ALLPKG_NOPRE and CF.D.ALLPKG_NOPOST:
+            flag = rpm.RPMTRANS_FLAG_NOSCRIPTS
+            should_setflag = True
+        elif CF.D.ALLPKG_NOPRE:
+            should_setflag = True
+            flag = rpm.RPMTRANS_FLAG_NOPRE
+        elif CF.D.ALLPKG_NOPOST:
+            flag = rpm.RPMTRANS_FLAG_NOPOST
+            should_setflag = True
+            
+            self.ts.setFlags(rpm.RPMTRANS_FLAG_NOPOST)
+            
+        if should_setflag:
+            self.ts.setFlags(flag)
+            
     def install_post(self):
         if self.ts is not None:
             logger.i('Close TransactionSet\n')
@@ -50,33 +75,38 @@ class InstallRpm(object):
             self.ts = None
         return 0
 
-    def _install(self, pkgpath, progress_cb):
+    def _install(self, pkgpath, progress_cb, noscripts=False):
         try:
-            pkgname = get_pkg_name
+#             pkgname = get_pkg_name
             rpmfd = os.open(pkgpath, os.O_RDONLY)
             hdr = self.ts.hdrFromFdno(rpmfd)
+            # because addInstall package each time will accumulate package set in transaction, so init transaction every time.
+            self.initTs()
+            if noscripts:
+                self.ts.setFlags(rpm.RPMTRANS_FLAG_NOSCRIPTS)
             self.ts.addInstall(hdr, pkgpath, 'i')
             os.close(rpmfd)
             # Sign the installing pkg name in stderr.
             #print >>sys.stderr, '%s ERROR :\n' % pkgname
             problems = self.ts.run(_rpm_installcb, (progress_cb, ))
             if problems:
-                logger.i('PROBLEMS: %s\n' % str(problems))
+                msg = 'PROBLEMS: with package %s result %s\n' % (os.path.basename(pkgpath), str(problems))
+                logger.w(msg)
                 # problems is a list that each elements is a tuple.
                 # The first element of the tuple is a human-readable string
                 # and the second is another tuple such as:
                 #    (rpm.RPMPROB_FILE_CONFLICT, conflict_filename, 0L)
-                return  problems
+                return  msg
         except Exception, errmsg:
             logger.w('FAILED: %s\n' % str(errmsg))
             return str(errmsg)
         return 0
 
-    def install(self, pkgpath, progress_cb):
+    def install(self, pkgpath, progress_cb, noscripts=False):
         ret = self._pre_pkg(pkgpath)
         if ret != 0:
             return 'PRE_PKG Failed %s' % ret
-        ret = self._install(pkgpath, progress_cb)
+        ret = self._install(pkgpath, progress_cb, noscripts)
         if ret != 0:
             return 'INSTALL Failed %s' % ret
         ret = self._post_pkg(pkgpath)

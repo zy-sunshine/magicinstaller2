@@ -1,8 +1,7 @@
 #!/bin/bash
-## Note: this script run in MI environment, no in the chroot target system.
-# parameters:
-# $1 <tgtsys_root> is the target system mount path.
+## Note: this script run in chroot target system.
+# parameters: nothing
 
-./scripts/arch-genfstab -p $1 >> /etc/fstab
+./scripts/arch-genfstab -p / >> /etc/fstab
 exit $?
 

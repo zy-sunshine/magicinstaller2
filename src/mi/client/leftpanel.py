@@ -51,7 +51,7 @@ class MILeftPanel(gtk.Frame):
         step = self.sself.steps.get_step_by_name(name)
 
         btn = StepButton('images/applet-blank.png', step.title)
-        btn.connect('clicked', self.on_switch_to_page, name)
+        #btn.connect('clicked', self.on_switch_to_page, name)
 
         self.btn_lst.append([group, btn])
 

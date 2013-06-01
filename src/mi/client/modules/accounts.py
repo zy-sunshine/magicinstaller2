@@ -64,7 +64,7 @@ class MIStep_accounts (magicstep.magicstepgroup):
                 return 0
             all_username[username] = 'y'
             uid = rownode.getAttribute('c4')
-            if uid == _('Auto'):
+            if uid == 'Auto':
                 continue
             if all_uid.has_key(uid):
                 errtxt = _("The custom uid is conflict between '%s' and '%s'.")
@@ -101,7 +101,7 @@ class MIStep_accounts (magicstep.magicstepgroup):
                 self.set_data(self.tmpdoc, 'homedir', 'true')
                 self.set_data(self.tmpdoc, 'customhomedir', homedir)
             uid = model.get_value(self.iter, 4)
-            if uid == _('Auto'):
+            if uid == 'Auto':
                 self.set_data(self.tmpdoc, 'uid', 'false')
                 self.set_data(self.tmpdoc, 'customuid', '500')
             else:
@@ -152,7 +152,7 @@ class MIStep_accounts (magicstep.magicstepgroup):
         if uid == 'true':
             uid = str(int(float(self.get_data(self.tmpvalues, 'customuid'))))
         else:
-            uid = _('Auto')
+            uid = 'Auto'
         newrow = self.rootobj.values.createElement('row')
         newrow.setAttribute('c0', username)
         newrow.setAttribute('c1', password)

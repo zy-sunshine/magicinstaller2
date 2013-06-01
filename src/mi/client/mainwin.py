@@ -165,20 +165,25 @@ class MIMainWindow(gtk.Window):
         self.tm = MiTaskman(1325, self.statusbar.get_progressbar(),
                           self.statusbar.get_progressbar(), self.err_dialog)
         self.step_name_list = step_name_list
+        self.popup_dialog_list = []
         
     def err_dialog(self, msg):
-        magicpopup.magicmsgbox(None, msg,
+        dlg = magicpopup.magicmsgbox(None, msg,
                                    magicpopup.magicmsgbox.MB_ERROR,
                                    magicpopup.magicpopup.MB_OK)
+        self.popup_dialog_list.append(dlg)
         
     def info_dialog(self, msg):
-        magicpopup.magicmsgbox(None, msg,
+        dlg = magicpopup.magicmsgbox(None, msg,
                                    magicpopup.magicmsgbox.MB_INFO,
                                    magicpopup.magicpopup.MB_OK)
+        self.popup_dialog_list.append(dlg)
+
     def warn_dialog(self, msg):
-        magicpopup.magicmsgbox(None, msg,
+        dlg = magicpopup.magicmsgbox(None, msg,
                                    magicpopup.magicmsgbox.MB_WARNING,
                                    magicpopup.magicpopup.MB_OK)
+        self.popup_dialog_list.append(dlg)
         
     def init(self):
         self.curstep = -1

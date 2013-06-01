@@ -1,5 +1,5 @@
 #!/bin/bash
-## Note: run in chroot environment
+## Note: run in target system
 # parameters:
 #    $1 <distkernelver> target system kernel version, pass from magicinstaller
 
