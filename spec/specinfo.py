@@ -8,23 +8,17 @@ distname='MagicLinux'
 
 # distver is used to specify the version of the installed distribution.
 #
-distver='2.5'
+distver='3.0beta1'
 
 # distkernelver is used to specify the kernel version which used by the
 # installed distribution.
 #
-distkernelver='2.6.30.10-smp'
+distkernelver='3.4.45-1mgc30.i686.PAE'
 
 # pkgtype is used to specify the package management scheme used by the
 # installed distribution. Now only 'rpm' is supported.
 #
 pkgtype='rpm'
-
-# bootloader type (bltype) only support grub and grub2 now.
-# If use grub, please create a script at spec/post_scripts/post-grub to 
-# install and config grub.
-# If use grub2, please create a script at spec/post_scripts/post-grub2
-bltype='grub2'
 
 # pkgdirs is used to specify the directories which contain the packages
 # which should be installed by MagicInstaller as a part of the installed
@@ -45,7 +39,7 @@ langset='zh_CN:en'
 # which should be provided in English only. Note that this string will be
 # placed into m4 command and put into C string, so be carefully about '\n'.
 #
-welcome="Welcome to MagicLinux 2.5 (Jingyou)!"
+welcome="Welcome to MagicLinux 3.0 beta1 (Kaibao)!"
 
 # kmods_arrange is map which key is the boot/driver floppy disk name and
 # the value is the modules which should be placed in. The item with 'boot'
