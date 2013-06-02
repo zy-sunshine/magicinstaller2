@@ -321,11 +321,10 @@ def format_partition(mia, operid, devpath, part_start, fstype):
     disk = CF.S.all_harddisks[devpath][1]
     if not disk:
         return _('Not any partition table found on: ') + devpath
-    #part = disk.next_partition()
+
     part = disk.getFirstPartition()
     while part:
         if part.geometry.start != part_start:
-            #part = disk.next_partition(part)
             part = part.nextPartition()
             continue
         if CF.D.FSTYPE_MAP[fstype][1] == 'internal':
@@ -348,37 +347,50 @@ def format_partition(mia, operid, devpath, part_start, fstype):
                 return  str(errmsg)
             except parted.DiskException as errmsg:
                 return  str(errmsg)
-                
-            # Wait for device block appear.
-            fblk = False
-            trycnt = 0
-            # We attemp to detect device file whether exists
-            for t in range(10):
-                devn = '%s%d' % (devpath, part.number)
-                # os.path.exists cannot detect file exists real time
-                #if os.path.exists(devn):
-                if os.system('ls %s' % devn) == 0:
-                    fblk = True
-                    break
+            
+            def try_format(devn, id_):
+                # Wait for device block appear.
+                fblk = False
+                time.sleep(1)
+                # We attemp to detect device file whether exists
+                for trycnt in range(10):
+                    # os.path.exists cannot detect file exists real time
+                    #if os.path.exists(devn):
+                    if os.system('ls %s' % devn) == 0:
+                        fblk = True
+                        break
+                    else:
+                        time.sleep(1)
+                        
+                if not fblk:
+                    msg = _('Not exists device block on %s: \ntry time: %d\n') % (devpath, trycnt)
+                    logger.w(msg)
+                    return msg
                 else:
-                    trycnt += 1
-                    time.sleep(1)
-                    
-            if not fblk:
-                return _('Not exists device block on %s: \ntry time: %d\n') % (devpath, trycnt)
-
-            # Run command to format partition
-            cmd_format = CF.D.FSTYPE_MAP[fstype][1]
-            cmd_f_list = cmd_format.split()
-            cmd = cmd_f_list[0]
-            argv = cmd_f_list[1:]
-            argv.append('%s%d' % (devpath, part.number))
-            cmdres = run_bash(cmd, argv)
-            dolog('%s %s\n' % (cmd, ' '.join(argv)))
-            dolog(' '.join(cmdres['out'])+'\n')
-            if cmdres['ret'] != 0:
-                errmsg = _('Run "%s %s" failed: %s\ntry time: %d\n')
-                return  errmsg % ( cmd, ' '.join(argv), str(cmdres['err']), trycnt )
+                    logger.d('try_format %s ls device %s time' % (id_, trycnt))
+                # Run command to format partition
+                cmd_format = CF.D.FSTYPE_MAP[fstype][1]
+                cmd_f_list = cmd_format.split()
+                cmd = cmd_f_list[0]
+                argv = cmd_f_list[1:]
+                argv.append(devn)
+                cmdres = run_bash(cmd, argv)
+                logger.d('%s %s' % (cmd, ' '.join(argv)))
+                logger.d(' '.join(cmdres['out']))
+                if cmdres['ret'] != 0:
+                    errmsg = _('Run "%s %s" failed: %s\ntry time: %d\n')
+                    return  errmsg % ( cmd, ' '.join(argv), str(cmdres['err']), trycnt )
+                else:
+                    return  0
+                
+            ret = 'None'
+            for t in range(5):
+                ret = try_format('%s%d' % (devpath, part.number), t)
+                if ret == 0:
+                    break
             else:
-                return  0
+                logger.d('try format time %s time, but can not format at last!' % t)
+                
+            return ret
+        
     return _('Not any partition found on position: ') + str(part_start)
