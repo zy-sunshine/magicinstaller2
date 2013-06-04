@@ -89,8 +89,8 @@ class InstallRpm(object):
             # Sign the installing pkg name in stderr.
             #print >>sys.stderr, '%s ERROR :\n' % pkgname
             problems = self.ts.run(_rpm_installcb, (progress_cb, ))
-            if problems:
-                msg = 'PROBLEMS: with package %s result %s\n' % (os.path.basename(pkgpath), str(problems))
+            if problems is not None:
+                msg = 'PROBLEMS: with package %s result %s (maybe prescript error)\n' % (os.path.basename(pkgpath), str(problems))
                 logger.w(msg)
                 # problems is a list that each elements is a tuple.
                 # The first element of the tuple is a human-readable string
