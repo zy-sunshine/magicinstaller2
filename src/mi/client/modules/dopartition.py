@@ -184,6 +184,7 @@ class DoPartition(magicstep):
         if result:
             # Error occurred. Stop it?
             # Yes, we should stop it, and we should stop at mount failed place too.
+            # TOOD: we should give a stop option too.
             logger.info('format_result ERROR: %s\n' % str(result))
             call_back = CallBack(lambda : self.act_parted_format_start(data + 1))
             magicpopup.magicmsgbox(call_back, _('Format Partition Error: %s' % result),
