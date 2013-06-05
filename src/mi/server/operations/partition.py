@@ -46,7 +46,7 @@ parted_MIN_FREESPACE = 2048  # 1M
 def revision_fstype(fstype):
     ''' revise the file system version between MI and to libparted, current only linux-swap version '''
     if fstype == 'linux-swap':
-        fstype = 'linux-swap(v0)'
+        fstype = 'linux-swap(v1)'
     return fstype
     
 @register.server_handler('long')
@@ -308,7 +308,7 @@ def commit_devpath(mia, operid, devpath):
 
 @register.server_handler('long')
 def format_partition(mia, operid, devpath, part_start, fstype):
-    logger.d('format_partition %s' % str((devpath, part_start, fstype)))
+    logger.d('format_partition device: %s partition start: %s fstype: %s' % (devpath, part_start, fstype))
     mia.set_step(operid, 0, -1)
     if not CF.D.FSTYPE_MAP.has_key(fstype):
         errmsg = _('Unrecoginzed filesystem %s.')
@@ -331,13 +331,15 @@ def format_partition(mia, operid, devpath, part_start, fstype):
             parted_fstype = parted.fileSystemType[revision_fstype(fstype)]
             try:
                 part.getPedPartition().set_system(parted_fstype)
+                logger.d('Create internal fstype %s on device %s partition start %s' % (fstype, devpath, part_start))
                 part.fileSystem.create()
                 disk.commit()
-                return  0
+                logger.d('Create internal partition complete!')
             except NotImplementedError, errmsg:
                 return  str(errmsg)
             except parted.DiskException as errmsg:
                 return  str(errmsg)
+            return  0
         else:
             parted_fstype = parted.fileSystemType[revision_fstype(fstype)]
             try:

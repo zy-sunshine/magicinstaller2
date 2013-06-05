@@ -67,7 +67,7 @@ class MIStep_Partition (magicstep.magicstep):
                 if CF.D.FSTYPE_MAP[fst][1] == '':
                         continue
 
-                if fst == 'linux-swap':
+                if fst in ('linux-swap', 'linux-swap(v1)', 'linux-swap(v0)'):
                     CF.G.fstype_swap_index = fst_index
                 newnode = self.uixmldoc.createElement('value')
                 newsubnode = self.uixmldoc.createTextNode(fst)
@@ -420,7 +420,7 @@ class MIStep_Partition (magicstep.magicstep):
             mntpnt = self.get_data(part_node, 'mountpoint')
             fs = self.get_data(part_node, 'filesystem')
             if fs.lower() == 'swap':
-                fs = 'linux-swap'
+                fs = 'linux-swap(v1)'
             elif fs == 'ext2fs':
                 fs = 'ext2'
             elif fs == 'ext3fs':
@@ -531,8 +531,8 @@ class MIStep_Partition (magicstep.magicstep):
                                                magicpopup.magicmsgbox.MB_ERROR,
                                                magicpopup.magicpopup.MB_OK)
                         break
-                    if part.filesystem == 'linux-swap':
-                        addon_info = ('true', 'linux-swap', 'USE')
+                    if part.filesystem in ('linux-swap', 'linux-swap(v1)', 'linux-swap(v0)'):
+                        addon_info = ('true', 'linux-swap(v1)', 'USE')
                     else:
                         addon_info = ('true', part.filesystem, part.mountpoint)
                     self.hdobj.part_addon_infor[real_start_sect] = addon_info
@@ -778,7 +778,7 @@ class  Harddisk(xmlgtk.xmlgtk):
                                                not_touched))
             if not_touched == 'true' and \
                    filesystem != 'N/A' and \
-                   filesystem not in ('linux-swap', 'linux-swap(v1)'):
+                   filesystem not in ('linux-swap', 'linux-swap(v1)', 'linux-swap(v0)'):
                 CF.G.all_orig_part.append((self.orig_partitions[start],
                                       filesystem,
                                       self.partdevfn(partnum)))
@@ -802,7 +802,7 @@ class  Harddisk(xmlgtk.xmlgtk):
                         errmsg = _('%0.2fM is too big for %s, %dM at most.')
                         errmsg = errmsg % ((end - start + 1.0) / 2048, filesystem, maxsize)
                         return  errmsg
-            if filesystem == 'linux-swap' and mountpoint == 'USE':
+            if filesystem in ('linux-swap', 'linux-swap(v1)', 'linux-swap(v0)') and mountpoint == 'USE':
                 # Choose the maximum swap.
                 if not CF.G.swap_device or CF.G.swap_device[2] < end - start + 1:
                     CF.G.swap_device = [self.devfn, partnum, end - start + 1]
@@ -821,7 +821,7 @@ class  Harddisk(xmlgtk.xmlgtk):
 
         for p in self.partlist:
             if not self.part_addon_infor.has_key(p[6]):
-                if p[4] == 'linux-swap':
+                if p[4] in ('linux-swap', 'linux-swap(v1)', 'linux-swap(v0)'):
                     self.part_addon_infor[p[6]] = ('false', p[4], 'USE')
                 else:
                     self.part_addon_infor[p[6]] = ('false', p[4], '')
@@ -914,7 +914,7 @@ class  Harddisk(xmlgtk.xmlgtk):
             must_format_or_not = (fs == 'N/A')
             mp = model.get_value(iter, self.COLUMN_MOUNTPOINT)
             swap = 'USE'  # default to use swap
-            if fs == 'linux-swap':
+            if fs in ('linux-swap', 'linux-swap(v1)', 'linux-swap(v0)'):
                 #swap = mp
                 mp = ''
             #else:
@@ -953,7 +953,7 @@ class  Harddisk(xmlgtk.xmlgtk):
                                          fon, fs, mp, swap,
                                          l, l, avaflags, flagsxml))
         return  (avaflags,
-                 extended_or_not, must_format_or_not, fs == 'linux-swap')
+                 extended_or_not, must_format_or_not, fs in ('linux-swap', 'linux-swap(v1)', 'linux-swap(v0)'))
 
     def aedialog_setup(self,
                        extended_or_not, must_format_or_not, swap_or_not):
@@ -994,7 +994,7 @@ class  Harddisk(xmlgtk.xmlgtk):
                                         self.get_pixbuf_map('images/apple-green.png'))
             fs = self.ae_model.get_value(self.ae_iter, self.COLUMN_ORIGFS)
             self.ae_model.set_value(self.ae_iter, self.COLUMN_FILESYSTEM, fs)
-        if fs == 'linux-swap':
+        if fs in ('linux-swap', 'linux-swap(v1)', 'linux-swap(v0)'):
             mp = self.aedialog.get_data(dE, 'swap')
         else:
             mp = self.aedialog.get_data(dE, 'mountpoint')
