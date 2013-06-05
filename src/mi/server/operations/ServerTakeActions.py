@@ -3,7 +3,7 @@ import os, glob, sys
 import isys
 from mi.utils import _
 from mi import getdev
-from mi.utils.common import mount_dev, umount_dev
+from mi.utils.common import mount_dev, umount_dev, run_bash
 from mi.utils.miconfig import MiConfig
 from mi.server.utils.device import MiDevice
 CF = MiConfig.get_instance()
@@ -58,24 +58,45 @@ class MiDevice_TgtSys(object):
                     return False
                 else:
                     self.mounted_devs.append(dev_tgt_other)
+                return True
+            else:
+                logger.e('Can not run to here!! The root file system had been mounted before!!')
+                return False
                     
         for mpoint, dev_, type_ in self.tgtsys_devinfo:
             if mpoint not in ('/', 'USE'):
-                mount_each(tgt_root_dev, dev_, type_, mpoint)
+                if not mount_each(tgt_root_dev, dev_, type_, mpoint):
+                    return False
         
         # mount -t proc proc myroot/proc/
         mnt_point = os.path.join(CF.D.TGTSYS_ROOT, 'proc')
-        mount_dev('proc', 'proc', mntdir=mnt_point,flags=None)
+        ret, msg = mount_dev('proc', 'proc', mntdir=mnt_point,flags=None)
+        if not ret:
+            logger.e("Error: mount proc on target failed '%s'" % msg)
+            return False
         self.mounted_devs.append(mnt_point)
+
         # mount -t sysfs sys myroot/sys/
         mnt_point = os.path.join(CF.D.TGTSYS_ROOT, 'sys')
-        mount_dev('sysfs', 'sys', mntdir=mnt_point,flags=None)
+        ret, msg = mount_dev('sysfs', 'sys', mntdir=mnt_point,flags=None)
+        if not ret:
+            logger.e("Error: mount sys on target failed '%s'" % msg)
+            return False
         self.mounted_devs.append(mnt_point)
+
         # mount -o bind /dev myroot/dev/
         mnt_point = os.path.join(CF.D.TGTSYS_ROOT, 'dev')
-        mount_dev(None, '/dev', mntdir=mnt_point,flags='bind')
+        ret, msg = mount_dev(None, '/dev', mntdir=mnt_point,flags='bind')
+        if not ret:
+            logger.e("Error: mount /dev on target failed '%s'" % msg)
+            return False
         self.mounted_devs.append(mnt_point)
         
+        res = run_bash('mount')
+        logger.d(''''Mount target system partition finished, check the mount output please:)
+%s
+%s
+        ''' % ('\n'.join(res['out']), '\n'.join(res['err'])))
         return True
                 
     def umount_tgt_device(self):
@@ -86,6 +107,11 @@ class MiDevice_TgtSys(object):
                     logger.w('Umount device %s Failed, but we continue')
             else:
                 umount_dev(dev)
+        res = run_bash('mount')
+        logger.d(''''UMount target system partition finished, check the mount output please:)
+%s
+%s
+        ''' % ('\n'.join(res['out']), '\n'.join(res['err'])))
                 
 @register.server_handler('long')
 def mount_tgtsys(mia, operid, tgtsys_devinfo):
