@@ -1,7 +1,6 @@
 #!/usr/bin/python
 import os, glob, sys, syslog
 import rpm, time
-import isys
 from mi import getdev
 from mi.server.utils.decorators import probe_cache
 from mi.server.utils.device import MiDevice

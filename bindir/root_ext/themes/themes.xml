@@ -1,9 +1,0 @@
-<?xml version="1.0"?>
-<!-- Copyright (C) 2003, Charles Wang <charles@linux.net.cn> -->
-<!-- Author: Charles Wang -->
-<all.themes>
-  <theme pic="Raleigh.png"/>
-  <theme dir="Dogmastik" pic="GTK2-Dogmastik.png" tar="GTK2-Dogmastik.tar.gz"/>
-  <theme dir="Milk-2.0" pic="GTK2-Milk-Th.png" tar="GTK2-Milk-2.0.tar.bz2"/>
-  <theme dir="Gnursid" pic="GTK2-Gnursid.png" tar="GTK2-Gnursid.tar.gz"/>
-</all.themes>

@@ -3,7 +3,7 @@
 
 from mi.client.utils import _
 import sys, os, time, string
-import isys, iconv
+import iconv
 from mi import getdev
 import parted, _ped #@UnresolvedImport
 from mi.utils.common import mount_dev, umount_dev, run_bash

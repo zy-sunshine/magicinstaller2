@@ -1,8 +1,9 @@
 import os, sys, time, shutil, tempfile
-import yum, rpm, rpmUtils
+import yum, rpm, rpmUtils  # @UnresolvedImport
 from mi.server.utils import _, logger, CF
 from mi.server.utils import iutil
-
+from yum.Errors import RepoError, RepoMDError, GroupsError, PackageSackError, YumBaseError  # @UnresolvedImport
+from mi.server.utils.size import Size
 ###
 ### ERROR HANDLING
 ###
@@ -20,6 +21,9 @@ class DependencyError(PayloadError):
 
 # installation
 class PayloadInstallError(PayloadError):
+    pass
+
+class TypeError(PayloadError):
     pass
 
 #default_repos = ['productName? FIXME', "rawhide"]
@@ -43,6 +47,58 @@ class CustomRepo():
         self.proxyurl = None
         self.sslverify = False
 
+class YumPackageManagement():
+    GROUP_DEFAULT = 1
+    GROUP_ALL = 2
+    class _Group():
+        def __init__(self, groupid):
+            # From yum-groups-manager man document:
+            # There are a couple of options you can't set, yet. Most notably you cannot put
+            # package names into the conditional section (where they are installed with
+            # groupinstall only if another package is installed).
+            
+            # So we do not care about conditional section
+            self.include = YumPackageManagement.GROUP_DEFAULT
+            self.id = groupid
+
+    def __init__(self):
+        self.packageList = [] # contain packages id
+        self.groupList = []   # contain attr include (GROUP_DEFAULT GROUP_ALL) attr id (groupid)
+        self.excludedList = []# pkgid
+        self.excludedGroupList = []
+        
+    def _addGroup(self, groupid):
+        self.groupList.append(YumPackageManagement._Group(groupid))
+        
+    def addGroup(self, group):
+        if type(group) in (list, tuple):
+            for g in group:
+                self._addGroup(g)
+        else:
+            self._addGroup(group)
+            
+    def addPackage(self, pkg):
+        if type(pkg) in (list, tuple):
+            self.packageList.extend(pkg)
+        else:
+            self.packageList.append(pkg)
+            
+    def excludePakcage(self, pkg):
+        if type(pkg) in (list, tuple):
+            self.excludedList.extend(pkg)
+        else:
+            self.excludedList.append(pkg)
+            
+    def _excludeGroup(self, groupid):
+        self.excludedGroupList.append(YumPackageManagement._Group(groupid))
+        
+    def excludeGroup(self, group):
+        if type(group) in (list, tuple):
+            for g in group:
+                self._excludeGroup(g)
+        else:
+            self._excludeGroup(group)
+        
 class YumPayload(object):
     """ A YumPayload installs packages onto the target system using yum.
 
@@ -56,7 +112,11 @@ class YumPayload(object):
         self._repos_dir = "/etc/yum.repos.d,/etc/mi.repos.d,/tmp/updates/mi.repos.d,/tmp/product/mi.repos.d"
         self._yum = None
         self._setup = False
-
+        class _Data():
+            def __init__(self):
+                self.packages = YumPackageManagement()
+        self.data = _Data()
+        
         self.reset()
         class MockFlags():
             def __init__(self):
@@ -65,7 +125,7 @@ class YumPayload(object):
                 self.excludeDocs = False
                 self.testing = False
                 
-        self.flags = MockFlags() ## TODO
+        self.flags = MockFlags()
         class MockProgress():
             def send_message(self, msg):
                 print 'progress message: %s' % msg
@@ -79,7 +139,7 @@ class YumPayload(object):
      
     def reset(self, root=None):
         """ Reset this instance to its initial (unconfigured) state. """
-        from mi.utils.size import Size
+        from mi.server.utils.size import Size
 
         self._space_required = Size(bytes=0)
 
@@ -142,7 +202,7 @@ class YumPayload(object):
 [main]
 cachedir=%s
 keepcache=0
-logfile=/tmp/yum.log
+logfile=/tmp/mi.yum.log
 metadata_expire=never
 pluginpath=/usr/lib/yum-plugins,/tmp/updates/yum-plugins
 pluginconfpath=/etc/yum/pluginconf.d,/tmp/updates/pluginconf.d
@@ -215,7 +275,7 @@ reposdir=%s
     #           knowledge of the yum internals or, better yet, some convenience
     #           functions for multi-threaded applications
     def release(self):
-        from yum.packageSack import MetaSack
+        from yum.packageSack import MetaSack  # @UnresolvedImport
         with _yum_lock:
             logger.debug("deleting package sacks")
             if hasattr(self._yum, "_pkgSack"):
@@ -241,11 +301,13 @@ reposdir=%s
 
         return self._yum.repos.repos.keys()
 
+## NOT BE USED ?
 #    @property
 #    def addOns(self):
 #        #return [r.name for r in self.data.repo.dataList()]
 #        return []
 
+## NOT BE USED ?
 #    @property
 #    def baseRepo(self):
 #        repo_names = [CF.S.BASE_REPO_NAME] + default_repos
@@ -273,6 +335,7 @@ reposdir=%s
     def gatherRepoMetadata(self):
         # now go through and get metadata for all enabled repos
         logger.info("gathering repo metadata")
+        self._disableOtherRepos()
         for repo_id in self.repos:
             repo = self._yum.repos.getRepo(repo_id)
             if repo.enabled:
@@ -284,9 +347,21 @@ reposdir=%s
                     self.disableRepo(repo_id)
 
         logger.info("metadata retrieval complete")
-
+        
+    def _disableOtherRepos(self):
+        for repo in self._yum.repos.repos.values():
+            if repo.id != CF.S.BASE_REPO_NAME:
+                self.disableRepo(repo.id)
+                
+    ## Note: unused
+    def _cleanRepos(self):
+        for repo in self._yum.repos.repos.values():
+            if repo.id != CF.S.BASE_REPO_NAME:
+                self._yum.repos.delete(repo.id)
+            
     def _configureBaseRepo(self):
         logger.info("configuring base repo")
+
         if CF.S.BASE_REPO_URL.startswith('/'):
             url = "file://" + CF.S.BASE_REPO_URL
         else:
@@ -305,7 +380,6 @@ reposdir=%s
 
     def _getRepoMetadata(self, yumrepo):
         """ Retrieve repo metadata if we don't already have it. """
-        from yum.Errors import RepoError, RepoMDError
 
         # And try to grab its metadata.  We do this here so it can be done
         # on a per-repo basis, so we can then get some finer grained error
@@ -330,8 +404,6 @@ reposdir=%s
             
     def _addYumRepo(self, name, baseurl, mirrorlist=None, proxyurl=None, **kwargs):
         """ Add a yum repo to the YumBase instance. """
-        from yum.Errors import RepoError
-
         # First, delete any pre-existing repo with the same name.
         with _yum_lock:
             if name in self._yum.repos.repos:
@@ -410,8 +482,6 @@ reposdir=%s
     @property
     def environments(self):
         """ List of environment ids. """
-        from yum.Errors import RepoError
-        from yum.Errors import GroupsError
 
         environments = []
         yum_groups = self._yumGroups
@@ -498,7 +568,6 @@ reposdir=%s
     @property
     def _yumGroups(self):
         """ yum.comps.Comps instance. """
-        from yum.Errors import RepoError, GroupsError
         with _yum_lock:
             if not self._groups:
                 self._groups = self._yum.comps
@@ -507,8 +576,6 @@ reposdir=%s
     @property
     def groups(self):
         """ List of group ids. """
-        from yum.Errors import RepoError
-        from yum.Errors import GroupsError
 
         groups = []
         yum_groups = self._yumGroups
@@ -552,8 +619,8 @@ reposdir=%s
                 return False
 
             group = groups.return_group(groupid)
-            return group.user_visible
-
+            return group
+        
     def _groupHasInstallableMembers(self, groupid):
         groups = self._yumGroups
         if not groups:
@@ -599,8 +666,6 @@ reposdir=%s
     ###
     @property
     def packages(self):
-        from yum.Errors import RepoError
-
         with _yum_lock:
             if not self._packages:
                 try:
@@ -642,8 +707,6 @@ reposdir=%s
         return self._space_required
 
     def calculateSpaceNeeds(self):
-        from mi.utils.size import Size
-
         # XXX this will only be useful if you've run checkSoftwareSelection
         total = 0
         with _yum_lock:
@@ -677,41 +740,38 @@ reposdir=%s
 
             This follows the same ordering/pattern as kickstart.py.
         """
-        self._selectYumGroup("core")
+        
+        for package in self.data.packages.packageList:
+            try:
+                self._selectYumPackage(package)
+            except NoSuchPackage as e:
+                self._handleMissing(e)
 
-### TODO These codes should be open by select group and packages feature.
+        for group in self.data.packages.groupList:
+            default = False
+            optional = False
+            if group.include == YumPackageManagement.GROUP_DEFAULT:
+                default = True
+            elif group.include == YumPackageManagement.GROUP_ALL:
+                default = True
+                optional = True
 
-#        for package in self.data.packages.packageList:
-#            try:
-#                self._selectYumPackage(package)
-#            except NoSuchPackage as e:
-#                self._handleMissing(e)
-#
-#        for group in self.data.packages.groupList:
-#            default = False
-#            optional = False
-#            if group.include == GROUP_DEFAULT:
-#                default = True
-#            elif group.include == GROUP_ALL:
-#                default = True
-#                optional = True
-#
-#            try:
-#                self._selectYumGroup(group.name, default=default, optional=optional)
-#            except NoSuchGroup as e:
-#                self._handleMissing(e)
+            try:
+                self._selectYumGroup(group.id, default=default, optional=optional)
+            except NoSuchGroup as e:
+                self._handleMissing(e)
 
-#        for package in self.data.packages.excludedList:
-#            try:
-#                self._deselectYumPackage(package)
-#            except NoSuchPackage as e:
-#                self._handleMissing(e)
-#
-#        for group in self.data.packages.excludedGroupList:
-#            try:
-#                self._deselectYumGroup(group.name)
-#            except NoSuchGroup as e:
-#                self._handleMissing(e)
+        for package in self.data.packages.excludedList:
+            try:
+                self._deselectYumPackage(package)
+            except NoSuchPackage as e:
+                self._handleMissing(e)
+
+        for group in self.data.packages.excludedGroupList:
+            try:
+                self._deselectYumGroup(group.id)
+            except NoSuchGroup as e:
+                self._handleMissing(e)
 
         self.selectKernelPackage()
 
@@ -749,9 +809,10 @@ reposdir=%s
                 for msg in msgs:
                     logger.warning(msg)
 
-                raise DependencyError(msgs)
+                #raise DependencyError(msgs)
 
         self.calculateSpaceNeeds()
+        import pdb; pdb.set_trace()
         logger.info("%d packages selected totalling %s"
                  % (len(self._yum.tsInfo.getMembers()), self.spaceRequired))
 
@@ -796,6 +857,9 @@ reposdir=%s
         """ Perform pre-installation tasks. """
         self.progress.send_message(_("Starting package installation process"))
 
+        self.data.packages.addGroup(groups)
+        self.data.packages.addPackage(packages)
+
         self._writeInstallConfig()
         self.checkSoftwareSelection()
 
@@ -808,11 +872,11 @@ reposdir=%s
             # this adds nofsync, which speeds things up but carries a risk of
             # rpmdb data loss if a crash occurs. that's why we only do it on
             # initial install and not for upgrades.
-            rpm.addMacro("__dbi_htconfig", #@UndefinedVariable
+            rpm.addMacro("__dbi_htconfig",
                          "hash nofsync %{__dbi_other} %{__dbi_perms}")
 
-        if self.flags.excludeDocs: #if self.data.packages.excludeDocs:
-            rpm.addMacro("_excludedocs", "1") #@UndefinedVariable
+        if self.flags.excludeDocs:
+            rpm.addMacro("_excludedocs", "1")
 
         if self.flags.selinux:
             for d in ["/tmp/updates",
@@ -828,8 +892,7 @@ reposdir=%s
 
     def install(self):
         """ Install the payload. """
-        from yum.Errors import PackageSackError, RepoError, YumBaseError
-
+        
         logger.info("preparing transaction")
         logger.debug("initialize transaction set")
         with _yum_lock:
@@ -1121,28 +1184,30 @@ def show_groups(payload):
     pprint.pprint(desktops)
     print "==== ADDONS ===="
     pprint.pprint(addons)
-
     print payload.groups
 
 
 if __name__ == '__main__':
-    TEST_INSTALL = False
+    TEST_INSTALL = True
     payload = YumPayload()
     CF.S.BASE_REPO_NAME = 'magiclinux'
     #CF.S.BASE_REPO_URL = '/mnt/fedora_iso'
     CF.S.BASE_REPO_URL = '/home/netsec/work/RPMS.base64'
     
     payload.setup()
-    
     for repo in payload._yum.repos.repos.values():
+        # MagicLinux Core mgc30 - x86_64 True
+        # magiclinux 1
         print repo.name, repo.enabled
         
-    
     if TEST_INSTALL:
         payload.preStorage()
-        t_packages = []
-        packages = t_packages + ["authconfig", "system-config-firewall-base"]
-        payload.preInstall(packages=packages, groups=payload.languageGroups('zh_CN'))
+        #packages = ["core", "authconfig", "system-config-firewall-base"] ## Note: the core is the mandatory install packages
+        packages = []
+        #groups = payload.languageGroups('zh_CN')
+        groups = ['base-mi']
+        
+        payload.preInstall(packages=packages, groups=groups)
         payload.install()
         payload.postInstall()
     else:
@@ -1162,3 +1227,4 @@ if __name__ == '__main__':
 #    # list all of the groups
 #    show_groups(payload)
     print 'Finished'
+    
