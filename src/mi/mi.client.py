@@ -8,12 +8,15 @@ from mi.utils.common import treedir
 USE_TEXTDOMAIN = True
 
 ## Setup constants and working directory.
-logger.info('change current working directory to %s' % os.path.join(CF.D.DATADIR, 'mi'))
 build_top = os.environ.get('MI_BUILD_TOP', None)
+data_dir = ''
 if build_top:
-    os.chdir('%s/src/mi' % build_top)
+    data_dir = '%s/src/mi' % build_top
 else:
-    os.chdir(os.path.join(CF.D.DATADIR, 'mi'))
+    data_dir = os.path.join(CF.D.DATADIR, 'mi')
+    
+logger.d('change working directory to %s' % data_dir)
+os.chdir(data_dir)
 
 if USE_TEXTDOMAIN:
     sys_locale = '/usr/share/locale'
