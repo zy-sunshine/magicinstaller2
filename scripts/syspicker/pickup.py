@@ -9,6 +9,9 @@ import os
 import stat
 import shutil
 
+class DuplicateFileError(Exception):
+    pass
+
 def usage():
     return '''
     %s filepath
@@ -45,6 +48,44 @@ def checkfiles(files):
     if xflist != []:
         print '%s not exists, please check!' % str(xflist)
         os._exit(0)
+        
+class Picker(object):
+    def __init__(self, flist = []):
+        self.depmap = {}
+        self.flist = flist
+        
+    def AddFiles(self, flist):
+        '''
+            flist is the new file list add to depmap
+            and flist member can not duplicate with previous file list.
+            return the new file tuple which have been add to depmap.
+        '''
+        intersect = set(self.flist).intersection(set(flist))
+        if intersect:
+            raise DuplicateFileError('Do not add duplicate files %s' % repr(intersect))
+            
+        self.flist.extend(flist)
+        oldset = set(self.depmap)
+        recurseldd(self.depmap, self.flist)
+        return list(set(self.depmap) - oldset)
+
+#    def paseFiles(self, flist = []):
+#        if flist:
+#            self.flist = flist
+#        checkfiles(self.flist)
+#
+#        recurseldd(self.depmap, self.flist)
+    
+    def getDepMap(self):
+        return self.depmap
+    
+    def copyFiles(self, flist, tgtsys):
+        for fpath in set(flist):
+            copyfile2tgtsys(fpath, tgtsys)
+    
+    def copyAll(self, tgtsys):
+        self.copyFiles(self.getDepMap().keys(), tgtsys)
+        self.copyFiles(self.flist, tgtsys)
         
 def main1():
     checkfiles(sys.argv[1:])

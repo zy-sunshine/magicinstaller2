@@ -1,0 +1,13 @@
+<packages>
+
+<package>
+<files></files>
+<pre_action>
+</pre_action>
+<install>
+/bin/bash
+/bin/sh
+</install>
+</package>
+
+</packages>

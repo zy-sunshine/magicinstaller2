@@ -36,6 +36,9 @@ find $ROOT -name .sconsign | xargs rm -frv
 find $ROOT -name .svn | xargs rm -frv
 
 # Make static device file.
+if [ ! -d $ROOT/dev ]; then
+    mkdir -pv $ROOT/dev
+fi
 mknod -m 600 $ROOT/dev/console c 5 1
 mknod -m 666 $ROOT/dev/null c 1 3
 mknod -m 666 $ROOT/dev/zero c 1 5
@@ -67,6 +70,9 @@ chown -R root:root $ROOT/*
 #install --directory --mode=0755 --owner=root --group=root /etc/profile.d
 
 # Create some neccessary shortcut
+if [ ! -d $ROOT/bin ]; then
+    mkdir -pv $ROOT/bin
+fi
 for cmd in \
 addgroup  date           fgrep     linux64     mv         rmdir         true \
 adduser   dd             fsync     ln          netstat    scriptreplay  umount \
@@ -85,6 +91,9 @@ cpio      false          linux32   mountpoint  rm         touch \
     fi
 done
 
+if [ ! -d $ROOT/usr/bin ]; then
+    mkdir -pv $ROOT/usr/bin
+fi
 for cmd in \
 [         dumpleases  install   nc         rtcwake    tftp        volname \
 [[        eject       kbd_mode  nohup      script     tftpd       wall \
@@ -110,6 +119,9 @@ du        ifplugd     mkfifo    rpm2cpio   test       uptime \
 done
 
 
+if [ ! -d $ROOT/usr/sbin ]; then
+    mkdir -pv $ROOT/usr/sbin
+fi
 for cmd in \
 brctl     dhcprelay  inetd     ntpd        readprofile  telnetd \
 chpasswd  dnsd       loadfont  popmaildir  sendmail     udhcpd \
@@ -120,6 +132,9 @@ chroot    ftpd       lpd       rdev        setfont \
     fi
 done
 
+if [ ! -d $ROOT/sbin ]; then
+    mkdir -pv $ROOT/sbin
+fi
 for cmd in \
 cpid       findfs       init      mkdosfs      pivot_root  swapon \
 arp         freeramdisk  insmod    mke2fs       poweroff    switch_root \
