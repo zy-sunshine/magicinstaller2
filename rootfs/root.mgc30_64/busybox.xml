@@ -1,0 +1,10 @@
+<packages>
+
+<package>
+<files></files>
+<install>
+/usr/sbin/busybox
+</install>
+</package>
+
+</packages>

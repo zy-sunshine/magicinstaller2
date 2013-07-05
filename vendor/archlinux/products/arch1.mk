@@ -2,7 +2,7 @@ Import('env', '_my_dir')
 
 LOCAL_PATH = _my_dir()
 
-PRODUCT_NAME = "archlinux"
+PRODUCT_NAME = "arch"
 
 PRODUCTS = env['PRODUCTS']
 if PRODUCT_NAME in PRODUCTS.keys():
@@ -11,11 +11,9 @@ if PRODUCT_NAME in PRODUCTS.keys():
 myp = PRODUCTS[PRODUCT_NAME] = {}
 
 myp['PRODUCT_NAME'] = PRODUCT_NAME
-myp['PRODUCT_DEVICE'] = "arch1"
+myp['PRODUCT_ROOTFS'] = "arch1"
+myp['PRODUCT_MIKERNELVER'] = "2.6.35.4"
 myp['PRODUCT_BRAND'] = "ArchLinux"
-myp['PRODUCT_MODEL'] = "ALEasy"
-myp['PRODUCT_HARDWARE_VERSION'] = "x86_full"
-myp['BUILD_DISPLAY_ID'] = "ArchLinuxEasy"
 myp['PRODUCT_LOCALES'] = "zh_CN en_US"
 myp['PRODUCT_MANUFACTURER'] = "Magic Team"
 myp['PRODUCT_PATH'] = LOCAL_PATH

@@ -1,0 +1,19 @@
+#!/bin/sh
+
+#******************************************************
+# Usage: in caller script, source this script by:
+#           import_cmdline
+#        then reference the variable value by $key
+#******************************************************
+import_cmdline()
+{
+    set -- `cat /proc/cmdline`
+    for kv in $* ; do
+        if expr match $kv ".*=" >/dev/null ; then
+            value=${kv#*=}
+            key=${kv%%=*}
+            #echo "key=$key, value=$value"
+            eval "$key=$value"
+        fi
+    done
+}

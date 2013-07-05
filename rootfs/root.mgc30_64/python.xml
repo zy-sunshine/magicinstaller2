@@ -1,0 +1,9 @@
+<packages>
+
+<package>
+<install>
+/usr/bin/python
+</install>
+</package>
+
+</packages>

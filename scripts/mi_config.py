@@ -14,7 +14,8 @@ def _p(*args):
     return os.path.join(*args)
 
 # Specify the kernel version which used by MI environment.
-mikernelver = '2.6.35.4'
+#mikernelver = '2.6.35.4'
+mikernelver = '3.4.51-1mgc30.x86_64'
 
 # If .distmode exists, enable Distributor Mode
 develmode = not os.path.exists('.distmode')

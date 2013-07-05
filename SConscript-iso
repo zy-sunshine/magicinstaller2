@@ -110,8 +110,9 @@ prepare_bootload = PrepareBootload()
 prepare_bootload.extract()
 
 ##### Prepare Kernel. Copy to #result/ .
+mikernelver = _get_cur_product_var('PRODUCT_MIKERNELVER')
 env.Command('result/mivmlinuz',
-            'bindir/mi-vmlinuz-$mikernelver',
+            'bindir/vmlinuz-%s' % mikernelver,
             'cp $SOURCE $TARGET')
 
 ### Other ISOs

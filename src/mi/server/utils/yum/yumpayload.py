@@ -1,4 +1,5 @@
 import os, sys, time, shutil, tempfile
+# sys.path.insert(0, '/home/netsec/work/yum')
 import yum, rpm, rpmUtils  # @UnresolvedImport
 from mi.server.utils import _, logger, CF
 from mi.server.utils import iutil
@@ -131,7 +132,7 @@ class YumPayload(object):
                 print 'progress message: %s' % msg
                 #logger.i('progress message: %s' % msg)
             def send_step(self, step=None, total=None):
-                print 'send_step'
+                print 'send_step', step, total
         self.progress = MockProgress() ## TODO post message to gui
         
     def _getReleaseVersion(self, url):
@@ -812,7 +813,7 @@ reposdir=%s
                 #raise DependencyError(msgs)
 
         self.calculateSpaceNeeds()
-        import pdb; pdb.set_trace()
+#         import pdb; pdb.set_trace()
         logger.info("%d packages selected totalling %s"
                  % (len(self._yum.tsInfo.getMembers()), self.spaceRequired))
 
@@ -931,7 +932,11 @@ reposdir=%s
             logger.info("running transaction")
             self.progress.send_step()
             try:
-                self._yum.runTransaction(cb=rpmcb)
+                resultobject = self._yum.runTransaction(cb=rpmcb)
+                if resultobject.return_code != 0:
+                    logger.error('scriptlet or other non-fatal errors occurred during transaction.')
+                else:
+                    logger.error('scriptlet all run success')
             except PackageSackError as e:
                 logger.error("error running transaction: %s" % e)
                 exn = PayloadInstallError(str(e))

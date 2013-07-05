@@ -27,21 +27,16 @@ Import('*')
 #           #bindir/root.bootscripts.tar.gz
 #           #bindir/kmodules-x.xx.xx.tar.bz2
 #           #bindir/mi-vmlinuz-x.xx.xx  (needed by iso)
-
-def add_root_target(tname, tname_bootscripts):
-    if DEF_ROOTFS == tname and TARGET_BUILD_VARIANT == 'eng':
-        if 'root.step1' in COMMAND_LINE_TARGETS:
-            SConscript('%s/SConscript' % tname)
-            print 'include', '%s/SConscript' % tname
-
-    if DEF_ROOTFS == tname:
-        SConscript('%s/SConscript' % tname_bootscripts)
-
+products = env['PRODUCTS']
 ## TARGET: root.step1
 ## TARGET: root.bootscripts
-add_root_target('root.magic1', 'bootscripts.magic1')
-add_root_target('root.arch1', 'bootscripts.arch1')
-add_root_target('root.magic64', 'bootscripts.arch1')
+rootfs_name = products[TARGET_PRODUCT]['PRODUCT_ROOTFS']
+if TARGET_BUILD_VARIANT == 'eng' and 'root.step1' in COMMAND_LINE_TARGETS:
+    SConscript('root.%s/SConscript' % rootfs_name)
+    print 'include', 'root.%s/SConscript' % rootfs_name
+
+SConscript('bootscripts.%s/SConscript' % rootfs_name)
+
 
 ## TARGET: busybox.bin
 #SConscript('busybox/SConscript')

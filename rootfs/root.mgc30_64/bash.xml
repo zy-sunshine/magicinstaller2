@@ -1,0 +1,39 @@
+<packages>
+
+<!-- bash files -->
+<package>
+<files></files>
+<install>
+/bin/bash
+/bin/sh
+</install>
+</package>
+
+<!-- bash utils -->
+<package>
+<install>
+/bin/file
+# magic files for /bin/file
+/etc/magic
+/usr/share/misc/magic
+/usr/share/misc/magic.mgc
+
+/usr/bin/which
+/bin/ls
+/bin/ps
+/bin/kill
+/bin/killall
+/bin/touch
+/bin/chmod
+/bin/chgrp
+
+# TODO: uuidd rsyslogd needed?
+/usr/sbin/uuidd
+/usr/sbin/rsyslogd
+
+# for debug
+/bin/strace
+</install>
+</package>
+
+</packages>

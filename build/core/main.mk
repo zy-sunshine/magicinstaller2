@@ -62,6 +62,13 @@ def get_sconscripts(dir, topdown=True):
             dirs[:] = []
     return scripts
 
+Import('TARGET_PRODUCT')
+
+def _get_cur_product_var(var_name):
+    return _get_var_by_product(TARGET_PRODUCT, var_name)
+
+Export('_get_cur_product_var')
+
 ## Historical issue include some SConscripts in TOPDIR, it is conveniently for pack packages.
 _inc(TOPDIR, 'SConscript-main')
 

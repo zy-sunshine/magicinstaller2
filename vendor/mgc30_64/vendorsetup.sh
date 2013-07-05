@@ -1,0 +1,2 @@
+add_lunch_combo mgc30_64-eng
+add_lunch_combo mgc30_64-user

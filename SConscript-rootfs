@@ -1,6 +1,6 @@
 import os
 import PkgMaker
-Import('env', 'getSudoSh', '_p', 'TOPDIR')
+Import('env', 'getSudoSh', '_p', 'TOPDIR', '_get_cur_product_var')
 ##### mirootfs.gz
 ## #result/mirootfs.gz <- 
 #               #bindir/root.step1.tar.gz
@@ -42,10 +42,11 @@ class MirootfsMaker(PkgMaker.StepMaker):
         return [], cmds
 
     def extract_bins(self):
+        mikernelver = _get_cur_product_var('PRODUCT_MIKERNELVER')
         toextract = ['bindir/root.step1.tar.gz',
                      'bindir/root.bootscripts.tar.gz',
                      'bindir/root.src.tar.gz',
-                     'bindir/kmodules-${mikernelver}.tar.bz2']
+                     'bindir/kmodules-%s.tar.bz2' % mikernelver]
         
         mkstep2_script = 'scripts/mkstep2.py'
         # Use sudo, because we use root to create the root.step1.tar.gz .
@@ -60,11 +61,13 @@ class MirootfsMaker(PkgMaker.StepMaker):
 
     def run_post_scripts(self):
         # Add some directory, nodes, links and check privilege.
-        os.chmod(_p(TOPDIR, 'rootfs/post_scripts/commands.sh'), 0777)
-        cmds = [getSudoSh("%s/rootfs/post_scripts/commands.sh $ROOT" % TOPDIR),
-                getSudoSh("install -m 0777 %s/rootfs/post_scripts/commands_chroot.sh $ROOT" % TOPDIR),
-                getSudoSh('chroot $ROOT /commands_chroot.sh'),
-                getSudoSh('rm $ROOT/commands_chroot.sh'),
+        rootfs_name = _get_cur_product_var('PRODUCT_ROOTFS')
+
+        os.chmod(_p(TOPDIR, 'rootfs/post_scripts/commands-%s.sh' % rootfs_name), 0777)
+        cmds = [getSudoSh("%s/rootfs/post_scripts/commands-%s.sh $ROOT" % (TOPDIR, rootfs_name)),
+                getSudoSh("install -m 0777 %s/rootfs/post_scripts/commands_chroot-%s.sh $ROOT" % (TOPDIR, rootfs_name)),
+                getSudoSh('chroot $ROOT /commands_chroot-%s.sh' % rootfs_name),
+                getSudoSh('rm $ROOT/commands_chroot-%s.sh' % rootfs_name),
             ]
         return [], cmds
 

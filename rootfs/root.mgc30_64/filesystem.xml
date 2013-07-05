@@ -1,0 +1,23 @@
+<packages>
+<package>
+<post_action>
+# Only create the base system directory.
+# The dev and other etc files will do in other step.
+
+mkdir -pv $ROOT/{dev,proc,sys}
+mkdir -pv $ROOT/{boot,etc,usr,home,mnt,opt} 
+mkdir -pv $ROOT/{media,srv} 
+install -dv -m 0750 $ROOT/root
+
+## Create the /tmp /var/tmp link into /tmpfs
+#       Change 1777 permision on /tmp and /var/tmp
+#       Change 777 permition on /tmpfs
+mkdir -pv $ROOT/tmpfs/var
+chmod 777 $ROOT/tmpfs
+install -dv -m 1777 $ROOT/tmpfs/tmp $ROOT/tmpfs/var/tmp
+ln -sv tmpfs/tmp $ROOT/tmp
+ln -sv tmpfs/var $ROOT/var
+</post_action>
+</package>
+</packages>
+

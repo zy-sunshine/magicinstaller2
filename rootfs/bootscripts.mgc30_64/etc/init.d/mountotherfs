@@ -1,0 +1,31 @@
+#!/bin/sh
+# $rc_base/init.d/mountotherfs
+
+. /etc/sysconfig/rc
+. ${rc_functions}
+
+case "${1}" in
+    start)
+        boot_mesg -n "Mounting other file systems:" ${INFO}
+        if ! mountpoint /dev/pts >/dev/null; then
+            boot_mesg -n " /dev/pts" ${NORMAL}
+            mount -n /dev/pts || failed=1
+        fi
+        
+        if ! mountpoint /dev/shm >/dev/null; then
+            boot_mesg -n " /dev/shm" ${NORMAL}
+            mount -n /dev/shm || failed=1
+        fi
+
+        boot_mesg "" ${NORMAL}
+
+        (exit ${failed})
+        evaluate_retval
+        ;;
+
+    *)
+        echo "Usage: ${0} {start}"
+        exit 1
+        ;;
+esac
+

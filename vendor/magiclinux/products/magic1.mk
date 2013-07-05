@@ -12,11 +12,9 @@ if PRODUCT_NAME in PRODUCTS.keys():
 myp = PRODUCTS[PRODUCT_NAME] = {}
 
 myp['PRODUCT_NAME'] = PRODUCT_NAME
-myp['PRODUCT_DEVICE'] = "magic1"
+myp['PRODUCT_ROOTFS'] = "magic1"
+myp['PRODUCT_MIKERNELVER'] = "2.6.35.4"
 myp['PRODUCT_BRAND'] = "MagicLinux"
-myp['PRODUCT_MODEL'] = "MLJingyou"
-myp['PRODUCT_HARDWARE_VERSION'] = "x86_full"
-myp['BUILD_DISPLAY_ID'] = "MagicLinuxJingyou"
 myp['PRODUCT_LOCALES'] = "zh_CN en_US"
 myp['PRODUCT_MANUFACTURER'] = "MagicLinux Team"
 myp['PRODUCT_PATH'] = LOCAL_PATH
