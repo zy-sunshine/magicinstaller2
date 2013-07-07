@@ -87,7 +87,7 @@ cp        egrep          kill      mount       rev        tar \
 cpio      false          linux32   mountpoint  rm         touch \
     ; do
     if [ ! -f $ROOT/bin/$cmd ]; then
-        ln -s ../usr/sbin/busybox $ROOT/bin/$cmd
+        ln -s ../../usr/sbin/busybox $ROOT/bin/$cmd
     fi
 done
 

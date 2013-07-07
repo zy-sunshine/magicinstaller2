@@ -45,14 +45,18 @@ case "${1}" in
         cp -a /lib/udev/devices/* /dev
 
         # Start the udev daemon to continually watch for, and act on, uevents
-        /sbin/udevd --daemon
+        #/sbin/udevd --daemon
+        /usr/lib/systemd/systemd-udevd --daemon
 
         # Now traverse /sys in order to "coldplug" devices that have
         # already been discovered
-        /sbin/udevadm trigger
+        #/sbin/udevadm trigger
+        /usr/bin/udevadm trigger --type=subsystems --action=add
+        /usr/bin/udevadm trigger --type=devices --action=add
 
         # Now wait for udevd to process the uevents we triggered
-        /sbin/udevadm settle
+        #/sbin/udevadm settle
+        /usr/bin/udevadm settle
         evaluate_retval
 
         ;;

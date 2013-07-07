@@ -52,7 +52,8 @@ def runbash(cmd):
     cmds = cmd.split()
     res = run_bash(cmds[0], cmds[1:])
     if res['ret'] != 0:
-        raise RunBashError('cmd %s std: %s err: %s' % (cmd, ' '.join(res['std']), ' '.join(res['err'])))
+        msg = 'cmd %s std: %s err: %s' % (str(cmd), ' '.join(res['std']), ' '.join(res['err']))
+        raise RunBashError(msg)
     
 def is_binary(filename):
     """Return true if the given filename is binary.
@@ -153,6 +154,7 @@ def main1():
     flist = []
     if len(sys.argv[1:]) == 1 and sys.argv[1].endswith('.lst'):
         loadflist(sys.argv[1], flist)
+    flist.extend(sys.argv[1:])
         
     checkfiles(flist)
     
@@ -248,6 +250,9 @@ def recurse_make_dir(sdir, tdir, use_bash=False):
         tdir_dirname = os.path.dirname(tdir)
         if not os.path.exists(tdir_dirname):
             recurse_make_dir(os.path.dirname(sdir), tdir_dirname, use_bash)
+        
+        if os.path.exists(tdir):
+            return
         
         if os.path.islink(sdir):
             copy_link(sdir, tdir, use_bash)

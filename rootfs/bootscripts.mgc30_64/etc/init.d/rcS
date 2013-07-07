@@ -34,8 +34,15 @@ ${rc_base}/init.d/setclock start
 # We have this boot script, but in MI we don't use it.
 #${rc_base}/init.d/checkfs start
 ${rc_base}/init.d/mountfs start
-${rc_base}/init.d/udev_retry start
+#${rc_base}/init.d/udev_retry start
 #${rc_base}/init.d/cleanfs start
+if [ ! -e /dev/tty ]; then
+    mknod -m 666 $ROOT/dev/tty c 5 0
+    for v in 0 1 2 3 4 5 6;do
+        [ ! -e $ROOT/dev/tty$v ] && mknod -m 620 $ROOT/dev/tty$v c 4 $v
+    done
+fi
+
 ${rc_base}/init.d/console start
 ${rc_base}/init.d/localnet start
 ${rc_base}/init.d/sysctl start

@@ -46,7 +46,8 @@ class MirootfsMaker(PkgMaker.StepMaker):
         toextract = ['bindir/root.step1.tar.gz',
                      'bindir/root.bootscripts.tar.gz',
                      'bindir/root.src.tar.gz',
-                     'bindir/kmodules-%s.tar.bz2' % mikernelver]
+                     #'bindir/kmodules-%s.tar.bz2' % mikernelver
+                     ]
         
         mkstep2_script = 'scripts/mkstep2.py'
         # Use sudo, because we use root to create the root.step1.tar.gz .

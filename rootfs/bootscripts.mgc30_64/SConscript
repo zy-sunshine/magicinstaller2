@@ -24,7 +24,7 @@ root_bs = os.path.join(mi_config.tmpdir, 'root.bootscripts.mgc30_64')
 depInstallDir(env, 'root.bootscripts.mgc30_64', root_bs,
                     srcdirs=['etc',
                              'usr',
-                             'lib',
+                             #'lib',
                              'root'])
 
 ##### Construct the #bindir/root.bootscripts.tar.gz
