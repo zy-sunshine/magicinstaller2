@@ -1,6 +1,5 @@
 #!/usr/bin/python
 import os, sys, time, string
-from mi import getdev
 from mi.utils.common import mount_dev, umount_dev
 from mi.utils.miconfig import MiConfig
 from mi.server.utils.device import MiDevice
@@ -224,17 +223,11 @@ def _prepare_grub(mia, operid, timeout, usepassword, password,
             dolog('TURN ON: nobootloader\n')
             return 0, ''
         # Get the command arguments for grub.
-        #floppy = kudzu.probe(kudzu.CLASS_FLOPPY,
-        #                     kudzu.BUS_IDE | kudzu.BUS_SCSI | kudzu.BUS_MISC,
-        #                     kudzu.PROBE_ALL)
-        floppy = getdev.probe(getdev.CLASS_FLOPPY)
-
         # Because --batch will cause a bus error, we don not use this
         # option.
         #grubopt = '--batch'
         grubopt = ''
-        if floppy == []:
-            grubopt = grubopt + ' --no-floppy'
+        grubopt = grubopt + ' --no-floppy'
 
         os.system('cp -p %s/*stage1*   %s 2>/dev/null || true' % \
                   (os.path.join(CF.D.TGTSYS_ROOT, 'usr/lib/grub'),

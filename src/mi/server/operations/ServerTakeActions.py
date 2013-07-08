@@ -2,7 +2,6 @@
 import os, glob, sys
 import isys
 from mi.utils import _
-from mi import getdev
 from mi.utils.common import mount_dev, umount_dev, run_bash
 from mi.utils.miconfig import MiConfig
 from mi.server.utils.device import MiDevice

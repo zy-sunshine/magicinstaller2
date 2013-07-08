@@ -30,6 +30,10 @@
 /bin/chmod
 /bin/chgrp
 /bin/chown
+/bin/mount
+/bin/umount
+/bin/su
+/usr/sbin/nologin
 
 # for systemctl show beautiful color format
 /bin/less
@@ -42,6 +46,14 @@
 
 # for debug
 /bin/strace
+
+# net util
+/usr/sbin/ifconfig
+/bin/ping
+
+# mi need some bash command
+/bin/sync
+/bin/eject
 </install>
 </package>
 

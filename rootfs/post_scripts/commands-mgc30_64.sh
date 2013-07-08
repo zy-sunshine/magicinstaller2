@@ -4,6 +4,9 @@
 # Remove the backslash at the end of ROOT.
 ROOT=$(echo "$1" |sed 's/\/*$//')
 
+if [ -e $ROOT/etc/X11/xorg.conf ]; then
+    rm $ROOT/etc/X11/xorg.conf
+fi
 # We have the root directory already,
 # so we just create the directory secondary and above there.
 

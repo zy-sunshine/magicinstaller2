@@ -1,5 +1,6 @@
 <packages>
 
+<!--
 <package>
 <files>glib2-2.22.5-1mgc25.i686.rpm</files>
 <install>
@@ -12,7 +13,9 @@ usr/lib/gio/modules/libgiofam.so
 usr/share/locale/zh_CN/LC_MESSAGES/glib20.mo
 </install>
 </package>
+-->
 
+<!--
 <package>
 <files>libxml2-2.7.3-1mgc25.i686.rpm</files>
 <install>
@@ -21,7 +24,8 @@ usr/share/locale/zh_CN/LC_MESSAGES/glib20.mo
 /usr/lib/libxml2.so.*
 </install>
 </package>
-
+-->
+<!--
 <package>
 <files>shared-mime-info-0.60-3mgc25.i686.rpm</files>
 <install>
@@ -34,7 +38,9 @@ usr/share/locale/zh_CN/LC_MESSAGES/glib20.mo
 LD_LIBRARY_PATH=/usr/lib sudo chroot $ROOT /usr/bin/update-mime-database /usr/share/mime
 </post_action>
 </package>
+-->
 
+<!--
 #<package>
 #<files>gdk-pixbuf-0.22.0-37mgc25.i686.rpm</files>
 #<install>
@@ -52,7 +58,8 @@ LD_LIBRARY_PATH=/usr/lib sudo chroot $ROOT /usr/bin/update-mime-database /usr/sh
 #/usr/lib/libgdk_pixbuf_xlib.so.*
 #</install>
 #</package>
-
+-->
+<!--
 <package>
 <files>gtk2-2.18.3-1mgc25.i686.rpm</files>
 <install>
@@ -91,35 +98,40 @@ rm -f $ROOT/etc/passwd
 rm -f $ROOT/etc/group
 </post_action>
 </package>
+-->
 
+<!--
 <package>
 <files>gtk2-immodules-2.18.3-1mgc25.i686.rpm</files>
 <install>
 usr/lib/gtk-2.0/2.10.0/immodules/im-xim.*
 </install>
 </package>
+-->
 
+<!--
 <package>
 <files>atk-1.26.0-1mgc25.i686.rpm</files>
 <install>
 usr/lib/libatk-1.0.so.*
 </install>
 </package>
+-->
 
 <package>
-<files>pango-1.26.2-1mgc25.i686.rpm</files>
 <install>
-usr/bin/pango-querymodules-32
-usr/lib/libpango-1.0.so.*
-usr/lib/libpangoft2-1.0.so.*
-usr/lib/libpangox-1.0.so.*
-usr/lib/libpangoxft-1.0.so.*
-usr/lib/libpangocairo-1.0.so.*
+# pango-1.26.2-1mgc25.i686.rpm
+/bin/pango-querymodules-64
+#usr/lib/libpango-1.0.so.*
+#usr/lib/libpangoft2-1.0.so.*
+#usr/lib/libpangox-1.0.so.*
+#usr/lib/libpangoxft-1.0.so.*
+#usr/lib/libpangocairo-1.0.so.*
 
 #usr/lib/pango/1.6.0/modules/pango-arabic-fc.so
 #usr/lib/pango/1.6.0/modules/pango-arabic-lang.so
-usr/lib/pango/1.6.0/modules/pango-basic-fc.so
-usr/lib/pango/1.6.0/modules/pango-basic-x.so
+#usr/lib/pango/1.6.0/modules/pango-basic-fc.so
+#usr/lib/pango/1.6.0/modules/pango-basic-x.so
 #usr/lib/pango/1.6.0/modules/pango-hangul-fc.so
 #usr/lib/pango/1.6.0/modules/pango-hebrew-fc.so
 #usr/lib/pango/1.6.0/modules/pango-indic-fc.so
@@ -131,6 +143,7 @@ usr/lib/pango/1.6.0/modules/pango-basic-x.so
 
 #usr/lib/pango/1.6.0/modules/pango-basic-*
 </install>
+<!--
 <post_action>
 mkdir -p $ROOT/etc/pango/i686-pc-linux-gnu
 /bin/sed 's/song ti/fangsong ti/g' $BUILD/etc/pango/pangox.aliases &gt; $ROOT/etc/pango/pangox.aliases
@@ -138,15 +151,19 @@ LD_LIBRARY_PATH=/usr/lib sudo chroot $ROOT /usr/bin/pango-querymodules-32 &gt; $
 cp $ROOT/etc/pango/pango.modules $ROOT/etc/pango/i686-pc-linux-gnu/
 #rm -f $ROOT/usr/bin/pango-querymodules-32
 </post_action>
+-->
 </package>
 
+<!--
 <package>
 <files>glitz-0.5.6-3mgc25.i686.rpm</files>
 <install>
 usr/lib/libglitz.so.*
 </install>
 </package>
+-->
 
+<!--
 <package>
 <files>directfb-1.3.0-1mgc25.i686.rpm</files>
 <install>
@@ -155,34 +172,41 @@ usr/lib/libfusion-1.3.so.*
 usr/lib/libdirectfb-1.3.so.*
 </install>
 </package>
+-->
 
+<!--
 <package>
 <files>cairo-1.8.8-1mgc25.i686.rpm</files>
 <install>
 usr/lib/libcairo.so.*
 </install>
 </package>
+-->
 
+<!--
 <package>
 <files>libsysfs-2.1.0-5mgc25.i686.rpm</files>
 <install>
 usr/lib/libsysfs.so.*
 </install>
 </package>
+-->
 
+<!--
 <package>
 <files>libffi-3.0.5-2mgc25.i686.rpm</files>
 <install>
 usr/lib/libffi.so.*
 </install>
 </package>
+-->
 
 <package>
-<files>gtk2-engines-2.17.3-1mgc25.i686.rpm</files>
 <install>
+#####gtk2-engines-2.17.3-1mgc25.i686.rpm
 #/etc/gtk-2.0/gtkrc
 #/usr/lib/gtk-2.0/2.10.0/engines/libpixmap.so
-/usr/lib/gtk-2.0/2.10.0/engines/libclearlooks.so
+######/usr/lib/gtk-2.0/2.10.0/engines/libclearlooks.so
 #/usr/lib/gtk-2.0/2.10.0/engines/libcrux-engine.so
 #/usr/lib/gtk-2.0/2.10.0/engines/libglide.so
 #/usr/lib/gtk-2.0/2.10.0/engines/libhcengine.so
@@ -190,7 +214,7 @@ usr/lib/libffi.so.*
 #/usr/lib/gtk-2.0/2.10.0/engines/libmist.so
 #/usr/lib/gtk-2.0/2.10.0/engines/libredmond95.so
 #/usr/lib/gtk-2.0/2.10.0/engines/libthinice.so
-/usr/share/gtk-engines/clearlooks.xml
+######/usr/share/gtk-engines/clearlooks.xml
 #/usr/share/gtk-engines/crux-engine.xml
 #/usr/share/gtk-engines/glide.xml
 #/usr/share/gtk-engines/hcengine.xml
@@ -198,7 +222,7 @@ usr/lib/libffi.so.*
 #/usr/share/gtk-engines/mist.xml
 #/usr/share/gtk-engines/redmond95.xml
 #/usr/share/gtk-engines/thinice.xml
-@usr/share/themes/Clearlooks
+######@usr/share/themes/Clearlooks
 #@usr/share/themes/Crux
 #@/usr/share/themes/Industrial
 #@/usr/share/themes/Mist
@@ -207,36 +231,45 @@ usr/lib/libffi.so.*
 </package>
 
 <package>
-<files>pygtk2-2.14.1-1mgc25.i686.rpm</files>
 <install>
-$pythondir/site-packages/gtk-2.0/*.so
-$pythondir/site-packages/gtk-2.0/gtk/*.pyc
-$pythondir/site-packages/gtk-2.0/gtk/*.so
+# pygtk2
+/usr/lib64/python2.7/site-packages/pygtk.pth
+/usr/lib64/python2.7/site-packages/gtk-2.0/atk.so
+/usr/lib64/python2.7/site-packages/gtk-2.0/gtk/__init__.pyc
+/usr/lib64/python2.7/site-packages/gtk-2.0/gtk/_gtk.so
+/usr/lib64/python2.7/site-packages/gtk-2.0/gtk/_lazyutils.pyc
+/usr/lib64/python2.7/site-packages/gtk-2.0/gtk/compat.pyc
+/usr/lib64/python2.7/site-packages/gtk-2.0/gtk/deprecation.pyc
+/usr/lib64/python2.7/site-packages/gtk-2.0/gtk/keysyms.pyc
+/usr/lib64/python2.7/site-packages/gtk-2.0/gtkunixprint.so
+/usr/lib64/python2.7/site-packages/gtk-2.0/pango.so
+/usr/lib64/python2.7/site-packages/gtk-2.0/pangocairo.so
 </install>
 </package>
 
 <package>
-<files>pycairo-1.8.2-1mgc25.i686.rpm</files>
 <install>
-$pythondir/site-packages/cairo/*.pyc
-$pythondir/site-packages/cairo/*.so
+# pycairo
+/usr/lib64/python2.7/site-packages/cairo/__init__.pyc
+/usr/lib64/python2.7/site-packages/cairo/_cairo.so
 </install>
 </package>
 
 <package>
-<files>pygobject2-2.20.0-1mgc25.i686.rpm</files>
 <install>
-#usr/lib/libpyglib-2.0.so.*
-usr/lib/libpyglib-2.0-python.so*
-$pythondir/site-packages/pygtk.pth
-$pythondir/site-packages/pygtk.py
-$pythondir/site-packages/gtk-2.0/dsextras.py
-$pythondir/site-packages/gtk-2.0/gobject/*.pyc
-$pythondir/site-packages/gtk-2.0/gobject/*.so
-$pythondir/site-packages/gtk-2.0/glib/*.pyc
-$pythondir/site-packages/gtk-2.0/glib/*.so
-$pythondir/site-packages/gtk-2.0/gio/*.pyc
-$pythondir/site-packages/gtk-2.0/gio/*.so
+# pygobject2
+/usr/lib64/python2.7/site-packages/glib/__init__.pyc
+/usr/lib64/python2.7/site-packages/glib/_glib.so
+/usr/lib64/python2.7/site-packages/glib/option.pyc
+/usr/lib64/python2.7/site-packages/gobject/__init__.pyc
+/usr/lib64/python2.7/site-packages/gobject/_gobject.so
+/usr/lib64/python2.7/site-packages/gobject/constants.pyc
+/usr/lib64/python2.7/site-packages/gobject/propertyhelper.pyc
+/usr/lib64/python2.7/site-packages/gtk-2.0/dsextras.pyc
+/usr/lib64/python2.7/site-packages/gtk-2.0/gio/__init__.pyc
+/usr/lib64/python2.7/site-packages/gtk-2.0/gio/_gio.so
+/usr/lib64/python2.7/site-packages/gtk-2.0/gio/unix.so
+/usr/lib64/python2.7/site-packages/pygtk.pyc
 </install>
 </package>
 

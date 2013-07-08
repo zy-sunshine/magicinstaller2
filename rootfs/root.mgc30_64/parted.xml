@@ -1,34 +1,27 @@
 <packages>
 
 <package>
-#<files>parted-1.8.8.bin.tar.gz</files>
-#<install>
-#usr/lib/libparted-1.8.so.*
-#usr/sbin/parted
-#</install>
-</package>
-
-<package>
-<files>parted-2.3-1mgc25.i686.rpm</files>
 <install>
-usr/lib/libparted.so*
-sbin/parted
-sbin/partprobe
+# parted
+/usr/sbin/parted
+/usr/sbin/partprobe
 </install>
 </package>
 
 <package>
-<files>python-decorator-3.0.1-3mgc25.noarch.rpm</files>
 <install>
-usr/lib/python2.6/site-packages/decorator.pyc
-</install>
-</package>
-
-<package>
-<files>pyparted-3.4-1mgc25.i686.rpm</files>
-<install>
-$pythondir/site-packages/_pedmodule.*
-$pythondir/site-packages/parted/*.pyc
+# pyparted
+/usr/lib64/python2.7/site-packages/_pedmodule.so
+/usr/lib64/python2.7/site-packages/parted/__init__.pyc
+/usr/lib64/python2.7/site-packages/parted/alignment.pyc
+/usr/lib64/python2.7/site-packages/parted/cachedlist.pyc
+/usr/lib64/python2.7/site-packages/parted/constraint.pyc
+/usr/lib64/python2.7/site-packages/parted/decorators.pyc
+/usr/lib64/python2.7/site-packages/parted/device.pyc
+/usr/lib64/python2.7/site-packages/parted/disk.pyc
+/usr/lib64/python2.7/site-packages/parted/filesystem.pyc
+/usr/lib64/python2.7/site-packages/parted/geometry.pyc
+/usr/lib64/python2.7/site-packages/parted/partition.pyc
 </install>
 </package>
 

@@ -1,7 +1,6 @@
 #!/usr/bin/python
 import os, glob, sys, syslog
 import rpm, time
-from mi import getdev
 from mi.server.utils.decorators import probe_cache
 from mi.server.utils.device import MiDevice
 
@@ -10,6 +9,95 @@ import ftplib
 register = MiRegister()
 
 from mi.server.utils import logger, CF
+
+import parted, _ped
+class PartedUtil():
+    def __init__(self):
+        self.all_harddisks = {}
+        self.probe_alldisk()
+
+    def get_all_partitions(self):
+        result = []
+        for devpath in self.all_harddisks.keys():
+            partinfo = self._get_partitions(devpath)
+            ## Because we can not detect cdrom, so we regarded this condition
+            #  to be cdrom
+            if len(partinfo) == 1 and partinfo[0][0] == -1 and \
+                partinfo[0][4] == 'N/A' and \
+                self.all_harddisks[devpath][0].readOnly is True:
+                result.append((devpath, 'iso9660'))
+            for info in partinfo:
+                if info[0] != -1:
+                    result.append(('%s%s' % (devpath, info[0]), info[4]))
+        return result
+
+    def get_device_list(self):
+        hd_list = filter(lambda d: d.type != parted.DEVICE_DM \
+                         #and d.readOnly != True, # CD-ROM will be read only.
+                         ,
+                         parted.getAllDevices())
+        return hd_list
+
+    def probe_alldisk(self):
+        devlist = self.get_device_list()
+        if devlist:
+            for dev in devlist:
+                newdisklabel = None
+                try:
+                    disk = parted.Disk(dev)
+                except _ped.DiskLabelException:
+                    # For the disk without any disk label, create it.
+                    # disk label is disk partition table format
+                    dltype = parted.diskType['msdos']
+                    disk = parted.freshDisk(device=dev, ty=dltype)
+                    #newdisklabel = 'y'
+                    #disk = dev.disk_new_fresh(parted.disk_type_get('msdos'))
+                # Model might contain GB2312, it must be convert to Unicode.
+                model = str(dev.model)
+                try:
+                    model = model.decode('gb18030').encode('utf8')
+                except UnicodeDecodeError, e:
+                    pass
+                
+                self.all_harddisks[dev.path] = (dev, disk, newdisklabel)
+
+    def _get_partitions(self, devpath):
+        result = []
+        def part2result(part):
+            flags = []
+            avaflags = []
+            label = 'N/A'
+            if part.active:
+                for f in parted.partitionFlag.keys():
+                    if part.isFlagAvailable(f):
+                        avaflags.append(f)
+                        if part.getFlag(f):
+                            flags.append(f)
+                if disk.supportsFeature(parted.DISK_TYPE_PARTITION_NAME):
+                    label = part.name
+
+            if part.fileSystem:
+                fs_type_name = part.fileSystem.type
+            else:
+                fs_type_name = 'N/A'
+
+            return (part.number, flags, part.type, part.geometry.length,
+                    fs_type_name, label, part.geometry.start, part.geometry.end, avaflags)
+
+        if self.all_harddisks.has_key(devpath):
+            disk = self.all_harddisks[devpath][1]
+            if disk:
+                try:
+                    part = disk.getFirstPartition()
+                except:
+                    logger.warn('devpath %s can not get one partition.' % devpath)
+                else:
+                    while part:
+                        if part.type & parted.PARTITION_METADATA == 0:
+                            result.append(part2result(part))
+                        part = part.nextPartition()
+        return result
+
 
 @register.server_handler('long', 'pkgarr_probe')
 @probe_cache('pkgarr')
@@ -42,21 +130,16 @@ def pkgarr_probe(mia, operid):
     mia.set_step(operid, 0, -1)
 
     result = []
+    pu = PartedUtil()
+    all_drives = pu.get_all_partitions()
     
-    all_drives = {}
-    all_parts = getdev.get_part_info(getdev.CLASS_HD)
-    cdrom_dev = getdev.get_dev_info(getdev.CLASS_CDROM)
-    for k, v in cdrom_dev.items():
-        v['fstype'] = 'iso9660'   # fill cdrom file type, because it is None for default.
+#     for k, v in cdrom_dev.items():
+#         v['fstype'] = 'iso9660'   # fill cdrom file type, because it is None for default.
     
-    all_drives.update(all_parts)
-    all_drives.update(cdrom_dev)
     logger.i('all_drives: %s' % all_drives)
     pos_id = -1
-    for k, value in all_drives.items():
-        devpath = value['devpath']
-        fstype = value['fstype']
-        if not CF.D.FSTYPE_MAP.has_key(fstype):
+    for devpath, fstype in all_drives:
+        if not CF.D.FSTYPE_MAP.has_key(fstype) or fstype.startswith('linux-swap'):
             continue
         if CF.D.FSTYPE_MAP[fstype][0] == '':
             continue

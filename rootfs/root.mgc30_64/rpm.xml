@@ -1,115 +1,25 @@
 <packages>
 
 <package>
-<files>rpm-4.7.0-2mgc25.i686.rpm</files>
-<pre_action>
-# replace it in busybox.
-rm $ROOT/usr/bin/rpm2cpio
-</pre_action>
 <install>
-bin/rpm
-usr/bin/rpm2cpio
-usr/lib/rpm/macros
-usr/lib/rpm/rpmrc
-@usr/lib/rpm/platform/*-linux
+# rpm
+/bin/rpm
+/usr/bin/rpm2cpio
+/usr/lib/rpm/macros
+/usr/lib/rpm/rpmrc
+/usr/bin/cpio
 </install>
 </package>
 
 <package>
-<files>cpio-2.9.90-3mgc25.i686.rpm</files>
-<pre_action>
-# replace it in busybox.
-rm $ROOT/bin/cpio
-</pre_action>
 <install>
-bin/cpio
+# rpm-python
+/usr/lib64/python2.7/site-packages/rpm/__init__.py
+/usr/lib64/python2.7/site-packages/rpm/_rpmbmodule.so
+/usr/lib64/python2.7/site-packages/rpm/_rpmmodule.so
+/usr/lib64/python2.7/site-packages/rpm/_rpmsmodule.so
+/usr/lib64/python2.7/site-packages/rpm/transaction.py
 </install>
 </package>
-
-<package>
-<files>rpm-libs-4.7.0-2mgc25.i686.rpm</files>
-<install>
-usr/lib/librpm.so.0*
-usr/lib/librpmio.so.0*
-usr/lib/librpmbuild.so.0*
-</install>
-</package>
-
-<package>
-<files>rpm-python-4.7.0-2mgc25.i686.rpm</files>
-<install>
-@$pythondir/site-packages
-</install>
-</package>
-
-<package>
-<files>compat-db45-4.5.20-1mgc25.i686.rpm</files>
-<install>
-lib/libdb-4.5.so
-</install>
-</package>
-
-<package>
-<files>xz-libs-4.999.9beta-0.1mgc25.i686.rpm</files>
-<install>
-usr/lib/liblzma.so.*
-</install>
-</package>
-
-<package>
-<files>lua-5.1.4-2mgc25.i686.rpm</files>
-<install>
-usr/lib/liblua-5.1.so
-</install>
-</package>
-
-<package>
-<files>file-libs-5.00-1mgc25.i686.rpm</files>
-<install>
-usr/lib/libmagic.so.*
-</install>
-</package>
-
-<package>
-<files>nss-3.12.4-1mgc25.i686.rpm </files>
-<install>
-lib/libnss3.so
-lib/libnssutil3.so
-lib/libsoftokn3.so
-</install>
-</package>
-
-<package>
-<files>nspr-4.8-1mgc25.i686.rpm</files>
-<install>
-lib/libplc4.so
-lib/libplds4.so
-lib/libnspr4.so
-</install>
-</package>
-
-#--------------------------------------------------
-# For python-rpm library
-<package>
-<files>xulrunner-1.9.2.3-1.mgc25.i686.rpm</files>
-<install>
-/usr/lib/xulrunner-1.9.2/libnss3.so
-/usr/lib/xulrunner-1.9.2/libsoftokn3.so
-/usr/lib/xulrunner-1.9.2/libfreebl3.so
-/usr/lib/xulrunner-1.9.2/libnssutil3.so
-</install>
-<post_action>
-echo /usr/lib/xulrunner-1.9.2 >> $ROOT/etc/ld.so.conf
-</post_action>
-</package>
-
-<package>
-<files>sqlite-3.6.19-1mgc25.i686.rpm</files>
-<install>
-/usr/lib/libsqlite3.so.0
-/usr/lib/libsqlite3.so.0.8.6
-</install>
-</package>
-#---------------------------------------------
 
 </packages>

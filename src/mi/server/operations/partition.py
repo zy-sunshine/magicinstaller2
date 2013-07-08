@@ -3,8 +3,6 @@
 
 from mi.client.utils import _
 import sys, os, time, string
-import iconv
-from mi import getdev
 import parted, _ped #@UnresolvedImport
 from mi.utils.common import mount_dev, umount_dev, run_bash
 # Because the short operation and long operation are run in different process,
@@ -75,7 +73,12 @@ def device_probe_all(mia, operid, dummy):
                 #newdisklabel = 'y'
                 #disk = dev.disk_new_fresh(parted.disk_type_get('msdos'))
             # Model might contain GB2312, it must be convert to Unicode.
-            model = iconv.iconv('gb2312', 'utf8', dev.model).encode('utf8')
+            model = str(dev.model)
+            try:
+                model = model.decode('gb18030').encode('utf8')
+            except UnicodeDecodeError, e:
+                pass
+
             result.append((dev.path, dev.length, model))
             CF.S.all_harddisks[dev.path] = (dev, disk, newdisklabel)
     dolog('operations.parted.device_probe_all: %s\n' % str(result))
