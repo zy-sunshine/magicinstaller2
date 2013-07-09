@@ -803,6 +803,8 @@ class xmlgtk:
                 #self.name_map[name] = menu_item
         widget.set_model(menu)
         self._xgc_connect(widget, node, 'changed')
+        if node.getElementsByTagName('value'):
+            widget.set_active(0)
         value = node.getAttribute('value')
         if value:
             self.optionmenu_map[widget] = (value, values)

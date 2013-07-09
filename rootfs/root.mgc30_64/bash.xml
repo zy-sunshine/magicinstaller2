@@ -34,6 +34,7 @@
 /bin/umount
 /bin/su
 /usr/sbin/nologin
+/bin/sed
 
 # for systemctl show beautiful color format
 /bin/less

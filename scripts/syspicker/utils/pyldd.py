@@ -6,22 +6,31 @@ import os, sys
 import json
 import time
 
-cachefpath = 'lddcache.json'
-if os.path.exists(cachefpath):
-    print 'loading cache...'
-    t = time.time()
-    with open(cachefpath, 'rt') as fp:
-        cachejson = json.load(fp)
-    print 'load cache done ', time.time() - t
-else:
-    cachejson = json.loads('{}')
+cachefpath = '_lddcache.json'
+cachejson = {}
+cacheb = False
+def initcache(tmpdir=''):
+    global cacheb, cachejson, cachefpath
+    if tmpdir:
+        cachefpath = os.path.join(tmpdir, cachefpath)
+    if os.path.exists(cachefpath):
+        print 'loading cache...'
+        t = time.time()
+        with open(cachefpath, 'rt') as fp:
+            cachejson = json.load(fp)
+        print 'load cache done ', time.time() - t
+    else:
+        cachejson = json.loads('{}')
+    cacheb = True
 
 def ldd(fpath):
-    if fpath in cachejson:
+    if cachejson.has_key(fpath):
+        #print 'Hit in cache %s' % fpath
         return cachejson[fpath]
-    
+    else:
+        print fpath
+        pass
     libs = []
-    
     p = subprocess.Popen(["ldd", fpath], 
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE)
@@ -47,10 +56,11 @@ def ldd(fpath):
 import atexit
 
 def all_done():
-    print 'saving cache...'
-    t = time.time()
-    with open(cachefpath, 'wt') as fp:
-        json.dump(cachejson, fp)
-    print 'saving cache done ', time.time() - t
+    if cacheb:
+        print 'saving cache...'
+        t = time.time()
+        with open(cachefpath, 'wt') as fp: 
+            json.dump(cachejson, fp, indent=4)
+        print 'saving cache done ', time.time() - t
 
 atexit.register(all_done)

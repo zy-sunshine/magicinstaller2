@@ -16,6 +16,7 @@ from mi.client.modules import *
 from mi.client.utils.magicpopup import magicmsgbox, magichelp_popup
 from mi.utils.miconfig import MiConfig
 import gettext
+import glob
 CF = MiConfig.get_instance()
 from mi.utils.mitaskman import MiTaskman
 from mi.client.utils import magicpopup
@@ -60,7 +61,6 @@ class Steps(object):
     def get_step_class(self, name):
         from mi.client.modules import module_list
         for mod in module_list:
-#            import pdb; pdb.set_trace()
             if mod.NAME == name:
                 return mod
         return None
@@ -364,11 +364,13 @@ class MIMainWindow(gtk.Window):
         if(hasattr(step.obj, 'btnfinish_clicked')):
             step.obj.btnfinish_clicked(widget, data)
         
-    def theme_clicked(self, widget, themedir):
+    def theme_clicked(self, widget, rc_path):
+        themedir = os.path.dirname(os.path.dirname(rc_path))
+        
         # Use 'gtk.settings' instead of 'gtk.rc'             By demonlj@linuxfans.org
         settings = gtk.settings_get_default()
         if themedir:
-            settings.set_string_property("gtk-theme-name", themedir, "")
+            settings.set_string_property("gtk-theme-name", os.path.basename(themedir), "")
             #gtk.rc_parse_string('gtk-theme-name = "%s"' % themedir)
         else:
             settings.set_string_property("gtk-theme-name", "Default", "")
@@ -390,38 +392,33 @@ class MIMainWindow(gtk.Window):
                                               _('Theme Choice'),
                                               magicpopup.magicpopup.MB_OK,
                                               'themedlg', 'theme')
-        themesdoc = parse('/etc/gtk-2.0/themes.xml')
-        themelist = themesdoc.getElementsByTagName('theme')
+        rc_path_list = glob.glob('/usr/share/themes/*/*/gtkrc')
+
+        theme_map = {}
+        for gtkrc in rc_path_list:
+            #print gtkrc
+            themename = gtkrc.split(os.path.sep)[4]
+            if themename == '':
+                continue
+            else:
+                theme_map[themename] = gtkrc
+                
         rows = 2
-        thetable = gtk.Table(rows, (len(themelist) + rows - 1) / rows, True)
+        thetable = gtk.Table(rows, (len(theme_map) + rows - 1) / rows, True)
         thetable.set_col_spacings(4)
         thetable.set_row_spacings(4)
         left = 0
         top = 0
-        for themenode in themelist:
-            path = themenode.getAttribute('dir')
-            pic = themenode.getAttribute('pic')
-            if pic:
-                thebutton = gtk.Button()
-                theimage = gtk.Image()
-                theimage.set_from_file('/etc/gtk-2.0/pics/' + pic)
-                theimage.show()
-                thebutton.add(theimage)
-                thebutton.show()
-            else:
-                name = themenode.getAttribute('name')
-                if not name:
-                    if path:
-                        name = path
-                    else:
-                        name = _('Default')
-                thebutton = gtk.Button(name)
-            thebutton.connect('clicked', self.theme_clicked, path)
+        
+        for tname, tgtkrc in theme_map.items():
+            thebutton = gtk.Button(tname)
+            thebutton.connect('clicked', self.theme_clicked, tgtkrc)
             thetable.attach(thebutton, left, left + 1, top, top + 1, 0, 0, 0, 0)
             top = top + 1
             if top == rows:
                 top = 0
                 left = left + 1
+            thebutton.show()
         thetable.show()
         self.themedlg.name_map['themes'].pack_start(thetable, True, True)
         

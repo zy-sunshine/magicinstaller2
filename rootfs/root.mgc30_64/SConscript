@@ -19,12 +19,46 @@
 import os
 import stat
 import sys, glob
+import time
+import json
 from SCons.Action import ActionFactory
 from xml.dom.minidom import parse
 from syspicker.pickup import Picker
 Import('env', 'mi_config', 'MiPkgMaker', 'PkgMaker', 'getSudoSh')
 
-picker = Picker(use_bash=True)
+picker = Picker(use_bash=True, tmpdir=mi_config.tmpdir)
+
+cachefpath1 = '_rootfiledepcache.json'
+cachejson1 = json.loads('{}')
+cacheb1 = False
+def initcache(tmpdir=''):
+    global cacheb1, cachejson1, cachefpath1
+    if tmpdir:
+        cachefpath1 = os.path.join(tmpdir, cachefpath1)
+    if os.path.exists(cachefpath1):
+        print 'loading cache...'
+        t = time.time()
+        with open(cachefpath1, 'rt') as fp:
+            cachejson1 = json.load(fp)
+        print 'load cache done ', time.time() - t
+    else:
+        cachejson1 = json.loads('{}')
+    cacheb1 = True
+    
+import atexit
+
+def all_done():
+    global cacheb1, cachejson1, cachefpath1
+    if cacheb1:
+        print 'saving cache...'
+        t = time.time()
+        with open(cachefpath1, 'wt') as fp:
+            json.dump(cachejson1, fp, indent=4)
+        print 'saving cache done ', time.time() - t
+
+atexit.register(all_done)
+
+initcache(mi_config.tmpdir)
 
 class FileNotExists(Exception):
     pass
@@ -45,29 +79,6 @@ def get_node_value(node, name):
             value = ''.join([t.data for t in subnode.childNodes \
                              if t.nodeType == t.TEXT_NODE])
     return line_split(value)
-
-class RootBuildTheme(PkgMaker.BaseMaker):
-    def __init__(self, mod, env):
-        self.source_list = source_list = []
-        self.build_cmds = cmds = []
-
-        source_list.append(mod + '.xml')
-        themesdoc = parse(source_list[-1])
-        cmds.extend(['mkdir -p $ROOT/etc/gtk-2.0/pics',
-                     'mkdir -p $ROOT/usr/share/themes',
-                     'cp ${pwd}/%s $ROOT/etc/gtk-2.0/' % source_list[-1]])
-
-        for themenode in themesdoc.getElementsByTagName('theme'):
-            dir = themenode.getAttribute('dir')
-            tar = themenode.getAttribute('tar')
-            if dir and tar:
-                source_list.append('$source_prefix/themes/' + tar)
-                cmds.extend(self.get_extract_cmd([source_list[-1]], '$ROOT/usr/share/themes'))
-            pic = themenode.getAttribute('pic')
-            if pic:
-                source_list.append('$source_prefix/themes/' + pic)
-                cmds.extend(['cp %s $ROOT/etc/gtk-2.0/pics/' % source_list[-1]])
-        cmds.extend(['find $ROOT/usr/share/themes -name "*~" | xargs rm -f'])
 
 class RootBuildNode(PkgMaker.BaseMaker):
     def __init__(self, mod, env):
@@ -93,18 +104,39 @@ class RootBuildNode(PkgMaker.BaseMaker):
         for pkgnode in rootdoc.getElementsByTagName('package'):
             pkgfiles_orig = get_node_value(pkgnode, 'files')
             if pkgfiles_orig:
-                pkgfiles = []
+                pkglist = []
                 #pkgfiles = self.path_prefix('$source_list_pkg', pkgfiles_orig)
-                for pkgfile in pkgfiles_orig:
-                    pkg_path = self.search_file(pkgfile, ['$source_prefix_pkg', '$source_prefix'])
-                    if pkg_path:
-                        pkgfiles.append(pkg_path)
-                    else:
-                        print "Can not find the package %s" % pkgfile
-                        sys.exit(1)
+                for pkgfiles in pkgfiles_orig:
+                    if pkgfiles[0] == '#':
+                        continue
+                    
+                    if pkgfiles[0] not in ('@', '+'):
+                        pkgfiles = glob.glob(pkgfiles)
+                        
+                    for pkgfile in pkgfiles:
+                        pkg_path = self.search_file(pkgfile, ['$source_prefix_pkg', '$source_prefix'])
+                        if pkg_path:
+                            pkglist.append(pkg_path)
+                        else:
+                            print "Can not find the package %s" % pkgfile
+                            sys.exit(1)
 
-                tarpkgs.extend(pkgfiles)
-            inst_list.extend(get_node_value(pkgnode, 'install'))
+                tarpkgs.extend(pkglist)
+                
+            install_list = []
+            for instfiles in get_node_value(pkgnode, 'install'):
+                if instfiles[0] == '#':
+                    continue
+                    
+                if instfiles[0] not in ('@', '+'):
+                    instfiles = glob.glob(instfiles)
+                else:
+                    instfiles = [instfiles, ]
+
+                install_list.extend(instfiles)
+                
+            inst_list.extend(install_list)
+            
             pre_list.extend(get_node_value(pkgnode, 'pre_action'))
             post_list.extend(get_node_value(pkgnode, 'post_action'))
 
@@ -118,18 +150,46 @@ class RootBuildNode(PkgMaker.BaseMaker):
         picker_inst_list = []
         old_inst_list = []
         for fpath in inst_list:
-            if fpath[0] == '#':
-                continue
             if fpath.startswith('/'):
                 if not os.path.exists(fpath):
+                    raise FileNotExists(fpath)
+                picker_inst_list.append(fpath)
+            elif fpath[:2] in ('+/', '@/'):
+                if not os.path.exists(fpath[1:]):
                     raise FileNotExists(fpath)
                 picker_inst_list.append(fpath)
             else:
                 old_inst_list.append(fpath)
         # picker files install
-        newfiles = picker.AddFiles(picker_inst_list)
-        newfiles.extend(picker_inst_list)
-        cmds.append(pcmd_decorator(lambda : picker.copyFiles(newfiles, env.subst('$ROOT'))))
+        def get_recursive_flist(dpath):
+            flist = []
+            for root, dirs, files in os.walk(top=dpath, topdown=True):
+                for f in files:
+                    flist.append(os.path.join(root, f))
+            return flist
+        
+        addlist = []
+        for f in picker_inst_list:
+            if f[0] == '+':
+                addlist.append(f[1:])
+            elif f[0] == '@':
+                addlist.extend(get_recursive_flist(f[1:]))
+            else:
+                addlist.append(f)
+                
+        _addlist = filter(lambda p: os.path.splitext(p)[1] not in ('.pyc', '.xml'), addlist)
+
+        newfiles0 = []
+        for addfile in _addlist:
+            if cachejson1.has_key(addfile):
+                #print 'hit cache in root file dep %s' % addfile
+                newfiles = cachejson1[addfile]
+            else:
+                newfiles = picker.AddFiles([addfile,])
+                cachejson1[addfile] = newfiles
+            newfiles0.extend(newfiles)
+        newfiles0.extend(addlist)
+        cmds.append(pcmd_decorator(lambda : picker.copyFiles(newfiles0, env.subst('$ROOT'))))
         
         # old files install mode
         for f in old_inst_list:
@@ -239,8 +299,6 @@ class RootMagic64Maker(RootPkgMaker):
 #                         'post_scripts',
                         ]:
             mods.append(RootBuildNode(mod_src, self.env))
-        # theme is special
-        #mods.append(RootBuildTheme('themes', self.env))
 
 pkg = RootMagic64Maker(env)
 pkg.make()

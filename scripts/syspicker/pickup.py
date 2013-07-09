@@ -77,9 +77,14 @@ def is_binary(filename):
     return False
     
 def _recurseldd(depmap, fpath):
-    for f in pyldd.ldd(fpath):
-        depmap.setdefault(f, []).append(fpath)
-        recurseldd(depmap, f)
+    if pyldd.cachejson.has_key(fpath):
+        for f in pyldd.cachejson[fpath]:
+            depmap.setdefault(f, []).append(fpath)
+            recurseldd(depmap, f)
+    else:
+        for f in pyldd.ldd(fpath):
+            depmap.setdefault(f, []).append(fpath)
+            recurseldd(depmap, f)
 
 def recurseldd(depmap, fpaths):
     if type(fpaths) is str:
@@ -105,10 +110,11 @@ def checkfiles(files):
         os._exit(0)
         
 class Picker(object):
-    def __init__(self, use_bash=False, flist = []):
+    def __init__(self, use_bash=False, flist = [], tmpdir=''):
         self.depmap = {}
         self.flist = flist
         self.use_bash = use_bash
+        pyldd.initcache(tmpdir)
         
     def AddFiles(self, flist):
         '''

@@ -33,8 +33,10 @@ if USE_TEXTDOMAIN:
 #settings.set_string_property('gtk-theme-name', 'Default', '')
 #gtk.rc_parse_string(open('style.rc', 'rt').read())
 #print gtk.rc_get_theme_dir()
+
 settings = gtk.settings_get_default()
-settings.set_string_property("gtk-theme-name", "Gnursid", "")
+settings.set_string_property('gtk-theme-name', 'Default', '')
+logger.d('Change Theme to %s' % str(gtk.rc_get_theme_dir()))
 
 step_name_list = [
     (_('Welcome'), 'welcome'), # (group name, module name)

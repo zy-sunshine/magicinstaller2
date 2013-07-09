@@ -9,7 +9,8 @@ kernel_copy     从 #bindir/root/ 中提取内核相关二进制包, 拷贝其�
 # root.step1 准备.
 busybox         编译 rootfs 中需要的 busybox 打包至 #bindir/root/busybox-$busybox_version.tar.bz2 .
 parted          编译特定 parted 为 magicinstaller 主程序提供支持, 打包至 #bindir/root/parted-$ver.bin.tar.gz .
-root.step1      从某一发行版的二进制包中提取文件, 与 busybox parted 共同构建 MI 运行的 rootfs .
+root.*          从某一发行版的二进制包中提取文件, 与 busybox parted 共同构建 MI 运行的 rootfs .
+bootscripts.*   mi 系统启动脚本
 
 # rootfs 的 etc 目录文件.
 etc             rootfs 中需要的 etc 目录文件.
@@ -21,4 +22,16 @@ SConscript          控制 rootfs 的各个模块的准备过程.
 post_scripts
     commands.sh             在宿主系统中执行的命令. $1 参数为目标系统目录.
     commands_chroot.sh      chroot 进入目标系统中执行的命令.
+
+
+root.mgc30_64 xml 使用描述
+<packages> 为 root 标签
+  <package> 为每一个待提取文件列表集合的描述
+    <files> 为二进制包，文件列表中的文件从此处提取
+    <install> 为具体的文件路径描述
+              描述格式：
+                  如果文件路径以 / 开始 (也包括 '@/' '+/'), 那么这个文件暗指为当前宿主系统的文件;
+                  如果文件不以 / 开始, 那么这个文件暗指从 files 中描述的二进制包中提取;
+                  如果文件以 @ 开始, 那么这个文件夹下的所有文件将被拷贝;
+                  如果文件以 + 开始, 那么只创建这个文件夹。
 

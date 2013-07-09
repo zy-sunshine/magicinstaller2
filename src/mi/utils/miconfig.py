@@ -68,8 +68,6 @@ class MiConfig(object):
         printer.d('MiConfig.save_to_file --> %s\n' % conf_file)
         confobj = self.__dict__['confobj']
         with open(conf_file, 'w') as configfile:
-            with open(conf_file+'raw', 'w')  as f:
-                f.write(repr(self.__dict__['confobj']))
             json.dump(self.__dict__['confobj'], fp=configfile, indent=4, ensure_ascii=False)
         
     def load_from_file(self, conf_file):
