@@ -19,6 +19,15 @@ usr/lib/X11/locale/locale.dir
 @usr/lib/X11/locale/zh_CN
 </install>
 </package>
+
+<package>
+<files>xorg-x11-fonts-misc-7.4-1mgc25.noarch.rpm</files>
+<install>
+# for mgc30_64 /usr/share/X11/fonts/75dpi/*.pcf.gz
+# but we use wqy only now.
+usr/lib/X11/fonts/misc/8x16.pcf.gz
+</install>
+</package>
 -->
 
 <package>
@@ -151,17 +160,6 @@ LD_LIBRARY_PATH=/usr/lib sudo chroot $ROOT /usr/bin/fc-cache -f
 
 </install>
 </package>
-
-<!--
-<package>
-<files>xorg-x11-fonts-misc-7.4-1mgc25.noarch.rpm</files>
-<install>
-# for mgc30_64 /usr/share/X11/fonts/75dpi/*.pcf.gz
-# but we use wqy only now.
-usr/lib/X11/fonts/misc/8x16.pcf.gz
-</install>
-</package>
--->
 
 <package>
 <install>
