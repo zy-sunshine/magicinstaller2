@@ -8,6 +8,6 @@
 [Unit]
 Description=MagicInstaller Environment
 Documentation=None
-Requires=sysinit.target mienv.service
+Requires=fnotify.service sysinit.target mienv.service
 After=sysinit.target mienv.service
 AllowIsolate=yes

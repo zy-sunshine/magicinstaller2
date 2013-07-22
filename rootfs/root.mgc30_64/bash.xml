@@ -35,6 +35,8 @@
 /bin/su
 /usr/sbin/nologin
 /bin/sed
+/usr/sbin/sysctl
+/usr/sbin/swapon
 
 # for systemctl show beautiful color format
 /bin/less

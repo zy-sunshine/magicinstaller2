@@ -335,7 +335,8 @@ def format_partition(mia, operid, devpath, part_start, fstype):
             try:
                 part.getPedPartition().set_system(parted_fstype)
                 logger.d('Create internal fstype %s on device %s partition start %s' % (fstype, devpath, part_start))
-                part.fileSystem.create()
+                if hasattr(part.fileSystem, 'create'):
+                    part.fileSystem.create()
                 disk.commit()
                 logger.d('Create internal partition complete!')
             except NotImplementedError, errmsg:

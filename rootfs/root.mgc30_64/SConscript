@@ -24,9 +24,11 @@ import json
 from SCons.Action import ActionFactory
 from xml.dom.minidom import parse
 from syspicker.pickup import Picker
-Import('env', 'mi_config', 'MiPkgMaker', 'PkgMaker', 'getSudoSh')
+Import('env', 'mi_config', 'MiPkgMaker', 'PkgMaker', 'getSudoSh', '_my_dir')
 
-picker = Picker(use_bash=True, tmpdir=mi_config.tmpdir)
+LOCAL_PATH = _my_dir()
+
+picker = Picker(use_bash=True, tmpdir=LOCAL_PATH)
 
 cachefpath1 = '_rootfiledepcache.json'
 cachejson1 = json.loads('{}')
@@ -58,7 +60,7 @@ def all_done():
 
 atexit.register(all_done)
 
-initcache(mi_config.tmpdir)
+initcache(LOCAL_PATH)
 
 class FileNotExists(Exception):
     pass
@@ -294,6 +296,7 @@ class RootMagic64Maker(RootPkgMaker):
                         'parted',
                         'rpm',
                         'mkfs',
+                        'debug',
 #                         'grub',
 #                         'trace',
 #                         'post_scripts',

@@ -1,9 +1,9 @@
 <packages>
 
 <package>
-<files>strace-4.5.18-2mgc25.i686.rpm</files>
 <install>
-/usr/bin/strace
+/bin/strace
+/usr/bin/fnotify
 </install>
 </package>
 

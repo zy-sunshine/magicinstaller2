@@ -26,8 +26,10 @@ def initcache(tmpdir=''):
 def ldd(fpath):
     if cachejson.has_key(fpath):
         #print 'Hit in cache %s' % fpath
+        print '.',
         return cachejson[fpath]
     else:
+        print
         print fpath
         pass
     libs = []

@@ -1,0 +1,9 @@
+[Unit]
+Description=System Filesystem Notify Service
+Before=local-fs.target
+
+[Service]
+ExecStartPre=/usr/sbin/sysctl fs.inotify.max_user_watches=32768
+ExecStart=/usr/bin/fnotify /home /opt /root /boot /etc /mnt /usr
+StandardOutput=null
+
