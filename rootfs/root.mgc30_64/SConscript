@@ -296,7 +296,7 @@ class RootMagic64Maker(RootPkgMaker):
                         'parted',
                         'rpm',
                         'mkfs',
-                        'debug',
+#                         'debug',
 #                         'grub',
 #                         'trace',
 #                         'post_scripts',

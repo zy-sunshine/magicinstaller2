@@ -1,0 +1,19 @@
+We use this tool to monitor file changes on disk, so we can analyze out the
+minimum system for MI base.
+
+1. Compile:
+  g++ fnotify.cpp -o fnotify
+
+2. put fnotify to MI base system path: usr/bin/fnotify
+
+3. copy fnotify.service to usr/lib/systemd/system/fnotify.service
+4. modify the service file to adjust the start order.
+   e.g. add Requires=fnotify.service in file:
+   ./bootscripts.mgc30_64/etc/systemd/system/default.target
+
+fnotify exe program accept a directories list, and it will monitor these
+directories recursively. the file changes action will be logged into log file
+/var/log/fnotify.log
+
+It is a deamon now, we will do lot of adjust work on this tool.
+

@@ -8,6 +8,9 @@
 /usr/lib/rpm/macros
 /usr/lib/rpm/rpmrc
 /usr/bin/cpio
+# NOTE: this file is import for rpm digest check, if not exist this file will
+#       get error: unpacking of archive failed on file /etc/aliases;51ef87a4: cpio: Digest mismatch
+/lib64/libsoftokn3.so
 </install>
 </package>
 

@@ -12,51 +12,50 @@
 <!-- bash utils -->
 <package>
 <install>
-/bin/file
-# magic files for /bin/file
-/etc/magic
-/usr/share/misc/magic
-/usr/share/misc/magic.mgc
+#/bin/ps
+#/bin/kill
+#/bin/killall
+#/bin/touch
+#/bin/chmod
+#/bin/chgrp
+#/bin/chown
+#/bin/su
+#/usr/sbin/nologin
+#/bin/sed
 
-/usr/bin/which
-/bin/ls
-# for ls nsswitch
+## for systemctl show beautiful color format
+#/bin/less
+#/bin/more
+#/usr/share/terminfo/l/linux
+
+## net util
+#/usr/sbin/ifconfig
+#/bin/ping
+
+## mi need some bash command
+#/bin/sync
+#/bin/eject
+
+#/bin/file
+## magic files for /bin/file
+#/etc/magic
+#/usr/share/misc/magic
+#/usr/share/misc/magic.mgc
+
+#/usr/bin/which
+#/bin/ls
+## for ls nsswitch
 /usr/lib64/libnss_files.so
 
-/bin/ps
-/bin/kill
-/bin/killall
-/bin/touch
-/bin/chmod
-/bin/chgrp
-/bin/chown
-/bin/mount
-/bin/umount
-/bin/su
-/usr/sbin/nologin
-/bin/sed
+/usr/bin/mount
+/usr/bin/umount
 /usr/sbin/sysctl
 /usr/sbin/swapon
-
-# for systemctl show beautiful color format
-/bin/less
-/bin/more
-/usr/share/terminfo/l/linux
+/usr/sbin/losetup
 
 # TODO: uuidd rsyslogd needed?
 /usr/sbin/uuidd
 /usr/sbin/rsyslogd
-
-# for debug
-/bin/strace
-
-# net util
-/usr/sbin/ifconfig
-/bin/ping
-
-# mi need some bash command
-/bin/sync
-/bin/eject
 </install>
 </package>
 

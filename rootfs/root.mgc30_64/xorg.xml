@@ -33,7 +33,6 @@ usr/lib/X11/fonts/misc/8x16.pcf.gz
 <package>
 <install>
 # fontconfig
-# TODO: remove these font util to minimize rootfs.
 /usr/bin/fc-cache
 /usr/bin/mkfontdir
 /usr/bin/mkfontscale
@@ -173,6 +172,10 @@ LD_LIBRARY_PATH=/usr/lib sudo chroot $ROOT /usr/bin/fc-cache -f
 LD_LIBRARY_PATH=/usr/lib sudo chroot $ROOT /usr/bin/fc-cache /usr/share/fonts/wqy-microhei
 LD_LIBRARY_PATH=/usr/lib sudo chroot $ROOT /usr/bin/mkfontdir /usr/share/fonts/wqy-microhei
 LD_LIBRARY_PATH=/usr/lib sudo chroot $ROOT /usr/bin/mkfontscale /usr/share/fonts/wqy-microhei
+# remove these font util to minimize rootfs.
+sudo rm $ROOT/usr/bin/fc-cache
+sudo rm $ROOT/usr/bin/mkfontdir
+sudo rm $ROOT/usr/bin/mkfontscale
 </post_action>
 </package>
 

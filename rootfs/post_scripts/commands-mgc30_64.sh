@@ -73,27 +73,7 @@ chown -R root:root $ROOT/*
 #install --directory --mode=0755 --owner=root --group=root /etc/profile.d
 
 # Create some neccessary shortcut
-if [ ! -d $ROOT/bin ]; then
-    mkdir -pv $ROOT/bin
-fi
-for cmd in \
-addgroup  date           fgrep     linux64     mv         rmdir         true \
-adduser   dd             fsync     ln          netstat    scriptreplay  umount \
-ash       delgroup       getopt    login       nice       sed           uname \
-bash      deluser        grep      ls          pidof      setarch       vi \
-busybox   df             gunzip    lzop        ping       sh            zcat \
-cat       dmesg          gzip      makemime    printenv   sleep \
-chgrp     dnsdomainname  hostname  mkdir       ps         stat \
-chmod     dumpkmap       ionice    mknod       pwd        stty \
-chown     echo           ip        more        reformime  sync \
-cp        egrep          kill      mount       rev        tar \
-cpio      false          linux32   mountpoint  rm         touch \
-    ; do
-    if [ ! -f $ROOT/bin/$cmd ]; then
-        ln -s ../../usr/sbin/busybox $ROOT/bin/$cmd
-    fi
-done
-
+# /usr/bin
 if [ ! -d $ROOT/usr/bin ]; then
     mkdir -pv $ROOT/usr/bin
 fi
@@ -117,11 +97,33 @@ dirname   id          microcom  resize     telnet     unzip \
 du        ifplugd     mkfifo    rpm2cpio   test       uptime \
     ; do
     if [ ! -f $ROOT/usr/bin/$cmd ]; then
-        ln -s ../../usr/sbin/busybox $ROOT/usr/bin/$cmd
+        ln -s /usr/sbin/busybox $ROOT/usr/bin/$cmd
     fi
 done
 
+# /bin
+if [ ! -d $ROOT/bin ]; then
+    ln -sv usr/bin $ROOT/bin
+fi
+for cmd in \
+addgroup  date           fgrep     linux64     mv         rmdir         true \
+adduser   dd             fsync     ln          netstat    scriptreplay  umount \
+ash       delgroup       getopt    login       nice       sed           uname \
+bash      deluser        grep      ls          pidof      setarch       vi \
+busybox   df             gunzip    lzop        ping       sh            zcat \
+cat       dmesg          gzip      makemime    printenv   sleep \
+chgrp     dnsdomainname  hostname  mkdir       ps         stat \
+chmod     dumpkmap       ionice    mknod       pwd        stty \
+chown     echo           ip        more        reformime  sync \
+cp        egrep          kill      mount       rev        tar \
+cpio      false          linux32   mountpoint  rm         touch \
+    ; do
+    if [ ! -f $ROOT/bin/$cmd ]; then
+        ln -s /usr/sbin/busybox $ROOT/bin/$cmd
+    fi
+done
 
+# /usr/sbin
 if [ ! -d $ROOT/usr/sbin ]; then
     mkdir -pv $ROOT/usr/sbin
 fi
@@ -135,8 +137,9 @@ chroot    ftpd       lpd       rdev        setfont \
     fi
 done
 
+# /sbin
 if [ ! -d $ROOT/sbin ]; then
-    mkdir -pv $ROOT/sbin
+    ln -sv usr/sbin $ROOT/sbin
 fi
 for cmd in \
 cpid       findfs        init      mkdosfs      pivot_root  swapon \
@@ -149,6 +152,7 @@ fbsplash    ifconfig     man       modinfo      slattach \
 fdisk       ifenslave    mdev      modprobe     swapoff \
     ; do
     if [ ! -f $ROOT/sbin/$cmd ]; then
-        ln -s ../usr/sbin/busybox $ROOT/sbin/$cmd
+        ln -s /usr/sbin/busybox $ROOT/sbin/$cmd
     fi
 done
+

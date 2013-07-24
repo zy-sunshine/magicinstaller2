@@ -37,18 +37,19 @@ LD_LIBRARY_PATH=/usr/lib sudo chroot $ROOT /usr/bin/update-mime-database /usr/sh
 /usr/lib64/libgdk_pixbuf-2.0.so.0.2902.0
 /usr/lib64/libgdk_pixbuf_xlib-2.0.so.0
 /usr/lib64/libgdk_pixbuf_xlib-2.0.so.0.2902.0
-# TODO: remove this command in post script
+
 /usr/bin/gdk-pixbuf-query-loaders-64
 </install>
 <post_action>
 LD_LIBRARY_PATH=/usr/lib sudo chroot $ROOT /usr/bin/gdk-pixbuf-query-loaders-64 --update-cache
+# remove this command in post script
+sudo rm $ROOT/usr/bin/gdk-pixbuf-query-loaders-64
 </post_action>
 </package>
 
 <package>
 <install>
 # gtk2
-# TODO: remove this command in post script
 /usr/bin/gtk-query-immodules-2.0-64
 /usr/bin/update-gtk-immodules
 
@@ -64,6 +65,9 @@ LD_LIBRARY_PATH=/usr/lib sudo chroot $ROOT /usr/bin/gdk-pixbuf-query-loaders-64 
 </install>
 <post_action>
 LD_LIBRARY_PATH=/usr/lib sudo chroot $ROOT /usr/bin/update-gtk-immodules x86_64-magic-linux-gnu
+# remove this command in post script
+sudo rm $ROOT/usr/bin/gtk-query-immodules-2.0-64
+sudo rm $ROOT/usr/bin/update-gtk-immodules
 </post_action>
 </package>
 
@@ -72,7 +76,7 @@ LD_LIBRARY_PATH=/usr/lib sudo chroot $ROOT /usr/bin/update-gtk-immodules x86_64-
 <package>
 <install>
 # pango-1.26.2-1mgc25.i686.rpm
-# TODO: remove
+
 /usr/bin/pango-querymodules-64
 
 /usr/lib64/libpango-1.0.so.0
@@ -90,6 +94,8 @@ LD_LIBRARY_PATH=/usr/lib sudo chroot $ROOT /usr/bin/update-gtk-immodules x86_64-
 </install>
 <post_action>
 LD_LIBRARY_PATH=/usr/lib sudo chroot $ROOT /usr/bin/pango-querymodules-64 --update-cache
+# remove
+sudo rm $ROOT/usr/bin/pango-querymodules-64
 </post_action>
 </package>
 

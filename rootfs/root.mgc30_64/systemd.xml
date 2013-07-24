@@ -140,6 +140,16 @@
 /usr/lib/tmpfiles.d/tmp.conf
 /usr/lib/tmpfiles.d/x11.conf
 
+/usr/lib/udev/ata_id
+/usr/lib/udev/scsi_id
+/usr/lib/udev/v4l_id
+/usr/lib/udev/mtd_probe
+/usr/lib/udev/accelerometer
+/usr/lib/udev/ata_id
+/usr/lib/udev/cdrom_id
+/usr/lib/udev/collect
+/usr/lib/udev/findkeyboards
+
 @/usr/lib/udev/hwdb.d/
 @/usr/lib/udev/keymaps/
 
