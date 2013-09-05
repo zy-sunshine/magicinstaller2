@@ -56,10 +56,13 @@ function terminate_signal(){
 trap terminate_signal SIGINT SIGTERM
 
 echo $SCRIPT_CLIENT
-for layout in LayoutFb LayoutVesa; do
+for layout in LayoutVesa LayoutFb; do
+    echo ================= Start $layout =========================
 	xinit /usr/bin/python $SCRIPT_CLIENT -- /usr/bin/X :1 -layout $layout
+    ret=$?
 	pid_client=$!
-	[ $? -eq 0 ] && break
+    echo ================= End $layout with result $ret =========================
+	[ $ret -eq 0 ] && break
 done
 
 kill_servers

@@ -1,6 +1,5 @@
 #!/usr/bin/python
 import os, glob, sys
-import isys
 from mi.utils import _
 from mi.utils.common import mount_dev, umount_dev, run_bash
 from mi.utils.miconfig import MiConfig
@@ -99,6 +98,9 @@ class MiDevice_TgtSys(object):
         return True
                 
     def umount_tgt_device(self):
+        tgt_swap_dev, tgt_swap_type = self.get_devinfo_by_mpoint('USE')
+        if tgt_swap_dev and os.path.exists(tgt_swap_dev):
+            os.system('swapoff %s' % tgt_swap_dev)
         self.mounted_devs.reverse()
         for dev in self.mounted_devs:
             if type(dev) is MiDevice:
@@ -212,9 +214,10 @@ def install_disc_post(mia, operid, dev, fstype, bootiso_relpath, reldir):
         if dev_hd.get_fstype() == 'iso9660':
             # Eject the cdrom after used.
             try:
-                cdfd = os.open(dev, os.O_RDONLY | os.O_NONBLOCK)
-                isys.ejectcdrom(cdfd) # TODO: ejectcdrom use other method
-                os.close(cdfd)
+                ret = os.system("eject %s" % dev)
+                if ret != 0:
+                    logger.e('Eject(%s) failed: %s' % \
+                            (dev, ))
             except Exception, errmsg:
                 logger.e('Eject(%s) failed: %s' % \
                             (dev, str(errmsg)))

@@ -1,8 +1,6 @@
 #!/usr/bin/python
 import os
 import sys
-import isys #@UnresolvedImport
-USE_ISYS = False
 from mi.utils import logger, CF
 
 class AttrDict(dict):
@@ -37,11 +35,14 @@ class NamedTuple(tuple):
 
 def run_bash(cmd, argv=[], root=None, env=None, cwd=None):
     import subprocess
+    import select, time
     def chroot():
         if root:
             os.chroot(root)
     env = env and env or os.environ
     cmd_res = {}
+    cmd_res['out'] = []
+    cmd_res['err'] = []
     if cwd and root:
         cwd = '/%s/%s' % (root.strip('/'), cwd.strip('/'))
         
@@ -52,9 +53,26 @@ def run_bash(cmd, argv=[], root=None, env=None, cwd=None):
                             preexec_fn = chroot, cwd = cwd,
                             close_fds = True,
                             env = env)
-    res.wait()
-    cmd_res['out']=res.stdout.readlines()
-    cmd_res['err']=res.stderr.readlines()
+    while True:
+        ret1 = res.poll()
+        if ret1 == 0:
+            #print res.pid, 'end'
+            break
+        elif ret1 is None:
+            #print  'running'
+            fs = select.select([res.stdout, res.stderr], [], [], 1)
+            if res.stdout in fs[0]:
+                tmp = res.stdout.readlines()
+                cmd_res['out'].extend(tmp)
+                #print 'read std:', tmp
+            elif res.stderr in fs[0]:
+                tmp = res.stderr.readlines()
+                cmd_res['err'].extend(tmp)
+        else:
+            #print res.pid, 'term'
+            break
+        time.sleep(0.5)
+
     cmd_res['ret']=res.returncode
     return cmd_res
 
@@ -75,24 +93,6 @@ def treedir(dir, complete_path=True):
                 all_files.append(f)
     return all_dirs, all_files
 
-# mntdir --> [loop_dev, isopath]
-LOOP_DEVICES = {}
-FREE_LOOP = ['/dev/loop0', '/dev/loop1', '/dev/loop2', '/dev/loop3',
-            '/dev/loop4', '/dev/loop5', '/dev/loop6', '/dev/loop7']
-USED_LOOP = []
-def _init_free_loop():
-    global FREE_LOOP
-    new_free_loop = []
-    for lo in FREE_LOOP:
-        ret, msg = isys.loopstatus(lo)
-        if not ret:
-            new_free_loop.append(lo)
-        else:
-            #print msg
-            pass
-    FREE_LOOP = new_free_loop
-_init_free_loop()
-
 def remove_empty_dir(dir):
     if not os.path.exists(dir):
         return True, ''
@@ -108,51 +108,7 @@ def remove_empty_dir(dir):
             return False, 'Remove dir failed: %s is not a empty dir' % dir
     return True, ''
 
-def get_new_loop():
-    try:
-        new_loop = FREE_LOOP.pop(0)
-    except IndexError,e:
-        return False, 'Have No loop devices: %s' % str(e)
-    USED_LOOP.append(new_loop)
-    return True, new_loop
-
-def free_loop(loop_dev):
-    f_flag = False
-    f_dev_s = None
-    for s in range(len(USED_LOOP)):
-        if USED_LOOP[s] == loop_dev:
-            f_flag = True
-            f_dev_s = s
-    if f_flag:
-        f_dev = USED_LOOP.pop(f_dev_s)
-        FREE_LOOP.append(f_dev)
-
 def mount_dev(fstype, devfn, mntdir=None,flags=None):
-    def mount_loop_dev(isopath, mntdir):
-        ret, msg = get_new_loop()
-        if ret:
-            new_loop = msg
-            loop_iso = [new_loop, isopath]
-            LOOP_DEVICES[mntdir] = loop_iso
-            cmd = '/sbin/losetup'
-            argv = [new_loop, isopath]
-            cmdres = run_bash(cmd, argv)
-            if cmdres['ret']:
-                errmsg = str(cmdres['err'])
-                free_loop(new_loop)
-                return False, errmsg
-            else:
-                cmd = '/bin/mount'
-                argv = [new_loop, mntdir]
-                cmdres = run_bash(cmd, argv)
-                if cmdres['ret']:
-                    errmsg = str(cmdres['err'])
-                    return False, errmsg
-                else:
-                    return True, mntdir
-        else:
-            return False, msg
-
     def get_mnt_dir(devfn):
         mntdir = '/tmpfs/mnt/%s' % os.path.basename(devfn)
         ret, msg = remove_empty_dir(mntdir)
@@ -176,9 +132,6 @@ def mount_dev(fstype, devfn, mntdir=None,flags=None):
         else:
             return False, msg
     else:
-        #ret, msg = remove_empty_dir(mntdir)
-        #if not ret:
-        #    return False, msg
         if not os.path.exists(mntdir):
             try:
                 os.makedirs(mntdir)
@@ -189,108 +142,39 @@ def mount_dev(fstype, devfn, mntdir=None,flags=None):
         (devfn, mntdir, fstype))
     if not os.path.exists(mntdir):
         os.makedirs(mntdir)
-    if USE_ISYS:
-        try:
-            isys.mount(fstype, devfn, mntdir, flags)
-        except SystemError, e:
-            errmsg = "mount_dev: mount failed: %s\n" % str(e)
-            logger.e(errmsg)
-            return False, errmsg
-        else:
-            return True, mntdir
+
+    cmd = ''
+    argv = []
+    if fstype in ['ntfs', 'ntfs-3g']:
+        cmd = 'ntfs-3g'
+        argv = [devfn, mntdir]
     else:
-        f_loop = False
+        cmd = 'busybox'
+        argv.append('mount')
+        if fstype:
+            argv = argv + ['-t', fstype]
         if flags:
-            flag_list = flags.split(',')
-        else:
-            flag_list = []
-        new_flag_list = []
-        for f in flag_list:
-            if f.strip().startswith('loop'):
-                f_loop = True
-            else:
-                new_flag_list.append(f.strip())
-        flags = ','.join(new_flag_list)
-        if f_loop:
-            isopath = devfn
-            ret, msg = mount_loop_dev(isopath, mntdir)
-            if not ret:
-                return False, msg
-            else:
-                return True, mntdir
-        cmd = ''
-        argv = []
-        if fstype in ['ntfs', 'ntfs-3g']:
-            cmd = '/bin/ntfs-3g'
-            argv = [devfn, mntdir]
-        else:
-            cmd = '/bin/mount'
-            if fstype:
-                argv = argv + ['-t', fstype]
-            if flags:
-                argv = argv + ['-o', flags]
-            argv = argv + [devfn, mntdir]
-        logger.i("Run mount command: %s %s\n" % (cmd, ' '.join(argv)))
-        cmdres = run_bash(cmd, argv)
-        if cmdres['ret']:
-            errmsg = "mount_dev: mount failed: %s\n" % str([cmdres['out'], cmdres['err']])
-            return False, errmsg
-        else:
-            return True, mntdir
+            argv = argv + ['-o', flags]
+        argv = argv + [devfn, mntdir]
+    logger.i("Run mount command: %s %s\n" % (cmd, ' '.join(argv)))
+    cmdres = run_bash(cmd, argv)
+    if cmdres['ret']:
+        errmsg = "mount_dev: mount failed: %s\n" % str([cmdres['out'], cmdres['err']])
+        return False, errmsg
+    else:
+        return True, mntdir
 
 def umount_dev(mntdir, rmdir=True):
-    def umount_loop_dev(mntdir):
-        cmd = '/bin/umount'
-        argv = [mntdir]
-        cmdres = run_bash(cmd, argv)
-        if cmdres['ret']:
-            return False, str(cmdres['err'])
-        else:
-            loop_dev, isopath = LOOP_DEVICES[mntdir]
-            cmd = '/sbin/losetup'
-            argv = ['-d', loop_dev]
-            cmdres = run_bash(cmd, argv)
-            if cmdres['ret']:
-                return False, str(cmdres['err'])
-            else:
-                free_loop(loop_dev)
-                LOOP_DEVICES.pop(mntdir, '')
-                return True, ''
-
-    isys.sync()
-    if USE_ISYS:
-        try:
-            isys.umount(mntdir)
-        except SystemError, e:
-            errmsg = "umount_dev: umount failed: %s\n" % str(e)
-            logger.e(errmsg)
-            return False, errmsg
+    os.system('sync')
+    cmd = 'busybox'
+    argv = ['umount', mntdir]
+    logger.i("Run umount command: %s %s\n" % (cmd, ' '.join(argv)))
+    cmdres = run_bash(cmd, argv)
+    if cmdres['ret']:
+        errmsg = "umount_dev: umount failed: %s\n" % str([cmdres['out'], cmdres['err']])
+        return False, errmsg
     else:
-        f_loop = False
-        for mntp in LOOP_DEVICES.keys():
-            if mntp == mntdir:
-                f_loop = True
-        if f_loop:
-            ret, msg = umount_loop_dev(mntdir)
-            if not ret:
-                return False, msg
-            else:
-                return True, ''
-
-        cmd = '/bin/umount'
-        argv = [mntdir]
-        logger.i("Run umount command: %s %s\n" % (cmd, ' '.join(argv)))
-        cmdres = run_bash(cmd, argv)
-        if cmdres['ret']:
-            errmsg = "umount_dev: umount failed: %s\n" % str([cmdres['out'], cmdres['err']])
-            return False, errmsg
-    if 0:
-        # attempt to remove the mnt dir. For next mount.
-        ret, msg = remove_empty_dir(mntdir)
-        if not ret:
-            return False, msg
-    # If there have nothing error happend, return true.
-    return True, ''
+        return True, ''
 
 
 def search_file(filename, pathes,

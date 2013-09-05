@@ -17,7 +17,7 @@
 # Place - Suite 330, Boston, MA 02111-1307, USA.
 
 #SConscript('iconv/SConscript')
-SConscript('isys/SConscript')
+#SConscript('isys/SConscript')
 SConscript('miactions/SConscript')
 # Remove parted pylib, because we will use pyparted instead of it.
 #SConscript('parted/SConscript')

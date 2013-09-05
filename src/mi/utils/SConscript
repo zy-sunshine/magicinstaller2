@@ -30,7 +30,7 @@ def get_json_var_map():
         'fat16':      ('vfat',     'internal',                  1, 2048, 'b'),
         'iso9660':    ('iso9660',  '',                         -1,   -1, ''),
         'jfs':        ('jfs',      'mkfs.jfs -q',        16,   -1, 'b'),
-        'linux-swap(v1)': ('',         'internal',                 -1,   -1, ''),
+        'linux-swap(v1)': ('',         'mkswap',                 -1,   -1, ''),
         'ntfs':       ('ntfs-3g',   'mkfs.ntfs -Q',         1,    -1,  ''),
         'reiserfs':   ('reiserfs', 'mkreiserfs -f -f',   33,   -1, 'b'),
         'xfs':        ('xfs',      'mkfs.xfs -q -f',      5,   -1, 'b')

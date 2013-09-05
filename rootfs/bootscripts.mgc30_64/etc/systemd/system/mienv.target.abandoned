@@ -7,8 +7,7 @@
 
 [Unit]
 Description=MagicInstaller Environment
-Requires=multi-user.target
-After=multi-user.target
-Conflicts=rescue.target
-Wants=mitoplevel.service
+Documentation=None
+Requires=sysinit.target mienv.service
+After=sysinit.target mienv.service
 AllowIsolate=yes

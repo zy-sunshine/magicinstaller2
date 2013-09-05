@@ -47,11 +47,12 @@
 ## for ls nsswitch
 /usr/lib64/libnss_files.so
 
-/usr/bin/mount
-/usr/bin/umount
+#/usr/bin/mount
+#/usr/bin/umount
+#/usr/sbin/losetup
+#/usr/sbin/swapon
 /usr/sbin/sysctl
-/usr/sbin/swapon
-/usr/sbin/losetup
+/usr/sbin/agetty
 
 # TODO: uuidd rsyslogd needed?
 /usr/sbin/uuidd

@@ -73,14 +73,23 @@ def depInstallDir(env, alias, destdir, srcdirs):
             continue
         else:
             files = getAllExcludeSvnFile(srcd)
-            files
+
         allfiles.extend(files)
         for f in files:
             related_dir = os.path.dirname(f)[len(srcd):]
-            env.Alias(target=alias, 
-                    source=env.Install(os.path.join(destdir, os.path.basename(srcd), 
-                                       related_dir.lstrip('/')), f))
+            dest_dir = os.path.join(destdir, os.path.basename(srcd), related_dir.lstrip('/'))
+            if os.path.islink(f):
+                depInstallLink(env, alias, dest_dir, [f, ])
+                dest_path = os.path.join(dest_dir, os.path.basename(f))
+            else:
+                env.Alias(target=alias, source=env.Install(dest_dir , f))
     return allfiles
+
+def depInstallLink(env, alias, destdir, files):
+    def SymLink(target, source, env):
+        os.symlink(os.readlink(str(source[0])), str(target[0]))
+    for f in files:
+        env.Alias(alias, env.Command(os.path.join(destdir, os.path.basename(f)), f, SymLink))
 
 def depInstall(env, alias, destdir, files):
     env.Alias(target=alias, source=env.Install(destdir, files))
