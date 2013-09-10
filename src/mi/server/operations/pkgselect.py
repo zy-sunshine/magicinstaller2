@@ -118,7 +118,8 @@ def pkgarr_probe(mia, operid):
         try:
             ftp = ftplib.FTP("127.0.0.1")
             ftp.login("root", "magic")
-            ftp.storbinary("STOR %s" % remotefn, open(localfn, "rb"), 1024)
+            with open(localfn, "rb") as localfnp:
+                ftp.storbinary("STOR %s" % remotefn, localfnp, 1024)
             ftp.close()
         except:
             logger.e('Upload failed')

@@ -86,6 +86,7 @@ def device_probe_all(mia, operid, dummy):
 
 @register.server_handler('long')
 def get_all_partitions(mia, operid, devpath):
+    logger.d('get_all_partitions %s' % devpath)
     def part2result(part):
         flags = []
         avaflags = []
@@ -110,12 +111,14 @@ def get_all_partitions(mia, operid, devpath):
     result = []
     if CF.S.all_harddisks.has_key(devpath):
         disk = CF.S.all_harddisks[devpath][1]
+        logger.d('Start get partitions from %s' % str(disk))
         if disk:
             try:
                 part = disk.getFirstPartition()
             except:
                 logger.warn('devpath %s can not get one partition.' % devpath)
             else:
+                logger.d('Current part is %s start get next part' % str(part))
                 while part:
                     if part.type & parted.PARTITION_METADATA == 0:
                         result.append(part2result(part))

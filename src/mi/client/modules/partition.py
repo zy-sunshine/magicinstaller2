@@ -122,12 +122,7 @@ class MIStep_Partition (magicstep.magicstep):
     
     def set_no_edit_device(self, dev_list):
         for hdobj in self.hdobj_list:
-            rows = hdobj.name_map['partitions_treeview'].get_model()
-            for row in rows:
-                devfn = row.model.get_value(row.iter, hdobj.COLUMN_DEVICE)
-                if devfn and devfn in dev_list:
-                    pixbuf = gtk.gdk.pixbuf_new_from_file('images/no.png') #@UndefinedVariable
-                    row.model.set_value(row.iter, hdobj.COLUMN_FORMAT, pixbuf)
+            hdobj.set_no_edit_device(dev_list)
 
     def enter(self):
         if not CF.G.choosed_patuple:
@@ -139,8 +134,9 @@ class MIStep_Partition (magicstep.magicstep):
         pkgarr_dev = CF.G.choosed_patuple[1]
 
         logger.d('enter partition step: pkgarr_dev is %s'% pkgarr_dev)
-        self.set_no_edit_device([pkgarr_dev, ]) 
-
+        if pkgarr_dev:
+            self.set_no_edit_device([pkgarr_dev, ])
+            
         if self.probeall_status != STAT.OP_STATUS_DONE:
             magicpopup.magicmsgbox(None, _('Please wait until the harddisk probe finished.'),
                                    magicpopup.magicmsgbox.MB_INFO,
@@ -826,6 +822,9 @@ class  Harddisk(xmlgtk.xmlgtk):
                 else:
                     self.part_addon_infor[p[6]] = ('false', p[4], '')
         self.fill_parts_view()
+        if CF.G.choosed_patuple:
+            pkgarr_dev = CF.G.choosed_patuple[1]
+            self.set_no_edit_device([pkgarr_dev, ])
         if data:
             data.topwin.destroy()
         else:
@@ -1245,8 +1244,23 @@ class  Harddisk(xmlgtk.xmlgtk):
 
 ##### Partition Remoe
     def remove_clicked(self, widget, data):
+        if CF.G.choosed_patuple:
+            pkgarr_dev = CF.G.choosed_patuple[1]
+        else:
+            pkgarr_dev = None
+            
         (model, iter) = \
                 self.name_map['partitions_treeview'].get_selection().get_selected()
+        if iter:
+            devfn = model.get_value(iter, self.COLUMN_DEVICE)
+        else:
+            devfn = None
+        if pkgarr_dev and devfn == pkgarr_dev:
+            magicpopup.magicmsgbox(None,
+                   _('Sorry, you can not edit this deivce.\nBecause the setup package is in it.'),
+                   magicpopup.magicmsgbox.MB_INFO,
+                   magicpopup.magicpopup.MB_OK)
+            return
         if iter:
             part_start = model.get_value(iter, self.COLUMN_START)
             part_start = int(part_start)
@@ -1312,6 +1326,14 @@ class  Harddisk(xmlgtk.xmlgtk):
         self.orig_partitions = None
         self.tm.add_action(None, self.reload_all_partitions, self.waitdlg(),
                            'disk_new_fresh', self.devfn, self.disktype)
-
+        
+    def set_no_edit_device(self, dev_list):
+        rows = self.name_map['partitions_treeview'].get_model()
+        for row in rows:
+            devfn = row.model.get_value(row.iter, self.COLUMN_DEVICE)
+            if devfn and devfn in dev_list:
+                pixbuf = gtk.gdk.pixbuf_new_from_file('images/no.png') #@UndefinedVariable
+                row.model.set_value(row.iter, self.COLUMN_FORMAT, pixbuf)
+                
 if __name__ == '__main__':
     MIStep_Partition()
