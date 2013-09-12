@@ -91,15 +91,20 @@ class DoPartition(magicstep):
         def gen_table(info_list):
             docstr = '''
             <hbox expand="true" fill="true" margin="4">
-            <vbox>
+            <vbox expand="true" fill="true" margin="4">
+            <tableV2  margin="5">
             '''
             for k, v in info_list:
                 docstr += '''
-                <hbox><label text="%s" /><label expand="true" /></hbox>
-                ''' % ("%-32s %s" % (k, v), )
+                <tr>
+                    <td><hbox fill="true"><label text="%-40s" /></hbox></td>
+                    <td><hbox><label text="%s" /></hbox></td>
+                </tr>
+                ''' % (k, v)
             docstr += '''
+            </tableV2>
             </vbox>
-            <label expand="true" />
+
             </hbox>
             '''
             return parseString(docstr)
@@ -107,7 +112,10 @@ class DoPartition(magicstep):
         # Package Information
         info_list = []
         for (pafile, dev, fstype, reldir, isofn) in [CF.G.choosed_patuple, ]:
-            info_list.append((isofn, os.path.join(dev, reldir, isofn)))
+            if isofn != '':
+                info_list.append((isofn, os.path.join(dev, isofn)))
+            else:
+                info_list.append((isofn, os.path.join(dev, reldir)))
         pkg_table = gen_table(info_list)
         
         # Dirty Disk
@@ -119,14 +127,13 @@ class DoPartition(magicstep):
         # Format Partition
         info_list = []
         for (devpath, start, ftype, partnum) in self.format_list: # [('/dev/sda', 935649280, 'ext3', 3)]
-            info_list.append(('%s%s' % (devpath, partnum), "filesystem type is %s" % ftype))
+            info_list.append(('%s%s' % (devpath, partnum), _('Filesystem type: %s') % ftype))
         format_table = gen_table(info_list)
         
         # target system partition
         info_list = []
-        print CF.G.mount_all_list
         for mntpoint, devfn, fstype in CF.G.mount_all_list:
-            info_list.append( ('Mount point: %s' % mntpoint, 'Device info: %s %s' %(devfn, fstype)) )
+            info_list.append( (_('Mount point: %s') % mntpoint, _('Device info: %s %s') %(devfn, fstype)) )
         tgtsys_table = gen_table(info_list)
         
         for table, frame in ((pkg_table, pkg_frame), (dirty_table, dirty_frame), 
@@ -206,6 +213,14 @@ def TestMIStep_dopartition():
     from mi.client.tests import TestRootObject
     obj = TestRootObject(DoPartition)
     obj.init()
+    
+    CF.G.choosed_patuple = ('pafile', 'dev', 'fstype', 'reldir', 'isofn')
+    obj.xmlgtk_obj.dirty_disks = ['dirty_disk01', 'dirty_disk02']
+    obj.xmlgtk_obj.format_list = [('/dev/sda', 935649280, 'ext3', 3), ('/dev/sdb', 935649280, 'ext4', 4)]
+    CF.G.mount_all_list = [('/', 'devfn', 'fstype'), ('/', 'devfn1', 'fstype1')]
+    
+    obj.xmlgtk_obj.fill_all_info()
+    
     obj.main()
     
 if __name__ == '__main__':

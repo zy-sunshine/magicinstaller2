@@ -399,7 +399,7 @@ class xmlgtk:
                 row += 1
             return row
         
-        def add_cell(subnode, cur_row, cur_col):
+        def add_cell(parentnode, subnode, cur_row, cur_col):
             rowspan = int(self._xgc_attr(subnode, 'rowspan', '1'))
             colspan = int(self._xgc_attr(subnode, 'colspan', '1'))
             
@@ -413,7 +413,7 @@ class xmlgtk:
                 for col in range(left, right + 1):
                     cell_fill_map[(row, col)] = 'y'
 
-            cell_list.append((subnode, cur_row, cur_col, left, right, top, bottom))
+            cell_list.append((parentnode, subnode, cur_row, cur_col, left, right, top, bottom))
             return right + 1
         cur_row = -1
         for trnode in node.childNodes:
@@ -430,15 +430,15 @@ class xmlgtk:
                         for subnode in tdnode.childNodes:
                             if subnode.nodeType != subnode.ELEMENT_NODE:
                                 continue
-                            cur_col = add_cell(subnode, cur_row, cur_col)
+                            cur_col = add_cell(tdnode, subnode, cur_row, cur_col)
                     else:
-                        cur_col = add_cell(tdnode, cur_row, cur_col)
+                        cur_col = add_cell(tdnode, tdnode, cur_row, cur_col)
             else:
                 # do one row
                 cur_col = add_cell(trnode, cur_row, cur_col)
         if cell_list:
-            rows = max(cell_list, key=lambda s: s[6])[6] + 1
-            columns = max(cell_list, key=lambda s: s[4])[4] + 1
+            rows = max(cell_list, key=lambda s: s[7])[7] + 1
+            columns = max(cell_list, key=lambda s: s[5])[5] + 1
         else:
             rows = 1
             columns = 1
@@ -460,7 +460,7 @@ class xmlgtk:
         if margin:
             widget.set_border_width(int(margin))
             
-        for subnode, cur_row, cur_col, left, right, top, bottom in cell_list:
+        for parentnode, subnode, cur_row, cur_col, left, right, top, bottom in cell_list:
             child = self.xgcwidget_create(subnode)
             expand = xgc_get_bool(self._xgc_attr(subnode, 'expand', 'false'))
             fill = xgc_get_bool(self._xgc_attr(subnode, 'fill', 'false'))
@@ -475,7 +475,7 @@ class xmlgtk:
                 def_xoptions = 'fill'
                 def_yoptions = 'fill'
 
-            xoptions = self._xgc_attr(subnode, 'xoptions', def_xoptions)
+            xoptions = self._xgc_attr(parentnode, 'xoptions', def_xoptions)
             if xoptions == 'expand':
                 xoptions = gtk.EXPAND
             elif xoptions == 'fill':
@@ -484,7 +484,7 @@ class xmlgtk:
                 xoptions = gtk.EXPAND | gtk.FILL
             else:
                 xoptions = 0
-            yoptions = self._xgc_attr(subnode, 'yoptions', def_yoptions)
+            yoptions = self._xgc_attr(parentnode, 'yoptions', def_yoptions)
             if yoptions == 'expand':
                 yoptions = gtk.EXPAND
             elif yoptions == 'fill':
@@ -493,9 +493,8 @@ class xmlgtk:
                 yoptions = gtk.EXPAND | gtk.FILL
             else:
                 yoptions = 0
-            xpadding = int(self._xgc_attr(subnode, 'xpadding', def_xpadding))
-            ypadding = int(self._xgc_attr(subnode, 'ypadding', def_ypadding))
-
+            xpadding = int(self._xgc_attr(parentnode, 'xpadding', def_xpadding))
+            ypadding = int(self._xgc_attr(parentnode, 'ypadding', def_ypadding))
             widget.attach(child, left, right + 1, top, bottom + 1,
                           xoptions, yoptions, xpadding, ypadding)
         return widget

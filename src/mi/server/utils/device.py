@@ -10,7 +10,13 @@ class MiDevice(object):
         self.mntdir = mntdir
         self.mntdir_fixed = self.mntdir and True or False
         self.loopmntdir = os.path.join(CF.D.MNT_ROOT, CF.D.ISOLOOP)
-        
+        self.fstype_map = CF.D.FSTYPE_MAP
+
+    
+    def get_mnt_type(self, fstype):
+        mnt_type = self.fstype_map.has_key(fstype) and self.fstype_map[fstype][0] or fstype
+        return mnt_type
+    
     def do_mount(self):
         if self.has_mounted: return True
         if not self.blk_path: logger.e('MiDevice.do_mount block path is "%s" ' % self.blk_path); return False
@@ -22,7 +28,7 @@ class MiDevice(object):
             else:
                 isopath = self.blk_path
                 mountdir = self.mntdir_fixed and self.mntdir or self.loopmntdir
-                ret, errmsg = mount_dev('iso9660', isopath, mountdir, flags='loop')
+                ret, errmsg = mount_dev(self.get_mnt_type('iso9660'), isopath, mountdir, flags='loop')
                 if not ret:
                     logger.e("LoMount %s on %s as %s failed: %s" %  (isopath, mountdir, 'iso9660', str(errmsg)))
                     return False
@@ -33,9 +39,9 @@ class MiDevice(object):
                     
         # Then treat Harddisk Device
         if not self.mntdir_fixed:
-            ret, mntdir = mount_dev(self.fstype, self.blk_path)
+            ret, mntdir = mount_dev(self.get_mnt_type(self.fstype), self.blk_path)
         else:
-            ret, mntdir = mount_dev(self.fstype, self.blk_path, self.mntdir)
+            ret, mntdir = mount_dev(self.get_mnt_type(self.fstype), self.blk_path, self.mntdir)
         if not ret:
             logger.e("MiDevice.do_mount Mount %s on %s as %s failed: %s" % \
                           (self.blk_path, mntdir, self.fstype, str(mntdir)))

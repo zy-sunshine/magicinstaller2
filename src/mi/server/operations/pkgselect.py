@@ -144,7 +144,7 @@ def pkgarr_probe(mia, operid):
             continue
         if CF.D.FSTYPE_MAP[fstype][0] == '':
             continue
-        midev = MiDevice(devpath, CF.D.FSTYPE_MAP[fstype][0])
+        midev = MiDevice(devpath, fstype)
         logger.d('Search %s pkgarr(%s) in dirs %s' % (CF.D.BOOTCDFN, CF.D.PKGARR_FILE, repr(CF.D.PKGARR_SER_HDPATH+CF.D.PKGARR_SER_CDPATH)))
         for f, reldir in midev.iter_searchfiles([CF.D.PKGARR_FILE, CF.D.BOOTCDFN], CF.D.PKGARR_SER_HDPATH+CF.D.PKGARR_SER_CDPATH):
             if f.endswith('.iso'):
@@ -152,7 +152,7 @@ def pkgarr_probe(mia, operid):
                 for pkgarr, relative_dir in midev_iso.iter_searchfiles([CF.D.PKGARR_FILE], CF.D.PKGARR_SER_CDPATH):
                     pos_id += 1
                     r = probe_position(pkgarr, 100 + pos_id,
-                        devpath, CF.D.FSTYPE_MAP[fstype][0], relative_dir, CF.D.BOOTCDFN)
+                        devpath, fstype, relative_dir, CF.D.BOOTCDFN)
                     if r:
                         r[-1] = os.path.join(reldir, r[-1]) #### revise iso relative path
                         result.append(r)
