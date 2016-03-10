@@ -1,0 +1,12 @@
+<packages>
+
+<package>
+<files>
+core/grub-common-*.xz
+</files>
+<install>
+usr/sbin/grub-install
+</install>
+</package>
+
+</packages>

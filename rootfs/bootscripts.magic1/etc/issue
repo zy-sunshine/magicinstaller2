@@ -1,0 +1,8 @@
+System:     \s
+Version:    \v
+tty:        \l
+Kernel:     \r on an \m
+Date:       \d
+Time:       \t
+User: root Passwd: magic
+

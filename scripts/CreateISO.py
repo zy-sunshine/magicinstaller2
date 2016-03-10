@@ -18,7 +18,7 @@
 
 # Usage:
 #   CreateISO.py TARGET_ISO PKG_ARR PKG_DIRS ISO_DIR DIST_NAME DIST_VER SET_NO
-#                NEED_CLEAN [BOOT_FILE]
+#                [BOOT_FILE]
 #
 #     TARGET_ISO:    The filename of the target iso.
 #     PKG_ARR:       The filename of the pkgarr.py or pkgarr.pyc.
@@ -30,9 +30,6 @@
 #     DIST_NAME:     The name of the distribution.
 #     DIST_VER:      The version of the distribution.
 #     SET_NO:        The no of the target iso.
-#     NEED_CLEAN     Whether to clean the packages directory. [clean | notclean]
-#           If NEED_CLEAN is clean, this script will clean last packages in
-#           PKG_DIRS, notclean will not do this.
 #     BOOT_FILE:     The boot image file name.
 
 import os
@@ -60,16 +57,15 @@ iso_dir       = sys.argv[4]
 dist_name     = sys.argv[5]
 dist_ver      = sys.argv[6]
 set_no        = sys.argv[7]
-need_clean    = sys.argv[8]
 
-if len(sys.argv) > 9:
-    bootload = sys.argv[9]
-    bootdir = sys.argv[10]
+if len(sys.argv) > 8:
+    bootload = sys.argv[8]
+    bootdir = sys.argv[9]
     if bootload == 'syslinux':
         boot_flags = ' '.join(('-b %s/mbboot' % bootdir,
                                '-c %s/boot.cat' % bootdir,
                                ))
-        #boot_flags = string.join(('-b', sys.argv[8],
+        #boot_flags = string.join(('-b', sys.argv[7],
         #'-c', 'miimages/boot.cat',
         #'-no-emul-boot',
         #'-boot-load-size', '2880'))
@@ -120,8 +116,6 @@ if pkg_arr != 'none':
     #         rsync_found = True
     #         break
     if not rsync_found:
-        if need_clean == 'clean':
-            os_system('rm -f %s/*' % cd_pkg_dir)
         for fn in rpm_files:
             os_system('ln -s %s %s' % (os.path.abspath(fn), cd_pkg_dir))
     else:
@@ -131,16 +125,6 @@ if pkg_arr != 'none':
         for fn in rpm_files:
             f.write(os.path.abspath(fn) + '\n')
         f.close()
-
-    if need_clean == 'clean':
-        # delete old rpms
-        basename_list = []
-        for fn in rpm_files:
-            basename_list.append(os.path.basename(fn))
-        for (dirpath, dirnames, filenames) in os.walk(cd_pkg_dir):
-            for fn in filenames:
-                if fn not in basename_list:
-                    os_system('rm -f %s' % os.path.join(dirpath, fn))
 
 os_system('mkisofs -V %s-%s-%s %s -J -T -r -f -o %s %s' % \
           (dist_name, dist_ver, set_no + 1, boot_flags,

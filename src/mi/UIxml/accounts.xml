@@ -19,17 +19,17 @@
 text="((IMPORTANT: The password of root account is the key of your system, choose it carefully please and don't forget it. Please do not use the password shorter than 3 characters for security.))"/>
           <label text="((_Root password :))"  mnemonic="rootpwd"
                  xalign="0" xoptions="none"/>
-          <entry name="rootpwd" visible="false"
+          <entry name="rootpwd" type="password"
                  value="accounts.root.password"/>
 	  <label text="((Root password _confirm :))" mnemonic="rootpwdconfirm"
 	         xalign="0" xoptions="none"/>
-	  <entry name="rootpwdconfirm" visible="false"
+	  <entry name="rootpwdconfirm" type="password"
                  value="accounts.root.passwordconfirm"/>
         </table>
       </frame>
       <label expand="true"/>
     </vbox>
-    <vbox name="others" show="false" expand="true" fill="true" spacing="8">
+    <vbox name="others" visible="false" expand="true" fill="true" spacing="8">
       <label line_wrap="true" text="((If you want to add more user, please click 'Add user'.))"/>
       <hbox spacing="4">
         <label expand="true"/>
@@ -58,11 +58,11 @@ text="((IMPORTANT: The password of root account is the key of your system, choos
            left="1" right="2" top="0" bottom="1"/>
     <label text="((_Password :))" mnemonic="password_entry"
            left="0" right="1" top="1" bottom="2"/>
-    <entry name="password_entry" visible="false" value="password"
+    <entry name="password_entry" type="password" value="password"
            left="1" right="2" top="1" bottom="2"/>
     <label text="((_Confirm Password :))" mnemonic="confirm_password_entry"
            left="0" right="1" top="2" bottom="3"/>
-    <entry name="confirm_password_entry" visible="false" value="confirm_password"
+    <entry name="confirm_password_entry" type="password" value="confirm_password"
            left="1" right="2" top="2" bottom="3"/>
     <label text="((_Shell :))" mnemonic="shell_optmenu"
            left="0" right="1" top="3" bottom="4"/>

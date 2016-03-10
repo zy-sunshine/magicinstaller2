@@ -24,9 +24,9 @@
                   clicked="change_srcpos" pack="end"/>
 	</hbox>
 	<checkbutton name="" label="((Choose _individual packages))"
-	             value="package.individual" fill="true" show="false"/>
+	             value="package.individual" fill="true" visible="false"/>
       </vbox>
-      <hbox name="pkgchoose" spacing="4" show="false" expand="true" fill="true">
+      <hbox name="pkgchoose" spacing="4" visible="false" expand="true" fill="true">
 	<list name="pkglist" value="pkglist" selection_mode="single" expand="true" fill="true">
 	  <column label="((Status))"/>
 	  <column label="((Type))"/>

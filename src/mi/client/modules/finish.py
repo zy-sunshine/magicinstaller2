@@ -3,11 +3,19 @@ from mi.client.utils import _, magicpopup
 from mi.client.utils import magicstep
 
 class MIStep_finish (magicstep.magicstep):
+    NAME = 'finish'
+    LABEL = _("Finish")
     def __init__(self, rootobj):
         magicstep.magicstep.__init__(self, rootobj, 'finish.xml', 'finish')
+        self.rootobj = rootobj
+        
+    def enter(self):
+        self.rootobj.btnnext_sensitive(False)
+        self.rootobj.btnback_sensitive(False)
+        return 1
 
     def get_label(self):
-        return _("Finish")
+        return self.LABEL
 
     def btnfinish_clicked(self, widget, data):
         self.default_btnfinish_clicked(widget, data)

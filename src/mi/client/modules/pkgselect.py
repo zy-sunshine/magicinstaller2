@@ -3,32 +3,50 @@ import os
 from mi.client.utils import _
 from mi.client.utils import magicstep, magicpopup
 from mi.utils.common import STAT
+from mi.utils.exception import MiNotSatisfied
 from xml.dom.minidom import Document
 from mi.utils.miconfig import MiConfig
 CF = MiConfig.get_instance()
 from mi.server.utils import logger
 dolog = logger.info
 
-class MIStep_pkgselect (magicstep.magicstepgroup):
+class MIStep_pkgselect(magicstep.magicstepgroup):
+    NAME = 'pkgselect'
+    LABEL = _("Package Select")
     def __init__(self, rootobj):
         magicstep.magicstepgroup.__init__(self, rootobj, 'pkgselect.xml',
                                           ['toplevel', 'pkgchoose'], 'steps')
         self.pa_choose = None
+        self.sself = rootobj
 
     def get_label(self):
-        return  _("Package Select")
+        return self.LABEL
 
     def startup_action(self):
-        self.rootobj.tm.add_action(_('Probe windows partition', None, None, 'pkgarr_probe', ''))
+        self.startup_flag = True
+        def check_data(tdata):
+            if not tdata:
+                return False
+            if type(tdata) not in (list, tuple):
+                return False
+            for d in tdata:
+                if (type(d) not in (list, tuple)):
+                    return False
+            return True
         
+        def resp_pkgarr_probe(tdata, data):
+            logger.i('resp_pkgarr_probe result %s' % tdata)
+            if not check_data(tdata):
+                msg = _('Can not get packages info (pkgarr_probe)')+'''RESULT TYPE %s VALUE: %s''' % (type(tdata), tdata)
+                logger.e(msg)
+                self.sself.warn_dialog(msg)
+            CF.G.pkgarr_probe_result = tdata
+            CF.G.pkgarr_probe_status = STAT.OP_STATUS_DONE
         CF.G.pkgarr_probe_status = STAT.OP_STATUS_DOING
-        if not os.path.isdir(CF.G.path_allpa):
-            os.makedirs(CF.G.path_allpa)
-        self.rootobj.tm.add_action(_('Search package information'),
-                                   self.got_pkgarr_probe_result, None,
-                                   'pkgarr_probe', CF.G.all_orig_part)
-        
-        
+        self.rootobj.tm.add_action(_('Search package information'), 
+                                   resp_pkgarr_probe, None, 
+                                   'pkgarr_probe')
+
     def popup_srcpos_dialog(self):
         valdoc = Document()
         self.srcpos_value_doc = valdoc
@@ -36,19 +54,23 @@ class MIStep_pkgselect (magicstep.magicstepgroup):
         valdoc.appendChild(topele)
         valtopele = valdoc.createElement('srcposlist')
         topele.appendChild(valtopele)
-        for (pafile, dev, fstype, reldir, isofn) in CF.G.pkgarr_probe_result:
-            rowele = valdoc.createElement('row')
-            rowele.setAttribute('c0', pafile)
-            rowele.setAttribute('c1', dev)
-            rowele.setAttribute('c2', fstype)
-            rowele.setAttribute('c3', '/' + reldir)
-            rowele.setAttribute('c4', isofn)
-            valtopele.appendChild(rowele)
+        try:
+            for (pafile, dev, fstype, reldir, isofn) in CF.G.pkgarr_probe_result:
+                rowele = valdoc.createElement('row')
+                rowele.setAttribute('c0', pafile)
+                rowele.setAttribute('c1', dev)
+                rowele.setAttribute('c2', fstype)
+                rowele.setAttribute('c3', '/' + reldir)
+                rowele.setAttribute('c4', isofn)
+                valtopele.appendChild(rowele)
+        except:
+            raise MiNotSatisfied('''Can not get information from CF.G.pkgarr_probe_result 
+                 TYPE %s VALUE: %s''' % (type(CF.G.pkgarr_probe_result), CF.G.pkgarr_probe_result))
         self.srcpos_dialog = magicpopup.magicpopup( \
             self, self.uixmldoc, _('You want fetch packages from...'),
             magicpopup.magicpopup.MB_OK, 'srcpos.dialog', 'srcpos_')
-        self.srcpos_dialogger.topwin.set_size_request(480, 320)
-        self.srcpos_dialogger.fill_values(topele)
+        self.srcpos_dialog.topwin.set_size_request(480, 320)
+        self.srcpos_dialog.fill_values(topele)
 
     def tryload_file(self, patuple):
         (pafile, dev, fstype, reldir, isofn) = patuple
@@ -88,18 +110,19 @@ class MIStep_pkgselect (magicstep.magicstepgroup):
         self.pa_choose = pafile
         self.name_map['srcpos_show'].set_text(os.path.join(dev, reldir, isofn))
         CF.G.choosed_patuple = patuple
+        logger.i('CF.G.choosed_patuple set to %s' % CF.G.choosed_patuple)
         return 1
 
     def srcpos_ok_clicked(self, widget, data):
         (model, iter) = \
-                self.srcpos_dialogger.name_map['srcposlist_treeview'].get_selection().get_selected()
+                self.srcpos_dialog.name_map['srcposlist_treeview'].get_selection().get_selected()
         if iter:
             pafile = model.get_value(iter, 0)
             for patuple in CF.G.pkgarr_probe_result:
                 if patuple[0] == pafile:
                     break
             if self.tryload_file(patuple):
-                self.srcpos_dialogger.topwin.destroy()
+                self.srcpos_dialog.topwin.destroy()
             else:
                 magicpopup.magicmsgbox(None,
                                        _('Load the choosed package arrangement failed!'),
@@ -127,12 +150,11 @@ class MIStep_pkgselect (magicstep.magicstepgroup):
                                    magicpopup.magicpopup.MB_OK)
             return 0
         if len(CF.G.pkgarr_probe_result) > 1:
-            dolog("CF.G.pkgarr_probe_result: %s" % CF.G.pkgarr_probe_result)
-            popup = 'true'
+            popup = True
             if self.pa_choose:
                 for result in CF.G.pkgarr_probe_result:
                     if self.pa_choose == result[0]:
-                        popup = None
+                        popup = False
                         break
             if popup:
                 self.popup_srcpos_dialog()

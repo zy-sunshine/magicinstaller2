@@ -1,0 +1,65 @@
+#!/bin/bash
+## Note: this script run in chroot target system.
+# parameters: <rootpasswd> [ user1 passwd1  shell1 homedir1  realuid ] [ ... and other users list ]
+# <rootpasswd> is the password
+# <user1> is the first user's name
+# <passwd1> first user's password
+# <shell1>  first user's shell
+# <homedir1> first user's home directory
+# <realuid>  first user's uid, if automatic allocate uid the value is "Auto"
+# And other user list same as first user
+
+shopt -s extglob
+
+rootpasswd=$1
+
+shift
+result=0
+function runcmd(){
+    echo "$@"
+    $@
+    ret=$?
+    [ $ret != 0 ] && result=$ret
+}
+
+function change_pass(){
+    user=$1
+    pass=$2
+    echo passwd $user
+    echo $pass | passwd --stdin $user
+    ret=$?
+    [ $ret != 0 ] && result=0
+}
+
+if [ "x$rootpasswd" != "x" ]; then
+    change_pass root $rootpasswd
+fi
+
+args=("$@")
+for ((i=0; i < $#; i=i+5)) {
+    idx=$i
+    user=${args[$idx]}
+    idx=$i+1
+    passwd=${args[$idx]}
+    idx=$i+2
+    shell=${args[$idx]}
+    idx=$i+3
+    homedir=${args[$idx]}
+    idx=$i+4
+    realuid=${args[$idx]}
+    uidopt=
+    if [ "$realuid" == "Auto" ]; then
+        uidopt=""
+    elif [ "x$realuid" != "x" ]; then
+        uidopt="-u $realuid"
+    else
+        uidopt=""
+    fi
+    echo adduser $user $passwd $shell $homedir $realuid
+    runcmd useradd -s $shell -d $homedir $uidopt -G users,uucp,audio,disk,video $user
+    change_pass $user $pass
+
+}
+
+exit $result
+

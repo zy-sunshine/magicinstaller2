@@ -15,8 +15,8 @@
   </hbox>
 
   <hbox margin="4" spacing="4">
-    <label name="mi_step_label" show="false"/>
-    <progressbar name="mi_step" pack="start" expand="true" fill="true" show="false"/>
+    <label name="mi_step_label" visible="false"/>
+    <progressbar name="mi_step" pack="start" expand="true" fill="true" visible="false"/>
   </hbox>
   <hbox name="mi_action" margin="4" spacing="8">
     <button name="btnlogger" clicked="btnlogger_clicked" pack="start">
@@ -61,12 +61,5 @@
     </button>
   </hbox>
 </vbox>
-</whole><themedlg>
-  <vbox>
-    <label line_wrap="true" fill="true"
-           text="((Click the button to choose the theme that you like.))"/>
-    <hbox name="themes" expand="true" fill="true">
-      <image file="images/gnome-ccthemes.png" fill="true"/>
-    </hbox>
-  </vbox>
-</themedlg></main>
+</whole>
+</main>

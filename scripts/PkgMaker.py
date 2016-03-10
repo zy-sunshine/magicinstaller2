@@ -27,6 +27,7 @@ class BaseMaker(object):
                    '.tar.bz2'   : 'tar -jxf %(srcfile)s -C %(destdir)s',
                    '.tbz2'      : 'tar -jxf %(srcfile)s -C %(destdir)s',
                    '.tar'       : 'tar -xf %(srcfile)s -C %(destdir)s',
+                   '.xz'       : 'tar -xf %(srcfile)s -C %(destdir)s',
                    '.zip'       : 'unzip -q %(srcfile)s -d %(destdir)s',
                    '.rpm'       : 'rpm2cpio %(srcfile)s' + \
                         ' | (cd %(destdir)s; cpio -i --make-directories)',
@@ -71,8 +72,10 @@ class StepMaker(BaseMaker):
     BUILD = ''
     ROOT = ''
     steps = []
+    alias = ''
     def __init__(self, env):
         self.env = env.Clone()
+        self.alias = self.alias or self.name
 
     def initenv(self):
         env = self.env
@@ -95,9 +98,11 @@ class StepMaker(BaseMaker):
         self.initenv()
         env = self.env
         self.source_list, self.build_cmds = self.all_steps()
-        env.Command(self.target_list,
+        c0 = env.Command(self.target_list,
                     self.source_list,
                     self.build_cmds)
+        if self.alias:
+            env.Alias(self.alias, c0)
 
 class BasePkgMaker(BaseMaker):
     # Package Info

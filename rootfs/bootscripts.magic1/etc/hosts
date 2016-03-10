@@ -1,0 +1,4 @@
+# Do not remove the following line, or various programs
+# that require network functionality will fail.
+127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
+# <192.168.1.1> <HOSTNAME.example.org> [alias1] [alias2 ...]

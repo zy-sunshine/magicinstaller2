@@ -1,0 +1,30 @@
+--- /home/zhangyang09/workspace/yum/yum/rpmsack.py	2012-09-30 12:43:41.188470307 +0800
++++ rpmsack.py	2012-10-03 01:59:19.394721117 +0800
+@@ -337,7 +337,8 @@
+         #  We are keeping some data from before, and sometimes (Eg. remove only)
+         # we never open the rpmdb again ... so get the mtime now.
+         rpmdbfname  = self.root + "/var/lib/rpm/Packages"
+-        self._cached_rpmdb_mtime = os.path.getmtime(rpmdbfname)
++        if os.path.exists(rpmdbfname):
++            self._cached_rpmdb_mtime = os.path.getmtime(rpmdbfname)
+ 
+         def _safe_del(x, y):
+             """ Make sure we never traceback here, because it screws our yumdb
+@@ -1074,6 +1075,7 @@
+                     return None
+                 rpmdbv = fo.readline()[:-1]
+                 self._have_cached_rpmdbv_data  = rpmdbv
++
+         return self._have_cached_rpmdbv_data
+ 
+     def _put_cached_simpleVersion_main(self, rpmdbv):
+@@ -1282,7 +1284,8 @@
+         self._tup2pkg[po.pkgtup] = po
+         if self.__cache_rpmdb__ and self._cached_rpmdb_mtime is None:
+             rpmdbfname  = self.root + "/var/lib/rpm/Packages"
+-            self._cached_rpmdb_mtime = os.path.getmtime(rpmdbfname)
++            if os.path.exists(rpmdbfname):
++                self._cached_rpmdb_mtime = os.path.getmtime(rpmdbfname)
+ 
+         return po
+         

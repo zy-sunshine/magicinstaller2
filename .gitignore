@@ -9,13 +9,12 @@ initial_data.json
 .pydevproject
 /bindir
 /out
-/spec
 /tmp
 /result
 /.settings
 .sconsign.dblite
 build
-
+!/build
 
 src/etc/X11/xorg.conf
 src/etc/init.d/apply-dbgopts

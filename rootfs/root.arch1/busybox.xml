@@ -1,0 +1,10 @@
+<packages>
+
+<package>
+<files>community/busybox-*.xz</files>
+<install>
+bin/busybox
+</install>
+</package>
+
+</packages>

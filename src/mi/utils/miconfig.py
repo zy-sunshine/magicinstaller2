@@ -1,6 +1,7 @@
 import os
 import threading
-import simplejson as json
+#import simplejson as json
+import json
 from mi.utils import printer
 
 class MiConfig_SubCategory(object):
@@ -67,7 +68,9 @@ class MiConfig(object):
         printer.d('MiConfig.save_to_file --> %s\n' % conf_file)
         confobj = self.__dict__['confobj']
         with open(conf_file, 'w') as configfile:
-            json.dump(self.__dict__['confobj'], fp=configfile, indent=4)
+            with open(conf_file+'raw', 'w')  as f:
+                f.write(repr(self.__dict__['confobj']))
+            json.dump(self.__dict__['confobj'], fp=configfile, indent=4, ensure_ascii=False)
         
     def load_from_file(self, conf_file):
         printer.d('MiConfig.load_from_file --> %s\n' % conf_file)

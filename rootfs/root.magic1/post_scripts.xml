@@ -1,0 +1,9 @@
+<packages>
+
+<package>
+<post_action>
+sudo chroot $ROOT /sbin/ldconfig
+</post_action>
+</package>
+
+</packages>

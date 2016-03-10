@@ -1,0 +1,34 @@
+#!/bin/sh
+########################################################################
+# Begin $rc_base/init.d/udev_retry
+#
+# Description : Udev cold-plugging script (retry)
+#
+# Authors     : Alexander E. Patrakov
+#
+# Version     : 00.02
+#
+# Notes       :
+#
+########################################################################
+
+. /etc/sysconfig/rc
+. ${rc_functions}
+
+case "${1}" in
+    start)
+        boot_mesg "Retrying failed uevents, if any..."
+
+        mdev -s
+        echo '/sbin/mdev' > /proc/sys/kernel/hotplug
+
+        evaluate_retval
+        ;;
+
+    *)
+        echo "Usage ${0} {start}"
+        exit 1
+        ;;
+esac
+
+# End $rc_base/init.d/udev_retry

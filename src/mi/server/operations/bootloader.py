@@ -3,6 +3,7 @@ import os, sys, time, string
 from mi import getdev
 from mi.utils.common import mount_dev, umount_dev
 from mi.utils.miconfig import MiConfig
+from mi.server.utils.device import MiDevice
 CF = MiConfig.get_instance()
 
 from mi.utils.miregister import MiRegister
@@ -11,25 +12,7 @@ register = MiRegister()
 from mi.server.utils import logger
 dolog = logger.info
 
-@register.server_handler('long')
-def do_mkinitrd(mia, operid, dummy):
-    mia.set_step(operid, 0, -1)
-    os.system('rm -f %s' % os.path.join(CF.D.TGTSYS_ROOT, 'boot', CF.D.INITRD_FN))
-    os.system('sync')
-    
-    time.sleep(1)
-    # Remove Dirty Work
-    #os.system('cp -f %s/tmp/fstab.* %s/etc/fstab' % (CF.D.TGTSYS_ROOT, CF.D.TGTSYS_ROOT))
-    if CF.D.USEUDEV:
-        os.system('cp -f %s/etc/fstab %s/etc/mtab' % (CF.D.TGTSYS_ROOT, CF.D.TGTSYS_ROOT)) # make udev happy
-    #dolog('/sbin/mkinitrd --fstab=/etc/fstab /boot/%s %s\n' % (CF.D.INITRD_FN, CF.D.DISTKERNELVER))
-    #os.system('/usr/sbin/chroot %s /sbin/mkinitrd --fstab=/etc/fstab /boot/%s %s' % (CF.D.TGTSYS_ROOT, CF.D.INITRD_FN, CF.D.DISTKERNELVER))
-    dolog('/sbin/new-kernel-pkg --install --mkinitrd --depmod %s\n' % CF.D.DISTKERNELVER)
-    os.system('/usr/sbin/chroot %s /sbin/new-kernel-pkg --install --mkinitrd --depmod %s' % (CF.D.TGTSYS_ROOT, CF.D.DISTKERNELVER))
-    return 0
-
-@register.server_handler('long')
-def prepare_grub(mia, operid, timeout, usepassword, password,
+def _prepare_grub(mia, operid, timeout, usepassword, password,
                  lba, options, entrylist, default, instpos, bootdev, mbrdev, windev, winfs):
     def get_grub_device_map():
         """The content of grub device map file is:
@@ -85,8 +68,12 @@ def prepare_grub(mia, operid, timeout, usepassword, password,
     mia.set_step(operid, 0, -1)
 
     device_map = get_grub_device_map()
+    
+    # eg. (10, 'false', '', 'false', 'vga=791 splash=silent,fadein,theme:default console=tty1', '', 'mbr', '', '/dev/sda', '', '')
     dolog('(timeout, usepassword, password, lba, options, default, instpos, bootdev, mbrdev, windev, winfs) = %s\n' % \
           str((timeout, usepassword, password, lba, options, default, instpos, bootdev, mbrdev, windev, winfs)))
+    
+    # eg. entrylist = [['', '/dev/sda2', 'true']]
     dolog('entrylist = %s\n' % str(entrylist))
 
     #has_dos = len(entrylist) == 2
@@ -118,37 +105,37 @@ def prepare_grub(mia, operid, timeout, usepassword, password,
                 grubsetupdev = windev
 
             if grubdev == None or grubsetupdev == None:
-                return 1 # Install grub failed.
+                return 1, _('Install grub failed') # Install grub failed.
 
             # init new bootsplash
             text = text + '\troot %s\n' % grubdev
             text = text + '\tkernel %s  ro root=%s %s\n' % \
-                   (os.path.join('/', grubpath, CF.D.KERNEL_FN), dev, options)
+                   (os.path.join('/', grubpath, CF.D.TARGET_KERNEL_FN), dev, options)
             text = text + '\tinitrd %s\n' % \
-                   (os.path.join('/', grubpath, CF.D.INITRD_FN))
+                   (os.path.join('/', grubpath, CF.D.TARGET_INITRD_FN))
 
             # normal graphics
             #text = text + 'title %s (Graphics Mode)\n' % label
             #text = text + '\troot %s\n' % grubdev
             #text = text + '\tkernel %s init 5 ro root=%s %s\n' % \
-            #       (os.path.join('/', grubpath, CF.D.KERNEL_FN), dev, options)
+            #       (os.path.join('/', grubpath, CF.D.TARGET_KERNEL_FN), dev, options)
             #text = text + '\tinitrd %s\n' % \
-            #       (os.path.join('/', grubpath, CF.D.INITRD_FN))
+            #       (os.path.join('/', grubpath, CF.D.TARGET_INITRD_FN))
             # add by yourfeng for init 3 init 1 init 5
             #init console
             #text = text + 'title %s (Console Mode)\n' % label
             #text = text + '\troot %s\n' % grubdev
             #text = text + '\tkernel %s init 3 ro root=%s %s\n' % \
-            #        (os.path.join('/', grubpath, CF.D.KERNEL_FN), dev, options)
+            #        (os.path.join('/', grubpath, CF.D.TARGET_KERNEL_FN), dev, options)
             #text = text + '\tinitrd %s\n' % \
-            #       (os.path.join('/', grubpath, CF.D.INITRD_FN))
+            #       (os.path.join('/', grubpath, CF.D.TARGET_INITRD_FN))
             #init 1
             text = text + 'title %s (Single Mode)\n' % label
             text = text + '\troot %s\n' % grubdev
             text = text + '\tkernel %s single ro root=%s %s\n' % \
-                   (os.path.join('/', grubpath, CF.D.KERNEL_FN), dev, options)
+                   (os.path.join('/', grubpath, CF.D.TARGET_KERNEL_FN), dev, options)
             text = text + '\tinitrd %s\n' % \
-                   (os.path.join('/', grubpath, CF.D.INITRD_FN))
+                   (os.path.join('/', grubpath, CF.D.TARGET_INITRD_FN))
 
         if default_or_not == 'true':
             default_number = number
@@ -159,7 +146,7 @@ def prepare_grub(mia, operid, timeout, usepassword, password,
     if instpos == 'win':
         ret, win_mntdir = mount_dev(winfs, windev)
         if not ret:
-            return 1
+            return 1, _('Install position on windows partition(%s) failed!' % windev)
         #grubdir = os.path.join(win_mntdir, 'grub')
         grubdir = win_mntdir        # Put it in the root 
     else:
@@ -230,12 +217,12 @@ def prepare_grub(mia, operid, timeout, usepassword, password,
         os.system('cp -a %s %s/' % ('/usr/share/grldr',
                                    win_mntdir))
         umount_dev(win_mntdir)
-        return 0
+        return 0, ''
 
     else:
         if os.path.exists('/tmpfs/debug/nobootloader'):
             dolog('TURN ON: nobootloader\n')
-            return 0
+            return 0, ''
         # Get the command arguments for grub.
         #floppy = kudzu.probe(kudzu.CLASS_FLOPPY,
         #                     kudzu.BUS_IDE | kudzu.BUS_SCSI | kudzu.BUS_MISC,
@@ -259,8 +246,8 @@ def prepare_grub(mia, operid, timeout, usepassword, password,
                   (os.path.join(CF.D.TGTSYS_ROOT, 'usr/lib/grub'),
                    os.path.join(CF.D.TGTSYS_ROOT, 'boot/grub')))
         os.system('sync')
-                   
-        return (grubdev, grubsetupdev, grubopt)
+        
+        return 0, (grubdev, grubsetupdev, grubopt)
 
 # Setup grub with all of the partitions mounted as readonly.
 # grub makes use of raw devices instead of filesystems that the operation
@@ -268,7 +255,8 @@ def prepare_grub(mia, operid, timeout, usepassword, password,
 # inconsistency may corrupt the filesystems. So I have to run grub without
 # any target partitions mounted for security.
 @register.server_handler('long')
-def setup_grub(mia, operid, grubdev, grubsetupdev, grubopt):
+def setup_grub(mia, operid, timeout, usepassword, password,
+                 lba, options, entrylist, default, instpos, bootdev, mbrdev, windev, winfs):
     def check_grub_result(filename):
         try:
             r = 1
@@ -284,7 +272,11 @@ def setup_grub(mia, operid, grubdev, grubsetupdev, grubopt):
             return  r
         except Exception, errmsg:
             return  None
-
+    ret, msg = _prepare_grub(mia, operid, timeout, usepassword, password, lba, options, entrylist, default, instpos, bootdev, mbrdev, windev, winfs)
+    if ret != 0:
+        return ret, msg
+    
+    (grubdev, grubsetupdev, grubopt) = msg
     # install grub
     grub_result = '/tmpfs/grub.%d.result'
     for sleep_time in [1, 2, 4, 8, 16, 32]:
@@ -300,7 +292,7 @@ def setup_grub(mia, operid, grubdev, grubsetupdev, grubopt):
             break
         os.system('sync')
         time.sleep(sleep_time)
-    return 0
+    return 0, ''
 
 ## setup_lilo is not debug and not finished.
 #@register.server_handler('long')
@@ -328,7 +320,7 @@ def setup_grub(mia, operid, grubdev, grubsetupdev, grubopt):
 #            text = text + '\toptional\n'
 #            text = text + 'label=%s\n' % label
 #        else:
-#            text = 'image=/boot/%s\n' % CF.D.KERNEL_FN
+#            text = 'image=/boot/%s\n' % CF.D.TARGET_KERNEL_FN
 #            text = text + '\tlabel=%s\n' % label
 #            text = text + '\tread-only\n'
 #            text = text + '\troot=%s\n' % dev
@@ -365,15 +357,17 @@ def win_probe(mia, operid, hdpartlist):
         if fstype not in CF.D.FSTYPE_MAP or \
                CF.D.FSTYPE_MAP[fstype][0] not in ('vfat', 'ntfs', 'ntfs-3g'):
             continue
-        ret, mntdir = mount_dev(CF.D.FSTYPE_MAP[fstype][0], device)
-        if ret:
-            if os.path.exists(os.path.join(mntdir, 'bootmgr')):
+        dev = MiDevice(device, fstype)
+        notfind = True
+        for absolute_path, reltive_dir in dev.iter_searchfiles(['bootmgr', 'ntldr', 'io.sys'], ['']):
+            if os.path.basename(absolute_path) == 'bootmgr':
                 result.append((new_device, 'vista/7'))
-            elif os.path.exists(os.path.join(mntdir, 'ntldr')):
+            elif os.path.basename(absolute_path) == 'ntldr':
                 result.append((new_device, 'winnt'))
-            elif os.path.exists(os.path.join(mntdir, 'io.sys')):
+            elif os.path.basename(absolute_path) == 'io.sys':
                 result.append((new_device, 'win98'))
-            else:
-                 result.append((new_device, 'win'))
-            umount_dev(mntdir)
+            notfind = False
+            
+        if notfind:
+            result.append((new_device, 'win'))
     return result

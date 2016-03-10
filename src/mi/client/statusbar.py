@@ -15,7 +15,7 @@ class MIStatusBar(gtk.HBox):
         self.pack_start(arrowup, False, True)
         self.pack_start(arrowdown, False, True)
         self.pack_start(self.progress, True, True)
-        
+        self.show_all()
     def get_progressbar(self):
         return self.progress
     

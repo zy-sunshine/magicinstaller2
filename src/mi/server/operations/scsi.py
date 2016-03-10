@@ -17,7 +17,7 @@ def get_all_scsi_modules():
                 the_list.append(os.path.splitext(bn)[0])
 
     scsi_module_list = []
-    os.path.walk(os.path.join('/lib/modules', CF.D.KERNELVER, 'kernel/drivers/scsi'),
+    os.path.walk(os.path.join('/lib/modules', CF.D.MI_KERNELVER, 'kernel/drivers/scsi'),
                  scan_scsi_module_dir, scsi_module_list)
     return  scsi_module_list
 

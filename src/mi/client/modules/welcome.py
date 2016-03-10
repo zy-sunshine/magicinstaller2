@@ -3,6 +3,8 @@ from mi.client.utils import _
 from mi.client.utils import magicstep, magicpopup
 
 class MIStep_welcome (magicstep.magicstep):
+    NAME = 'welcome'
+    LABEL = _("Welcome")
     def __init__(self, rootobj):
         self.substeps = [('welcome', False, ''),
                          ('license', True, 'license'),
@@ -14,7 +16,7 @@ class MIStep_welcome (magicstep.magicstep):
         self.cancel_data = None
 
     def get_label(self):
-        return  _("Welcome")
+        return self.LABEL
 
     def subswitch(self, substep):
         self.substep = substep

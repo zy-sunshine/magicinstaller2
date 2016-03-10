@@ -1,0 +1,10 @@
+<packages>
+
+<package>
+<files>extra/strace-*.xz</files>
+<install>
+usr/bin/strace
+</install>
+</package>
+
+</packages>

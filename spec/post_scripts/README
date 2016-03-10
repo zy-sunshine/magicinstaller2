@@ -1,0 +1,17 @@
+规则：
+
+magicinstaller 在特定步骤会执行这里面的相应脚本完成系统安装配置工作。
+遵守如下规则
+1. 现规定 3 个主要脚本，分别为
+ genfstab 生成目标系统 fstab , 执行环境为 MI 系统环境
+ geninitrd 生成目标系统 initrd, 执行环境为 chroot 进入目标系统环境
+ post_grub{x} 安装目标系统 grub, 配置 grub config 文件 (目前只有post_grub2), 执行环境为 chroot 进入目标系统环境
+ post_install 在所有操作完成后会执行这个脚本，脚本中是一些调整现有系统缺陷的命令, 执行环境为 chroot 进入目标系统环境
+
+2. magicinstaller 会根据不同的脚本传入一些必要的参数，参数的定义已经写在每个脚本中，请查看。
+
+3. 这些脚本运行时的 cwd 是 post_scripts 所在目录, 所以可以直接调用其他同目录下的相关脚本。
+
+4. 怎样调试
+ 本目录中有一个 magic-chroot.sh 脚本，chroot 进入目标系统执行相应的环境脚本, 调试。
+ 

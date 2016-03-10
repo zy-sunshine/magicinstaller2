@@ -42,6 +42,9 @@ class magicstep (xmlgtk.xmlgtk):
         self.pypath = ''
         
     def init(self):
+        '''
+        Note: not be used
+        '''
         print 'init %d' % self.stepid
         if self.stepid > 0 and self.confdir:
             preconf = os.path.join(self.confdir, 'step%s.xml' % (self.stepid - 1))
@@ -52,6 +55,9 @@ class magicstep (xmlgtk.xmlgtk):
                 self.uixml_path, self.pypath))
         
     def fini(self):
+        '''
+        Note: not be used
+        '''
         print 'fini %d' % self.stepid
         curconf = os.path.join(self.confdir, 'step%s.xml' % self.stepid)
         print curconf

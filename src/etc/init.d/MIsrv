@@ -8,7 +8,7 @@
 # Start some services for magicinstaller.
 boot_mesg -n "Start tftpd service for magicinstaller..." ${INFO}
 boot_mesg -n "" ${NORMAL}
-/etc/init.d/tftpd
+#/etc/init.d/tftpd
 evaluate_retval
 if [ ${?} != 0 ]; then
     > /tmp/MIsrv.failed

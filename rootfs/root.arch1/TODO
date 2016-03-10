@@ -1,0 +1,8 @@
+post_scripts:
+    remove *.pc files
+    remove *.a files
+
+remove systemd (check it)
+
+make X work
+
